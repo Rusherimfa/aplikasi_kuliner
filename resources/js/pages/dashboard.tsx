@@ -76,7 +76,7 @@ function getStatusColor(status: string) {
     }
 }
 
-export default function Dashboard() {
+export default function Dashboard() {git
     return (
         <>
             <Head title="Staff Dashboard - Command Center" />
