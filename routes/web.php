@@ -11,11 +11,12 @@ Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
 Route::get('/catalog', [PublicCatalogController::class, 'catalog'])->name('catalog');
 Route::get('/experience', [PublicCatalogController::class, 'experience'])->name('experience');
 
-// Public reservations (requires login, but belongs to default team technically)
-Route::middleware(['auth', config('jetstream.auth_session'), 'verified'])->group(function () {
-    Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
-    Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
-});
+// Public reservations (no login required)
+Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
+
+// Checkout (Public)
+Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
 
 Route::middleware(['auth', 'verified'])
     ->group(function () {

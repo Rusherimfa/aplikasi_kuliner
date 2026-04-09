@@ -66,4 +66,12 @@ class PublicCatalogController extends Controller
     {
         return Inertia::render('experience/index');
     }
+
+    /**
+     * Display the Checkout static page.
+     */
+    public function checkout()
+    {
+        return Inertia::render('checkout/index');
+    }
 }

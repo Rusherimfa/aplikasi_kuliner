@@ -4,9 +4,9 @@ import { login } from '@/routes';
 
 export default function Footer() {
     return (
-        <footer className="bg-slate-950 text-slate-400">
+        <footer className="bg-[#FAFAFA] text-slate-600 border-t border-slate-200/60">
             {/* Top decorative line */}
-            <div className="h-px bg-gradient-to-r from-transparent via-amber-600/30 to-transparent" />
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
 
             <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
@@ -16,11 +16,11 @@ export default function Footer() {
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-lg shadow-amber-900/30">
                                 <UtensilsCrossed size={20} />
                             </span>
-                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-white">
-                                Resto<span className="text-amber-500">Web</span>
+                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900">
+                                Resto<span className="text-amber-600">Web</span>
                             </span>
                         </div>
-                        <p className="mb-8 max-w-sm text-sm leading-loose text-slate-500">
+                        <p className="mb-8 max-w-sm text-sm leading-loose text-slate-600">
                             Destinasi kuliner di mana tradisi bertemu inovasi. Kami membuat setiap hidangan dengan niat,
                             setiap momen dengan perhatian.
                         </p>
@@ -33,7 +33,7 @@ export default function Footer() {
                                 <a
                                     key={i}
                                     href={href}
-                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/5 text-slate-400 transition-all duration-300 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400"
+                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600"
                                 >
                                     <Icon size={16} />
                                 </a>
@@ -43,7 +43,7 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-white uppercase">
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-slate-900 uppercase">
                             Navigasi
                         </h4>
                         <ul className="space-y-4 text-sm">
@@ -56,7 +56,7 @@ export default function Footer() {
                                 <li key={link.label}>
                                     <Link
                                         href={link.href}
-                                        className="group inline-flex items-center gap-1.5 text-slate-500 transition-all hover:text-amber-400"
+                                        className="group inline-flex items-center gap-1.5 text-slate-600 transition-all hover:text-amber-600"
                                     >
                                         {link.label}
                                         <ArrowUpRight
@@ -71,7 +71,7 @@ export default function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-white uppercase">Kontak</h4>
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-slate-900 uppercase">Kontak</h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
                                 <MapPin size={14} className="mt-0.5 shrink-0 text-amber-500" />
@@ -96,14 +96,14 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs sm:flex-row">
-                    <p className="text-slate-600">© {new Date().getFullYear()} RestoWeb. Hak cipta dilindungi.</p>
+                <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-8 text-xs sm:flex-row">
+                    <p className="text-slate-500">© {new Date().getFullYear()} RestoWeb. Hak cipta dilindungi.</p>
                     <div className="flex gap-6">
                         {['Kebijakan Privasi', 'Syarat Ketentuan'].map((label) => (
                             <a
                                 key={label}
                                 href="#"
-                                className="text-slate-600 transition-colors hover:text-amber-400"
+                                className="text-slate-500 transition-colors hover:text-amber-600"
                             >
                                 {label}
                             </a>

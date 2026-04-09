@@ -22,8 +22,9 @@ class ReservationController extends Controller
             ->map(function ($reservation) {
                 return [
                     'id' => $reservation->id,
-                    'user_name' => $reservation->user->name,
-                    'user_email' => $reservation->user->email,
+                    'customer_name' => $reservation->customer_name ?? $reservation->user?->name ?? 'Guest',
+                    'customer_email' => $reservation->customer_email ?? $reservation->user?->email,
+                    'customer_phone' => $reservation->customer_phone,
                     'date' => $reservation->date,
                     'time' => $reservation->time,
                     'guest_count' => $reservation->guest_count,
@@ -51,6 +52,9 @@ class ReservationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'required|string|max:20',
             'date' => 'required|date|after_or_equal:today',
             'time' => 'required|date_format:H:i',
             'guest_count' => 'required|integer|min:1|max:20',
@@ -64,7 +68,10 @@ class ReservationController extends Controller
 
         Reservation::create([
             'team_id' => $defaultTeam->id,
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id(), // Still store if logged in
+            'customer_name' => $validated['customer_name'],
+            'customer_email' => $validated['customer_email'],
+            'customer_phone' => $validated['customer_phone'],
             'date' => $validated['date'],
             'time' => $validated['time'],
             'guest_count' => $validated['guest_count'],

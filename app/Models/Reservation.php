@@ -16,6 +16,9 @@ class Reservation extends Model
     protected $fillable = [
         'team_id',
         'user_id',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
         'date',
         'time',
         'guest_count',

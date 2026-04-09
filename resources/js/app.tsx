@@ -1,6 +1,7 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
+import { CartProvider } from '@/hooks/use-cart';
 import AppLayout from '@/layouts/app-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -29,7 +30,11 @@ createInertiaApp({
     },
     strictMode: true,
     withApp(app) {
-        return <TooltipProvider delayDuration={0}>{app}</TooltipProvider>;
+        return (
+            <CartProvider>
+                <TooltipProvider delayDuration={0}>{app}</TooltipProvider>
+            </CartProvider>
+        );
     },
     progress: {
         color: '#4B5563',

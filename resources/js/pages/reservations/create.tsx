@@ -16,6 +16,9 @@ export default function CreateReservation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
+        customer_name: '',
+        customer_email: '',
+        customer_phone: '',
         date: '',
         time: '',
         guest_count: 2,
@@ -31,7 +34,7 @@ export default function CreateReservation() {
         <>
             <Head title="Pesan Meja - RestoWeb" />
 
-            <div className="flex min-h-screen flex-col bg-[#0A0A0B] font-['Inter',sans-serif] text-slate-300 selection:bg-amber-500/30 selection:text-amber-200 md:flex-row">
+            <div className="flex min-h-screen flex-col bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-600 selection:bg-amber-100 selection:text-amber-900 md:flex-row">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -40,13 +43,13 @@ export default function CreateReservation() {
                 />
 
                 {/* Left Side: Editorial Banner */}
-                <div className="relative hidden flex-col justify-end overflow-hidden bg-[#0A0A0B] p-12 shadow-2xl md:flex md:w-1/2">
+                <div className="relative hidden flex-col justify-end overflow-hidden bg-slate-900 p-12 shadow-2xl md:flex md:w-1/2">
                     <img
                         src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2670&auto=format&fit=crop"
                         alt="Meja Restoran"
-                        className="absolute inset-0 h-full w-full object-cover opacity-20 transition-transform duration-10000 hover:scale-105"
+                        className="absolute inset-0 h-full w-full object-cover opacity-[0.85] transition-transform duration-10000 hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/40 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
                     
                     <div className="relative z-10 max-w-lg pb-12">
                         <span className="mb-4 block text-sm font-medium tracking-widest text-amber-500 uppercase">
@@ -55,11 +58,11 @@ export default function CreateReservation() {
                         <h1 className="mb-6 font-['Playfair_Display',serif] text-5xl leading-tight font-bold text-white lg:text-6xl">
                             Meja Anda Menanti
                         </h1>
-                        <p className="mb-8 text-lg font-light text-white/60">
+                        <p className="mb-8 text-lg font-light text-white/80">
                             Pesan tempat Anda untuk malam gastronomi yang tak terlupakan. Kami menyiapkan setiap detail hingga sempurna bahkan sebelum Anda tiba.
                         </p>
-                        <div className="flex items-center gap-4 text-white/30">
-                            <div className="h-px flex-1 bg-white/10"></div>
+                        <div className="flex items-center gap-4 text-white/40">
+                            <div className="h-px flex-1 bg-white/20"></div>
                             <span className="text-xs font-semibold tracking-widest uppercase">
                                 RestoWeb
                             </span>
@@ -68,22 +71,65 @@ export default function CreateReservation() {
                 </div>
 
                 {/* Right Side: Booking Form */}
-                <div className="relative flex w-full flex-col items-center justify-center bg-[#0A0A0B] p-6 pt-32 pb-24 md:w-1/2 md:p-12 lg:p-24">
-                    <div className="absolute inset-0 bg-gradient-to-b from-amber-900/5 to-transparent opacity-50 md:hidden"></div>
+                <div className="relative flex w-full flex-col items-center justify-center bg-white p-6 pt-32 pb-24 md:w-1/2 md:p-12 lg:p-24 shadow-[-20px_0_40px_rgb(0,0,0,0.02)]">
+                    <div className="absolute inset-0 bg-gradient-to-b from-amber-50/50 to-transparent opacity-50 md:hidden"></div>
 
                     <div className="relative z-10 w-full max-w-md">
                         <div className="mb-10 text-center md:text-left">
-                            <h2 className="mb-3 font-['Playfair_Display',serif] text-3xl font-bold text-white">
+                            <h2 className="mb-3 font-['Playfair_Display',serif] text-3xl font-bold text-slate-900">
                                 Detail Reservasi
                             </h2>
-                            <p className="text-sm text-white/50">
+                            <p className="text-sm text-slate-500">
                                 Silakan isi formulir di bawah ini. Untuk rombongan lebih dari 20 orang, hubungi kami secara langsung.
                             </p>
                         </div>
 
                         <form onSubmit={submit} className="space-y-6">
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm font-medium text-slate-700">Nama Lengkap</label>
+                                    <Input
+                                        type="text"
+                                        placeholder="Nama Lengkap Anda"
+                                        value={data.customer_name}
+                                        onChange={(e) => setData('customer_name', e.target.value)}
+                                        className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
+                                        required
+                                    />
+                                    {errors.customer_name && <p className="mt-1 text-xs text-red-500">{errors.customer_name as string}</p>}
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-700">Email Utama</label>
+                                        <Input
+                                            type="email"
+                                            placeholder="you@example.com"
+                                            value={data.customer_email}
+                                            onChange={(e) => setData('customer_email', e.target.value)}
+                                            className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
+                                            required
+                                        />
+                                        {errors.customer_email && <p className="mt-1 text-xs text-red-500">{errors.customer_email as string}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="text-sm font-medium text-slate-700">No. WhatsApp</label>
+                                        <Input
+                                            type="tel"
+                                            placeholder="+62 8..."
+                                            value={data.customer_phone}
+                                            onChange={(e) => setData('customer_phone', e.target.value)}
+                                            className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
+                                            required
+                                        />
+                                        {errors.customer_phone && <p className="mt-1 text-xs text-red-500">{errors.customer_phone as string}</p>}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <hr className="border-slate-200" />
+
                             <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                                     <Calendar size={16} className="text-amber-500" />
                                     Tanggal
                                 </label>
@@ -92,18 +138,18 @@ export default function CreateReservation() {
                                     min={new Date().toISOString().split('T')[0]}
                                     value={data.date}
                                     onChange={(e) => setData('date', e.target.value)}
-                                    className="h-14 rounded-2xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus:border-amber-500/50 focus:bg-white/10 focus:ring-amber-500/50"
+                                    className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
                                     required
-                                    style={{ colorScheme: 'dark' }}
+                                    style={{ colorScheme: 'light' }}
                                 />
                                 {errors.date && (
-                                    <p className="mt-1 text-xs text-red-400">{errors.date}</p>
+                                    <p className="mt-1 text-xs text-red-500">{errors.date}</p>
                                 )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                                         <Clock size={16} className="text-amber-500" />
                                         Waktu
                                     </label>
@@ -111,16 +157,16 @@ export default function CreateReservation() {
                                         type="time"
                                         value={data.time}
                                         onChange={(e) => setData('time', e.target.value)}
-                                        className="h-14 rounded-2xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus:border-amber-500/50 focus:bg-white/10 focus:ring-amber-500/50"
+                                        className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
                                         required
-                                        style={{ colorScheme: 'dark' }}
+                                        style={{ colorScheme: 'light' }}
                                     />
                                     {errors.time && (
-                                        <p className="mt-1 text-xs text-red-400">{errors.time}</p>
+                                        <p className="mt-1 text-xs text-red-500">{errors.time}</p>
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm font-medium text-white/80">
+                                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
                                         <Users size={16} className="text-amber-500" />
                                         Tamu
                                     </label>
@@ -130,18 +176,18 @@ export default function CreateReservation() {
                                         max="20"
                                         value={data.guest_count}
                                         onChange={(e) => setData('guest_count', parseInt(e.target.value))}
-                                        className="h-14 rounded-2xl border-white/10 bg-white/5 px-4 text-white placeholder:text-white/30 focus:border-amber-500/50 focus:bg-white/10 focus:ring-amber-500/50"
+                                        className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
                                         required
                                     />
                                     {errors.guest_count && (
-                                        <p className="mt-1 text-xs text-red-400">{errors.guest_count}</p>
+                                        <p className="mt-1 text-xs text-red-500">{errors.guest_count}</p>
                                     )}
                                 </div>
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-white/80">
-                                    Catatan Tambahan <span className="font-normal text-white/30">(Opsional)</span>
+                                <label className="text-sm font-medium text-slate-700">
+                                    Catatan Tambahan <span className="font-normal text-slate-400">(Opsional)</span>
                                 </label>
                                 <Textarea
                                     placeholder="Alergi, hari jadi, preferensi meja khusus..."
@@ -149,17 +195,17 @@ export default function CreateReservation() {
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                                         setData('special_requests', e.target.value)
                                     }
-                                    className="min-h-[120px] resize-none rounded-3xl border-white/10 bg-white/5 p-4 text-white placeholder:text-white/30 focus:border-amber-500/50 focus:bg-white/10 focus:ring-amber-500/50"
+                                    className="min-h-[120px] resize-none rounded-3xl border-slate-200 bg-white p-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
                                 />
                                 {errors.special_requests && (
-                                    <p className="mt-1 text-xs text-red-400">{errors.special_requests}</p>
+                                    <p className="mt-1 text-xs text-red-500">{errors.special_requests}</p>
                                 )}
                             </div>
 
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/40 transition-all duration-300 hover:from-amber-400 hover:to-amber-600 disabled:opacity-70"
+                                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all duration-300 hover:scale-105 hover:from-amber-400 hover:to-amber-600 disabled:opacity-70"
                             >
                                 Konfirmasi Pemesanan 
                                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
