@@ -1,32 +1,39 @@
 import { Link } from '@inertiajs/react';
-import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
 import { login } from '@/routes';
 
 export default function Footer() {
     return (
-        <footer className="border-t border-slate-200 bg-white text-slate-500">
-            <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <footer className="bg-slate-950 text-slate-400">
+            {/* Top decorative line */}
+            <div className="h-px bg-gradient-to-r from-transparent via-amber-600/30 to-transparent" />
+
+            <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
                     {/* Brand */}
                     <div className="lg:col-span-2">
-                        <div className="mb-4 flex items-center gap-2">
-                            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white">
+                        <div className="mb-5 flex items-center gap-3">
+                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-lg shadow-amber-900/30">
                                 <UtensilsCrossed size={20} />
                             </span>
-                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900">
-                                Resto<span className="text-amber-700">Web</span>
+                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-white">
+                                Resto<span className="text-amber-500">Web</span>
                             </span>
                         </div>
-                        <p className="mb-6 max-w-xs text-sm leading-relaxed text-slate-500">
-                            A culinary destination where tradition meets innovation. We craft every dish with intention, every
-                            moment with care.
+                        <p className="mb-8 max-w-sm text-sm leading-loose text-slate-500">
+                            Destinasi kuliner di mana tradisi bertemu inovasi. Kami membuat setiap hidangan dengan niat,
+                            setiap momen dengan perhatian.
                         </p>
                         <div className="flex gap-3">
-                            {[Instagram, Twitter, Facebook].map((Icon, i) => (
+                            {[
+                                { Icon: Instagram, href: '#' },
+                                { Icon: Twitter, href: '#' },
+                                { Icon: Facebook, href: '#' },
+                            ].map(({ Icon, href }, i) => (
                                 <a
                                     key={i}
-                                    href="#"
-                                    className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all duration-300 hover:bg-amber-700 hover:text-white"
+                                    href={href}
+                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/8 bg-white/5 text-slate-400 transition-all duration-300 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-400"
                                 >
                                     <Icon size={16} />
                                 </a>
@@ -36,20 +43,26 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="mb-5 text-sm font-semibold tracking-wider text-slate-900 uppercase">Navigation</h4>
-                        <ul className="space-y-3 text-sm">
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-white uppercase">
+                            Navigasi
+                        </h4>
+                        <ul className="space-y-4 text-sm">
                             {[
-                                { label: 'Our Menu', href: '/catalog' },
-                                { label: 'Reserve a Table', href: '/reservations/create' },
-                                { label: 'The Experience', href: '/experience' },
-                                { label: 'Staff Login', href: login().url },
+                                { label: 'Menu Kami', href: '/catalog' },
+                                { label: 'Pesan Meja', href: '/reservations/create' },
+                                { label: 'Pengalaman', href: '/experience' },
+                                { label: 'Login Staf', href: login().url },
                             ].map((link) => (
                                 <li key={link.label}>
                                     <Link
                                         href={link.href}
-                                        className="inline-block transition-all hover:translate-x-1 hover:text-amber-700"
+                                        className="group inline-flex items-center gap-1.5 text-slate-500 transition-all hover:text-amber-400"
                                     >
                                         {link.label}
+                                        <ArrowUpRight
+                                            size={12}
+                                            className="opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                        />
                                     </Link>
                                 </li>
                             ))}
@@ -58,37 +71,43 @@ export default function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h4 className="mb-5 text-sm font-semibold tracking-wider text-slate-900 uppercase">Contact</h4>
-                        <ul className="space-y-3 text-sm">
-                            <li className="flex items-start gap-2">
-                                <MapPin size={15} className="mt-0.5 shrink-0 text-amber-600" />
-                                <span>Jl. Sudirman No. 123, Jakarta Pusat 10220</span>
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-white uppercase">Kontak</h4>
+                        <ul className="space-y-4 text-sm">
+                            <li className="flex items-start gap-3">
+                                <MapPin size={14} className="mt-0.5 shrink-0 text-amber-500" />
+                                <span className="text-slate-500 leading-relaxed">
+                                    Jl. Sudirman No. 123, Jakarta Pusat 10220
+                                </span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <Phone size={15} className="shrink-0 text-amber-600" />
-                                <span>(021) 555-0123</span>
+                            <li className="flex items-center gap-3">
+                                <Phone size={14} className="shrink-0 text-amber-500" />
+                                <span className="text-slate-500">(021) 555-0123</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <Mail size={15} className="shrink-0 text-amber-600" />
-                                <span>hello@restoweb.id</span>
+                            <li className="flex items-center gap-3">
+                                <Mail size={14} className="shrink-0 text-amber-500" />
+                                <span className="text-slate-500">hello@restoweb.id</span>
                             </li>
-                            <li className="flex items-center gap-2">
-                                <Clock size={15} className="shrink-0 text-amber-600" />
-                                <span>Daily 11:00 AM – 11:00 PM</span>
+                            <li className="flex items-center gap-3">
+                                <Clock size={14} className="shrink-0 text-amber-500" />
+                                <span className="text-slate-500">Setiap Hari 11:00 – 23:00</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-                    <p>© {new Date().getFullYear()} RestoWeb. All rights reserved.</p>
+                {/* Bottom bar */}
+                <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/5 pt-8 text-xs sm:flex-row">
+                    <p className="text-slate-600">© {new Date().getFullYear()} RestoWeb. Hak cipta dilindungi.</p>
                     <div className="flex gap-6">
-                        <a href="#" className="hover:text-amber-700 transition-colors">
-                            Privacy Policy
-                        </a>
-                        <a href="#" className="hover:text-amber-700 transition-colors">
-                            Terms of Service
-                        </a>
+                        {['Kebijakan Privasi', 'Syarat Ketentuan'].map((label) => (
+                            <a
+                                key={label}
+                                href="#"
+                                className="text-slate-600 transition-colors hover:text-amber-400"
+                            >
+                                {label}
+                            </a>
+                        ))}
                     </div>
                 </div>
             </div>

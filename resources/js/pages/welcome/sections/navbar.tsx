@@ -1,7 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { UtensilsCrossed, Menu as MenuIcon, X, ChevronRight } from 'lucide-react';
+import { UtensilsCrossed, Menu as MenuIcon, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { login } from '@/routes';
+import { useEffect, useState } from 'react';
 
 interface NavbarProps {
     auth: any;
@@ -11,122 +12,155 @@ interface NavbarProps {
 }
 
 export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMenuOpen }: NavbarProps) {
+    const [scrolled, setScrolled] = useState(false);
+
+    useEffect(() => {
+        const onScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [mobileMenuOpen]);
+
     return (
-        <nav className="fixed top-0 z-50 w-full border-b border-slate-200/50 bg-white/80 backdrop-blur-md">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="flex h-20 items-center justify-between">
+        <>
+            {/* Desktop & Mobile Pill Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 p-4 transition-all duration-500 sm:p-6 lg:p-8 pointer-events-none">
+                <nav
+                    className={`mx-auto flex h-16 max-w-6xl items-center justify-between pointer-events-auto rounded-full border px-4 pl-6 transition-all duration-500 sm:px-6 sm:pl-8 ${
+                        scrolled || mobileMenuOpen
+                            ? 'border-white/10 bg-[#0A0A0B]/80 shadow-2xl backdrop-blur-2xl'
+                            : 'border-white/10 bg-white/[0.02] backdrop-blur-sm'
+                    }`}
+                >
                     {/* Logo */}
-                    <Link href="/" className="flex shrink-0 items-center gap-2">
-                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white shadow-sm">
-                            <UtensilsCrossed size={20} />
+                    <Link href="/" className="group flex shrink-0 items-center gap-3 outline-none" onClick={() => setMobileMenuOpen(false)}>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-amber-500/40">
+                            <UtensilsCrossed size={14} />
                         </span>
-                        <span className="font-['Playfair_Display',serif] text-2xl font-bold tracking-tight text-slate-900">
-                            Resto
-                            <span className="text-amber-700">Web</span>
+                        <span className="font-['Playfair_Display',serif] text-xl font-semibold tracking-wide text-white">
+                            Resto<span className="text-amber-500 italic">Web</span>
                         </span>
                     </Link>
 
                     {/* Desktop nav */}
-                    <div className="hidden flex-1 items-center justify-center gap-8 md:flex">
-                        <Link
-                            href="/catalog"
-                            className="text-sm font-medium text-slate-600 transition-colors hover:text-amber-700"
-                        >
-                            Our Menu
-                        </Link>
-                        <Link
-                            href="/reservations/create"
-                            className="text-sm font-medium text-slate-600 transition-colors hover:text-amber-700"
-                        >
-                            Reservations
-                        </Link>
-                        <Link
-                            href="/experience"
-                            className="text-sm font-medium text-slate-600 transition-colors hover:text-amber-700"
-                        >
-                            The Experience
-                        </Link>
+                    <div className="hidden flex-1 items-center justify-center space-x-2 md:flex">
+                        {[
+                            { href: '/catalog', label: 'Menu Kami' },
+                            { href: '/reservations/create', label: 'Reservasi' },
+                            { href: '/experience', label: 'Pengalaman' },
+                        ].map((link) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-all duration-300 hover:bg-white/10 hover:text-white"
+                            >
+                                {link.label}
+                            </Link>
+                        ))}
                     </div>
 
                     {/* Desktop CTA */}
-                    <div className="hidden shrink-0 items-center gap-4 md:flex">
+                    <div className="hidden shrink-0 items-center gap-3 md:flex">
                         {auth.user ? (
                             <Link href={dashboardUrl}>
                                 <Button
                                     variant="outline"
-                                    className="rounded-full border-slate-300 px-6 font-medium hover:bg-slate-50"
+                                    className="h-10 rounded-full border-white/20 bg-white/5 px-6 text-sm font-medium text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:border-white/30"
                                 >
-                                    Go to Dashboard
+                                    Ke Dasbor
                                 </Button>
                             </Link>
                         ) : (
                             <>
                                 <Link
                                     href={login().url}
-                                    className="text-sm font-medium text-slate-600 transition-colors hover:text-slate-900"
+                                    className="rounded-full px-4 py-2 text-sm font-medium text-white/70 transition-colors hover:text-white"
                                 >
-                                    Staff Login
+                                    Login Staf
                                 </Link>
                                 <Link href="/reservations/create">
-                                    <Button className="rounded-full bg-amber-700 px-6 font-medium text-white shadow-lg shadow-amber-900/10 hover:bg-amber-800">
-                                        Book a Table
+                                    <Button className="h-10 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 px-6 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 transition-all duration-300 hover:scale-105 hover:shadow-amber-500/30">
+                                        Pesan Meja
                                     </Button>
                                 </Link>
                             </>
                         )}
                     </div>
 
-                    {/* Mobile hamburger */}
+                    {/* Mobile menu toggle */}
                     <button
-                        className="rounded-lg p-2 text-slate-600 transition-colors hover:bg-slate-100 md:hidden"
+                        className="flex h-10 w-10 items-center justify-center rounded-full text-white/80 transition-all duration-300 hover:bg-white/10 hover:text-white md:hidden ml-4"
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         aria-label="Toggle menu"
                     >
-                        {mobileMenuOpen ? <X size={24} /> : <MenuIcon size={24} />}
+                        {mobileMenuOpen ? <X size={20} /> : <MenuIcon size={20} />}
                     </button>
-                </div>
-            </div>
+                </nav>
+            </header>
 
-            {/* Mobile Menu */}
-            {mobileMenuOpen && (
-                <div className="space-y-4 border-t border-slate-100 bg-white px-4 py-6 shadow-lg md:hidden">
-                    <Link
-                        href="/catalog"
-                        className="flex items-center justify-between py-2 font-medium text-slate-700"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Our Menu <ChevronRight size={16} className="text-slate-400" />
-                    </Link>
-                    <Link
-                        href="/reservations/create"
-                        className="flex items-center justify-between py-2 font-medium text-slate-700"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        Reservations <ChevronRight size={16} className="text-slate-400" />
-                    </Link>
-                    <Link
-                        href="/experience"
-                        className="flex items-center justify-between py-2 font-medium text-slate-700"
-                        onClick={() => setMobileMenuOpen(false)}
-                    >
-                        The Experience <ChevronRight size={16} className="text-slate-400" />
-                    </Link>
-                    <div className="flex flex-col gap-3 border-t border-slate-100 pt-4">
-                        <Link href="/reservations/create" onClick={() => setMobileMenuOpen(false)}>
-                            <Button className="w-full rounded-full bg-amber-700 text-white hover:bg-amber-800">
-                                Book a Table
+            {/* Premium Full-screen Mobile Overlay */}
+            <div
+                className={`fixed inset-0 z-40 flex flex-col justify-center bg-[#0A0A0B]/95 px-8 pt-20 pb-12 backdrop-blur-3xl transition-all duration-500 md:hidden ${
+                    mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+                }`}
+            >
+                {/* Decorative floating lights for the menu */}
+                <div className="pointer-events-none absolute left-0 top-1/4 h-64 w-64 rounded-full bg-amber-600/10 blur-[100px]" />
+                <div className="pointer-events-none absolute right-0 bottom-1/4 h-64 w-64 rounded-full bg-amber-800/10 blur-[100px]" />
+                
+                <div className="relative z-10 flex flex-col items-center gap-10">
+                    <div className="flex flex-col items-center gap-8 space-y-2">
+                        {[
+                            { href: '/catalog', label: 'Menu Kami' },
+                            { href: '/reservations/create', label: 'Reservasi' },
+                            { href: '/experience', label: 'Pengalaman' },
+                        ].map((link, i) => (
+                            <Link
+                                key={link.href}
+                                href={link.href}
+                                className="group relative font-['Playfair_Display',serif] text-4xl font-medium text-white/70 transition-colors duration-300 hover:text-amber-400"
+                                onClick={() => setMobileMenuOpen(false)}
+                                style={{ transitionDelay: `${i * 100}ms` }}
+                            >
+                                {link.label}
+                                <span className="absolute -bottom-2 left-1/2 h-0.5 w-0 -translate-x-1/2 rounded-full bg-amber-500 transition-all duration-300 group-hover:w-full" />
+                            </Link>
+                        ))}
+                    </div>
+
+                    <div className="mt-12 flex w-full max-w-sm flex-col gap-4">
+                        <Link href="/reservations/create" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                            <Button className="h-14 w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/30 transition-all duration-300 hover:scale-105 hover:from-amber-400 hover:to-amber-600">
+                                Pesan Meja Sekarang
                             </Button>
                         </Link>
-                        {!auth.user && (
-                            <Link href={login().url} onClick={() => setMobileMenuOpen(false)}>
-                                <Button variant="outline" className="w-full rounded-full border-slate-300">
-                                    Staff Login
+                        {!auth.user ? (
+                            <Link href={login().url} className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                                <Button variant="outline" className="h-14 w-full rounded-full border-white/20 bg-transparent text-base font-medium text-white transition-all hover:bg-white/10 hover:border-white/30">
+                                    Login Area Staf
+                                </Button>
+                            </Link>
+                        ) : (
+                            <Link href={dashboardUrl} className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                                <Button variant="outline" className="h-14 w-full rounded-full border-white/20 bg-transparent text-base font-medium text-white transition-all hover:bg-white/10 hover:border-white/30">
+                                    Ke Dasbor
                                 </Button>
                             </Link>
                         )}
                     </div>
                 </div>
-            )}
-        </nav>
+            </div>
+        </>
     );
 }

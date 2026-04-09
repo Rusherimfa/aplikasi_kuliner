@@ -5,65 +5,85 @@ import { Button } from '@/components/ui/button';
 const HOW_IT_WORKS = [
     {
         step: '01',
-        title: 'Choose Your Date',
-        desc: 'Pick your preferred date and time for an evening to remember.',
+        title: 'Pilih Tanggal Anda',
+        desc: 'Pilih tanggal dan waktu yang Anda inginkan untuk malam yang tak terlupakan.',
     },
     {
         step: '02',
-        title: 'Make a Reservation',
-        desc: 'Fill in your details and any special requests through our simple form.',
+        title: 'Buat Reservasi',
+        desc: 'Isi detail Anda dan permintaan khusus melalui formulir sederhana kami.',
     },
     {
         step: '03',
-        title: 'Get Confirmed',
-        desc: "We'll confirm your booking within 2 hours via email or WhatsApp.",
+        title: 'Dapatkan Konfirmasi',
+        desc: "Kami akan mengonfirmasi pemesanan Anda dalam 2 jam melalui email atau WhatsApp.",
     },
     {
         step: '04',
-        title: 'Enjoy the Experience',
-        desc: 'Arrive and let us take care of everything else. Sit back and indulge.',
+        title: 'Nikmati Pengalaman',
+        desc: 'Datanglah dan biarkan kami mengatur semuanya. Duduk santai dan nikmati.',
     },
 ];
 
 export default function HowItWorks() {
     return (
-        <section className="bg-white py-24">
+        <section className="relative overflow-hidden bg-[#F8F5F0] py-28">
+            {/* Decorative top divider */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
+
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="mb-16 text-center">
-                    <span className="mb-3 block text-xs font-medium tracking-widest text-amber-700 uppercase">
-                        Simple & Easy
+                {/* Header */}
+                <div className="mb-20 text-center">
+                    <span className="mb-4 inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 uppercase">
+                        Sederhana & Mudah
                     </span>
-                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900">
-                        How to Reserve a Table
+                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 md:text-5xl">
+                        Cara Memesan Meja
                     </h2>
-                    <p className="mx-auto max-w-xl text-slate-500">
-                        In just four simple steps, secure your place at one of the most sought-after dining tables in the
-                        city.
+                    <p className="mx-auto max-w-xl text-slate-500 text-lg">
+                        Hanya dalam empat langkah mudah, amankan tempat Anda di salah satu meja makan paling dicari di
+                        kota ini.
                     </p>
                 </div>
 
+                {/* Steps */}
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
                     {HOW_IT_WORKS.map((step, idx) => (
-                        <div key={step.step} className="group relative text-center">
+                        <div key={step.step} className="group relative">
+                            {/* Connecting line (desktop only) */}
                             {idx < HOW_IT_WORKS.length - 1 && (
-                                <div className="absolute top-8 left-[60%] z-0 hidden h-px w-full bg-gradient-to-r from-slate-200 to-transparent lg:block" />
+                                <div className="absolute top-10 left-[calc(50%+2.5rem)] z-0 hidden h-px w-[calc(100%-5rem)] bg-gradient-to-r from-amber-300/60 to-transparent lg:block" />
                             )}
-                            <div className="relative z-10 mb-5 inline-flex h-16 w-16 items-center justify-center rounded-full border-2 border-amber-200 bg-amber-50 font-['Playfair_Display',serif] text-2xl font-bold text-amber-800 transition-all duration-300 group-hover:border-amber-700 group-hover:bg-amber-700 group-hover:text-white">
-                                {step.step}
+
+                            {/* Step card */}
+                            <div className="relative z-10 flex flex-col items-center text-center">
+                                {/* Step circle */}
+                                <div className="relative mb-6 flex h-20 w-20 items-center justify-center">
+                                    <div className="absolute inset-0 rounded-full bg-amber-100 transition-all duration-500 group-hover:bg-amber-600" />
+                                    <div className="absolute inset-2 rounded-full border-2 border-dashed border-amber-300 transition-all duration-500 group-hover:border-amber-400/50" />
+                                    <span className="relative font-['Playfair_Display',serif] text-2xl font-bold text-amber-800 transition-colors duration-500 group-hover:text-white">
+                                        {step.step}
+                                    </span>
+                                </div>
+
+                                <h3 className="mb-3 text-lg font-bold text-slate-900 transition-colors group-hover:text-amber-700">
+                                    {step.title}
+                                </h3>
+                                <p className="text-sm leading-relaxed text-slate-500">{step.desc}</p>
                             </div>
-                            <h3 className="mb-2 text-lg font-semibold text-slate-900">{step.title}</h3>
-                            <p className="text-sm leading-relaxed text-slate-500">{step.desc}</p>
                         </div>
                     ))}
                 </div>
 
+                {/* CTA */}
                 <div className="mt-16 text-center">
                     <Link href="/reservations/create">
                         <Button
                             size="lg"
-                            className="h-14 rounded-full bg-amber-700 px-10 text-base text-white shadow-xl shadow-amber-900/15 hover:bg-amber-800"
+                            className="group h-14 rounded-full bg-gradient-to-r from-amber-600 to-amber-800 px-12 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all hover:scale-105 hover:shadow-amber-900/30"
                         >
-                            Book Your Table Now <ArrowRight className="ml-2 h-4 w-4" />
+                            Pesan Meja Anda Sekarang{' '}
+                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>
                     </Link>
                 </div>
