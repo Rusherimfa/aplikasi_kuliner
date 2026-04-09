@@ -17,8 +17,7 @@ Route::middleware(['auth', config('jetstream.auth_session'), 'verified'])->group
     Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 });
 
-Route::prefix('{current_team}')
-    ->middleware(['auth', 'verified', EnsureTeamMembership::class])
+Route::middleware(['auth', 'verified'])
     ->group(function () {
         Route::inertia('dashboard', 'dashboard')->name('dashboard');
 

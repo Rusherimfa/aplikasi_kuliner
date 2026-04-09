@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, FolderGit2, LayoutGrid, Utensils, Calendar, PieChart, Settings } from 'lucide-react';
 import AppLogo from '@/components/app/app-logo';
 import { NavFooter } from '@/components/app/nav-footer';
 import { NavMain } from '@/components/app/nav-main';
@@ -29,20 +29,34 @@ export function AppSidebar() {
             href: dashboardUrl,
             icon: LayoutGrid,
         },
-    ];
-
-    const footerNavItems: NavItem[] = [
         {
-            title: 'Repository',
-            href: 'https://github.com/laravel/react-starter-kit',
-            icon: FolderGit2,
+            title: 'Pesanan Aktif',
+            href: '#',
+            icon: Utensils,
         },
         {
-            title: 'Documentation',
-            href: 'https://laravel.com/docs/starter-kits#react',
+            title: 'Manajemen Menu',
+            href: '#',
             icon: BookOpen,
         },
+        {
+            title: 'Meja & Reservasi',
+            href: '#',
+            icon: Calendar,
+        },
+        {
+            title: 'Laporan Penjualan',
+            href: '#',
+            icon: PieChart,
+        },
+        {
+            title: 'Pengaturan Resto',
+            href: '#',
+            icon: Settings,
+        },
     ];
+
+    const footerNavItems: NavItem[] = [];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

@@ -16,6 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { dashboard as dashboardRoute } from '@/routes';
 
 // Mock Data for the UI
@@ -135,7 +136,7 @@ export default function Dashboard() {
         <>
             <Head title="Dasbor Staf — Pusat Komando" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto bg-slate-50/80 p-6 font-['Inter',sans-serif]">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto text-white font-['Inter',sans-serif]">
                 {/* Header */}
                 <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
@@ -143,16 +144,16 @@ export default function Dashboard() {
                             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-md shadow-amber-900/20">
                                 <Sparkles size={15} />
                             </div>
-                            <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                            <h1 className="text-2xl font-bold tracking-tight text-white">
                                 Ringkasan Hari Ini
                             </h1>
                         </div>
-                        <p className="mt-1 text-sm text-slate-500">
+                        <p className="mt-1 text-sm text-white/50">
                             Kelola pesanan, meja, dan lacak kinerja restoran.
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" className="rounded-xl border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50">
+                        <Button variant="outline" className="rounded-xl border-white/10 bg-white/5 text-white shadow-sm hover:bg-white/10">
                             <Clock className="mr-2 h-4 w-4" />
                             Riwayat Shift
                         </Button>
@@ -167,19 +168,19 @@ export default function Dashboard() {
                     {METRICS.map((metric) => {
                         const Icon = metric.icon;
                         return (
-                            <Card key={metric.label} className="overflow-hidden border-0 bg-white shadow-sm ring-1 ring-slate-900/5">
+                            <Card key={metric.label} className="overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl">
                                 {/* Top accent bar */}
                                 <div className={`h-1 w-full bg-gradient-to-r ${metric.gradient}`} />
                                 <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4">
-                                    <CardTitle className="text-sm font-medium text-slate-500">
+                                    <CardTitle className="text-sm font-medium text-white/60">
                                         {metric.label}
                                     </CardTitle>
-                                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${metric.bgLight}`}>
+                                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-white/5`}>
                                         <Icon className={`h-4 w-4 ${metric.iconColor}`} />
                                     </div>
                                 </CardHeader>
                                 <CardContent>
-                                    <div className="text-2xl font-bold text-slate-900">{metric.value}</div>
+                                    <div className="text-2xl font-bold text-white">{metric.value}</div>
                                     <p className={`mt-1 flex items-center gap-1 text-xs ${
                                         metric.subPositive === true
                                             ? 'text-emerald-600'
@@ -199,15 +200,15 @@ export default function Dashboard() {
                 {/* Main Grid */}
                 <div className="grid flex-1 gap-6 lg:grid-cols-3">
                     {/* Table Status */}
-                    <Card className="col-span-full overflow-hidden border-0 bg-white shadow-sm ring-1 ring-slate-900/5 lg:col-span-2">
-                        <CardHeader className="border-b border-slate-100 pb-4">
+                    <Card className="col-span-full overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl lg:col-span-2">
+                        <CardHeader className="border-b border-white/5 pb-4">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
                                         <Users size={16} className="text-amber-600" />
                                         Status Ruang Makan
                                     </CardTitle>
-                                    <CardDescription className="mt-1">
+                                    <CardDescription className="mt-1 text-white/50">
                                         Ringkasan ketersediaan meja waktu nyata.
                                     </CardDescription>
                                 </div>
@@ -274,13 +275,13 @@ export default function Dashboard() {
                     </Card>
 
                     {/* Recent Orders */}
-                    <Card className="col-span-full flex flex-col overflow-hidden border-0 bg-white shadow-sm ring-1 ring-slate-900/5 lg:col-span-1">
-                        <CardHeader className="border-b border-slate-100 pb-4">
-                            <CardTitle className="flex items-center gap-2 text-base font-semibold text-slate-900">
+                    <Card className="col-span-full flex flex-col overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl lg:col-span-1">
+                        <CardHeader className="border-b border-white/5 pb-4">
+                            <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
                                 <ChefHat size={16} className="text-amber-600" />
                                 Tiket Terbaru
                             </CardTitle>
-                            <CardDescription>Pesanan masuk langsung dari semua zona.</CardDescription>
+                            <CardDescription className="mt-1 text-white/50">Pesanan masuk langsung dari semua zona.</CardDescription>
                         </CardHeader>
                         <CardContent className="flex-1 pt-4">
                             <div className="space-y-3">
@@ -343,11 +344,4 @@ export default function Dashboard() {
     );
 }
 
-Dashboard.layout = (props: { currentTeam?: { slug: string } | null }) => ({
-    breadcrumbs: [
-        {
-            title: 'Dashboard',
-            href: props.currentTeam ? dashboardRoute(props.currentTeam.slug) : '/',
-        },
-    ],
-});
+Dashboard.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;

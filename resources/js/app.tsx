@@ -2,6 +2,7 @@ import { createInertiaApp } from '@inertiajs/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
+import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
@@ -12,12 +13,15 @@ createInertiaApp({
     layout: (name) => {
         switch (true) {
             case name === 'welcome' || name === 'welcome/index':
+            case name.startsWith('experience'):
+            case name.startsWith('menu'):
+            case name.startsWith('reservations'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
             case name.startsWith('teams/'):
-                return [AppLayout, SettingsLayout];
+                return [AppHeaderLayout, SettingsLayout];
             default:
                 return AppLayout;
         }

@@ -11,7 +11,7 @@ import Navbar from '../welcome/sections/navbar';
 
 export default function CreateReservation() {
     const { auth, currentTeam } = usePage().props as any;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
+    const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({

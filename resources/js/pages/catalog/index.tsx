@@ -27,7 +27,7 @@ interface PageProps {
 
 export default function CatalogIndex({ menus, filters }: PageProps) {
     const { auth, currentTeam } = usePage().props as any;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
+    const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const [activeCategory, setActiveCategory] = useState(

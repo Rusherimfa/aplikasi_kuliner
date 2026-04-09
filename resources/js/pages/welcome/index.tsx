@@ -19,7 +19,7 @@ export default function Welcome({
     bestSellers?: any[];
 }) {
     const { auth, currentTeam } = usePage().props;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
+    const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (

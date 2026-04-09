@@ -10,7 +10,7 @@ import Footer from '../welcome/sections/footer';
 
 export default function Experience() {
     const { auth, currentTeam } = usePage().props as any;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
+    const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
