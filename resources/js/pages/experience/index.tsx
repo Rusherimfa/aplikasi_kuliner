@@ -7,6 +7,7 @@ import { useState } from 'react';
 // Layout Shared Components
 import Navbar from '../welcome/sections/navbar';
 import Footer from '../welcome/sections/footer';
+import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function Experience() {
     const { auth, currentTeam } = usePage().props as any;
@@ -129,6 +130,8 @@ export default function Experience() {
                 </main>
 
                 <Footer />
+                
+                <AIChatbot />
             </div>
         </>
     );

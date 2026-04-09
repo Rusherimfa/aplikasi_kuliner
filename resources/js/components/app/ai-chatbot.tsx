@@ -1,0 +1,192 @@
+import { useState, useRef, useEffect } from 'react';
+import { Bot, X, Send, Sparkles, ChefHat } from 'lucide-react';
+
+interface ChatMessage {
+    id: string;
+    text: string;
+    isBot: boolean;
+}
+
+export default function AIChatbot() {
+    const [isOpen, setIsOpen] = useState(false);
+    const [messages, setMessages] = useState<ChatMessage[]>([
+        {
+            id: '1',
+            text: 'Halo! Saya RestoBot, asisten virtual Anda. Ada yang bisa saya bantu hari ini?',
+            isBot: true,
+        },
+    ]);
+    const [inputText, setInputText] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages, isTyping]);
+
+    const suggestions = [
+        'Ulasan & Rekomendasi Menu',
+        'Cara Reservasi Meja',
+        'Jam Buka Restoran',
+    ];
+
+    const generateResponse = (prompt: string) => {
+        const p = prompt.toLowerCase();
+        if (p.includes('menu') || p.includes('rekomendasi')) {
+            return 'Menu paling populer kami adalah *Wagyu A5 Striploin* dan *Truffle Lobster Risotto*. Kami sangat merekomendasikannya untuk makan malam Anda!';
+        }
+        if (p.includes('reservasi') || p.includes('pesan meja') || p.includes('rombongan')) {
+            return 'Anda dapat melakukan reservasi langsung melalui menu "Reservasi" di navigasi atas. Untuk rombongan lebih dari 20 orang, mohon hubungi kami H-3 via WhatsApp: (021) 555-0123.';
+        }
+        if (p.includes('jam') || p.includes('buka')) {
+            return 'RestoWeb buka setiap hari. Makan siang (11:00 - 15:00) dan Makan Malam (18:00 - 23:00).';
+        }
+        return 'Maaf, untuk saat ini AI saya masih dalam tahap simulasi dan hanya dapat merespon seputar Menu, Reservasi, dan Jam Operasional. Silakan hubungi staf kami untuk bantuan lebih lanjut!';
+    };
+
+    const handleSend = (text: string) => {
+        if (!text.trim()) return;
+
+        // User message
+        const newUserMsg: ChatMessage = {
+            id: Date.now().toString(),
+            text: text,
+            isBot: false,
+        };
+        
+        setMessages((prev) => [...prev, newUserMsg]);
+        setInputText('');
+        setIsTyping(true);
+
+        // Simulate network/bot delay
+        setTimeout(() => {
+            const botResponse: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                text: generateResponse(text),
+                isBot: true,
+            };
+            setMessages((prev) => [...prev, botResponse]);
+            setIsTyping(false);
+        }, 1000);
+    };
+
+    return (
+        <div className="fixed bottom-24 right-6 md:bottom-6 md:right-6 z-50 flex flex-col items-end font-['Inter',sans-serif]">
+            {isOpen ? (
+                <div className="mb-4 flex h-[65vh] max-h-[500px] sm:h-[500px] w-[calc(100vw-3rem)] sm:w-[400px] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0B]/95 shadow-2xl shadow-black backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 bg-white/5 p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-700 shadow-lg shadow-amber-900/30">
+                                <Bot size={20} className="text-white" />
+                            </div>
+                            <div>
+                                <h3 className="font-['Playfair_Display',serif] font-bold text-white text-lg leading-none">
+                                    RestoBot <span className="text-amber-500 rounded px-1.5 py-0.5 bg-amber-500/10 text-[10px] ml-1 font-sans align-middle">AI</span>
+                                </h3>
+                                <p className="text-xs text-white/50 mt-1">Asisten Daring (Simulasi)</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="flex h-8 w-8 items-center justify-center rounded-full text-white/50 hover:bg-white/10 hover:text-white transition-colors"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+
+                    {/* Chat Body */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                        {messages.map((msg) => (
+                            <div
+                                key={msg.id}
+                                className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
+                            >
+                                <div
+                                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                                        msg.isBot
+                                            ? 'bg-white/10 text-white rounded-tl-sm'
+                                            : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md shadow-amber-900/20 rounded-tr-sm'
+                                    }`}
+                                >
+                                    {msg.text}
+                                </div>
+                            </div>
+                        ))}
+                        {isTyping && (
+                            <div className="flex justify-start">
+                                <div className="bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-white/5">
+                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                </div>
+                            </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Suggestions */}
+                    {messages.length === 1 && !isTyping && (
+                        <div className="border-t border-white/5 p-3 flex flex-wrap gap-2 bg-white/[0.02]">
+                            {suggestions.map((sug) => (
+                                <button
+                                    key={sug}
+                                    onClick={() => handleSend(sug)}
+                                    className="text-[11px] font-medium border border-amber-500/30 text-amber-500/80 rounded-full px-3 py-1.5 hover:bg-amber-500/10 hover:text-amber-400 transition-colors"
+                                >
+                                    {sug}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Input Area */}
+                    <div className="border-t border-white/10 p-3 bg-[#0A0A0B]">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSend(inputText);
+                            }}
+                            className="relative flex items-center"
+                        >
+                            <input
+                                type="text"
+                                value={inputText}
+                                onChange={(e) => setInputText(e.target.value)}
+                                placeholder="Tanyakan sesuatu..."
+                                className="w-full rounded-full border border-white/10 bg-white/5 pl-4 pr-12 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                            />
+                            <button
+                                type="submit"
+                                disabled={!inputText.trim()}
+                                className="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white transition-opacity disabled:opacity-30 disabled:hover:scale-100 hover:scale-105"
+                            >
+                                <Send size={14} className="ml-0.5" />
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            ) : (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-900/40 hover:scale-105 transition-all duration-300"
+                >
+                    <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity blur-sm"></div>
+                    <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-500 to-amber-700 rounded-full">
+                        <Sparkles size={16} className="absolute top-3 right-3 text-white/80" />
+                        <Bot size={24} className="text-white relative z-10" />
+                    </div>
+                    {/* Badge */}
+                    <span className="absolute -top-1 -right-1 flex h-4 w-4">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500 border-2 border-[#0A0A0B]"></span>
+                    </span>
+                </button>
+            )}
+        </div>
+    );
+}

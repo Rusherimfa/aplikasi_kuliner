@@ -8,6 +8,7 @@ import { login, dashboard } from '@/routes';
 // Layout Shared Components
 import Navbar from '../welcome/sections/navbar';
 import Footer from '../welcome/sections/footer';
+import AIChatbot from '@/components/app/ai-chatbot';
 
 interface Menu {
     id: number;
@@ -183,6 +184,8 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                 </main>
 
                 <Footer />
+                
+                <AIChatbot />
             </div>
         </>
     );

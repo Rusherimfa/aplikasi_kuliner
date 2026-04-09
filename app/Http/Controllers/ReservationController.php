@@ -15,10 +15,7 @@ class ReservationController extends Controller
      */
     public function index(Request $request)
     {
-        $team = $request->get('current_team');
-
         $reservations = Reservation::with('user')
-            ->where('team_id', $team->id)
             ->orderBy('date', 'asc')
             ->orderBy('time', 'asc')
             ->get()

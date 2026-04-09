@@ -12,6 +12,7 @@ import InfoBar from './sections/info-bar';
 import PhotoGallery from './sections/photo-gallery';
 import SignatureDishes from './sections/signature-dishes';
 import Testimonials from './sections/testimonials';
+import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function Welcome({
     bestSellers = [],
@@ -56,6 +57,8 @@ export default function Welcome({
                 <CTASection />
 
                 <Footer />
+                
+                <AIChatbot />
             </div>
         </>
     );

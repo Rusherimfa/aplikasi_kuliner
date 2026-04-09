@@ -8,6 +8,7 @@ import { dashboard } from '@/routes';
 
 // Shared Components
 import Navbar from '../welcome/sections/navbar';
+import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function CreateReservation() {
     const { auth, currentTeam } = usePage().props as any;
@@ -166,6 +167,8 @@ export default function CreateReservation() {
                         </form>
                     </div>
                 </div>
+                
+                <AIChatbot />
             </div>
         </>
     );
