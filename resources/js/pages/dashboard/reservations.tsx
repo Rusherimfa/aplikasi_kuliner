@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Calendar, Clock, Users, Check, X, Filter } from 'lucide-react';
+import { Calendar, Clock, Users, Check, X, Filter, MessageCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,12 +14,16 @@ import RestoAdminLayout from '@/layouts/resto-admin-layout';
 
 interface Reservation {
     id: number;
-    user_name: string;
-    user_email: string;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
     date: string;
     time: string;
     guest_count: number;
-    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+    status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment';
+    payment_status?: string;
+    booking_fee?: string | number;
+    menus_count?: number;
     special_requests: string | null;
 }
 
@@ -38,6 +42,7 @@ export default function ReservationsDashboard({ reservations }: PageProps) {
 
     const StatusBadge = ({ status }: { status: string }) => {
         const variants: Record<string, string> = {
+            awaiting_payment: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
             pending: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
             confirmed: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
             rejected: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
@@ -45,6 +50,7 @@ export default function ReservationsDashboard({ reservations }: PageProps) {
         };
 
         const labels: Record<string, string> = {
+            awaiting_payment: 'Menunggu DP',
             pending: 'Menunggu',
             confirmed: 'Dikonfirmasi',
             rejected: 'Ditolak',
@@ -119,11 +125,33 @@ export default function ReservationsDashboard({ reservations }: PageProps) {
                                             className="hover:bg-white/5 border-white/5"
                                         >
                                             <TableCell>
-                                                <div className="font-semibold text-white/90">
-                                                    {reservation.user_name}
-                                                </div>
-                                                <div className="text-xs text-white/50">
-                                                    {reservation.user_email}
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500">
+                                                        <Users size={18} />
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <h3 className="truncate font-semibold text-white/90">
+                                                                {reservation.customer_name}
+                                                            </h3>
+                                                            {reservation.table_name && (
+                                                                <span className="inline-flex items-center rounded-md bg-white/10 px-2 py-0.5 text-xs font-medium text-white/60">
+                                                                    M: {reservation.table_name}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <div className="text-xs text-white/50 flex flex-col gap-0.5 mt-0.5">
+                                                            <span>{reservation.customer_email}</span>
+                                                            <a 
+                                                                href={`https://wa.me/${reservation.customer_phone?.replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(reservation.customer_name)},%0A%0AMengenai%20reservasi%20Anda%20di%20RestoWeb%20untuk%20tanggal%20${reservation.date}...`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="inline-flex items-center gap-1 mt-1 text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer"
+                                                            >
+                                                                <MessageCircle size={12} /> Hubungi Pelanggan
+                                                            </a>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
@@ -162,7 +190,7 @@ export default function ReservationsDashboard({ reservations }: PageProps) {
                                             <TableCell className="max-w-[200px]">
                                                 {reservation.special_requests ? (
                                                     <p
-                                                        className="truncate text-xs text-white/60"
+                                                        className="truncate text-xs text-white/60 mb-2"
                                                         title={
                                                             reservation.special_requests
                                                         }
@@ -170,9 +198,16 @@ export default function ReservationsDashboard({ reservations }: PageProps) {
                                                         {reservation.special_requests}
                                                     </p>
                                                 ) : (
-                                                    <span className="text-xs text-white/30 italic">
-                                                        Tidak ada
+                                                    <span className="text-xs text-white/30 italic block mb-2">
+                                                        Tidak ada catatan
                                                     </span>
+                                                )}
+                                                
+                                                {reservation.payment_status === 'paid' && (
+                                                    <Badge variant="outline" className="bg-orange-500/20 text-orange-500 border-orange-500/30 text-[10px] px-1.5 py-0 mt-1">
+                                                        🔥 DP Lunas (Rp {Number(reservation.booking_fee).toLocaleString('id-ID')})
+                                                        {reservation.menus_count ? ` + ${reservation.menus_count} Makanan` : ''}
+                                                    </Badge>
                                                 )}
                                             </TableCell>
                                             <TableCell>

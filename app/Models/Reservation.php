@@ -6,6 +6,7 @@ use Database\Factories\ReservationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Reservation extends Model
@@ -24,7 +25,23 @@ class Reservation extends Model
         'guest_count',
         'status',
         'special_requests',
+        'resto_table_id',
+        'booking_fee',
+        'payment_status',
+        'check_in_token',
+        'checked_in_at',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'checked_in_at' => 'datetime',
+            'booking_fee' => 'decimal:2',
+        ];
+    }
 
     public function team(): BelongsTo
     {
@@ -34,5 +51,17 @@ class Reservation extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function menus(): BelongsToMany
+    {
+        return $this->belongsToMany(Menu::class)
+            ->withPivot('quantity', 'notes')
+            ->withTimestamps();
+    }
+
+    public function restoTable()
+    {
+        return $this->belongsTo(RestoTable::class);
     }
 }

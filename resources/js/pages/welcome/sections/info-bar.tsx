@@ -25,7 +25,7 @@ const INFO_ITEMS = [
 
 export default function InfoBar() {
     return (
-        <div className="relative overflow-hidden bg-[#FDFBF7] border-y border-slate-200/60 py-12">
+        <div className="relative overflow-hidden bg-[#FDFBF7] dark:bg-neutral-950 border-y border-slate-200/60 dark:border-neutral-800 py-12 transition-colors duration-500">
             {/* Decorative grain */}
             <div className="pointer-events-none absolute inset-0 opacity-[0.03]"
                 style={{
@@ -40,16 +40,16 @@ export default function InfoBar() {
                     {INFO_ITEMS.map(({ icon: Icon, label, value }) => (
                         <div
                             key={label}
-                            className="group flex items-center gap-4 rounded-2xl border border-amber-100 bg-white p-5 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 hover:shadow-md"
+                            className="group flex items-center gap-4 rounded-2xl border border-amber-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 dark:hover:border-amber-900/50 dark:hover:bg-amber-500/10 hover:shadow-md"
                         >
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-200 transition-all duration-300 group-hover:bg-amber-500 group-hover:text-white">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500 ring-1 ring-amber-200 dark:ring-amber-900 transition-all duration-300 group-hover:bg-amber-500 group-hover:text-white">
                                 <Icon size={20} />
                             </div>
                             <div>
                                 <p className="text-xs font-semibold tracking-widest text-amber-700 uppercase">
                                     {label}
                                 </p>
-                                <p className="mt-0.5 text-sm font-medium text-slate-800">{value}</p>
+                                <p className="mt-0.5 text-sm font-medium text-slate-800 dark:text-white">{value}</p>
                             </div>
                         </div>
                     ))}

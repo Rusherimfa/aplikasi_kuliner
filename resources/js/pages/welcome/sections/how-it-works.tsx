@@ -27,20 +27,20 @@ const HOW_IT_WORKS = [
 
 export default function HowItWorks() {
     return (
-        <section className="relative overflow-hidden bg-[#F8F5F0] py-28">
+        <section className="relative overflow-hidden bg-[#F8F5F0] dark:bg-neutral-900 py-28 transition-colors duration-500">
             {/* Decorative top divider */}
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-20 text-center">
-                    <span className="mb-4 inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 uppercase">
+                    <span className="mb-4 inline-block rounded-full border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-500/10 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 dark:text-amber-500 uppercase">
                         Sederhana & Mudah
                     </span>
-                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 md:text-5xl">
+                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-5xl">
                         Cara Memesan Meja
                     </h2>
-                    <p className="mx-auto max-w-xl text-slate-500 text-lg">
+                    <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg">
                         Hanya dalam empat langkah mudah, amankan tempat Anda di salah satu meja makan paling dicari di
                         kota ini.
                     </p>
@@ -59,17 +59,17 @@ export default function HowItWorks() {
                             <div className="relative z-10 flex flex-col items-center text-center">
                                 {/* Step circle */}
                                 <div className="relative mb-6 flex h-20 w-20 items-center justify-center">
-                                    <div className="absolute inset-0 rounded-full bg-amber-100 transition-all duration-500 group-hover:bg-amber-600" />
-                                    <div className="absolute inset-2 rounded-full border-2 border-dashed border-amber-300 transition-all duration-500 group-hover:border-amber-400/50" />
-                                    <span className="relative font-['Playfair_Display',serif] text-2xl font-bold text-amber-800 transition-colors duration-500 group-hover:text-white">
+                                    <div className="absolute inset-0 rounded-full bg-amber-100 dark:bg-neutral-800 transition-all duration-500 group-hover:bg-amber-600" />
+                                    <div className="absolute inset-2 rounded-full border-2 border-dashed border-amber-300 dark:border-amber-900/50 transition-all duration-500 group-hover:border-amber-400/50" />
+                                    <span className="relative font-['Playfair_Display',serif] text-2xl font-bold text-amber-800 dark:text-amber-500 transition-colors duration-500 group-hover:text-white">
                                         {step.step}
                                     </span>
                                 </div>
 
-                                <h3 className="mb-3 text-lg font-bold text-slate-900 transition-colors group-hover:text-amber-700">
+                                <h3 className="mb-3 text-lg font-bold text-slate-900 dark:text-white transition-colors group-hover:text-amber-700 dark:group-hover:text-amber-500">
                                     {step.title}
                                 </h3>
-                                <p className="text-sm leading-relaxed text-slate-500">{step.desc}</p>
+                                <p className="text-sm leading-relaxed text-slate-500 dark:text-neutral-400">{step.desc}</p>
                             </div>
                         </div>
                     ))}

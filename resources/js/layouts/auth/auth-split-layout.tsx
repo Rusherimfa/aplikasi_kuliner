@@ -11,73 +11,64 @@ export default function AuthSplitLayout({
     const { name } = usePage().props;
 
     return (
-        <div className="relative grid h-dvh flex-col items-center justify-center bg-[#0A0A0B] selection:bg-amber-500/30 selection:text-amber-200 lg:max-w-none lg:grid-cols-2 lg:px-0">
-            {/* Left Side: Image Banner */}
-            <div className="relative hidden h-full flex-col p-10 text-white lg:flex">
-                <div className="absolute inset-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2670&auto=format&fit=crop"
-                        alt="RestoWeb Premium Interior"
-                        className="h-full w-full object-cover opacity-40 mix-blend-overlay"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent"></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#0A0A0B]/80 via-[#0A0A0B]/40 to-transparent"></div>
-                </div>
-
-                {/* Logo Area */}
-                <Link
-                    href={home()}
-                    className="relative z-20 flex items-center gap-2 text-xl font-['Playfair_Display',serif] font-bold text-white transition-opacity hover:opacity-80"
-                >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-lg shadow-amber-900/20">
-                        <ChefHat size={20} className="text-white" />
-                    </div>
-                    {name || 'RestoWeb'}
-                </Link>
-
-                <div className="relative z-20 mt-auto">
-                    <blockquote className="space-y-4">
-                        <p className="font-['Playfair_Display',serif] text-3xl font-medium leading-relaxed italic text-white/90">
-                            "Makan malam bukan sekadar tentang kebutuhan gizi, melainkan perjalanan holistik yang memanjakan seluruh pancaindra."
-                        </p>
-                        <footer className="text-sm font-medium tracking-widest text-amber-500 uppercase">
-                            — RestoWeb Philosophy
-                        </footer>
-                    </blockquote>
-                </div>
+        <div className="relative min-h-dvh w-full flex items-center justify-center selection:bg-amber-500/30 selection:text-amber-200">
+            {/* Full Screen Background Image */}
+            <div className="fixed inset-0 z-0">
+                <img
+                    src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"
+                    alt="Premium Restaurant Atmosphere"
+                    className="h-full w-full object-cover"
+                />
+                {/* Gradient Overlays for readability */}
+                <div className="absolute inset-0 bg-neutral-950/60 backdrop-blur-[2px]"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-neutral-950/90 via-transparent to-neutral-950/40"></div>
             </div>
 
-            {/* Right Side: Form Content */}
-            <div className="flex w-full items-center justify-center lg:p-8">
-                <div className="mx-auto flex w-full flex-col justify-center space-y-8 sm:w-[400px] rounded-3xl border border-white/5 bg-white/[0.02] p-8 shadow-2xl backdrop-blur-xl lg:bg-transparent lg:border-none lg:shadow-none lg:p-0">
-                    
-                    {/* Mobile Logo */}
+            {/* Content Container */}
+            <div className="relative z-10 w-full max-w-md px-4 py-12 sm:px-0">
+                {/* Brand Logo - Centered Above Form */}
+                <div className="mb-8 flex flex-col items-center justify-center">
                     <Link
                         href={home()}
-                        className="relative z-20 flex flex-col items-center justify-center gap-3 lg:hidden"
+                        className="group flex flex-col items-center gap-4 transition-transform hover:scale-105"
                     >
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-900/40">
-                            <ChefHat size={28} className="text-white" />
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-700 shadow-xl shadow-amber-900/50 ring-1 ring-white/20 transition-all group-hover:shadow-amber-500/30">
+                            <ChefHat size={32} className="text-white drop-shadow-md" />
                         </div>
-                        <span className="font-['Playfair_Display',serif] text-2xl font-bold text-white">
-                            {name || 'RestoWeb'}
-                        </span>
+                        <h2 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-widest text-white drop-shadow-lg">
+                            {name || 'RESTOWEB'}
+                        </h2>
                     </Link>
+                </div>
+
+                {/* Glassmorphism Form Card */}
+                <div className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/40 p-8 shadow-2xl shadow-black/80 backdrop-blur-xl sm:p-10 relative">
+                    
+                    {/* Subtle inner highlight */}
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                    <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
 
                     {/* Header */}
-                    <div className="flex flex-col items-center justify-center space-y-2 text-center">
-                        <h1 className="font-['Playfair_Display',serif] text-3xl font-bold text-white">
+                    <div className="mb-8 text-center space-y-2">
+                        <h1 className="font-['Playfair_Display',serif] text-2xl font-semibold text-white tracking-wide">
                             {title}
                         </h1>
-                        <p className="text-sm text-balance text-white/60">
+                        <p className="text-sm font-light tracking-wide text-neutral-400">
                             {description}
                         </p>
                     </div>
 
                     {/* Form Container (Children) */}
-                    <div className="w-full text-slate-300 [&_label]:text-white/80 [&_input]:border-white/10 [&_input]:bg-white/5 [&_input]:text-white focus:[&_input]:border-amber-500/50 focus:[&_input]:ring-amber-500/50 [&_button[type=submit]]:rounded-full [&_button[type=submit]]:bg-gradient-to-r [&_button[type=submit]]:from-amber-500 [&_button[type=submit]]:to-amber-700 [&_button[type=submit]]:font-semibold [&_button[type=submit]]:text-white [&_button[type=submit]]:shadow-xl [&_button[type=submit]]:shadow-amber-900/40 hover:[&_button[type=submit]]:scale-[1.02] hover:[&_button[type=submit]]:from-amber-400 hover:[&_button[type=submit]]:to-amber-600">
+                    <div className="w-full text-slate-300">
                         {children}
                     </div>
+                </div>
+
+                {/* Footer Note */}
+                <div className="mt-8 text-center">
+                    <p className="font-['Playfair_Display',serif] text-sm italic text-neutral-400/80 drop-shadow-md">
+                        "Holistic dining experience for the senses."
+                    </p>
                 </div>
             </div>
         </div>

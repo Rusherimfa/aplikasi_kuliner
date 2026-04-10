@@ -34,7 +34,7 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="min-h-screen bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-800 selection:bg-amber-100 selection:text-amber-900">
+            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-amber-100 selection:text-amber-900 dark:selection:bg-amber-500/30 dark:selection:text-amber-200 transition-colors duration-500">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}

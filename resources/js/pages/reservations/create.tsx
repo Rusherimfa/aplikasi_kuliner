@@ -1,33 +1,63 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Calendar, Clock, Users, ArrowRight } from 'lucide-react';
+import { Head, useForm, usePage, router } from '@inertiajs/react';
+import { Calendar, Clock, Users, ArrowRight, CheckCircle2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { dashboard } from '@/routes';
+import { useCart } from '@/hooks/use-cart';
 
-// Shared Components
 import Navbar from '../welcome/sections/navbar';
 import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function CreateReservation() {
-    const { auth, currentTeam } = usePage().props as any;
-    const dashboardUrl = dashboard().url;
+    const { auth, tables = [], bookedTableIds = [] } = usePage().props as any;
+    const dashboardUrl = dashboard()?.url || '/dashboard';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { data, setData, post, processing, errors } = useForm({
-        customer_name: '',
-        customer_email: '',
+        customer_name: auth.user ? auth.user.name : '',
+        customer_email: auth.user ? auth.user.email : '',
         customer_phone: '',
         date: '',
         time: '',
         guest_count: 2,
         special_requests: '',
+        resto_table_id: '',
     });
+
+    const { items, cartTotal } = useCart();
+    const dpAmount = cartTotal > 0 ? cartTotal * 0.5 : 50000;
+
+    // Generate valid minimum date based on local timezone
+    const today = new Date();
+    today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+    const minDateLocal = today.toISOString().slice(0, 10);
+
+    // Auto-fetch booked tables when date and time is selected
+    useEffect(() => {
+        if (data.date && data.time) {
+            router.reload({
+                data: { date: data.date, time: data.time },
+                only: ['bookedTableIds'],
+                preserveState: true,
+                preserveScroll: true,
+            });
+            // Auto deselect if currently selected table becomes booked
+            if (data.resto_table_id && bookedTableIds.includes(data.resto_table_id)) {
+                setData('resto_table_id', '');
+            }
+        }
+    }, [data.date, data.time]);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/reservations');
+        
+        // Attach cart items dynamically before submitting using Inertia's router directly since useForm transform is clumsy with hooks
+        router.post('/reservations', {
+            ...data,
+            menus: items.map(i => ({ id: i.id, quantity: i.quantity, notes: '' }))
+        });
     };
 
     return (
@@ -42,172 +72,259 @@ export default function CreateReservation() {
                     setMobileMenuOpen={setMobileMenuOpen}
                 />
 
-                {/* Left Side: Editorial Banner */}
-                <div className="relative hidden flex-col justify-end overflow-hidden bg-slate-900 p-12 shadow-2xl md:flex md:w-1/2">
-                    <img
-                        src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2670&auto=format&fit=crop"
-                        alt="Meja Restoran"
-                        className="absolute inset-0 h-full w-full object-cover opacity-[0.85] transition-transform duration-10000 hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                {/* Left Side: Interactive Floor Plan Map */}
+                <div className="relative flex min-h-[50vh] flex-col items-center justify-center overflow-hidden bg-slate-900 px-4 py-24 shadow-2xl md:min-h-screen md:w-1/2 lg:p-12">
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
                     
-                    <div className="relative z-10 max-w-lg pb-12">
-                        <span className="mb-4 block text-sm font-medium tracking-widest text-amber-500 uppercase">
-                            Reservasi Eksklusif
-                        </span>
-                        <h1 className="mb-6 font-['Playfair_Display',serif] text-5xl leading-tight font-bold text-white lg:text-6xl">
-                            Meja Anda Menanti
-                        </h1>
-                        <p className="mb-8 text-lg font-light text-white/80">
-                            Pesan tempat Anda untuk malam gastronomi yang tak terlupakan. Kami menyiapkan setiap detail hingga sempurna bahkan sebelum Anda tiba.
-                        </p>
-                        <div className="flex items-center gap-4 text-white/40">
-                            <div className="h-px flex-1 bg-white/20"></div>
-                            <span className="text-xs font-semibold tracking-widest uppercase">
-                                RestoWeb
-                            </span>
+                    <div className="relative z-10 w-full max-w-lg">
+                        <div className="mb-8 text-center text-white">
+                            <h2 className="mb-2 font-['Playfair_Display',serif] text-3xl font-bold text-amber-500">Peta Denah Interaktif</h2>
+                            <p className="text-sm text-slate-400">
+                                {!data.date || !data.time 
+                                    ? 'Pilih tanggal & waktu terlebih dahulu untuk melihat meja kosong.'
+                                    : 'Pilih meja favorit Anda. Meja merah sudah dipesan orang lain.'}
+                            </p>
+                        </div>
+
+                        {/* Visual Map Grid */}
+                        <div className="relative mx-auto aspect-square w-full max-w-md rounded-2xl border border-slate-700 bg-slate-800/50 p-6 shadow-xl backdrop-blur-md">
+                            <div className="absolute inset-x-8 top-0 flex justify-center">
+                                <div className="h-2 w-1/2 rounded-b-lg bg-slate-700"></div>
+                                <span className="absolute -top-3 bg-slate-900 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Panggung Utama</span>
+                            </div>
+                            
+                            <div className="absolute inset-y-8 right-0 flex items-center justify-center">
+                                <div className="h-1/2 w-2 rounded-l-lg bg-slate-700/50"></div>
+                                <span className="absolute -right-6 top-1/2 origin-left -rotate-90 bg-slate-900 px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jendela View</span>
+                            </div>
+
+                            <div 
+                                className="grid h-full w-full gap-2 lg:gap-3" 
+                                style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gridTemplateRows: 'repeat(12, minmax(0, 1fr))' }}
+                            >
+                                {tables.map((t: any) => {
+                                    const isBooked = bookedTableIds.includes(t.id);
+                                    const isSelected = data.resto_table_id === t.id;
+                                    const isDisabled = !data.date || !data.time || isBooked;
+                                    
+                                    let bgClass = 'bg-slate-700 border-slate-600 text-slate-400'; // Default disabled
+                                    
+                                    if (!isDisabled) {
+                                        bgClass = isSelected 
+                                            ? 'bg-amber-500 border-amber-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110 z-10' 
+                                            : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/40 cursor-pointer';
+                                    } else if (isBooked) {
+                                        bgClass = 'bg-rose-500/20 border-rose-500/50 text-rose-500 cursor-not-allowed';
+                                    }
+
+                                    // Category Shapes
+                                    const isRound = t.category === 'window';
+                                    const spanClass = t.capacity >= 6 ? 'span 3' : (t.capacity >= 4 ? 'span 2' : 'span 1');
+                                    
+                                    return (
+                                        <button
+                                            key={t.id}
+                                            type="button"
+                                            onClick={() => !isDisabled && setData('resto_table_id', t.id)}
+                                            disabled={isDisabled}
+                                            className={`relative flex flex-col items-center justify-center border-2 transition-all duration-300 ${isRound ? 'rounded-full' : 'rounded-xl'} ${bgClass}`}
+                                            style={{ 
+                                                gridColumn: `${t.pos_x} / span ${t.capacity >= 6 ? 3 : (t.capacity >= 4 ? 2 : 1)}`, 
+                                                gridRow: `${t.pos_y} / span 2` 
+                                            }}
+                                            title={`${t.name} - ${t.capacity} Orang`}
+                                        >
+                                            <span className="text-[10px] font-bold sm:text-xs">{t.name}</span>
+                                            {isBooked && <Lock size={10} className="absolute -bottom-1 -right-1 rounded-full bg-slate-900 p-0.5 text-rose-500" />}
+                                            {isSelected && <CheckCircle2 size={12} className="absolute -top-1 -right-1 rounded-full bg-slate-900 text-amber-500" />}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-center gap-6 text-xs font-medium text-slate-400">
+                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-emerald-500/50 bg-emerald-500/20"></div> Tersedia</div>
+                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-rose-500/50 bg-rose-500/20"></div> Dipesan</div>
+                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-amber-400 bg-amber-500"></div> Pilihanmu</div>
                         </div>
                     </div>
                 </div>
 
                 {/* Right Side: Booking Form */}
-                <div className="relative flex w-full flex-col items-center justify-center bg-white p-6 pt-32 pb-24 md:w-1/2 md:p-12 lg:p-24 shadow-[-20px_0_40px_rgb(0,0,0,0.02)]">
-                    <div className="absolute inset-0 bg-gradient-to-b from-amber-50/50 to-transparent opacity-50 md:hidden"></div>
-
-                    <div className="relative z-10 w-full max-w-md">
+                <div className="relative flex w-full flex-col py-12 px-6 md:w-1/2 md:p-12 lg:p-16 lg:pt-32">
+                    <div className="mx-auto w-full max-w-md">
                         <div className="mb-10 text-center md:text-left">
-                            <h2 className="mb-3 font-['Playfair_Display',serif] text-3xl font-bold text-slate-900">
-                                Detail Reservasi
-                            </h2>
+                            <h1 className="mb-3 font-['Playfair_Display',serif] text-3xl font-bold text-slate-900">Detail Reservasi</h1>
                             <p className="text-sm text-slate-500">
-                                Silakan isi formulir di bawah ini. Untuk rombongan lebih dari 20 orang, hubungi kami secara langsung.
+                                Langkah 1: Tentukan waktu. Langkah 2: Pilih meja di peta. Langkah 3: Konfirmasi.
                             </p>
                         </div>
 
                         <form onSubmit={submit} className="space-y-6">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="text-sm font-medium text-slate-700">Nama Lengkap</label>
-                                    <Input
-                                        type="text"
-                                        placeholder="Nama Lengkap Anda"
-                                        value={data.customer_name}
-                                        onChange={(e) => setData('customer_name', e.target.value)}
-                                        className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
-                                        required
-                                    />
-                                    {errors.customer_name && <p className="mt-1 text-xs text-red-500">{errors.customer_name as string}</p>}
-                                </div>
+                            {/* WAKTU & TANGGAL */}
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">1. Kapan Anda datang?</h3>
                                 <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
+                                            <Calendar size={14} className="text-amber-500" /> Tanggal
+                                        </label>
+                                        <Input
+                                            type="date"
+                                            min={minDateLocal}
+                                            value={data.date}
+                                            onChange={(e) => setData('date', e.target.value)}
+                                            className="h-12 rounded-xl border-slate-300 bg-white"
+                                            required
+                                        />
+                                        {errors.date && <p className="text-[10px] text-red-500">{errors.date}</p>}
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
+                                            <Clock size={14} className="text-amber-500" /> Waktu
+                                        </label>
+                                        <Input
+                                            type="time"
+                                            value={data.time}
+                                            onChange={(e) => setData('time', e.target.value)}
+                                            className="h-12 rounded-xl border-slate-300 bg-white"
+                                            required
+                                        />
+                                        {errors.time && <p className="text-[10px] text-red-500">{errors.time}</p>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* PILIHAN MEJA */}
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">2. Meja Pilihan</h3>
+                                {errors.resto_table_id && <p className="mb-3 rounded-lg bg-red-100 p-2 text-xs font-medium text-red-600">{errors.resto_table_id}</p>}
+                                
+                                {data.resto_table_id ? (
+                                    <div className="flex items-center justify-between rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-white shadow-md">
+                                                <CheckCircle2 size={20} />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-amber-900">
+                                                    Meja {tables.find((t: any) => t.id === data.resto_table_id)?.name}
+                                                </p>
+                                                <p className="text-xs text-amber-700">
+                                                    Maks. {tables.find((t: any) => t.id === data.resto_table_id)?.capacity} Orang
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <Button type="button" variant="ghost" size="sm" onClick={() => setData('resto_table_id', '')} className="text-red-500 hover:bg-red-100 hover:text-red-600">
+                                            Batal
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    <div className="rounded-xl border border-dashed border-slate-300 bg-white py-6 text-center">
+                                        <p className="text-sm text-slate-500">
+                                            {data.date && data.time ? 'Silakan klik meja berwarna hijau di Peta (Kiri).' : 'Isi tanggal & waktu terlebih dahulu.'}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* KONTAK DETAIL */}
+                            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-500">3. Identitas Anda</h3>
+                                <div className="space-y-4">
                                     <div>
-                                        <label className="text-sm font-medium text-slate-700">Email Utama</label>
+                                        <Input
+                                            type="text"
+                                            placeholder="Nama Lengkap"
+                                            value={data.customer_name}
+                                            onChange={(e) => setData('customer_name', e.target.value)}
+                                            className="h-12 rounded-xl border-slate-300"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
                                         <Input
                                             type="email"
-                                            placeholder="you@example.com"
+                                            placeholder="Email"
                                             value={data.customer_email}
                                             onChange={(e) => setData('customer_email', e.target.value)}
-                                            className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
+                                            className="h-12 rounded-xl border-slate-300"
+                                            readOnly={!!auth.user}
                                             required
                                         />
-                                        {errors.customer_email && <p className="mt-1 text-xs text-red-500">{errors.customer_email as string}</p>}
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium text-slate-700">No. WhatsApp</label>
                                         <Input
                                             type="tel"
-                                            placeholder="+62 8..."
+                                            placeholder="No. WhatsApp"
                                             value={data.customer_phone}
                                             onChange={(e) => setData('customer_phone', e.target.value)}
-                                            className="mt-1.5 h-12 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
+                                            className="h-12 rounded-xl border-slate-300"
                                             required
                                         />
-                                        {errors.customer_phone && <p className="mt-1 text-xs text-red-500">{errors.customer_phone as string}</p>}
                                     </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                max="20"
+                                                placeholder="Jumlah Tamu"
+                                                value={data.guest_count}
+                                                onChange={(e) => setData('guest_count', parseInt(e.target.value))}
+                                                className="h-12 rounded-xl border-slate-300"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <Textarea
+                                        placeholder="Catatan tambahan (Opsional)"
+                                        value={data.special_requests}
+                                        onChange={(e) => setData('special_requests', e.target.value)}
+                                        className="h-20 resize-none rounded-xl border-slate-300"
+                                    />
                                 </div>
                             </div>
                             
-                            <hr className="border-slate-200" />
-
-                            <div className="space-y-2">
-                                <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                                    <Calendar size={16} className="text-amber-500" />
-                                    Tanggal
-                                </label>
-                                <Input
-                                    type="date"
-                                    min={new Date().toISOString().split('T')[0]}
-                                    value={data.date}
-                                    onChange={(e) => setData('date', e.target.value)}
-                                    className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
-                                    required
-                                    style={{ colorScheme: 'light' }}
-                                />
-                                {errors.date && (
-                                    <p className="mt-1 text-xs text-red-500">{errors.date}</p>
+                            {/* RINGKASAN PEMBAYARAN */}
+                            <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-5">
+                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-900">Ringkasan Pembayaran</h3>
+                                
+                                {items.length > 0 ? (
+                                    <div className="mb-4 space-y-2 border-b border-amber-200 pb-4">
+                                        {items.map(item => (
+                                            <div key={item.id} className="flex justify-between text-sm text-amber-900/80">
+                                                <span>{item.quantity}x {item.name}</span>
+                                                <span className="font-medium">Rp {((Number(item.price)) * item.quantity).toLocaleString('id-ID')}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="mb-4 rounded-xl bg-orange-100 p-3 text-xs text-orange-800">
+                                        Anda belum memilih menu makanan (Pre-order kosong).
+                                    </div>
                                 )}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
+                                
                                 <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                                        <Clock size={16} className="text-amber-500" />
-                                        Waktu
-                                    </label>
-                                    <Input
-                                        type="time"
-                                        value={data.time}
-                                        onChange={(e) => setData('time', e.target.value)}
-                                        className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
-                                        required
-                                        style={{ colorScheme: 'light' }}
-                                    />
-                                    {errors.time && (
-                                        <p className="mt-1 text-xs text-red-500">{errors.time}</p>
-                                    )}
+                                    <div className="flex justify-between text-sm text-amber-900">
+                                        <span>Total Makanan</span>
+                                        <span className="font-bold">Rp {cartTotal.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div className="flex justify-between text-sm text-amber-900">
+                                        <span>Ketentuan DP {cartTotal > 0 ? '(50%)' : '(Tarif Dasar)'}</span>
+                                        <span className="font-bold text-rose-600">Rp {dpAmount.toLocaleString('id-ID')}</span>
+                                    </div>
                                 </div>
-                                <div className="space-y-2">
-                                    <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
-                                        <Users size={16} className="text-amber-500" />
-                                        Tamu
-                                    </label>
-                                    <Input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        value={data.guest_count}
-                                        onChange={(e) => setData('guest_count', parseInt(e.target.value))}
-                                        className="h-14 rounded-2xl border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
-                                        required
-                                    />
-                                    {errors.guest_count && (
-                                        <p className="mt-1 text-xs text-red-500">{errors.guest_count}</p>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">
-                                    Catatan Tambahan <span className="font-normal text-slate-400">(Opsional)</span>
-                                </label>
-                                <Textarea
-                                    placeholder="Alergi, hari jadi, preferensi meja khusus..."
-                                    value={data.special_requests}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        setData('special_requests', e.target.value)
-                                    }
-                                    className="min-h-[120px] resize-none rounded-3xl border-slate-200 bg-white p-4 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:bg-white focus:ring-amber-500/20 shadow-sm"
-                                />
-                                {errors.special_requests && (
-                                    <p className="mt-1 text-xs text-red-500">{errors.special_requests}</p>
-                                )}
+                                <p className="mt-4 text-center text-xs text-amber-700/60 font-medium">
+                                    Anda akan diarahkan ke halaman pembayaran DP setelah konfirmasi.
+                                </p>
                             </div>
 
                             <Button
                                 type="submit"
-                                disabled={processing}
-                                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all duration-300 hover:scale-105 hover:from-amber-400 hover:to-amber-600 disabled:opacity-70"
+                                disabled={processing || !data.resto_table_id}
+                                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all duration-300 hover:scale-105 disabled:opacity-50"
                             >
-                                Konfirmasi Pemesanan 
+                                Lanjutkan ke Pembayaran (Rp {dpAmount.toLocaleString('id-ID')})
                                 <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
                             </Button>
                         </form>

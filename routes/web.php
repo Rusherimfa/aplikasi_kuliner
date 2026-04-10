@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
-use App\Http\Middleware\EnsureTeamMembership;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
@@ -18,9 +19,23 @@ Route::post('/reservations', [ReservationController::class, 'store'])->name('res
 // Checkout (Public)
 Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
 
+// Google Socialite Login
+Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
+Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
+
 Route::middleware(['auth', 'verified'])
     ->group(function () {
-        Route::inertia('dashboard', 'dashboard')->name('dashboard');
+        Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
+        Route::get('/reservations/payment/{reservation}', [ReservationController::class, 'payment'])->name('reservations.payment');
+        Route::post('/reservations/payment/{reservation}', [ReservationController::class, 'processPayment'])->name('reservations.payment.process');
+        Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
+        Route::put('/reservations/{reservation}/customer', [ReservationController::class, 'updateCustomer'])->name('reservations.update_customer');
+        Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+    });
+
+Route::middleware(['auth', 'verified', 'role:admin,staff'])
+    ->group(function () {
+        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Menu Routes
         Route::get('menus', [MenuController::class, 'index'])->name('menus.index');
@@ -31,6 +46,9 @@ Route::middleware(['auth', 'verified'])
         // Reservation Dashboard Routes
         Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
         Route::put('reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+
+        // QR Code Check-in (Staff only — scan from mobile QR reader)
+        Route::get('/checkin/{token}', [ReservationController::class, 'checkin'])->name('reservations.checkin');
     });
 
 Route::middleware(['auth'])->group(function () {

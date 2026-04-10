@@ -6,12 +6,9 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
     const { auth } = usePage().props as any;
 
     const navItems = [
-        { title: 'Dashboard', href: dashboard().url, icon: LayoutGrid },
-        { title: 'Pesanan Aktif', href: '#', icon: Utensils },
-        { title: 'Manajemen Menu', href: '#', icon: BookOpen },
+        { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+        { title: 'Manajemen Menu', href: '/menus', icon: BookOpen },
         { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar },
-        { title: 'Laporan Penjualan', href: '#', icon: PieChart },
-        { title: 'Pengaturan Resto', href: '#', icon: Settings },
     ];
 
     return (

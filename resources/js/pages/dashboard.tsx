@@ -1,343 +1,127 @@
-import { Head } from '@inertiajs/react';
-import {
-    Utensils,
-    CreditCard,
-    TrendingUp,
-    Clock,
-    MoreHorizontal,
-    BellRing,
-    Users,
-    ChefHat,
-    CircleDot,
-    CheckCircle2,
-    Timer,
-    Sparkles,
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Head, Link } from '@inertiajs/react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { dashboard as dashboardRoute } from '@/routes';
+import { Users, BookOpen, Clock, CalendarCheck, TrendingUp, HandPlatter, ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-// Mock Data for the UI
-const TABLE_STATUSES = [
-    { id: 'T01', capacity: 4, status: 'occupied', time: '45m', wait: false },
-    { id: 'T02', capacity: 2, status: 'available', time: '-', wait: false },
-    { id: 'T03', capacity: 6, status: 'waiting-food', time: '15m', wait: true },
-    { id: 'T04', capacity: 4, status: 'occupied', time: '1h 10m', wait: false },
-    { id: 'T05', capacity: 2, status: 'cleaning', time: '5m', wait: false },
-    { id: 'T06', capacity: 8, status: 'available', time: '-', wait: false },
-    { id: 'T07', capacity: 2, status: 'waiting-food', time: '22m', wait: true },
-    { id: 'T08', capacity: 4, status: 'available', time: '-', wait: false },
-];
+export default function Dashboard({ stats, recent_activity }: any) {
+    const formatRupiah = (amount: number) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    };
 
-const RECENT_ORDERS = [
-    { id: '#ORD-001', table: 'T03', items: 4, total: 'Rp 450.000', status: 'preparing' },
-    { id: '#ORD-002', table: 'T07', items: 2, total: 'Rp 185.000', status: 'preparing' },
-    { id: '#ORD-003', table: 'T01', items: 5, total: 'Rp 890.000', status: 'served' },
-    { id: '#ORD-004', table: 'T04', items: 3, total: 'Rp 320.000', status: 'served' },
-];
+    const getStatusBadge = (status: string) => {
+        if (status === 'pending') return <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20">Menunggu</Badge>;
+        if (status === 'confirmed') return <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20">Dikonfirmasi</Badge>;
+        if (status === 'completed') return <Badge className="bg-white/10 text-white/70 hover:bg-white/10">Selesai</Badge>;
+        return <Badge className="bg-rose-500/20 text-rose-500 hover:bg-rose-500/20">Dibatalkan</Badge>;
+    };
 
-const METRICS = [
-    {
-        label: 'Pendapatan Kotor',
-        value: 'Rp 12.45M',
-        sub: '+15.2% dari kemarin',
-        subPositive: true,
-        icon: CreditCard,
-        gradient: 'from-emerald-500 to-teal-600',
-        bgLight: 'bg-emerald-50',
-        iconColor: 'text-emerald-600',
-    },
-    {
-        label: 'Pesanan Aktif',
-        value: '24',
-        sub: '8 disiapkan di dapur',
-        subPositive: null,
-        icon: Utensils,
-        gradient: 'from-blue-500 to-indigo-600',
-        bgLight: 'bg-blue-50',
-        iconColor: 'text-blue-600',
-    },
-    {
-        label: 'Waktu Persiapan Rata-rata',
-        value: '18 mnt',
-        sub: 'Target: di bawah 20 mnt',
-        subPositive: true,
-        icon: Clock,
-        gradient: 'from-amber-500 to-orange-600',
-        bgLight: 'bg-amber-50',
-        iconColor: 'text-amber-600',
-    },
-    {
-        label: 'Tindakan Tertunda',
-        value: '3',
-        sub: 'Meja butuh perhatian',
-        subPositive: false,
-        icon: BellRing,
-        gradient: 'from-rose-500 to-pink-600',
-        bgLight: 'bg-rose-50',
-        iconColor: 'text-rose-600',
-    },
-];
-
-function getTableConfig(status: string) {
-    switch (status) {
-        case 'available':
-            return {
-                bg: 'bg-emerald-50',
-                border: 'border-emerald-200 hover:border-emerald-400',
-                text: 'text-emerald-700',
-                badge: 'bg-emerald-100 text-emerald-700',
-                dot: 'bg-emerald-500',
-                label: 'Tersedia',
-            };
-        case 'occupied':
-            return {
-                bg: 'bg-slate-50',
-                border: 'border-slate-200 hover:border-slate-400',
-                text: 'text-slate-700',
-                badge: 'bg-slate-100 text-slate-700',
-                dot: 'bg-slate-500',
-                label: 'Terisi',
-            };
-        case 'waiting-food':
-            return {
-                bg: 'bg-amber-50',
-                border: 'border-amber-300 hover:border-amber-500',
-                text: 'text-amber-700',
-                badge: 'bg-amber-100 text-amber-700',
-                dot: 'bg-amber-500',
-                label: 'Menunggu',
-            };
-        case 'cleaning':
-            return {
-                bg: 'bg-sky-50',
-                border: 'border-sky-200 hover:border-sky-400',
-                text: 'text-sky-700',
-                badge: 'bg-sky-100 text-sky-700',
-                dot: 'bg-sky-500',
-                label: 'Membersihkan',
-            };
-        default:
-            return {
-                bg: 'bg-slate-50',
-                border: 'border-slate-200',
-                text: 'text-slate-700',
-                badge: 'bg-slate-100 text-slate-600',
-                dot: 'bg-slate-400',
-                label: status,
-            };
-    }
-}
-
-export default function Dashboard() {
     return (
         <>
-            <Head title="Dasbor Staf — Pusat Komando" />
+            <Head title="Overview - RestoWeb Admin" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto text-white font-['Inter',sans-serif]">
-                {/* Header */}
-                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-                    <div>
-                        <div className="flex items-center gap-2.5">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-md shadow-amber-900/20">
-                                <Sparkles size={15} />
+            <div className="mx-auto max-w-7xl font-sans text-white">
+                <div className="mb-8">
+                    <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-white/90">
+                        Overview Operasional
+                    </h1>
+                    <p className="mt-1 text-sm text-white/50">
+                        Ringkasan aktivitas restoran dan performa reservasi hari ini.
+                    </p>
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-md transition-all hover:bg-white/[0.04]">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/20 text-amber-500">
+                                <Clock size={24} strokeWidth={1.5} />
                             </div>
-                            <h1 className="text-2xl font-bold tracking-tight text-white">
-                                Ringkasan Hari Ini
-                            </h1>
+                            <div>
+                                <p className="text-sm font-medium tracking-wide text-white/50 uppercase">Menunggu</p>
+                                <p className="text-2xl font-bold text-white">{stats.pending_reservations}</p>
+                            </div>
                         </div>
-                        <p className="mt-1 text-sm text-white/50">
-                            Kelola pesanan, meja, dan lacak kinerja restoran.
-                        </p>
                     </div>
-                    <div className="flex gap-2">
-                        <Button variant="outline" className="rounded-xl border-white/10 bg-white/5 text-white shadow-sm hover:bg-white/10">
-                            <Clock className="mr-2 h-4 w-4" />
-                            Riwayat Shift
-                        </Button>
-                        <Button className="rounded-xl bg-gradient-to-r from-amber-600 to-amber-800 text-white shadow-md shadow-amber-900/20 hover:from-amber-500 hover:to-amber-700">
-                            + Pesanan Baru
-                        </Button>
+                    
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-md transition-all hover:bg-white/[0.04]">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-500">
+                                <CalendarCheck size={24} strokeWidth={1.5} />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium tracking-wide text-white/50 uppercase">Tamu Hari Ini</p>
+                                <p className="text-2xl font-bold text-white">{stats.today_reservations}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-md transition-all hover:bg-white/[0.04]">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20 text-blue-500">
+                                <TrendingUp size={24} strokeWidth={1.5} />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium tracking-wide text-white/50 uppercase">Est. Omset Hari Ini</p>
+                                <p className="text-xl font-bold text-white">{formatRupiah(stats.estimated_revenue)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.02] p-6 shadow-xl backdrop-blur-md transition-all hover:bg-white/[0.04]">
+                        <div className="flex items-center gap-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500/20 text-purple-500">
+                                <HandPlatter size={24} strokeWidth={1.5} />
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium tracking-wide text-white/50 uppercase">Total Menu</p>
+                                <p className="text-2xl font-bold text-white">{stats.total_menus}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Metric Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {METRICS.map((metric) => {
-                        const Icon = metric.icon;
-                        return (
-                            <Card key={metric.label} className="overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl">
-                                {/* Top accent bar */}
-                                <div className={`h-1 w-full bg-gradient-to-r ${metric.gradient}`} />
-                                <CardHeader className="flex flex-row items-center justify-between pb-2 pt-4">
-                                    <CardTitle className="text-sm font-medium text-white/60">
-                                        {metric.label}
-                                    </CardTitle>
-                                    <div className={`flex h-9 w-9 items-center justify-center rounded-xl bg-white/5`}>
-                                        <Icon className={`h-4 w-4 ${metric.iconColor}`} />
-                                    </div>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="text-2xl font-bold text-white">{metric.value}</div>
-                                    <p className={`mt-1 flex items-center gap-1 text-xs ${
-                                        metric.subPositive === true
-                                            ? 'text-emerald-600'
-                                            : metric.subPositive === false
-                                              ? 'text-rose-600'
-                                              : 'text-slate-500'
-                                    }`}>
-                                        {metric.subPositive === true && <TrendingUp className="h-3 w-3" />}
-                                        {metric.sub}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
-
-                {/* Main Grid */}
-                <div className="grid flex-1 gap-6 lg:grid-cols-3">
-                    {/* Table Status */}
-                    <Card className="col-span-full overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl lg:col-span-2">
-                        <CardHeader className="border-b border-white/5 pb-4">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
-                                        <Users size={16} className="text-amber-600" />
-                                        Status Ruang Makan
-                                    </CardTitle>
-                                    <CardDescription className="mt-1 text-white/50">
-                                        Ringkasan ketersediaan meja waktu nyata.
-                                    </CardDescription>
-                                </div>
-                                {/* Legend */}
-                                <div className="hidden flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 sm:flex">
-                                    {[
-                                        { color: 'bg-emerald-500', label: 'Tersedia' },
-                                        { color: 'bg-slate-400', label: 'Terisi' },
-                                        { color: 'bg-amber-500', label: 'Menunggu' },
-                                        { color: 'bg-sky-400', label: 'Membersihkan' },
-                                    ].map((l) => (
-                                        <span key={l.label} className="flex items-center gap-1.5">
-                                            <span className={`h-2 w-2 rounded-full ${l.color}`} />
-                                            {l.label}
-                                        </span>
+                <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+                    <div className="rounded-2xl border border-white/5 bg-white/[0.02] shadow-xl backdrop-blur-md flex flex-col">
+                        <div className="border-b border-white/5 p-6 flex justify-between items-center">
+                            <h2 className="text-lg font-semibold text-white/90 font-['Playfair_Display',serif]">Aktivitas Terbaru</h2>
+                            <Link href="/reservations" className="text-xs font-medium text-amber-500 hover:text-amber-400 flex items-center gap-1">
+                                Lihat Semua <ArrowRight size={14} />
+                            </Link>
+                        </div>
+                        <div className="flex-1 p-0">
+                            {recent_activity.length > 0 ? (
+                                <ul className="divide-y divide-white/5">
+                                    {recent_activity.map((activity: any) => (
+                                        <li key={activity.id} className="flex items-center justify-between p-6 hover:bg-white/[0.01] transition-colors">
+                                            <div>
+                                                <p className="font-semibold text-white/90">{activity.customer_name}</p>
+                                                <p className="text-xs text-white/50 mt-1">Meja tgl {activity.date} jam {activity.time} · <span className="opacity-70">{activity.created_at}</span></p>
+                                            </div>
+                                            <div>
+                                                {getStatusBadge(activity.status)}
+                                            </div>
+                                        </li>
                                     ))}
+                                </ul>
+                            ) : (
+                                <div className="p-12 text-center text-white/40 text-sm">
+                                    Belum ada aktivitas reservasi.
                                 </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="pt-5">
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-                                {TABLE_STATUSES.map((table) => {
-                                    const config = getTableConfig(table.status);
-                                    return (
-                                        <div
-                                            key={table.id}
-                                            className={`group relative flex cursor-pointer flex-col rounded-2xl border-2 p-4 transition-all duration-200 hover:shadow-md ${config.bg} ${config.border}`}
-                                        >
-                                            {/* Ping indicator for waiting tables */}
-                                            {table.wait && (
-                                                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4">
-                                                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                                                    <span className="relative inline-flex h-4 w-4 rounded-full border-2 border-white bg-amber-500" />
-                                                </span>
-                                            )}
+                            )}
+                        </div>
+                    </div>
 
-                                            {/* Table ID + capacity */}
-                                            <div className="mb-3 flex items-start justify-between">
-                                                <span className={`text-xl font-bold ${config.text}`}>
-                                                    {table.id}
-                                                </span>
-                                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${config.badge}`}>
-                                                    {table.capacity}p
-                                                </span>
-                                            </div>
-
-                                            {/* Status + time */}
-                                            <div className="mt-auto flex items-center justify-between">
-                                                <div className="flex items-center gap-1.5">
-                                                    <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
-                                                    <span className={`text-xs font-semibold capitalize ${config.text}`}>
-                                                        {config.label}
-                                                    </span>
-                                                </div>
-                                                <span className={`text-xs font-medium opacity-60 ${config.text}`}>
-                                                    {table.time}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    {/* Recent Orders */}
-                    <Card className="col-span-full flex flex-col overflow-hidden border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl lg:col-span-1">
-                        <CardHeader className="border-b border-white/5 pb-4">
-                            <CardTitle className="flex items-center gap-2 text-base font-semibold text-white">
-                                <ChefHat size={16} className="text-amber-600" />
-                                Tiket Terbaru
-                            </CardTitle>
-                            <CardDescription className="mt-1 text-white/50">Pesanan masuk langsung dari semua zona.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex-1 pt-4">
-                            <div className="space-y-3">
-                                {RECENT_ORDERS.map((order) => {
-                                    const isPreparing = order.status === 'preparing';
-                                    return (
-                                        <div
-                                            key={order.id}
-                                            className="group flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3 transition-all hover:border-slate-200 hover:bg-white hover:shadow-sm"
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                {/* Status icon */}
-                                                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                                                    isPreparing ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'
-                                                }`}>
-                                                    {isPreparing ? <Timer size={15} /> : <CheckCircle2 size={15} />}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-1.5">
-                                                        <span className="text-sm font-bold text-slate-900">
-                                                            {order.table}
-                                                        </span>
-                                                        <span className="text-xs text-slate-400">{order.id}</span>
-                                                    </div>
-                                                    <p className="text-xs text-slate-500">{order.items} item</p>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2 text-right">
-                                                <div>
-                                                    <p className="text-sm font-bold text-slate-900">{order.total}</p>
-                                                    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                                                        isPreparing
-                                                            ? 'bg-amber-100 text-amber-700'
-                                                            : 'bg-emerald-100 text-emerald-700'
-                                                    }`}>
-                                                        {order.status === 'preparing' ? 'disiapkan' : order.status === 'served' ? 'disajikan' : order.status}
-                                                    </span>
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 shrink-0 rounded-lg text-slate-400 opacity-0 transition-all group-hover:opacity-100 hover:text-slate-900"
-                                                >
-                                                    <MoreHorizontal className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <Button className="mt-5 w-full rounded-xl bg-slate-100 text-sm font-medium text-slate-700 hover:bg-amber-50 hover:text-amber-700" variant="secondary">
-                                Lihat Semua Pesanan
-                            </Button>
-                        </CardContent>
-                    </Card>
+                    <div className="rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-900/20 border border-amber-500/20 p-6 shadow-xl flex flex-col items-center justify-center text-center">
+                        <div className="h-20 w-20 rounded-full bg-amber-500 flex items-center justify-center mb-6 shadow-lg shadow-amber-500/30">
+                            <Users size={32} className="text-[#0A0A0B]" />
+                        </div>
+                        <h3 className="font-['Playfair_Display',serif] text-2xl font-bold text-amber-400 mb-2">{stats.total_customers} Pelanggan</h3>
+                        <p className="text-sm text-amber-200/60 leading-relaxed mb-6">
+                            Telah mendaftar di sistem RestoWeb. Kelola hubungan pelanggan dengan menu terbaik.
+                        </p>
+                        <Link href="/menus" className="inline-flex h-10 items-center justify-center rounded-full bg-amber-500 px-6 text-sm font-semibold text-[#0A0A0B] transition-transform hover:scale-105 w-full max-w-[200px]">
+                            Kelola Menu <BookOpen size={16} className="ml-2" />
+                        </Link>
+                    </div>
                 </div>
             </div>
         </>

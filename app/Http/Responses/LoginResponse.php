@@ -20,8 +20,10 @@ class LoginResponse implements LoginResponseContract
 
         URL::defaults(['current_team' => $team->slug]);
 
+        $redirectUrl = $user->isCustomer() ? '/' : route('dashboard');
+
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 200)
-            : redirect()->intended(route('dashboard'));
+            : redirect()->intended($redirectUrl);
     }
 }

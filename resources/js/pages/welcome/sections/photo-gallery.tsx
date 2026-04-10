@@ -35,17 +35,17 @@ const GALLERY_IMAGES = [
 
 export default function PhotoGallery() {
     return (
-        <section className="bg-white py-28">
+        <section className="bg-white dark:bg-neutral-950 py-28 transition-colors duration-500">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-16 text-center">
-                    <span className="mb-4 inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 uppercase">
+                    <span className="mb-4 inline-block rounded-full border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-500/10 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 dark:text-amber-500 uppercase">
                         Suasana & Karya
                     </span>
-                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 md:text-5xl">
+                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-5xl">
                         Pesta untuk Mata
                     </h2>
-                    <p className="mx-auto max-w-xl text-slate-500 text-lg">
+                    <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg">
                         Setiap sudut restoran kami dirancang untuk menyenangkan — dari penyajian hingga suasananya.
                     </p>
                 </div>

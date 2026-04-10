@@ -1,269 +1,301 @@
-import { Head, Link, router } from '@inertiajs/react';
-import {
-    Search,
-    Plus,
-    Edit,
-    Trash2,
-    EyeOff,
-} from 'lucide-react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
+import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import * as menus from '@/routes/menus';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
-// Assuming basic prop types from the controller
-interface Menu {
-    id: number;
-    name: string;
-    description: string | null;
-    category: string;
-    price: string;
-    is_available: boolean;
-}
+export default function MenuManagement({ menus, filters }: any) {
+    const [searchQuery, setSearchQuery] = useState(filters.search || '');
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingMenu, setEditingMenu] = useState<any>(null);
 
-interface PageProps {
-    menus: {
-        data: Menu[];
-        current_page: number;
-        last_page: number;
-        links: any[];
+    const { data, setData, post, put, delete: destroy, reset, processing, errors, clearErrors } = useForm({
+        name: '',
+        description: '',
+        category: '',
+        price: '',
+        is_available: true,
+    });
+
+    const categories = ['Main Course', 'Appetizer', 'Beverage', 'Dessert', 'Snack'];
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        router.get('/menus', { search: searchQuery }, { preserveState: true, replace: true });
     };
-    filters: {
-        search?: string;
-        category?: string;
-    };
-    currentTeam: {
-        slug: string;
-    };
-}
 
-export default function MenusIndex({
-    menus: paginatedMenus,
-    filters,
-    currentTeam,
-}: PageProps) {
-    const [searchTerm, setSearchTerm] = useState(filters.search || '');
+    const openCreateModal = () => {
+        clearErrors();
+        setEditingMenu(null);
+        reset();
+        setData('is_available', true);
+        setIsModalOpen(true);
+    };
 
-    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-            router.get(
-                menus.index(currentTeam.slug),
-                { search: searchTerm },
-                { preserveState: true },
-            );
+    const openEditModal = (menu: any) => {
+        clearErrors();
+        setEditingMenu(menu);
+        setData({
+            name: menu.name,
+            description: menu.description || '',
+            category: menu.category,
+            price: menu.price,
+            is_available: menu.is_available,
+        });
+        setIsModalOpen(true);
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (editingMenu) {
+            put(`/menus/${editingMenu.id}`, {
+                onSuccess: () => setIsModalOpen(false),
+            });
+        } else {
+            post('/menus', {
+                onSuccess: () => setIsModalOpen(false),
+            });
         }
     };
 
-    const formatPrice = (price: string) => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-        }).format(Number(price));
+    const handleDelete = (id: number) => {
+        if (confirm('Yakin ingin menghapus menu ini?')) {
+            destroy(`/menus/${id}`);
+        }
+    };
+
+    const formatRupiah = (amount: any) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(parseFloat(amount));
     };
 
     return (
         <>
-            <Head title="Menu Management" />
+            <Head title="Manajemen Menu - RestoWeb Admin" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto bg-slate-50/50 p-6 font-['Inter',sans-serif]">
-                {/* Header Actions */}
-                <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-white font-['Inter',sans-serif]">
+                <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                            Menu Management
+                        <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-white/90">
+                            Katalog Menu
                         </h1>
-                        <p className="text-sm text-slate-500">
-                            Manage your restaurant's offerings, pricing, and
-                            availability.
+                        <p className="mt-1 text-sm text-white/50">
+                            Tambah, kurangi, atau ubah detail makanan yang ditawarkan.
                         </p>
                     </div>
-                    <div className="flex gap-2">
-                        <Button className="bg-amber-700 text-white shadow-md hover:bg-amber-800">
+                    <div className="flex w-full sm:w-auto items-center gap-3">
+                        <form onSubmit={handleSearch} className="relative w-full sm:w-64">
+                            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                            <Input 
+                                type="text"
+                                placeholder="Cari sajian..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-white/40 focus-visible:ring-amber-500"
+                            />
+                        </form>
+                        <Button 
+                            onClick={openCreateModal}
+                            className="shrink-0 bg-amber-500 hover:bg-amber-600 text-[#0A0A0B] font-semibold"
+                        >
                             <Plus className="mr-2 h-4 w-4" />
-                            Add New Item
+                            Tambah Menu
                         </Button>
                     </div>
                 </div>
 
-                <Card className="border-slate-200/60 bg-white shadow-sm">
-                    <CardHeader className="flex flex-col items-center justify-between gap-4 pb-4 sm:flex-row">
-                        <div>
-                            <CardTitle className="text-lg text-slate-900">
-                                Menu Items
-                            </CardTitle>
-                            <CardDescription>
-                                A complete list of your restaurant menu.
-                            </CardDescription>
+                <div className="overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-xl">
+                    {menus.length > 0 ? (
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader className="border-b border-white/5 bg-white/5">
+                                    <TableRow className="hover:bg-transparent border-white/5">
+                                        <TableHead className="font-semibold text-white/70">Menu Item</TableHead>
+                                        <TableHead className="font-semibold text-white/70">Kategori</TableHead>
+                                        <TableHead className="font-semibold text-white/70">Harga</TableHead>
+                                        <TableHead className="font-semibold text-white/70">Wujud</TableHead>
+                                        <TableHead className="text-right font-semibold text-white/70">Aksi</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {menus.map((menu: any) => (
+                                        <TableRow key={menu.id} className="hover:bg-white/5 border-white/5">
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/50">
+                                                        <BookOpen size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-semibold text-white/90">{menu.name}</p>
+                                                        <p className="text-xs text-white/50 mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline" className="border-white/10 text-white/70 bg-transparent">
+                                                    {menu.category}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>
+                                                <span className="font-medium text-amber-500">{formatRupiah(menu.price)}</span>
+                                            </TableCell>
+                                            <TableCell>
+                                                {menu.is_available ? (
+                                                    <span className="inline-flex items-center text-xs font-medium text-emerald-400">
+                                                        <Check size={14} className="mr-1" /> Tersedia
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center text-xs font-medium text-rose-400 opacity-70">
+                                                        <EyeOff size={14} className="mr-1" /> Habis (Hidden)
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <Button 
+                                                        size="icon" 
+                                                        variant="ghost" 
+                                                        onClick={() => openEditModal(menu)}
+                                                        className="h-8 w-8 text-white/60 hover:text-white hover:bg-white/10"
+                                                    >
+                                                        <Edit2 size={16} />
+                                                    </Button>
+                                                    <Button 
+                                                        size="icon" 
+                                                        variant="ghost" 
+                                                        onClick={() => handleDelete(menu.id)}
+                                                        className="h-8 w-8 text-rose-500/80 hover:text-rose-500 hover:bg-rose-500/10"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </div>
-                        <div className="flex w-full items-center gap-2 sm:w-auto">
-                            <div className="relative w-full sm:w-64">
-                                <Search className="absolute top-2.5 left-2.5 h-4 w-4 text-slate-400" />
-                                <Input
-                                    type="search"
-                                    placeholder="Search menus..."
-                                    className="border-slate-200 bg-slate-50 pl-9"
-                                    value={searchTerm}
-                                    onChange={(e) =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                    onKeyDown={handleSearch}
-                                />
+                    ) : (
+                        <div className="p-16 flex flex-col items-center justify-center text-center">
+                            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5 text-white/20">
+                                <BookOpen size={28} />
                             </div>
-                            <Button
-                                variant="outline"
-                                className="shrink-0 border-slate-200 bg-white text-slate-600"
-                            >
-                                Filter
+                            <h3 className="mb-1 text-lg font-semibold text-white/90">Katalog Kosong</h3>
+                            <p className="text-sm text-white/50 mb-6 max-w-sm">Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.</p>
+                            <Button onClick={openCreateModal} className="bg-amber-500 hover:bg-amber-600 text-[#0A0A0B] font-semibold">
+                                Mulai Tambah Menu
                             </Button>
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="overflow-hidden rounded-md border border-slate-200">
-                            <table className="w-full text-left text-sm">
-                                <thead className="border-b border-slate-200 bg-slate-50 text-xs text-slate-500 uppercase">
-                                    <tr>
-                                        <th className="px-6 py-3 font-medium">
-                                            Item Name
-                                        </th>
-                                        <th className="px-6 py-3 font-medium">
-                                            Category
-                                        </th>
-                                        <th className="px-6 py-3 text-right font-medium">
-                                            Price
-                                        </th>
-                                        <th className="px-6 py-3 text-center font-medium">
-                                            Status
-                                        </th>
-                                        <th className="px-6 py-3 text-right font-medium">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 bg-white">
-                                    {paginatedMenus.data.length > 0 ? (
-                                        paginatedMenus.data.map((item) => (
-                                            <tr
-                                                key={item.id}
-                                                className="transition-colors hover:bg-slate-50/80"
-                                            >
-                                                <td className="px-6 py-4">
-                                                    <div className="font-semibold text-slate-900">
-                                                        {item.name}
-                                                    </div>
-                                                    <div
-                                                        className="mt-0.5 line-clamp-1 max-w-[200px] text-xs text-slate-500"
-                                                        title={
-                                                            item.description ||
-                                                            ''
-                                                        }
-                                                    >
-                                                        {item.description ||
-                                                            'No description provided'}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <Badge
-                                                        variant="outline"
-                                                        className="border-slate-200 bg-slate-50 font-normal text-slate-600"
-                                                    >
-                                                        {item.category}
-                                                    </Badge>
-                                                </td>
-                                                <td className="px-6 py-4 text-right font-medium text-slate-900">
-                                                    {formatPrice(item.price)}
-                                                </td>
-                                                <td className="px-6 py-4 text-center">
-                                                    {item.is_available ? (
-                                                        <Badge className="border-0 bg-emerald-100 font-normal text-emerald-800 hover:bg-emerald-100">
-                                                            Available
-                                                        </Badge>
-                                                    ) : (
-                                                        <Badge className="border-0 bg-rose-100 font-normal text-rose-800 hover:bg-rose-100">
-                                                            Unavailable
-                                                        </Badge>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-slate-400 hover:text-amber-700"
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-slate-400 hover:text-slate-900"
-                                                        >
-                                                            <EyeOff className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-8 w-8 text-slate-400 hover:text-rose-600"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td
-                                                colSpan={5}
-                                                className="px-6 py-12 text-center text-slate-500"
-                                            >
-                                                No menu items found.
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                    )}
+                </div>
+            </div>
+
+            {/* Premium Modal Form */}
+            {isModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="relative w-full max-w-lg rounded-2xl border border-white/10 bg-[#121214] p-6 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        
+                        <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/20 blur-3xl"></div>
+                        
+                        <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
+                            <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-white">
+                                {editingMenu ? 'Edit Menu' : 'Menu Makanan Baru'}
+                            </h2>
+                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-white/50 hover:bg-white/5 hover:text-white transition-colors">
+                                <X size={18} />
+                            </button>
                         </div>
 
-                        {/* Basic Pagination Header Stub */}
-                        <div className="mt-4 flex items-center justify-between px-2">
-                            <span className="text-sm text-slate-500">
-                                Showing page {paginatedMenus.current_page} of{' '}
-                                {paginatedMenus.last_page}
-                            </span>
-                            <div className="flex gap-1">
-                                {paginatedMenus.links.map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        preserveState
-                                        className={`rounded-md px-3 py-1 text-sm transition-colors ${link.active ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'} ${!link.url && 'pointer-events-none opacity-50'}`}
-                                        dangerouslySetInnerHTML={{
-                                            __html: link.label,
-                                        }}
-                                    />
-                                ))}
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div>
+                                <Label htmlFor="name" className="text-white/70">Nama Hidangan</Label>
+                                <Input 
+                                    id="name" 
+                                    value={data.name} 
+                                    onChange={e => setData('name', e.target.value)}
+                                    className="mt-1.5 bg-white/5 border-white/10 text-white focus-visible:ring-amber-500"
+                                    placeholder="Cth: Wagyu A5 Ribeye"
+                                />
+                                {errors.name && <p className="mt-1 text-xs text-rose-500">{errors.name}</p>}
                             </div>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
+                            
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="category" className="text-white/70">Kategori</Label>
+                                    <select 
+                                        id="category" 
+                                        value={data.category} 
+                                        onChange={e => setData('category', e.target.value)}
+                                        className="mt-1.5 flex h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                    >
+                                        <option value="" className="bg-[#121214] text-white/50">Pilih...</option>
+                                        {categories.map(c => <option key={c} value={c} className="bg-[#121214]">{c}</option>)}
+                                    </select>
+                                    {errors.category && <p className="mt-1 text-xs text-rose-500">{errors.category}</p>}
+                                </div>
+                                <div>
+                                    <Label htmlFor="price" className="text-white/70">Harga (Rp)</Label>
+                                    <Input 
+                                        id="price" 
+                                        type="number"
+                                        value={data.price} 
+                                        onChange={e => setData('price', e.target.value)}
+                                        className="mt-1.5 bg-white/5 border-white/10 text-white focus-visible:ring-amber-500"
+                                        placeholder="75000"
+                                    />
+                                    {errors.price && <p className="mt-1 text-xs text-rose-500">{errors.price}</p>}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <Label htmlFor="description" className="text-white/70">Deskripsi Singkat</Label>
+                                <Textarea 
+                                    id="description" 
+                                    value={data.description} 
+                                    onChange={e => setData('description', e.target.value)}
+                                    className="mt-1.5 bg-white/5 border-white/10 text-white focus-visible:ring-amber-500 resize-none h-20"
+                                    placeholder="Sajian istimewa dari dapur kami..."
+                                />
+                                {errors.description && <p className="mt-1 text-xs text-rose-500">{errors.description}</p>}
+                            </div>
+                            
+                            <div className="flex items-center gap-2 pt-2">
+                                <input 
+                                    type="checkbox" 
+                                    id="is_available" 
+                                    checked={data.is_available} 
+                                    onChange={e => setData('is_available', e.target.checked)}
+                                    className="h-4 w-4 rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                />
+                                <Label htmlFor="is_available" className="text-white cursor-pointer font-medium">Tersedia untuk dipesan</Label>
+                            </div>
+
+                            <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-white/5">
+                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-white/70 hover:text-white hover:bg-white/5">
+                                    Batal
+                                </Button>
+                                <Button type="submit" disabled={processing} className="bg-amber-500 hover:bg-amber-600 text-[#0A0A0B] font-bold">
+                                    {processing ? 'Menyimpan...' : 'Simpan Menu'}
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
 
-MenusIndex.layout = (props: { currentTeam?: { slug: string } | null }) => ({
-    breadcrumbs: [
-        {
-            title: 'Menu Management',
-            href: props.currentTeam ? menus.index(props.currentTeam.slug) : '#',
-        },
-    ],
-});
+MenuManagement.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;

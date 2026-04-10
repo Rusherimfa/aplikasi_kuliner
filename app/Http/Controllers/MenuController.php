@@ -12,8 +12,13 @@ class MenuController extends Controller
     /**
      * Display a listing of the menus for the team.
      */
-    public function index(Request $request, Team $team)
+    public function index(Request $request)
     {
+        $team = Team::first();
+        if (! $team) {
+            abort(500, 'Master team not found');
+        }
+
         $menus = $team->menus()
             ->when($request->query('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
@@ -22,8 +27,7 @@ class MenuController extends Controller
                 $query->where('category', $category);
             })
             ->latest()
-            ->paginate(15)
-            ->withQueryString();
+            ->get();
 
         return Inertia::render('menus/index', [
             'menus' => $menus,
@@ -34,8 +38,9 @@ class MenuController extends Controller
     /**
      * Store a newly created menu in storage.
      */
-    public function store(Request $request, Team $team)
+    public function store(Request $request)
     {
+        $team = Team::first();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -46,19 +51,14 @@ class MenuController extends Controller
 
         $team->menus()->create($validated);
 
-        return back()->with('success', 'Menu added successfully.');
+        return back()->with('success', 'Menu ditambahkan berhasil.');
     }
 
     /**
      * Update the specified menu in storage.
      */
-    public function update(Request $request, Team $team, Menu $menu)
+    public function update(Request $request, Menu $menu)
     {
-        // Ensure menu belongs to team
-        if ($menu->team_id !== $team->id) {
-            abort(403);
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -69,20 +69,16 @@ class MenuController extends Controller
 
         $menu->update($validated);
 
-        return back()->with('success', 'Menu updated successfully.');
+        return back()->with('success', 'Menu diperbarui berhasil.');
     }
 
     /**
      * Remove the specified menu from storage.
      */
-    public function destroy(Team $team, Menu $menu)
+    public function destroy(Menu $menu)
     {
-        if ($menu->team_id !== $team->id) {
-            abort(403);
-        }
-
         $menu->delete();
 
-        return back()->with('success', 'Menu deleted successfully.');
+        return back()->with('success', 'Menu berhasil dihapus.');
     }
 }

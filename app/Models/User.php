@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Concerns\HasTeams;
+use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -30,6 +31,22 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
+            'role' => Role::class,
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === Role::ADMIN;
+    }
+
+    public function isStaff(): bool
+    {
+        return in_array($this->role, [Role::STAFF, Role::ADMIN]);
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === Role::CUSTOMER;
     }
 }
