@@ -1,7 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff } from 'lucide-react';
+import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +27,7 @@ export default function MenuManagement({ menus, filters }: any) {
         category: '',
         price: '',
         is_available: true,
+        is_best_seller: false,
     });
 
     const categories = ['Main Course', 'Appetizer', 'Beverage', 'Dessert', 'Snack'];
@@ -40,7 +41,7 @@ export default function MenuManagement({ menus, filters }: any) {
         clearErrors();
         setEditingMenu(null);
         reset();
-        setData('is_available', true);
+        setData((prev) => ({ ...prev, is_available: true, is_best_seller: false }));
         setIsModalOpen(true);
     };
 
@@ -53,6 +54,7 @@ export default function MenuManagement({ menus, filters }: any) {
             category: menu.category,
             price: menu.price,
             is_available: menu.is_available,
+            is_best_seller: menu.is_best_seller || false,
         });
         setIsModalOpen(true);
     };
@@ -137,7 +139,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                         <BookOpen size={18} />
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-white/90">{menu.name}</p>
+                                                        <p className="font-semibold text-white/90 flex items-center gap-2">{menu.name} {menu.is_best_seller && <Flame size={14} className="text-rose-500" title="Sangat Laris" />}</p>
                                                         <p className="text-xs text-white/50 mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
                                                     </div>
                                                 </div>
@@ -271,15 +273,27 @@ export default function MenuManagement({ menus, filters }: any) {
                                 {errors.description && <p className="mt-1 text-xs text-rose-500">{errors.description}</p>}
                             </div>
                             
-                            <div className="flex items-center gap-2 pt-2">
-                                <input 
-                                    type="checkbox" 
-                                    id="is_available" 
-                                    checked={data.is_available} 
-                                    onChange={e => setData('is_available', e.target.checked)}
-                                    className="h-4 w-4 rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
-                                />
-                                <Label htmlFor="is_available" className="text-white cursor-pointer font-medium">Tersedia untuk dipesan</Label>
+                            <div className="flex flex-col gap-3 pt-2">
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox" 
+                                        id="is_available" 
+                                        checked={data.is_available} 
+                                        onChange={e => setData('is_available', e.target.checked)}
+                                        className="h-4 w-4 rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                    />
+                                    <Label htmlFor="is_available" className="text-white cursor-pointer font-medium">Tersedia untuk dipesan</Label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="checkbox" 
+                                        id="is_best_seller" 
+                                        checked={data.is_best_seller} 
+                                        onChange={e => setData('is_best_seller', e.target.checked)}
+                                        className="h-4 w-4 rounded border-white/10 bg-white/5 text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                    />
+                                    <Label htmlFor="is_best_seller" className="text-white cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> Tandai sebagai hidangan "Sangat Laris"</Label>
+                                </div>
                             </div>
 
                             <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-white/5">

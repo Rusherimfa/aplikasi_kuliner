@@ -67,8 +67,8 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                     Rp {Number(item.price).toLocaleString('id-ID')}
                                 </div>
 
-                                {/* Popular badge for first item */}
-                                {index === 0 && (
+                                {/* Popular badge conditional based on db flag */}
+                                {item.is_best_seller && (
                                     <div className="absolute bottom-4 left-4 flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-lg">
                                         <Flame size={11} />
                                         Sangat Laris

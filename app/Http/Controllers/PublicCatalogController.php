@@ -22,14 +22,22 @@ class PublicCatalogController extends Controller
         if ($defaultTeam) {
             $bestSellers = $defaultTeam->menus()
                 ->where('is_available', true)
+                ->orderBy('is_best_seller', 'desc')
                 ->inRandomOrder()
                 ->take(4)
                 ->get();
         }
 
+        $testimonials = \App\Models\Testimonial::where('is_approved', true)
+            ->orderBy('rating', 'desc')
+            ->latest()
+            ->take(3)
+            ->get();
+
         return Inertia::render('welcome/index', [
             'canRegister' => Features::enabled(Features::registration()),
             'bestSellers' => $bestSellers,
+            'testimonials' => $testimonials,
         ]);
     }
 

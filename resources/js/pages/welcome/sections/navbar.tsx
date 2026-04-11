@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut } from 'lucide-react';
+import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { login } from '@/routes';
@@ -25,6 +25,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
         { href: '/catalog', label: 'Menu Kami', subtitle: 'Jelajahi hidangan unggulan', icon: BookOpen },
         { href: '/reservations/create', label: 'Reservasi', subtitle: 'Pesan meja dalam hitungan detik', icon: CalendarPlus },
         { href: '/experience', label: 'Pengalaman', subtitle: 'Lihat suasana & cerita kami', icon: UtensilsCrossed },
+        { href: '/testimonials', label: 'Cerita Tamu', subtitle: 'Kisah dari pelanggan kami', icon: Quote },
     ];
 
     useEffect(() => {
@@ -80,6 +81,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             { href: '/catalog', label: 'Menu Kami' },
                             { href: '/reservations/create', label: 'Reservasi' },
                             { href: '/experience', label: 'Pengalaman' },
+                            { href: '/testimonials', label: 'Cerita Tamu' },
                         ].map((link) => (
                             <Link
                                 key={link.href}

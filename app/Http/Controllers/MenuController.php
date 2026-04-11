@@ -47,6 +47,7 @@ class MenuController extends Controller
             'category' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
+            'is_best_seller' => 'boolean',
         ]);
 
         $team->menus()->create($validated);
@@ -65,6 +66,7 @@ class MenuController extends Controller
             'category' => 'required|string|max:100',
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
+            'is_best_seller' => 'boolean',
         ]);
 
         $menu->update($validated);

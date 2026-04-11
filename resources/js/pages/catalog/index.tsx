@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { UtensilsCrossed, Search, ShoppingBag } from 'lucide-react';
+import { UtensilsCrossed, Search, ShoppingBag, Flame } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,7 @@ interface Menu {
     description: string | null;
     category: string;
     price: string;
+    is_best_seller: boolean;
 }
 
 interface PageProps {
@@ -138,6 +139,14 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                         <div className="absolute inset-0 flex items-center justify-center text-slate-200 transition-transform duration-700 group-hover:scale-110">
                                             <UtensilsCrossed size={48} className="opacity-70" />
                                         </div>
+                                        
+                                        {/* Best Seller Badge */}
+                                        {item.is_best_seller && (
+                                            <div className="absolute top-4 left-4 flex items-center gap-1.5 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-lg z-10">
+                                                <Flame size={11} />
+                                                Sangat Laris
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div className="flex flex-1 flex-col p-6">

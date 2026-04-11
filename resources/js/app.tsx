@@ -18,6 +18,7 @@ createInertiaApp({
             case name.startsWith('menu'):
             case name.startsWith('catalog'):
             case name.startsWith('reservations'):
+            case name.startsWith('testimonials'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

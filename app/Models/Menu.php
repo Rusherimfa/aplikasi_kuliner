@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['team_id', 'name', 'description', 'category', 'price', 'image_path', 'is_available'])]
+#[Fillable(['team_id', 'name', 'description', 'category', 'price', 'image_path', 'is_available', 'is_best_seller'])]
 class Menu extends Model
 {
     /** @use HasFactory<MenuFactory> */
@@ -41,6 +41,7 @@ class Menu extends Model
         return [
             'price' => 'decimal:2',
             'is_available' => 'boolean',
+            'is_best_seller' => 'boolean',
         ];
     }
 }

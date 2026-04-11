@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
 Route::get('/catalog', [PublicCatalogController::class, 'catalog'])->name('catalog');
 Route::get('/experience', [PublicCatalogController::class, 'experience'])->name('experience');
+Route::get('/testimonials', [\App\Http\Controllers\TestimonialController::class, 'index'])->name('testimonials.index');
 
 // Public reservations (no login required)
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
         Route::put('/reservations/{reservation}/customer', [ReservationController::class, 'updateCustomer'])->name('reservations.update_customer');
         Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+
+        // Authenticated Testimonials
+        Route::post('/testimonials', [\App\Http\Controllers\TestimonialController::class, 'store'])->name('testimonials.store');
     });
 
 Route::middleware(['auth', 'verified', 'role:admin,staff'])

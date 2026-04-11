@@ -16,8 +16,10 @@ import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function Welcome({
     bestSellers = [],
+    testimonials = [],
 }: {
     bestSellers?: any[];
+    testimonials?: any[];
 }) {
     const { auth, currentTeam } = usePage().props;
     const dashboardUrl = dashboard().url;
@@ -52,7 +54,7 @@ export default function Welcome({
 
                 <HowItWorks />
 
-                <Testimonials />
+                <Testimonials testimonials={testimonials} auth={auth} />
 
                 <CTASection />
 
