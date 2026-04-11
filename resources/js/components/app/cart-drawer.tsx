@@ -22,7 +22,7 @@ export default function CartDrawer() {
                 >
                     <div className="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-sm" />
                 </Transition.Child>
-
+ 
                 <div className="fixed inset-0 overflow-hidden">
                     <div className="absolute inset-0 overflow-hidden">
                         <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
@@ -36,17 +36,17 @@ export default function CartDrawer() {
                                 leaveTo="translate-x-full"
                             >
                                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                                    <div className="flex h-full flex-col bg-[#FAFAFA] shadow-2xl">
+                                    <div className="flex h-full flex-col bg-card shadow-2xl transition-colors duration-500">
                                         <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                                             <div className="flex items-start justify-between">
-                                                <Dialog.Title className="text-xl font-['Playfair_Display',serif] font-bold text-slate-900 flex items-center gap-2">
+                                                <Dialog.Title className="text-xl font-['Playfair_Display',serif] font-bold text-foreground flex items-center gap-2">
                                                     <ShoppingBag size={24} className="text-amber-500" />
                                                     Pesanan Anda
                                                 </Dialog.Title>
                                                 <div className="ml-3 flex h-7 items-center">
                                                     <button
                                                         type="button"
-                                                        className="relative -m-2 p-2 text-slate-400 hover:text-slate-500 transition-colors"
+                                                        className="relative -m-2 p-2 text-muted-foreground hover:text-foreground transition-colors"
                                                         onClick={() => setCartOpen(false)}
                                                     >
                                                         <span className="absolute -inset-0.5" />
@@ -59,44 +59,44 @@ export default function CartDrawer() {
                                             <div className="mt-8">
                                                 {items.length === 0 ? (
                                                     <div className="flex flex-col items-center justify-center py-12 text-center">
-                                                        <div className="h-24 w-24 rounded-full bg-slate-100 flex items-center justify-center mb-6">
-                                                            <UtensilsCrossed size={40} className="text-slate-300" />
+                                                        <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center mb-6">
+                                                            <UtensilsCrossed size={40} className="text-muted-foreground/40" />
                                                         </div>
-                                                        <h3 className="text-lg font-medium text-slate-900 mb-2">Keranjang Kosong</h3>
-                                                        <p className="text-slate-500 max-w-[200px]">
+                                                        <h3 className="text-lg font-medium text-foreground mb-2">Keranjang Kosong</h3>
+                                                        <p className="text-muted-foreground max-w-[200px]">
                                                             Silakan telusuri katalog untuk menambahkan hidangan.
                                                         </p>
                                                     </div>
                                                 ) : (
                                                     <div className="flow-root">
-                                                        <ul role="list" className="-my-6 divide-y divide-slate-200">
+                                                        <ul role="list" className="-my-6 divide-y divide-border">
                                                             {items.map((item) => (
-                                                                <li key={item.id} className="flex py-6">
-                                                                    <div className="flex flex-1 flex-col">
-                                                                        <div>
-                                                                            <div className="flex justify-between text-base font-semibold text-slate-900">
-                                                                                <h4 className="line-clamp-2 pr-4">{item.name}</h4>
-                                                                                <p className="ml-4 whitespace-nowrap text-amber-600">
-                                                                                    Rp {(Number(item.price) * item.quantity).toLocaleString('id-ID')}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div className="flex flex-1 items-end justify-between text-sm mt-4">
-                                                                            <div className="flex items-center gap-3 rounded-full border border-slate-200 bg-white p-1 shadow-sm">
-                                                                                <button
-                                                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                                                    className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                                                                                >
-                                                                                    <Minus size={14} />
-                                                                                </button>
-                                                                                <span className="w-4 text-center font-medium text-slate-900">{item.quantity}</span>
-                                                                                <button
-                                                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                                    className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700"
-                                                                                >
-                                                                                    <Plus size={14} />
-                                                                                </button>
-                                                                            </div>
+                                                                 <li key={item.id} className="flex py-6">
+                                                                     <div className="flex flex-1 flex-col">
+                                                                         <div>
+                                                                             <div className="flex justify-between text-base font-semibold text-foreground">
+                                                                                 <h4 className="line-clamp-2 pr-4">{item.name}</h4>
+                                                                                 <p className="ml-4 whitespace-nowrap text-amber-600">
+                                                                                     Rp {(Number(item.price) * item.quantity).toLocaleString('id-ID')}
+                                                                                 </p>
+                                                                             </div>
+                                                                         </div>
+                                                                         <div className="flex flex-1 items-end justify-between text-sm mt-4">
+                                                                             <div className="flex items-center gap-3 rounded-full border border-border bg-background p-1 shadow-sm">
+                                                                                 <button
+                                                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
+                                                                                 >
+                                                                                     <Minus size={14} />
+                                                                                 </button>
+                                                                                 <span className="w-4 text-center font-medium text-foreground">{item.quantity}</span>
+                                                                                 <button
+                                                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
+                                                                                 >
+                                                                                     <Plus size={14} />
+                                                                                 </button>
+                                                                             </div>
 
                                                                             <button
                                                                                 type="button"
@@ -116,8 +116,8 @@ export default function CartDrawer() {
                                         </div>
 
                                         {items.length > 0 && (
-                                            <div className="border-t border-slate-200 bg-white px-4 py-6 sm:px-6">
-                                                <div className="flex justify-between text-lg font-bold text-slate-900 mb-6">
+                                            <div className="border-t border-border bg-card px-4 py-6 sm:px-6">
+                                                <div className="flex justify-between text-lg font-bold text-foreground mb-6">
                                                     <p>Total Pesanan</p>
                                                     <p className="text-amber-600">Rp {cartTotal.toLocaleString('id-ID')}</p>
                                                 </div>
@@ -126,7 +126,7 @@ export default function CartDrawer() {
                                                         Lanjut ke Pembayaran <ArrowRight className="ml-2" size={20} />
                                                     </Button>
                                                 </Link>
-                                                <div className="mt-4 flex justify-center text-center text-sm text-slate-500">
+                                                <div className="mt-4 flex justify-center text-center text-sm text-muted-foreground">
                                                     <p>
                                                         atau{' '}
                                                         <button

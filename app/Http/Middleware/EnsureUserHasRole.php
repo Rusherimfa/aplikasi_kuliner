@@ -21,7 +21,7 @@ class EnsureUserHasRole
         }
 
         // We access ->value since role was casted to App\Enums\Role
-        $userRole = Auth::user()->role->value ?? 'customer';
+        $userRole = Auth::user()->role?->value ?? 'customer';
 
         // Let admin access any route inside roles unless explicitly prevented (optional design choice, here we enforce strict match or admin override)
         if ($userRole === 'admin') {

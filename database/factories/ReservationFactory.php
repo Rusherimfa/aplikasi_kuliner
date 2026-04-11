@@ -62,4 +62,3 @@ class ReservationFactory extends Factory
         ]);
     }
 }
-

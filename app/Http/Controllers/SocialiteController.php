@@ -69,7 +69,7 @@ class SocialiteController extends Controller
         Auth::login($user, true); // true = remember me
 
         // Jika dia adalah staff/admin arahkan ke dashboard. Jika customer arahkan ke home.
-        if (in_array($user->role, ['admin', 'staff'])) {
+        if (in_array($user->role?->value ?? 'customer', ['admin', 'staff'])) {
             return redirect()->route('dashboard');
         }
 

@@ -30,28 +30,23 @@ export function AppSidebar() {
             icon: LayoutGrid,
         },
         {
-            title: 'Pesanan Aktif',
-            href: '#',
+            title: 'Katalog Menu',
+            href: '/catalog',
             icon: Utensils,
         },
         {
-            title: 'Manajemen Menu',
-            href: '#',
-            icon: BookOpen,
-        },
-        {
-            title: 'Meja & Reservasi',
-            href: '#',
+            title: 'Buat Reservasi',
+            href: '/reservations/create',
             icon: Calendar,
         },
         {
-            title: 'Laporan Penjualan',
-            href: '#',
-            icon: PieChart,
+            title: 'Aktivitas Saya',
+            href: '/reservations/history',
+            icon: BookOpen,
         },
         {
-            title: 'Pengaturan Resto',
-            href: '#',
+            title: 'Pengaturan',
+            href: '/settings/profile',
             icon: Settings,
         },
     ];

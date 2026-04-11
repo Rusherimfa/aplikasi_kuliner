@@ -30,7 +30,9 @@ const TESTIMONIALS = [
     },
 ];
 
-export default function Testimonials() {
+export default function Testimonials({ reviews = [] }: { reviews?: any[] }) {
+    const displayReviews = reviews && reviews.length > 0 ? reviews : TESTIMONIALS;
+
     return (
         <section className="relative overflow-hidden bg-slate-50 dark:bg-slate-900 dark:bg-gradient-to-br dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-28 transition-colors duration-500">
             {/* Decorative ambient */}
@@ -53,43 +55,55 @@ export default function Testimonials() {
 
                 {/* Cards */}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                    {TESTIMONIALS.map((t) => (
-                        <div
-                            key={t.id}
-                            className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-white/8 bg-white dark:bg-white/5 p-8 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-amber-300 dark:hover:border-amber-500/20 hover:shadow-xl dark:hover:bg-white/8"
-                        >
-                            {/* Top glow line */}
-                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    {displayReviews.map((t: any) => {
+                        const id = t.id;
+                        const quote = t.message || t.quote;
+                        const rating = t.rating;
+                        const name = t.user?.name || t.name;
+                        const role = t.user ? 'Tamu Terverifikasi' : t.role;
+                        
+                        // Extract initials for avatar
+                        const avatar = t.avatar || (name ? name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'RT');
+                        const avatarColor = t.avatarColor || 'from-amber-500 to-orange-700';
 
-                            {/* Quote icon */}
-                            <Quote size={36} className="mb-6 shrink-0 text-amber-500/30" />
+                        return (
+                            <div
+                                key={id}
+                                className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-white/8 bg-white dark:bg-white/5 p-8 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:border-amber-300 dark:hover:border-amber-500/20 hover:shadow-xl dark:hover:bg-white/8"
+                            >
+                                {/* Top glow line */}
+                                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/40 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                            {/* Quote text */}
-                            <p className="mb-8 flex-1 text-base leading-relaxed text-slate-600 dark:text-white/70 italic">
-                                "{t.quote}"
-                            </p>
+                                {/* Quote icon */}
+                                <Quote size={36} className="mb-6 shrink-0 text-amber-500/30" />
 
-                            {/* Stars */}
-                            <div className="mb-5 flex gap-1">
-                                {Array.from({ length: t.rating }).map((_, i) => (
-                                    <Star key={i} size={13} className="fill-amber-400 text-amber-400" />
-                                ))}
-                            </div>
+                                {/* Quote text */}
+                                <p className="mb-8 flex-1 text-base leading-relaxed text-slate-600 dark:text-white/70 italic line-clamp-4">
+                                    "{quote}"
+                                </p>
 
-                            {/* Author */}
-                            <div className="flex items-center gap-4 border-t border-slate-100 dark:border-white/8 pt-5">
-                                <div
-                                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${t.avatarColor} text-sm font-bold text-white shadow-lg`}
-                                >
-                                    {t.avatar}
+                                {/* Stars */}
+                                <div className="mb-5 flex gap-1">
+                                    {Array.from({ length: rating }).map((_, i) => (
+                                        <Star key={i} size={13} className="fill-amber-400 text-amber-400" />
+                                    ))}
                                 </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{t.name}</p>
-                                    <p className="mt-0.5 text-xs text-slate-500 dark:text-white/40">{t.role}</p>
+
+                                {/* Author */}
+                                <div className="flex items-center gap-4 border-t border-slate-100 dark:border-white/8 pt-5">
+                                    <div
+                                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${avatarColor} text-sm font-bold text-white shadow-lg`}
+                                    >
+                                        {avatar}
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-white">{name}</p>
+                                        <p className="mt-0.5 text-xs text-slate-500 dark:text-white/40">{role}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </div>
         </section>

@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
+use App\Models\Review;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
@@ -17,19 +19,30 @@ class PublicCatalogController extends Controller
     {
         $defaultTeam = Team::first();
 
-        // 4 Menus for the landing page (random or latest)
-        $bestSellers = [];
-        if ($defaultTeam) {
-            $bestSellers = $defaultTeam->menus()
+        // 4 Menus for the landing page (random or latest) cached for 1 hour to reduce DB hits
+        $bestSellers = Cache::remember('welcome_best_sellers', 3600, function () use ($defaultTeam) {
+            return $defaultTeam ? $defaultTeam->menus()
                 ->where('is_available', true)
                 ->inRandomOrder()
                 ->take(4)
-                ->get();
-        }
+                ->get()->toArray() : [];
+        });
+
+        // 3 Real Reviews
+        $reviews = Cache::remember('welcome_reviews', 3600, function () {
+            return Review::with('user:id,name,avatar')
+                ->where('rating', 5)
+                ->whereNotNull('message')
+                ->latest()
+                ->take(3)
+                ->get()
+                ->toArray();
+        });
 
         return Inertia::render('welcome/index', [
             'canRegister' => Features::enabled(Features::registration()),
             'bestSellers' => $bestSellers,
+            'reviews' => $reviews,
         ]);
     }
 
@@ -40,9 +53,10 @@ class PublicCatalogController extends Controller
     {
         $defaultTeam = Team::first();
 
-        $menus = [];
-        if ($defaultTeam) {
-            $menus = $defaultTeam->menus()
+        $cacheKey = 'catalog_menus_'.md5(json_encode($request->only(['search', 'category'])));
+
+        $menus = Cache::remember($cacheKey, 3600, function () use ($defaultTeam, $request) {
+            return $defaultTeam ? $defaultTeam->menus()
                 ->where('is_available', true)
                 ->when($request->query('category'), function ($query, $category) {
                     $query->where('category', $category);
@@ -50,8 +64,8 @@ class PublicCatalogController extends Controller
                 ->when($request->query('search'), function ($query, $search) {
                     $query->where('name', 'like', "%{$search}%");
                 })
-                ->get(); // Using get for frontend grid display instead of heavy pagination for now, or we can use pagination.
-        }
+                ->get()->toArray() : [];
+        });
 
         return Inertia::render('catalog/index', [
             'menus' => $menus,

@@ -56,8 +56,8 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                 <nav
                     className={`mx-auto flex h-16 max-w-6xl items-center justify-between pointer-events-auto rounded-full border px-4 transition-all duration-500 sm:px-6 md:pl-8 ${
                         scrolled || mobileMenuOpen
-                            ? 'border-slate-200 bg-white/90 shadow-xl shadow-slate-200/50 backdrop-blur-2xl dark:border-neutral-800 dark:bg-neutral-900/90 dark:shadow-black/50'
-                            : 'border-slate-200/50 bg-white/50 backdrop-blur-sm dark:border-neutral-800/50 dark:bg-neutral-900/50'
+                            ? 'border-border bg-background/90 shadow-xl shadow-background/50 backdrop-blur-2xl'
+                            : 'border-border/50 bg-background/50 backdrop-blur-sm'
                     } ${mobileMenuOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
                 >
                     {/* Logo (Centered on mobile, Left on Desktop) */}
@@ -69,7 +69,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-amber-500/40">
                             <UtensilsCrossed size={14} />
                         </span>
-                        <span className="font-['Playfair_Display',serif] text-xl font-semibold tracking-wide text-slate-900 dark:text-white">
+                        <span className="font-['Playfair_Display',serif] text-xl font-semibold tracking-wide text-foreground">
                             Resto<span className="text-amber-600 italic">Web</span>
                         </span>
                     </Link>
@@ -84,8 +84,8 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-neutral-800 dark:hover:text-white ${
-                                    isActive(link.href) ? 'bg-slate-100 text-amber-700 shadow-sm dark:bg-neutral-800 dark:text-amber-500' : 'text-slate-600 dark:text-neutral-400'
+                                className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-muted hover:text-foreground ${
+                                    isActive(link.href) ? 'bg-muted text-amber-700 shadow-sm dark:text-amber-500' : 'text-muted-foreground'
                                 }`}
                             >
                                 {link.label}
@@ -101,11 +101,11 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                     <img 
                                         src={auth.user.avatar} 
                                         alt={auth.user.name} 
-                                        className="h-10 w-10 rounded-full border border-slate-200 dark:border-neutral-700 object-cover shadow-sm bg-white dark:bg-neutral-800"
+                                        className="h-10 w-10 rounded-full border border-border object-cover shadow-sm bg-card"
                                         referrerPolicy="no-referrer"
                                     />
                                 ) : (
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800 text-sm font-bold text-slate-500 dark:text-neutral-400 border border-slate-200 dark:border-neutral-700">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground border border-border">
                                         {auth.user.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
                                 )}
@@ -113,7 +113,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                     <Link href="/reservations/history">
                                         <Button
                                             variant="outline"
-                                            className="h-10 rounded-full border-slate-200 bg-white px-6 text-sm font-medium text-slate-700 shadow-sm backdrop-blur-sm transition-all hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white"
+                                            className="h-10 rounded-full border-border bg-background px-6 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition-all hover:bg-muted hover:border-border hover:text-foreground"
                                         >
                                             Reservasi Saya
                                         </Button>
@@ -122,7 +122,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                     <Link href={dashboardUrl}>
                                         <Button
                                             variant="outline"
-                                            className="h-10 rounded-full border-slate-200 bg-white px-6 text-sm font-medium text-slate-700 shadow-sm backdrop-blur-sm transition-all hover:bg-slate-50 hover:border-slate-300 hover:text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white"
+                                            className="h-10 rounded-full border-border bg-background px-6 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition-all hover:bg-muted hover:border-border hover:text-foreground"
                                         >
                                             Ke Dasbor
                                         </Button>
@@ -143,7 +143,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             <>
                                 <Link
                                     href={login().url}
-                                    className="rounded-full px-4 py-2 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
+                                    className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                                 >
                                     Login Staf
                                 </Link>
@@ -156,13 +156,13 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         )}
                         <button
                             onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
-                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white"
+                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
                         >
                             {resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                         </button>
                         <button
                             onClick={() => setCartOpen(true)}
-                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 dark:bg-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white"
+                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
                         >
                             <ShoppingBag size={18} />
                             {cartCount > 0 && (
@@ -181,26 +181,26 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                     mobileMenuOpen ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
                 }`}
             >
-                <nav className="mx-auto flex w-full max-w-sm items-center justify-between rounded-full border border-slate-200/60 bg-white/90 px-6 py-2 pb-3 pt-2 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] backdrop-blur-2xl dark:border-neutral-800/60 dark:bg-neutral-900/90">
+                <nav className="mx-auto flex w-full max-w-sm items-center justify-between rounded-full border border-border/60 bg-background/90 px-6 py-2 pb-3 pt-2 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] backdrop-blur-2xl">
                     <Link href="/" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
-                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-slate-400 dark:text-neutral-500 group-hover:text-slate-700 dark:group-hover:text-neutral-300 group-hover:bg-slate-50 dark:group-hover:bg-neutral-800'}`}>
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
                             <Home size={20} strokeWidth={isActive('/') ? 2.5 : 2} />
                         </div>
-                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/') ? 'text-amber-700 dark:text-amber-500' : 'text-slate-500 dark:text-neutral-500 group-hover:text-slate-800 dark:group-hover:text-neutral-300'}`}>Beranda</span>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Beranda</span>
                     </Link>
                     
                     <Link href="/catalog" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
-                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/catalog') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-slate-400 dark:text-neutral-500 group-hover:text-slate-700 dark:group-hover:text-neutral-300 group-hover:bg-slate-50 dark:group-hover:bg-neutral-800'}`}>
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/catalog') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
                             <BookOpen size={20} strokeWidth={isActive('/catalog') ? 2.5 : 2} />
                         </div>
-                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/catalog') ? 'text-amber-700 dark:text-amber-500' : 'text-slate-500 dark:text-neutral-500 group-hover:text-slate-800 dark:group-hover:text-neutral-300'}`}>Menu</span>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/catalog') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Menu</span>
                     </Link>
                     
                     <button 
                         onClick={() => setCartOpen(true)}
                         className="group flex flex-col items-center gap-1 mt-1 transition-colors relative"
                     >
-                        <div className="p-1.5 rounded-full text-slate-400 dark:text-neutral-500 transition-colors group-hover:bg-slate-50 dark:group-hover:bg-neutral-800 group-hover:text-slate-700 dark:group-hover:text-neutral-300">
+                        <div className="p-1.5 rounded-full text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
                             <ShoppingBag size={20} strokeWidth={2} />
                             {cartCount > 0 && (
                                 <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-amber-600 text-[8px] font-bold text-white">
@@ -208,63 +208,63 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 </span>
                             )}
                         </div>
-                        <span className="text-[10px] font-medium tracking-wide text-slate-500 dark:text-neutral-500 group-hover:text-slate-800 dark:group-hover:text-neutral-300">Keranjang</span>
+                        <span className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground">Keranjang</span>
                     </button>
                     
                     <Link href="/reservations/create" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
-                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/reservations') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-slate-400 dark:text-neutral-500 group-hover:text-slate-700 dark:group-hover:text-neutral-300 group-hover:bg-slate-50 dark:group-hover:bg-neutral-800'}`}>
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/reservations') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
                             <CalendarPlus size={20} strokeWidth={isActive('/reservations') ? 2.5 : 2} />
                         </div>
-                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/reservations') ? 'text-amber-700 dark:text-amber-500' : 'text-slate-500 dark:text-neutral-500 group-hover:text-slate-800 dark:group-hover:text-neutral-300'}`}>Pesan</span>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/reservations') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Pesan</span>
                     </Link>
                     
                     <button 
                         className="group flex flex-col items-center gap-1 mt-1 transition-colors"
                         onClick={() => setMobileMenuOpen(true)}
                     >
-                        <div className="p-1.5 rounded-full text-slate-400 dark:text-neutral-500 transition-colors group-hover:bg-slate-50 dark:group-hover:bg-neutral-800 group-hover:text-slate-700 dark:group-hover:text-neutral-300">
+                        <div className="p-1.5 rounded-full text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
                             <MenuIcon size={20} strokeWidth={2} />
                         </div>
-                        <span className="text-[10px] font-medium tracking-wide text-slate-500 dark:text-neutral-500 group-hover:text-slate-800 dark:group-hover:text-neutral-300">Lainnya</span>
+                        <span className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground">Lainnya</span>
                     </button>
                 </nav>
             </div>
 
             {/* Premium Full-screen Mobile Overlay */}
             <div
-                className={`fixed inset-0 z-50 bg-slate-50/95 dark:bg-neutral-950/95 p-4 backdrop-blur-2xl transition-all duration-500 md:hidden pointer-events-auto ${
+                className={`fixed inset-0 z-50 bg-background/95 p-4 backdrop-blur-2xl transition-all duration-500 md:hidden pointer-events-auto ${
                     mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
                 }`}
             >
                 <div className="pointer-events-none absolute left-1/3 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-amber-500/15 dark:bg-amber-500/5 blur-[110px]" />
                 <div className="pointer-events-none absolute bottom-0 right-1/4 h-56 w-56 translate-x-1/2 rounded-full bg-amber-600/10 dark:bg-amber-600/5 blur-[110px]" />
 
-                <div className="relative mx-auto flex h-full w-full max-w-md flex-col rounded-[2rem] border border-slate-200/60 dark:border-neutral-800/60 bg-white dark:bg-neutral-900 p-5 shadow-[0_18px_60px_-24px_rgba(0,0,0,0.1)] dark:shadow-[0_18px_60px_-24px_rgba(0,0,0,0.5)]">
-                    <div className="flex items-center justify-between rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50/80 dark:bg-neutral-800/50 px-3 py-2">
+                <div className="relative mx-auto flex h-full w-full max-w-md flex-col rounded-[2rem] border border-border bg-card p-5 shadow-[0_18px_60px_-24px_rgba(0,0,0,0.1)] dark:shadow-[0_18px_60px_-24px_rgba(0,0,0,0.5)]">
+                    <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/50 px-3 py-2">
                         <Link
                             href="/"
                             className="group flex items-center gap-3 outline-none"
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-md shadow-amber-900/10 transition-all duration-500 group-hover:scale-105">
-                                <UtensilsCrossed size={14} />
-                            </span>
-                            <span className="font-['Playfair_Display',serif] text-xl font-semibold tracking-wide text-slate-900 dark:text-white">
-                                Resto<span className="text-amber-600 dark:text-amber-500 italic">Web</span>
-                            </span>
+                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-lg shadow-amber-900/30">
+                                 <UtensilsCrossed size={20} />
+                             </span>
+                             <span className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
+                                 Resto<span className="text-amber-600 dark:text-amber-500">Web</span>
+                             </span>
                         </Link>
 
                         <div className="flex gap-2">
                             <button
                                 onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:hover:border-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-white"
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                                 aria-label="Toggle tema"
                             >
                                 {resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
                             </button>
                             <button
                                 onClick={() => setMobileMenuOpen(false)}
-                                className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 transition-all hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:hover:border-neutral-600 dark:hover:bg-neutral-700 dark:hover:text-white"
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
                                 aria-label="Tutup menu"
                             >
                                 <X size={18} />

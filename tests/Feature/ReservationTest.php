@@ -1,7 +1,6 @@
 <?php
 
 use App\Mail\ReservationConfirmedMail;
-use App\Models\Menu;
 use App\Models\Reservation;
 use App\Models\RestoTable;
 use App\Models\Team;
