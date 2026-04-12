@@ -5,6 +5,7 @@ use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\ReservationController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\TestimonialController;
@@ -37,6 +38,9 @@ Route::middleware(['auth', 'verified'])
 
         // Authenticated Testimonials
         Route::post('/testimonials', [TestimonialController::class, 'store'])->name('testimonials.store');
+
+        // Review Submission Route
+        Route::post('/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     });
 
 Route::middleware(['auth', 'verified', 'role:admin,staff'])

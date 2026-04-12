@@ -82,7 +82,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
     const currentTotal = calculateTotal(displayMenus);
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-neutral-950 font-sans text-slate-900 selection:bg-amber-100 selection:text-amber-900 dark:text-white dark:selection:bg-amber-900/30 dark:selection:text-amber-300">
+        <div className="min-h-screen bg-background font-sans text-foreground selection:bg-amber-100 selection:text-amber-900 transition-colors duration-500">
             <Head title={`Detail Reservasi #RES-${reservation.id} - RestoWeb`} />
             
             <Navbar auth={auth} dashboardUrl="/dashboard" mobileMenuOpen={mobileMenuOpen} setMobileMenuOpen={setMobileMenuOpen} />
@@ -91,13 +91,13 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                 <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
                     
                     <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-                        <Link href="/reservations/history" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-amber-600 dark:text-neutral-400 dark:hover:text-amber-500 transition-colors">
+                        <Link href="/reservations/history" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-amber-600 transition-colors">
                             <ArrowLeft size={16} /> Kembali ke Riwayat
                         </Link>
 
                         {isPending && !isEditing && (
                             <div className="flex gap-3">
-                                <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 border-slate-200 dark:border-neutral-800">
+                                <Button onClick={() => setIsEditing(true)} variant="outline" className="gap-2 border-border">
                                     <PencilLine size={16} /> Ubah Pesanan
                                 </Button>
                                 <Button onClick={handleDelete} variant="destructive" className="gap-2 bg-rose-600 hover:bg-rose-700">
@@ -107,7 +107,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                         )}
                         {isEditing && (
                             <div className="flex gap-3">
-                                <Button onClick={() => { setIsEditing(false); setData('menus', reservation.menus) }} variant="ghost" className="text-slate-500">
+                                <Button onClick={() => { setIsEditing(false); setData('menus', reservation.menus) }} variant="ghost" className="text-muted-foreground">
                                     Batal Ubah
                                 </Button>
                             </div>
@@ -116,11 +116,11 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
 
                     <div className="grid gap-8 lg:grid-cols-[1fr_350px]">
                         {/* Main Detail / Form */}
-                        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 sm:p-8">
-                            <div className="mb-6 flex items-start justify-between border-b border-slate-100 pb-6 dark:border-neutral-800">
+                        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm sm:p-8">
+                            <div className="mb-6 flex items-start justify-between border-b border-border pb-6">
                                 <div>
                                     <h1 className="font-['Playfair_Display',serif] text-3xl font-bold">Tiket Reservasi</h1>
-                                    <p className="mt-1 font-mono text-sm text-slate-500 dark:text-neutral-400">#RES-{reservation.id.toString().padStart(4, '0')}</p>
+                                    <p className="mt-1 font-mono text-sm text-muted-foreground">#RES-{reservation.id.toString().padStart(4, '0')}</p>
                                 </div>
                             <div className="text-right">
                                 <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold
@@ -174,23 +174,23 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                 <div className="space-y-8">
                                     <div className="grid gap-6 sm:grid-cols-3">
                                         <div className="flex flex-col gap-1">
-                                            <span className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-neutral-400"><CalendarRange size={16} /> Tanggal</span>
+                                            <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground"><CalendarRange size={16} /> Tanggal</span>
                                             <span className="text-lg font-semibold">{new Date(reservation.date).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <span className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-neutral-400"><Clock size={16} /> Waktu</span>
+                                            <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground"><Clock size={16} /> Waktu</span>
                                             <span className="text-lg font-semibold">{reservation.time} WIB</span>
                                         </div>
                                         <div className="flex flex-col gap-1">
-                                            <span className="flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-neutral-400"><Users size={16} /> Meja Untuk</span>
+                                            <span className="flex items-center gap-2 text-sm font-medium text-muted-foreground"><Users size={16} /> Meja Untuk</span>
                                             <span className="text-lg font-semibold">{reservation.guest_count} Orang</span>
                                         </div>
                                     </div>
 
                                     {reservation.special_requests && (
-                                        <div className="rounded-2xl bg-amber-50 p-5 dark:bg-amber-500/5">
-                                            <span className="mb-2 block text-sm font-semibold text-amber-800 dark:text-amber-500">Catatan Khusus</span>
-                                            <p className="text-amber-900/80 dark:text-amber-200/70">{reservation.special_requests}</p>
+                                        <div className="rounded-2xl bg-amber-500/10 p-5">
+                                            <span className="mb-2 block text-sm font-semibold text-amber-500">Catatan Khusus</span>
+                                            <p className="text-foreground/80">{reservation.special_requests}</p>
                                         </div>
                                     )}
                                 </div>
@@ -202,26 +202,26 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
 
                             {/* QR Code Digital Ticket */}
                             {reservation.check_in_token && !isAwaitingPayment && (
-                                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 text-center">
+                                <div className="rounded-3xl border border-border bg-card p-6 shadow-sm text-center">
                                     <div className="mb-3 flex items-center justify-center gap-2">
                                         <QrCode size={18} className="text-amber-600" />
                                         <h2 className="font-['Playfair_Display',serif] text-lg font-bold">Tiket Check-in Digital</h2>
                                     </div>
-                                    <p className="mb-4 text-xs text-slate-500 dark:text-neutral-400">
+                                    <p className="mb-4 text-xs text-muted-foreground">
                                         Tunjukkan QR ini kepada staf saat Anda tiba di restoran.
                                     </p>
 
                                     {isCheckedIn ? (
-                                        <div className="rounded-2xl bg-emerald-50 p-4 dark:bg-emerald-500/10">
+                                        <div className="rounded-2xl bg-emerald-500/10 p-4">
                                             <ShieldCheck size={36} className="mx-auto mb-2 text-emerald-500" />
-                                            <p className="text-sm font-bold text-emerald-700 dark:text-emerald-400">Sudah Check-in ✅</p>
-                                            <p className="text-xs text-emerald-600/70 dark:text-emerald-500/60 mt-1">
+                                            <p className="text-sm font-bold text-emerald-500">Sudah Check-in ✅</p>
+                                            <p className="text-xs text-emerald-500/60 mt-1">
                                                 {new Date(reservation.checked_in_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}
                                             </p>
                                         </div>
                                     ) : (
                                         <>
-                                            <div className="inline-block rounded-2xl bg-white p-3 shadow-md ring-1 ring-slate-100 dark:bg-neutral-800 dark:ring-neutral-700">
+                                            <div className="inline-block rounded-2xl bg-white p-3 shadow-md ring-1 ring-border/10 dark:bg-zinc-800 dark:ring-white/10">
                                                 <img
                                                     src={qrImageUrl}
                                                     alt="QR Code Check-in"
@@ -230,14 +230,14 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                                     className="rounded-lg"
                                                 />
                                             </div>
-                                            <div className="mt-3 inline-block rounded-full bg-slate-900 px-4 py-1.5 font-mono text-[10px] font-bold tracking-widest text-amber-400 dark:bg-neutral-950">
+                                            <div className="mt-3 inline-block rounded-full bg-zinc-950 px-4 py-1.5 font-mono text-[10px] font-bold tracking-widest text-amber-500">
                                                 {reservation.check_in_token?.slice(0, 8).toUpperCase()}
                                             </div>
                                         </>
                                     )}
 
                                     {reservation.payment_status === 'paid' && (
-                                        <div className="mt-4 rounded-xl bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700 dark:bg-orange-500/10 dark:text-orange-400">
+                                        <div className="mt-4 rounded-xl bg-orange-500/10 px-3 py-2 text-xs font-semibold text-orange-500">
                                             🔥 DP Lunas: Rp {Number(reservation.booking_fee).toLocaleString('id-ID')}
                                         </div>
                                     )}
@@ -255,7 +255,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                 </div>
                             )}
 
-                            <div className="rounded-3xl border border-slate-200 bg-slate-100 p-6 shadow-inner dark:border-neutral-800 dark:bg-neutral-900/50">
+                            <div className="rounded-3xl border border-border bg-muted/40 p-6 shadow-inner">
                                 <h2 className="mb-4 flex items-center gap-2 font-['Playfair_Display',serif] text-xl font-bold">
                                     <Utensils size={20} className="text-amber-600" /> Makanan Dipesan
                                 </h2>
@@ -270,7 +270,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             <li key={idx} className="flex justify-between items-start gap-3 text-sm">
                                                 <div className="flex-1">
                                                     <span className="font-semibold">{item.name}</span>
-                                                    <div className="text-slate-500 dark:text-neutral-400">{formatRupiah(item.price)} x {qty}</div>
+                                                    <div className="text-muted-foreground">{formatRupiah(item.price)} x {qty}</div>
                                                 </div>
                                                 <div className="font-semibold whitespace-nowrap">
                                                     {formatRupiah(item.price * qty)}
@@ -280,12 +280,12 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                     </ul>
                                 )}
 
-                                <div className="mt-auto border-t border-slate-300 pt-4 dark:border-neutral-700">
+                                <div className="mt-auto border-t border-border pt-4">
                                     <div className="flex justify-between items-center font-bold text-lg">
                                         <span>Estimasi Total</span>
                                         <span className="text-amber-600 dark:text-amber-500">{formatRupiah(currentTotal)}</span>
                                     </div>
-                                    <p className="mt-2 text-[10px] text-slate-400 leading-tight">Harga akhir dapat berubah sesuai pajak restoran dan layanan di tempat.</p>
+                                    <p className="mt-2 text-[10px] text-muted-foreground/60 leading-tight">Harga akhir dapat berubah sesuai pajak restoran dan layanan di tempat.</p>
                                 </div>
 
                                 {isEditing && (
@@ -297,29 +297,29 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
 
                             {/* Menu Catalog (Only visible when editing) */}
                             {isEditing && (
-                                <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+                                <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
                                     <h3 className="mb-4 font-semibold">Tersedia Pre-Order</h3>
                                     <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                        {availableMenus.length === 0 && <p className="text-xs text-slate-500">Katalog menu sedang kosong.</p>}
+                                        {availableMenus.length === 0 && <p className="text-xs text-muted-foreground">Katalog menu sedang kosong.</p>}
                                         {availableMenus.map((menu: any) => {
                                             const inCart = data.menus.find((m: any) => m.id === menu.id);
                                             return (
-                                            <div key={menu.id} className="flex flex-col gap-2 p-3 rounded-2xl border border-slate-100 hover:border-amber-200 dark:border-neutral-800 dark:hover:border-neutral-700 transition-colors">
+                                            <div key={menu.id} className="flex flex-col gap-2 p-3 rounded-2xl border border-border hover:border-amber-500/30 transition-colors">
                                                 <div className="flex justify-between items-start">
                                                     <span className="font-medium text-sm">{menu.name}</span>
                                                     <span className="font-semibold text-xs text-amber-600">{formatRupiah(menu.price)}</span>
                                                 </div>
                                                 {inCart ? (
-                                                    <div className="flex items-center justify-between bg-slate-50 dark:bg-neutral-950 p-1 rounded-full">
-                                                        <button type="button" onClick={() => removeMenu(menu.id)} className="p-1.5 text-rose-500 hover:bg-rose-100 rounded-full dark:hover:bg-rose-900/30">
+                                                    <div className="flex items-center justify-between bg-muted p-1 rounded-full text-foreground">
+                                                        <button type="button" onClick={() => removeMenu(menu.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded-full">
                                                             <Trash2 size={14} />
                                                         </button>
                                                         <div className="flex items-center gap-3 px-2">
-                                                            <button type="button" onClick={() => updateMenuQuantity(menu.id, -1)} className="p-1 bg-white dark:bg-neutral-800 rounded-full shadow-sm">
+                                                            <button type="button" onClick={() => updateMenuQuantity(menu.id, -1)} className="p-1 bg-card rounded-full shadow-sm">
                                                                 <Minus size={14} />
                                                             </button>
                                                             <span className="font-semibold text-sm w-4 text-center">{inCart.quantity || inCart.pivot?.quantity || 1}</span>
-                                                            <button type="button" onClick={() => updateMenuQuantity(menu.id, 1)} className="p-1 bg-white dark:bg-neutral-800 rounded-full shadow-sm">
+                                                            <button type="button" onClick={() => updateMenuQuantity(menu.id, 1)} className="p-1 bg-card rounded-full shadow-sm">
                                                                 <Plus size={14} />
                                                             </button>
                                                         </div>

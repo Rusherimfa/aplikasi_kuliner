@@ -58,7 +58,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
         <>
             <Head title="Katalog Menu - RestoWeb" />
 
-            <div className="min-h-screen bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-600 selection:bg-amber-100 selection:text-amber-900">
+            <div className="min-h-screen bg-background font-['Inter',sans-serif] text-foreground selection:bg-amber-100 selection:text-amber-900 transition-colors duration-500">
                 
                 <Navbar
                     auth={auth}
@@ -71,21 +71,21 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                     {/* Header Section */}
                     <div className="mx-auto mb-16 flex flex-col items-center justify-between gap-8 text-center md:flex-row md:text-left">
                         <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-6 duration-1000">
-                            <h1 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 sm:text-5xl">
+                            <h1 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-foreground sm:text-5xl">
                                 Seleksi Gastronomi
                             </h1>
-                            <p className="text-lg text-slate-500">
+                            <p className="text-lg text-muted-foreground">
                                 Jelajahi penawaran lengkap kami. Dari hidangan pembuka yang ringan hingga hidangan utama khas kami, semuanya disiapkan dengan sempurna.
                             </p>
                         </div>
                         
                         <div className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row sm:items-center animate-in fade-in slide-in-from-right-8 duration-1000 delay-300 fill-mode-both">
                             <div className="relative w-full sm:w-64 z-30">
-                                <Search className="absolute top-3 left-3 h-4 w-4 text-slate-400" />
+                                <Search className="absolute top-3 left-3 h-4 w-4 text-muted-foreground" />
                                 <Input
                                     type="search"
                                     placeholder="Cari hidangan istimewa..."
-                                    className="h-10 rounded-full border-slate-200 bg-white pl-10 text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:ring-amber-500/20 shadow-sm"
+                                    className="h-10 rounded-full border-border bg-card pl-10 text-foreground placeholder:text-muted-foreground focus:border-amber-500 focus:ring-amber-500/20 shadow-sm"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
@@ -94,7 +94,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                 <Button
                                     onClick={() => setCartOpen(true)}
                                     variant="outline"
-                                    className="h-10 w-full rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm relative"
+                                    className="h-10 w-full rounded-full border-border bg-card text-foreground hover:bg-muted hover:border-border shadow-sm relative"
                                 >
                                     <ShoppingBag size={16} className="mr-2" />
                                     Keranjang
@@ -117,7 +117,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                 className={`rounded-full px-6 py-2.5 text-sm font-medium transition-all duration-300 ${
                                     activeCategory === category
                                         ? 'bg-amber-600 text-white shadow-md shadow-amber-900/20'
-                                        : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
+                                        : 'border border-border bg-card text-muted-foreground hover:border-amber-500/50 hover:bg-muted'
                                 }`}
                             >
                                 {category}
@@ -132,11 +132,11 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                 <div
                                     key={item.id}
                                     style={{ animationFillMode: 'both', animationDelay: `${index * 100}ms` }}
-                                    className="animate-in fade-in slide-in-from-bottom-8 duration-700 group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white transition-all hover:-translate-y-1 hover:border-amber-200 hover:shadow-xl hover:shadow-slate-200/50"
+                                    className="animate-in fade-in slide-in-from-bottom-8 duration-700 group flex flex-col overflow-hidden rounded-3xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-amber-500/30 hover:shadow-xl hover:shadow-amber-500/10"
                                 >
-                                    <div className="relative aspect-square overflow-hidden bg-slate-50">
+                                    <div className="relative aspect-square overflow-hidden bg-muted">
                                         {/* Image placeholder */}
-                                        <div className="absolute inset-0 flex items-center justify-center text-slate-200 transition-transform duration-700 group-hover:scale-110">
+                                        <div className="absolute inset-0 flex items-center justify-center text-muted-foreground/20 transition-transform duration-700 group-hover:scale-110">
                                             <UtensilsCrossed size={48} className="opacity-70" />
                                         </div>
                                         
@@ -151,14 +151,14 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
 
                                     <div className="flex flex-1 flex-col p-6">
                                         <div className="mb-2 flex items-start justify-between gap-3">
-                                            <h3 className="text-lg leading-tight font-semibold text-slate-900">
+                                            <h3 className="text-lg leading-tight font-semibold text-foreground">
                                                 {item.name}
                                             </h3>
-                                            <span className="font-bold whitespace-nowrap text-amber-600">
+                                            <span className="font-bold whitespace-nowrap text-amber-500">
                                                 Rp {Number(item.price).toLocaleString('id-ID')}
                                             </span>
                                         </div>
-                                        <p className="mb-6 line-clamp-3 flex-1 text-sm text-slate-500 leading-relaxed">
+                                        <p className="mb-6 line-clamp-3 flex-1 text-sm text-muted-foreground leading-relaxed">
                                             {item.description ||
                                                 'Tambahan luar biasa untuk melengkapi pengalaman bersantap Anda, disusun oleh koki terbaik kami.'}
                                         </p>
@@ -167,7 +167,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                             <Button
                                                 onClick={() => addItem({ id: item.id, name: item.name, price: item.price })}
                                                 variant="outline"
-                                                className="w-full rounded-2xl border-slate-200 bg-white text-slate-700 transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-700 shadow-sm"
+                                                className="w-full rounded-2xl border-border bg-card text-foreground transition-all duration-300 hover:border-amber-500/30 hover:bg-amber-500/10 hover:text-amber-500 shadow-sm"
                                             >
                                                 + Tambah
                                             </Button>
@@ -177,17 +177,17 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             ))}
                         </div>
                     ) : (
-                        <div className="rounded-3xl border border-dashed border-slate-300 bg-white py-24 text-center shadow-sm relative z-30">
-                            <UtensilsCrossed size={48} className="mx-auto mb-6 text-slate-300" />
-                            <h3 className="mb-3 font-['Playfair_Display',serif] text-2xl font-medium text-slate-900">
+                        <div className="rounded-3xl border border-dashed border-border bg-card py-24 text-center shadow-sm relative z-30">
+                            <UtensilsCrossed size={48} className="mx-auto mb-6 text-muted-foreground/30" />
+                            <h3 className="mb-3 font-['Playfair_Display',serif] text-2xl font-medium text-foreground">
                                 Menu tidak ditemukan
                             </h3>
-                            <p className="mx-auto mb-8 max-w-md text-slate-500">
+                            <p className="mx-auto mb-8 max-w-md text-muted-foreground">
                                 Kami tidak dapat menemukan hidangan yang sesuai dengan pencarian atau kategori yang Anda pilih.
                             </p>
                             <Button
                                 variant="outline"
-                                className="rounded-full border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+                                className="rounded-full border-border bg-card text-foreground hover:bg-muted hover:border-border shadow-sm"
                                 onClick={() => {
                                     setActiveCategory('Semua');
                                     setSearchTerm('');

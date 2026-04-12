@@ -4,7 +4,7 @@ import { login } from '@/routes';
 
 export default function Footer() {
     return (
-        <footer className="bg-[#FAFAFA] dark:bg-neutral-950 text-slate-600 dark:text-neutral-400 border-t border-slate-200/60 dark:border-neutral-800 transition-colors duration-500">
+        <footer className="bg-background text-muted-foreground border-t border-border transition-colors duration-500">
             {/* Top decorative line */}
             <div className="h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
 
@@ -16,11 +16,11 @@ export default function Footer() {
                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-lg shadow-amber-900/30">
                                 <UtensilsCrossed size={20} />
                             </span>
-                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-white">
+                            <span className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
                                 Resto<span className="text-amber-600 dark:text-amber-500">Web</span>
                             </span>
                         </div>
-                        <p className="mb-8 max-w-sm text-sm leading-loose text-slate-600 dark:text-neutral-400">
+                        <p className="mb-8 max-w-sm text-sm leading-loose">
                             Destinasi kuliner di mana tradisi bertemu inovasi. Kami membuat setiap hidangan dengan niat,
                             setiap momen dengan perhatian.
                         </p>
@@ -33,7 +33,7 @@ export default function Footer() {
                                 <a
                                     key={i}
                                     href={href}
-                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-slate-400 dark:text-neutral-500 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 hover:text-amber-600 dark:hover:border-amber-900/50 dark:hover:bg-amber-500/10 dark:hover:text-amber-500"
+                                    className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground/60 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-500/10 hover:text-amber-600 dark:hover:text-amber-500"
                                 >
                                     <Icon size={16} />
                                 </a>
@@ -43,7 +43,7 @@ export default function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-slate-900 dark:text-white uppercase">
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-foreground uppercase">
                             Navigasi
                         </h4>
                         <ul className="space-y-4 text-sm">
@@ -56,7 +56,7 @@ export default function Footer() {
                                 <li key={link.label}>
                                     <Link
                                         href={link.href}
-                                        className="group inline-flex items-center gap-1.5 text-slate-600 dark:text-neutral-400 transition-all hover:text-amber-600 dark:hover:text-amber-500"
+                                        className="group inline-flex items-center gap-1.5 transition-all hover:text-amber-600 dark:hover:text-amber-500"
                                     >
                                         {link.label}
                                         <ArrowUpRight
@@ -71,39 +71,39 @@ export default function Footer() {
 
                     {/* Contact */}
                     <div>
-                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-slate-900 dark:text-white uppercase">Kontak</h4>
+                        <h4 className="mb-6 text-xs font-semibold tracking-widest text-foreground uppercase">Kontak</h4>
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-start gap-3">
                                 <MapPin size={14} className="mt-0.5 shrink-0 text-amber-500" />
-                                <span className="text-slate-500 dark:text-neutral-400 leading-relaxed">
+                                <span className="leading-relaxed">
                                     Jl. Sudirman No. 123, Jakarta Pusat 10220
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={14} className="shrink-0 text-amber-500" />
-                                <span className="text-slate-500 dark:text-neutral-400">(021) 555-0123</span>
+                                <span>(021) 555-0123</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail size={14} className="shrink-0 text-amber-500" />
-                                <span className="text-slate-500 dark:text-neutral-400">hello@restoweb.id</span>
+                                <span>hello@restoweb.id</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Clock size={14} className="shrink-0 text-amber-500" />
-                                <span className="text-slate-500 dark:text-neutral-400">Setiap Hari 11:00 – 23:00</span>
+                                <span>Setiap Hari 11:00 – 23:00</span>
                             </li>
                         </ul>
                     </div>
                 </div>
 
                 {/* Bottom bar */}
-                <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-200 dark:border-neutral-800 pt-8 text-xs sm:flex-row">
-                    <p className="text-slate-500 dark:text-neutral-400">© {new Date().getFullYear()} RestoWeb. Hak cipta dilindungi.</p>
+                <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-xs sm:flex-row">
+                    <p>© {new Date().getFullYear()} RestoWeb. Hak cipta dilindungi.</p>
                     <div className="flex gap-6">
                         {['Kebijakan Privasi', 'Syarat Ketentuan'].map((label) => (
                             <a
                                 key={label}
                                 href="#"
-                                className="text-slate-500 dark:text-neutral-400 transition-colors hover:text-amber-600 dark:hover:text-amber-500"
+                                className="transition-colors hover:text-amber-600 dark:hover:text-amber-500"
                             >
                                 {label}
                             </a>

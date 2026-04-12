@@ -18,7 +18,7 @@ export default function Experience() {
         <>
             <Head title="Pengalaman Kami - RestoWeb" />
 
-            <div className="min-h-screen bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-600 selection:bg-amber-100 selection:text-amber-900">
+            <div className="min-h-screen bg-background font-['Inter',sans-serif] text-foreground selection:bg-amber-100 selection:text-amber-900 transition-colors duration-500">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -28,24 +28,24 @@ export default function Experience() {
 
                 <main className="pt-24 md:pt-32">
                     {/* Hero Section */}
-                    <div className="relative mx-4 flex h-[60vh] md:h-[70vh] items-center justify-center overflow-hidden rounded-3xl bg-[#FAFAFA] sm:mx-6 lg:mx-8 border border-slate-200/50">
+                    <div className="relative mx-4 flex h-[60vh] md:h-[70vh] items-center justify-center overflow-hidden rounded-3xl bg-background sm:mx-6 lg:mx-8 border border-border/50">
                         <div className="absolute inset-0">
                             <img
                                 src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2670&auto=format&fit=crop"
                                 alt="Interior Restoran Kelas Atas"
                                 className="h-full w-full object-cover opacity-20 transition-transform duration-10000 hover:scale-105"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-[#FAFAFA]/40 to-transparent"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAFA]/80 via-transparent to-[#FAFAFA]/80"></div>
+                            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent"></div>
+                            <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-background/80"></div>
                         </div>
                         <div className="relative z-10 mx-auto max-w-4xl px-4 text-center animate-in fade-in zoom-in-95 duration-1000 fill-mode-both">
                             <span className="mb-4 block text-sm font-medium tracking-widest text-amber-600 uppercase">
                                 Filosofi Kami
                             </span>
-                            <h1 className="mb-6 font-['Playfair_Display',serif] text-5xl leading-tight font-bold text-slate-900 md:text-7xl">
+                            <h1 className="mb-6 font-['Playfair_Display',serif] text-5xl leading-tight font-bold text-foreground md:text-7xl">
                                 Menyuburkan Kejeniusan Kuliner
                             </h1>
-                            <p className="mx-auto max-w-2xl text-lg font-light text-slate-600 md:text-xl">
+                            <p className="mx-auto max-w-2xl text-lg font-light text-muted-foreground md:text-xl">
                                 Kami percaya bahwa makan malam bukan sekadar tentang kebutuhan gizi, melainkan perjalanan holistik yang memanjakan seluruh pancaindra.
                             </p>
                         </div>
@@ -56,7 +56,7 @@ export default function Experience() {
                         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                             <div className="grid items-center gap-16 lg:grid-cols-2">
                                 <div className="relative order-2 lg:order-1 animate-in fade-in slide-in-from-left-8 duration-1000 fade-in delay-300 fill-mode-both">
-                                    <div className="group aspect-[3/4] overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl relative">
+                                    <div className="group aspect-[3/4] overflow-hidden rounded-3xl border border-border bg-card shadow-xl relative">
                                         <div className="absolute inset-0 bg-amber-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100 z-10"></div>
                                         <img
                                             src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=2568&auto=format&fit=crop"
@@ -64,40 +64,40 @@ export default function Experience() {
                                             className="h-full w-full object-cover opacity-90 transition-all duration-700 group-hover:scale-105 group-hover:opacity-100 grayscale hover:grayscale-0"
                                         />
                                     </div>
-                                    <div className="absolute -right-4 -bottom-8 md:-right-8 md:-bottom-8 flex items-center gap-6 rounded-3xl border border-slate-200 bg-white/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl z-20">
+                                    <div className="absolute -right-4 -bottom-8 md:-right-8 md:-bottom-8 flex items-center gap-6 rounded-3xl border border-border bg-card/95 p-6 md:p-8 shadow-2xl backdrop-blur-xl z-20">
                                         <ChefHat size={48} className="text-amber-600" />
                                         <div>
-                                            <p className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900">
+                                            <p className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
                                                 Chef Antonio
                                             </p>
-                                            <p className="text-sm text-slate-500">
+                                            <p className="text-sm text-muted-foreground">
                                                 Alumni Bintang 3 Michelin
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div className="order-1 lg:order-2 animate-in fade-in slide-in-from-right-8 duration-1000 delay-500 fill-mode-both">
-                                    <h2 className="mb-6 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 md:text-5xl">
+                                    <h2 className="mb-6 font-['Playfair_Display',serif] text-4xl font-bold text-foreground md:text-5xl">
                                         Temui Sang Jenius
                                     </h2>
-                                    <p className="mb-6 text-lg leading-relaxed text-slate-600">
+                                    <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
                                         Dengan lebih dari dua dekade pengalaman menjelajahi Paris, Roma, dan Tokyo, Chef Antonio membawa kekayaan pengaruh global ke dapur kami. Pendekatannya memadukan teknik klasik Prancis dengan bahan-bahan lokal musiman secara sempurna.
                                     </p>
                                     <blockquote className="mb-10 border-l-2 border-amber-400 pl-6 italic">
-                                        <p className="text-xl leading-relaxed text-slate-700">
+                                        <p className="text-xl leading-relaxed text-foreground/90">
                                             "Setiap piring adalah kanvas, dan setiap bahan adalah warna. Tujuannya adalah melukis kenangan yang bertahan lama bahkan setelah gigitan terakhir."
                                         </p>
                                     </blockquote>
                                     <div className="flex flex-wrap gap-4">
-                                        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm backdrop-blur-sm">
+                                        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 shadow-sm backdrop-blur-sm">
                                             <Award size={24} className="text-amber-500" />
-                                            <span className="text-sm font-medium text-slate-700">
+                                            <span className="text-sm font-medium text-foreground">
                                                 Pemenang Penghargaan Global
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-6 py-4 shadow-sm backdrop-blur-sm">
+                                        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-4 shadow-sm backdrop-blur-sm">
                                             <Sparkles size={24} className="text-amber-500" />
-                                            <span className="text-sm font-medium text-slate-700">
+                                            <span className="text-sm font-medium text-foreground">
                                                 Inovator Kuliner
                                             </span>
                                         </div>
@@ -109,12 +109,12 @@ export default function Experience() {
 
                     {/* Call to Action */}
                     <section className="relative px-4 py-24 text-center">
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-amber-50 to-[#FAFAFA]"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-background via-amber-500/10 to-background"></div>
                         <div className="relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-700 fill-mode-both">
-                            <h2 className="mb-6 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 md:text-5xl">
+                            <h2 className="mb-6 font-['Playfair_Display',serif] text-4xl font-bold text-foreground md:text-5xl">
                                 Rasakan Sendiri Pengalamannya
                             </h2>
-                            <p className="mx-auto mb-10 max-w-xl text-lg text-slate-600">
+                            <p className="mx-auto mb-10 max-w-xl text-lg text-muted-foreground">
                                 Amankan meja Anda untuk pengalaman bersantap malam ini. Reservasi sangat disarankan untuk kepastian layanan terbaik kami.
                             </p>
                             <Link href="/reservations/create">

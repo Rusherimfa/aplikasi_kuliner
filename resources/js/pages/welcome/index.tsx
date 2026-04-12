@@ -8,7 +8,7 @@ import Footer from './sections/footer';
 import Hero from './sections/hero';
 import HowItWorks from './sections/how-it-works';
 import InfoBar from './sections/info-bar';
-                import Navbar from './sections/navbar';
+import Navbar from './sections/navbar';
 import PhotoGallery from './sections/photo-gallery';
 import SignatureDishes from './sections/signature-dishes';
 import Testimonials from './sections/testimonials';
@@ -17,11 +17,13 @@ import AIChatbot from '@/components/app/ai-chatbot';
 export default function Welcome({
     bestSellers = [],
     testimonials = [],
+    reviews = []
 }: {
     bestSellers?: any[];
     testimonials?: any[];
+    reviews?: any[];
 }) {
-    const { auth, currentTeam } = usePage().props;
+    const { auth } = usePage().props as any;
     const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -54,7 +56,7 @@ export default function Welcome({
 
                 <HowItWorks />
 
-                <Testimonials testimonials={testimonials} auth={auth} />
+                <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
 
                 <CTASection />
 

@@ -14,6 +14,8 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
+import { index as reservationsRoute } from '@/routes/reservations';
+import { index as menusRoute } from '@/routes/menus';
 
 export default function Dashboard({ stats, recent_activity, revenue_chart, best_sellers }: any) {
     const formatRupiah = (amount: number) => {
@@ -21,10 +23,10 @@ export default function Dashboard({ stats, recent_activity, revenue_chart, best_
     };
 
     const getStatusBadge = (status: string) => {
-        if (status === 'pending') return <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20 px-3 py-1">Menunggu</Badge>;
-        if (status === 'confirmed') return <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 px-3 py-1">Dikonfirmasi</Badge>;
-        if (status === 'completed') return <Badge className="bg-white/10 text-white/70 hover:bg-white/10 px-3 py-1">Selesai</Badge>;
-        return <Badge className="bg-rose-500/20 text-rose-500 hover:bg-rose-500/20 px-3 py-1">Dibatalkan</Badge>;
+        if (status === 'pending') return <Badge className="bg-amber-500/20 text-amber-500 hover:bg-amber-500/20 px-3 py-1 border-none">Menunggu</Badge>;
+        if (status === 'confirmed') return <Badge className="bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 px-3 py-1 border-none">Dikonfirmasi</Badge>;
+        if (status === 'completed') return <Badge className="bg-white/10 text-white/70 hover:bg-white/10 px-3 py-1 border-none">Selesai</Badge>;
+        return <Badge className="bg-rose-500/20 text-rose-500 hover:bg-rose-500/20 px-3 py-1 border-none">Dibatalkan</Badge>;
     };
 
     // Custom Chart Components
@@ -149,7 +151,7 @@ export default function Dashboard({ stats, recent_activity, revenue_chart, best_
                             <h2 className="text-lg font-semibold text-white/90 font-['Playfair_Display',serif]">Menu Terlaris</h2>
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            {best_sellers.length > 0 ? (
+                            {best_sellers && best_sellers.length > 0 ? (
                                 <div className="space-y-6">
                                     {best_sellers.map((menu: any, idx: number) => (
                                         <div key={menu.id} className="relative">
@@ -183,12 +185,12 @@ export default function Dashboard({ stats, recent_activity, revenue_chart, best_
                     <div className="rounded-2xl border border-white/5 bg-white/[0.02] shadow-xl backdrop-blur-md flex flex-col overflow-hidden">
                         <div className="border-b border-white/5 p-6 flex justify-between items-center bg-white/[0.01]">
                             <h2 className="text-lg font-semibold text-white/90 font-['Playfair_Display',serif]">Aktivitas Reservasi</h2>
-                            <Link href="/reservations" className="text-xs font-semibold text-amber-500 hover:text-amber-400 flex items-center gap-1 group">
+                            <Link href={reservationsRoute.url()} className="text-xs font-semibold text-amber-500 hover:text-amber-400 flex items-center gap-1 group">
                                 Monitoring <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>
                         <div className="flex-1 p-0">
-                            {recent_activity.length > 0 ? (
+                            {recent_activity && recent_activity.length > 0 ? (
                                 <ul className="divide-y divide-white/5">
                                     {recent_activity.map((activity: any) => (
                                         <li key={activity.id} className="flex items-center justify-between p-6 hover:bg-white/[0.02] transition-all group">
@@ -228,10 +230,10 @@ export default function Dashboard({ stats, recent_activity, revenue_chart, best_
                         <p className="text-sm font-semibold text-amber-200/40 uppercase tracking-[4px] mb-8">Pelanggan Setia</p>
                         
                         <p className="text-sm text-white/50 leading-relaxed mb-10 max-w-[200px]">
-                            Terus berikan layanan terbaik untuk meningkatkan loyalitas tamu Anda.
+                            Terus berikan layanan terbaik for meningkatkan loyalitas tamu Anda.
                         </p>
                         
-                        <Link href="/menus" className="inline-flex h-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 px-8 text-sm font-bold text-white transition-all hover:bg-white/10 hover:border-white/20 w-full group">
+                        <Link href={menusRoute.url()} className="inline-flex h-12 items-center justify-center rounded-2xl bg-amber-500 px-8 text-sm font-bold text-[#0A0A0B] transition-all hover:bg-amber-400 w-full group">
                             Optimasi Menu <BookOpen size={16} className="ml-2 group-hover:rotate-12 transition-transform opacity-70" />
                         </Link>
                     </div>
@@ -242,4 +244,3 @@ export default function Dashboard({ stats, recent_activity, revenue_chart, best_
 }
 
 Dashboard.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;
-
