@@ -1,93 +1,118 @@
 import { Link } from '@inertiajs/react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Calendar, ClipboardCheck, MailCheck, Rocket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 const HOW_IT_WORKS = [
     {
         step: '01',
-        title: 'Pilih Tanggal Anda',
-        desc: 'Pilih tanggal dan waktu yang Anda inginkan untuk malam yang tak terlupakan.',
+        title: 'Pilih Jadwal',
+        desc: 'Tentukan tanggal and waktu yang Anda inginkan untuk pengalaman yang tak terlupakan.',
+        icon: Calendar,
     },
     {
         step: '02',
-        title: 'Buat Reservasi',
-        desc: 'Isi detail Anda dan permintaan khusus melalui formulir sederhana kami.',
+        title: 'Konfigurasi',
+        desc: 'Lengkapi kriteria reservasi and preferensi khusus Anda melalui sistem kami.',
+        icon: ClipboardCheck,
     },
     {
         step: '03',
-        title: 'Dapatkan Konfirmasi',
-        desc: "Kami akan mengonfirmasi pemesanan Anda dalam 2 jam melalui email atau WhatsApp.",
+        title: 'Validasi',
+        desc: "Sistem kami akan memproses and memvalidasi ketersediaan secara instan.",
+        icon: MailCheck,
     },
     {
         step: '04',
-        title: 'Nikmati Pengalaman',
-        desc: 'Datanglah dan biarkan kami mengatur semuanya. Duduk santai dan nikmati.',
+        title: 'Experience',
+        desc: 'Hadir and biarkan tim kurasi kami memberikan pelayanan gastronomi terbaik.',
+        icon: Rocket,
     },
 ];
 
 export default function HowItWorks() {
     return (
-        <section className="relative overflow-hidden bg-[#F8F5F0] dark:bg-neutral-900 py-28 transition-colors duration-500">
-            {/* Decorative top divider */}
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-200 to-transparent" />
+        <section className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500 font-['Inter',sans-serif]">
+            {/* Background Texture */}
+            <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="relative z-10 mx-auto max-w-7xl px-8">
                 {/* Header */}
-                <div className="mb-20 text-center">
-                    <span className="mb-4 inline-block rounded-full border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-500/10 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 dark:text-amber-500 uppercase">
-                        Sederhana & Mudah
-                    </span>
-                    <h2 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-5xl">
-                        Cara Memesan Meja
-                    </h2>
-                    <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg">
-                        Hanya dalam empat langkah mudah, amankan tempat Anda di salah satu meja makan paling dicari di
-                        kota ini.
+                <div className="mb-24 flex flex-col items-center text-center space-y-6">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        className="inline-flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-amber-600 dark:text-amber-500 uppercase glow-amber"
+                    >
+                        The Process
+                    </motion.div>
+                    <motion.h2 
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.1 }}
+                        className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter"
+                    >
+                        Arsitektur <span className="italic font-serif opacity-30">Pemesanan</span>
+                    </motion.h2>
+                    <p className="mx-auto max-w-2xl text-slate-500 dark:text-neutral-400 text-lg font-medium">
+                        Empat langkah presisi untuk mengamankan tempat Anda di destinasi kuliner paling eksklusif.
                     </p>
                 </div>
 
-                {/* Steps */}
-                <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+                {/* Steps Grid */}
+                <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
                     {HOW_IT_WORKS.map((step, idx) => (
-                        <div key={step.step} className="group relative">
-                            {/* Connecting line (desktop only) */}
-                            {idx < HOW_IT_WORKS.length - 1 && (
-                                <div className="absolute top-10 left-[calc(50%+2.5rem)] z-0 hidden h-px w-[calc(100%-5rem)] bg-gradient-to-r from-amber-300/60 to-transparent lg:block" />
-                            )}
-
-                            {/* Step card */}
-                            <div className="relative z-10 flex flex-col items-center text-center">
-                                {/* Step circle */}
-                                <div className="relative mb-6 flex h-20 w-20 items-center justify-center">
-                                    <div className="absolute inset-0 rounded-full bg-amber-100 dark:bg-neutral-800 transition-all duration-500 group-hover:bg-amber-600" />
-                                    <div className="absolute inset-2 rounded-full border-2 border-dashed border-amber-300 dark:border-amber-900/50 transition-all duration-500 group-hover:border-amber-400/50" />
-                                    <span className="relative font-['Playfair_Display',serif] text-2xl font-bold text-amber-800 dark:text-amber-500 transition-colors duration-500 group-hover:text-white">
+                        <motion.div 
+                            key={step.step}
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.6, delay: idx * 0.1 }}
+                            className="group relative"
+                        >
+                            <div className="glass-card flex h-full flex-col items-center text-center p-10 rounded-[2.5rem] bg-white dark:bg-white/[0.02] border border-border dark:border-white/5 transition-all duration-700 hover:-translate-y-4 hover:border-amber-500/30 hover:shadow-amber-500/10">
+                                {/* Icon & Step Number */}
+                                <div className="relative mb-10">
+                                    <div className="flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-slate-50 dark:bg-white/5 transition-all duration-700 group-hover:bg-amber-500 group-hover:rotate-[15deg]">
+                                        <step.icon className="h-8 w-8 text-amber-600 dark:text-amber-500 transition-colors duration-700 group-hover:text-black" />
+                                    </div>
+                                    <span className="absolute -bottom-4 -right-4 font-['Playfair_Display',serif] text-4xl font-black text-slate-200 dark:text-neutral-800 transition-colors duration-700 group-hover:text-amber-500/40">
                                         {step.step}
                                     </span>
                                 </div>
 
-                                <h3 className="mb-3 text-lg font-bold text-slate-900 dark:text-white transition-colors group-hover:text-amber-700 dark:group-hover:text-amber-500">
+                                <h3 className="mb-4 text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
                                     {step.title}
                                 </h3>
-                                <p className="text-sm leading-relaxed text-slate-500 dark:text-neutral-400">{step.desc}</p>
+                                <p className="text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-500">
+                                    {step.desc}
+                                </p>
                             </div>
-                        </div>
+                        </motion.div>
                     ))}
                 </div>
 
-                {/* CTA */}
-                <div className="mt-16 text-center">
+                {/* Bottom Action */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.5 }}
+                    className="mt-20 text-center"
+                >
                     <Link href="/reservations/create">
                         <Button
-                            size="lg"
-                            className="group h-14 rounded-full bg-gradient-to-r from-amber-600 to-amber-800 px-12 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all hover:scale-105 hover:shadow-amber-900/30"
+                            className="group h-16 rounded-[1.25rem] bg-slate-900 dark:bg-white px-12 text-[11px] font-black uppercase tracking-[0.2em] text-white dark:text-black shadow-2xl transition-all hover:scale-105 hover:bg-amber-500 hover:text-black dark:hover:bg-amber-500"
                         >
-                            Pesan Meja Anda Sekarang{' '}
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            Initiate Reservation Now
+                            <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>
                     </Link>
-                </div>
+                </motion.div>
             </div>
         </section>
     );
 }
+

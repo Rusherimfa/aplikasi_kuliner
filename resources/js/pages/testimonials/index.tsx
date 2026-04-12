@@ -1,4 +1,4 @@
-import { Head, usePage, useForm } from '@inertiajs/react';
+import { Head, usePage, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,9 +16,17 @@ interface Testimonial {
     rating: number;
 }
 
-export default function TestimonialIndex({ testimonials }: { testimonials: Testimonial[] }) {
+export default function TestimonialIndex({ testimonials = [] }: { testimonials?: Testimonial[] }) {
     const { auth, flash } = usePage().props as any;
-    const dashboardUrl = dashboard().url;
+    
+    // Safely generate dashboard URL
+    let dashboardUrl = '/';
+    try {
+        dashboardUrl = dashboard().url;
+    } catch (e) {
+        console.error('Wayfinder dashboard route failed:', e);
+    }
+    
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -44,9 +52,9 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
         <>
             <Head title="Cerita Tamu - RestoWeb" />
 
-            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200">
+            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 transition-colors duration-500">
                 <Navbar
-                    auth={auth}
+                    auth={auth || {}}
                     dashboardUrl={dashboardUrl}
                     mobileMenuOpen={mobileMenuOpen}
                     setMobileMenuOpen={setMobileMenuOpen}
@@ -69,7 +77,7 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                     <div className="flex flex-col lg:flex-row gap-12">
                         {/* Left Side - Testimonial Grid */}
                         <div className="w-full lg:w-7/12">
-                            {testimonials.length > 0 ? (
+                            {(testimonials && testimonials.length > 0) ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {testimonials.map((t) => (
                                         <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl dark:hover:border-amber-500/30">
@@ -84,10 +92,10 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-neutral-700 dark:to-neutral-800 text-sm font-bold text-slate-600 dark:text-neutral-300">
-                                                    {t.name ? t.name.substring(0, 2).toUpperCase() : 'U'}
+                                                    {t.name ? t.name.substring(0, 1).toUpperCase() : 'U'}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{t.name}</p>
+                                                    <p className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{t.name || 'Tamu'}</p>
                                                     {t.role && <p className="text-xs text-slate-500 dark:text-neutral-500">{t.role}</p>}
                                                 </div>
                                             </div>
@@ -105,7 +113,7 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
 
                         {/* Right Side - Submission Form */}
                         <div className="w-full lg:w-5/12">
-                            <div className="sticky top-24 rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10 p-6 md:p-8 shadow-lg">
+                            <div className="sticky top-24 rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10 p-6 md:p-8 shadow-lg backdrop-blur-md">
                                 <h2 className="mb-2 font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-white">
                                     Berikan Cerita Anda
                                 </h2>
@@ -133,16 +141,14 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                                                         key={star}
                                                         type="button"
                                                         onClick={() => setData('rating', star)}
-                                                        className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
+                                                        className="focus:outline-none transition-all hover:scale-110 active:scale-95"
                                                     >
                                                         <Star size={28} className={star <= data.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700 transition-colors"} />
                                                     </button>
                                                 ))}
                                             </div>
-                                            {errors.rating && <p className="text-xs text-rose-500">{errors.rating}</p>}
+                                            {errors.rating && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.rating}</p>}
                                         </div>
-
-                                        {/* Name input removed since we get from Auth in backend */}
 
                                         <div>
                                             <label htmlFor="role" className="mb-1 block text-sm font-medium text-slate-700 dark:text-neutral-300">
@@ -155,7 +161,7 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                                                 className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-amber-500"
                                                 placeholder="Cth: Food Blogger, Tamu Keluarga"
                                             />
-                                            {errors.role && <p className="text-xs text-rose-500">{errors.role}</p>}
+                                            {errors.role && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.role}</p>}
                                         </div>
 
                                         <div>
@@ -166,17 +172,17 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                                                 id="quote"
                                                 value={data.quote}
                                                 onChange={e => setData('quote', e.target.value)}
-                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-amber-500 min-h-[100px] resize-none"
+                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-amber-500 min-h-[120px] resize-none"
                                                 placeholder="Ceritakan tentang momen favorit Anda, hidangan yang Anda suka, dll..."
                                                 required
                                             />
-                                            {errors.quote && <p className="text-xs text-rose-500">{errors.quote}</p>}
+                                            {errors.quote && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.quote}</p>}
                                         </div>
 
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-amber-600/20"
+                                            className="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-amber-600/20 transition-all hover:scale-[1.01]"
                                         >
                                             {processing ? 'Mengirim Cerita...' : 'Kirim Cerita Saya'}
                                         </Button>
@@ -186,12 +192,12 @@ export default function TestimonialIndex({ testimonials }: { testimonials: Testi
                                         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-400">
                                             <MessageSquarePlus size={24} />
                                         </div>
-                                        <h3 className="mb-2 font-semibold text-slate-900 dark:text-white">Anda belum masuk</h3>
+                                        <h3 className="mb-2 font-semibold text-slate-900 dark:text-white uppercase tracking-tight">Anda belum masuk</h3>
                                         <p className="mb-6 text-sm text-slate-500 dark:text-neutral-400">
                                             Silakan login menggunakan akun pelanggan untuk identifikasi dan mengisi buku cerita kami.
                                         </p>
                                         <Link href="/login">
-                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-amber-600 dark:hover:bg-amber-700">
+                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-amber-600 dark:hover:bg-amber-700 transition-all active:scale-95 shadow-lg">
                                                 Login Sekarang
                                             </Button>
                                         </Link>

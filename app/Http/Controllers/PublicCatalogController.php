@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Menu;
 use App\Models\Review;
 use App\Models\Team;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -29,9 +30,10 @@ class PublicCatalogController extends Controller
                 ->get()->toArray() : [];
         });
 
-        // 3 Real Reviews
+        // 3 Real Reviews - now filtered by is_approved
         $reviews = Cache::remember('welcome_reviews', 3600, function () {
             return Review::with('user:id,name,avatar')
+                ->where('is_approved', true)
                 ->where('rating', 5)
                 ->whereNotNull('message')
                 ->latest()
@@ -40,7 +42,7 @@ class PublicCatalogController extends Controller
                 ->toArray();
         });
 
-        $testimonials = \App\Models\Testimonial::where('is_approved', true)
+        $testimonials = Testimonial::where('is_approved', true)
             ->orderBy('rating', 'desc')
             ->latest()
             ->take(3)

@@ -1,62 +1,97 @@
 import { Link } from '@inertiajs/react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 
 export default function CTASection() {
     return (
-        <section className="relative overflow-hidden bg-[#F8F5F0] dark:bg-[#0A0A0B] py-32 transition-colors duration-500">
-            {/* Background image with overlay */}
-            <div className="absolute inset-0">
+        <section className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500 font-['Inter',sans-serif]">
+            {/* Background Texture & Ambient */}
+            <div className="absolute inset-0 z-0">
                 <img
                     src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2670&auto=format&fit=crop"
-                    alt="Background"
-                    className="h-full w-full object-cover opacity-20"
+                    alt="Atmosphere"
+                    className="h-full w-full object-cover opacity-10 dark:opacity-[0.05] grayscale"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#F8F5F0] via-[#F8F5F0]/90 to-[#F8F5F0]/60 dark:from-[#0A0A0B] dark:via-[#0A0A0B]/60 dark:to-[#0A0A0B]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#FAFAFA] via-transparent to-[#FAFAFA] dark:from-[#0A0A0B] dark:via-transparent dark:to-[#0A0A0B]" />
             </div>
 
-            {/* Decorative elements */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-amber-500/30 to-transparent" />
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-64 w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-600/8 blur-3xl" />
+            {/* Premium Decorative Ambient */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/5 blur-[120px]" />
+            
+            <div className="relative z-10 mx-auto max-w-5xl px-8">
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8 }}
+                    className="glass-card relative overflow-hidden rounded-[3rem] bg-slate-900 dark:bg-white/[0.02] border border-white/5 p-12 md:p-24 text-center shadow-3xl"
+                >
+                    {/* Inner Decoration */}
+                    <div className="absolute top-0 left-0 h-40 w-40 bg-amber-500/10 blur-[80px]" />
+                    <div className="absolute bottom-0 right-0 h-40 w-40 bg-amber-600/10 blur-[80px]" />
 
-            <div className="relative z-10 mx-auto max-w-3xl px-4 text-center">
-                {/* Eyebrow */}
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-amber-700 dark:text-amber-400 uppercase">
-                    <Sparkles size={12} />
-                    Pesan Malam Ini
-                </div>
-
-                <h2 className="mb-6 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-6xl">
-                    Malam Sempurnamu{' '}
-                    <span className="bg-gradient-to-r from-amber-600 to-amber-800 dark:from-amber-400 dark:to-amber-600 bg-clip-text text-transparent italic">
-                        Menanti
-                    </span>
-                </h2>
-                <p className="mb-12 text-lg leading-relaxed text-slate-600 dark:text-white/50">
-                    Pesan meja Anda hari ini dan biarkan kami membuat kenangan bersantap yang tak terlupakan untuk Anda dan orang-orang terkasih.
-                </p>
-
-                <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                    <Link href="/reservations/create">
-                        <Button
-                            size="lg"
-                            className="group h-14 w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-700 px-10 text-base font-semibold text-white shadow-2xl shadow-amber-900/30 transition-all hover:scale-105 hover:from-amber-400 hover:to-amber-600 sm:w-auto"
+                    <div className="relative z-10 max-w-3xl mx-auto space-y-8">
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                            className="inline-flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-amber-500 uppercase glow-amber"
                         >
-                            Pesan Sekarang{' '}
-                            <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </Button>
-                    </Link>
-                    <Link href="/catalog">
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="h-14 w-full rounded-full border-slate-300 dark:border-white/15 bg-white/50 dark:bg-white/5 px-10 text-base font-medium text-slate-700 dark:text-white/80 backdrop-blur-sm transition-all hover:border-amber-300 dark:hover:border-white/25 hover:bg-white sm:w-auto"
+                            <Sparkles size={12} />
+                            <span>Reserved Excellence</span>
+                        </motion.div>
+
+                        <motion.h2 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                            className="font-['Playfair_Display',serif] text-5xl font-black text-white md:text-7xl tracking-tight leading-tight"
                         >
-                            Jelajahi Menu
-                        </Button>
-                    </Link>
-                </div>
+                            Malam Sempurnamu <br />
+                            <span className="italic font-serif opacity-40">Menanti Anda</span>
+                        </motion.h2>
+
+                        <motion.p 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                            className="text-lg font-medium text-slate-400 max-w-2xl mx-auto"
+                        >
+                            Kurasi pengalaman bersantap yang tak terlupakan. Dari persiapan bahan pilihan hingga penyajian yang artistik.
+                        </motion.p>
+
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                            className="flex flex-col justify-center gap-6 pt-6 sm:flex-row"
+                        >
+                            <Link href="/reservations/create">
+                                <Button
+                                    className="group h-16 rounded-[1.25rem] bg-amber-500 px-12 text-[11px] font-black uppercase tracking-[0.2em] text-black shadow-2xl shadow-amber-500/20 transition-all hover:scale-105 hover:bg-white active:scale-95"
+                                >
+                                    Reserver Now
+                                    <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                </Button>
+                            </Link>
+                            <Link href="/catalog">
+                                <Button
+                                    variant="outline"
+                                    className="h-16 rounded-[1.25rem] border-white/10 bg-white/5 px-12 text-[11px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-md transition-all hover:border-white/20 hover:bg-white/10 active:scale-95"
+                                >
+                                    Explore Catalog
+                                </Button>
+                            </Link>
+                        </motion.div>
+                    </div>
+                </motion.div>
             </div>
         </section>
     );
 }
+

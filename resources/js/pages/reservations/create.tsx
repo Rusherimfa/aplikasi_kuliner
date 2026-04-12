@@ -1,11 +1,12 @@
 import { Head, useForm, usePage, router } from '@inertiajs/react';
-import { Calendar, Clock, Users, ArrowRight, CheckCircle2, Lock } from 'lucide-react';
+import { Calendar, Clock, Users, ArrowRight, CheckCircle2, Lock, MapPin, Info, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useState, useEffect } from 'react';
 import { dashboard } from '@/routes';
 import { useCart } from '@/hooks/use-cart';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import Navbar from '../welcome/sections/navbar';
 import AIChatbot from '@/components/app/ai-chatbot';
@@ -29,12 +30,10 @@ export default function CreateReservation() {
     const { items, cartTotal } = useCart();
     const dpAmount = cartTotal > 0 ? cartTotal * 0.5 : 50000;
 
-    // Generate valid minimum date based on local timezone
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
     const minDateLocal = today.toISOString().slice(0, 10);
 
-    // Auto-fetch booked tables when date and time is selected
     useEffect(() => {
         if (data.date && data.time) {
             router.reload({
@@ -43,7 +42,6 @@ export default function CreateReservation() {
                 preserveState: true,
                 preserveScroll: true,
             });
-            // Auto deselect if currently selected table becomes booked
             if (data.resto_table_id && bookedTableIds.includes(data.resto_table_id)) {
                 setData('resto_table_id', '');
             }
@@ -52,8 +50,6 @@ export default function CreateReservation() {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Attach cart items dynamically before submitting using Inertia's router directly since useForm transform is clumsy with hooks
         router.post('/reservations', {
             ...data,
             menus: items.map(i => ({ id: i.id, quantity: i.quantity, notes: '' }))
@@ -61,278 +57,300 @@ export default function CreateReservation() {
     };
 
     return (
-        <>
-            <Head title="Pesan Meja - RestoWeb" />
+        <div className="relative min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-foreground transition-colors duration-500 flex flex-col md:flex-row overflow-hidden">
+            <Head title="Pesan Meja — Pengalaman Kuliner Premium" />
+            
+            <Navbar
+                auth={auth}
+                dashboardUrl={dashboardUrl}
+                mobileMenuOpen={mobileMenuOpen}
+                setMobileMenuOpen={setMobileMenuOpen}
+            />
 
-            <div className="flex min-h-screen flex-col bg-background font-['Inter',sans-serif] text-foreground selection:bg-amber-100 selection:text-amber-900 md:flex-row transition-colors duration-500">
-                <Navbar
-                    auth={auth}
-                    dashboardUrl={dashboardUrl}
-                    mobileMenuOpen={mobileMenuOpen}
-                    setMobileMenuOpen={setMobileMenuOpen}
-                />
-
-                {/* Left Side: Interactive Floor Plan Map */}
-                <div className="relative flex min-h-[50vh] flex-col items-center justify-center overflow-hidden bg-zinc-950 px-4 py-24 shadow-2xl md:min-h-screen md:w-1/2 lg:p-12">
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
-                    
-                    <div className="relative z-10 w-full max-w-lg">
-                        <div className="mb-8 text-center text-white">
-                            <h2 className="mb-2 font-['Playfair_Display',serif] text-3xl font-bold text-amber-500">Peta Denah Interaktif</h2>
-                            <p className="text-sm text-slate-400">
-                                {!data.date || !data.time 
-                                    ? 'Pilih tanggal & waktu terlebih dahulu untuk melihat meja kosong.'
-                                    : 'Pilih meja favorit Anda. Meja merah sudah dipesan orang lain.'}
-                            </p>
+            {/* Left Side: Interactive Floor Plan */}
+            <div className="relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden bg-slate-950 px-6 py-24 md:min-h-screen md:w-1/2 lg:p-16 border-r border-white/5">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 z-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-30" />
+                
+                <motion.div 
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="relative z-10 w-full max-w-xl flex flex-col items-center"
+                >
+                    <div className="mb-12 text-center space-y-4">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-amber-500 uppercase glow-amber">
+                            <MapPin size={12} />
+                            <span>Interactive Map</span>
                         </div>
+                        <h2 className="font-['Playfair_Display',serif] text-4xl font-black text-white tracking-tight leading-tight">Pilih <span className="italic font-serif opacity-40">Lokasi</span> Spesifik Anda</h2>
+                        <p className="text-sm text-slate-400 font-medium max-w-sm mx-auto">
+                            {!data.date || !data.time 
+                                ? 'Tentukan waktu kunjungan untuk melihat ketersediaan meja.'
+                                : 'Pilih unit meja yang sesuai dengan kenyamanan Anda.'}
+                        </p>
+                    </div>
 
-                        {/* Visual Map Grid */}
-                        <div className="relative mx-auto aspect-square w-full max-w-md rounded-2xl border border-white/10 bg-black/40 p-6 shadow-xl backdrop-blur-md">
-                            <div className="absolute inset-x-8 top-0 flex justify-center">
-                                <div className="h-2 w-1/2 rounded-b-lg bg-zinc-800"></div>
-                                <span className="absolute -top-3 bg-zinc-950 px-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Panggung Utama</span>
-                            </div>
-                            
-                            <div className="absolute inset-y-8 right-0 flex items-center justify-center">
-                                <div className="h-1/2 w-2 rounded-l-lg bg-zinc-800/50"></div>
-                                <span className="absolute -right-6 top-1/2 origin-left -rotate-90 bg-zinc-950 px-2 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Jendela View</span>
-                            </div>
-
-                            <div 
-                                className="grid h-full w-full gap-2 lg:gap-3" 
-                                style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gridTemplateRows: 'repeat(12, minmax(0, 1fr))' }}
-                            >
-                                {tables.map((t: any) => {
-                                    const isBooked = bookedTableIds.includes(t.id);
-                                    const isSelected = data.resto_table_id === t.id;
-                                    const isDisabled = !data.date || !data.time || isBooked;
-                                    
-                                    let bgClass = 'bg-zinc-800 border-zinc-700 text-zinc-600'; // Default disabled
-                                    
-                                    if (!isDisabled) {
-                                        bgClass = isSelected 
-                                            ? 'bg-amber-500 border-amber-400 text-white shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110 z-10' 
-                                            : 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/40 cursor-pointer';
-                                    } else if (isBooked) {
-                                        bgClass = 'bg-rose-500/20 border-rose-500/50 text-rose-500 cursor-not-allowed';
-                                    }
-
-                                    // Category Shapes
-                                    const isRound = t.category === 'window';
-                                    const spanClass = t.capacity >= 6 ? 'span 3' : (t.capacity >= 4 ? 'span 2' : 'span 1');
-                                    
-                                    return (
-                                        <button
-                                            key={t.id}
-                                            type="button"
-                                            onClick={() => !isDisabled && setData('resto_table_id', t.id)}
-                                            disabled={isDisabled}
-                                            className={`relative flex flex-col items-center justify-center border-2 transition-all duration-300 ${isRound ? 'rounded-full' : 'rounded-xl'} ${bgClass}`}
-                                            style={{ 
-                                                gridColumn: `${t.pos_x} / span ${t.capacity >= 6 ? 3 : (t.capacity >= 4 ? 2 : 1)}`, 
-                                                gridRow: `${t.pos_y} / span 2` 
-                                            }}
-                                            title={`${t.name} - ${t.capacity} Orang`}
-                                        >
-                                            <span className="text-[10px] font-bold sm:text-xs">{t.name}</span>
-                                            {isBooked && <Lock size={10} className="absolute -bottom-1 -right-1 rounded-full bg-black p-0.5 text-rose-500" />}
-                                            {isSelected && <CheckCircle2 size={12} className="absolute -top-1 -right-1 rounded-full bg-black text-amber-500" />}
-                                        </button>
-                                    );
-                                })}
-                            </div>
+                    {/* Digital Floor Plan Frame */}
+                    <div className="relative mx-auto aspect-square w-full max-w-md rounded-[3rem] border border-white/10 bg-black/40 p-8 shadow-3xl backdrop-blur-2xl ring-1 ring-white/5">
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex h-8 w-40 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/10">
+                            <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Panggung Utama</span>
                         </div>
+                        
+                        <div className="grid h-full w-full gap-3" 
+                             style={{ gridTemplateColumns: 'repeat(12, minmax(0, 1fr))', gridTemplateRows: 'repeat(12, minmax(0, 1fr))' }}>
+                            {tables.map((t: any) => {
+                                const isBooked = bookedTableIds.includes(t.id);
+                                const isSelected = data.resto_table_id === t.id;
+                                const isDisabled = !data.date || !data.time || isBooked;
+                                
+                                let bgClass = 'bg-zinc-900/50 border-white/5 text-zinc-800';
+                                
+                                if (!isDisabled) {
+                                    bgClass = isSelected 
+                                        ? 'bg-amber-500 border-amber-400 text-black shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-110 z-20' 
+                                        : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20 hover:scale-105 cursor-pointer';
+                                } else if (isBooked) {
+                                    bgClass = 'bg-rose-500/10 border-rose-500/30 text-rose-500 cursor-not-allowed';
+                                }
 
-                        <div className="mt-6 flex justify-center gap-6 text-xs font-medium text-slate-400">
-                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-emerald-500/50 bg-emerald-500/20"></div> Tersedia</div>
-                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-rose-500/50 bg-rose-500/20"></div> Dipesan</div>
-                            <div className="flex items-center gap-2"><div className="h-3 w-3 rounded-sm border border-amber-400 bg-amber-500"></div> Pilihanmu</div>
+                                const isRound = t.category === 'window';
+                                
+                                return (
+                                    <motion.button
+                                        key={t.id}
+                                        whileHover={!isDisabled ? { scale: 1.1 } : {}}
+                                        whileTap={!isDisabled ? { scale: 0.95 } : {}}
+                                        type="button"
+                                        onClick={() => !isDisabled && setData('resto_table_id', t.id)}
+                                        disabled={isDisabled}
+                                        className={`relative flex flex-col items-center justify-center border transition-all duration-500 ${isRound ? 'rounded-full' : 'rounded-2xl'} ${bgClass}`}
+                                        style={{ 
+                                            gridColumn: `${t.pos_x} / span ${t.capacity >= 6 ? 3 : (t.capacity >= 4 ? 2 : 1)}`, 
+                                            gridRow: `${t.pos_y} / span 2` 
+                                        }}
+                                    >
+                                        <span className="text-[9px] font-black uppercase tracking-tighter">{t.name}</span>
+                                        {isBooked && <Lock size={8} className="absolute -bottom-1 -right-1 text-rose-500" />}
+                                        {isSelected && <CheckCircle2 size={10} className="absolute -top-1 -right-1 text-black" />}
+                                    </motion.button>
+                                );
+                            })}
                         </div>
                     </div>
-                </div>
 
-                {/* Right Side: Booking Form */}
-                <div className="relative flex w-full flex-col py-12 px-6 md:w-1/2 md:p-12 lg:p-16 lg:pt-32">
-                    <div className="mx-auto w-full max-w-md">
-                        <div className="mb-10 text-center md:text-left">
-                            <h1 className="mb-3 font-['Playfair_Display',serif] text-3xl font-bold text-foreground">Detail Reservasi</h1>
-                            <p className="text-sm text-muted-foreground">
-                                Langkah 1: Tentukan waktu. Langkah 2: Pilih meja di peta. Langkah 3: Konfirmasi.
-                            </p>
-                        </div>
+                    {/* Legend */}
+                    <div className="mt-10 flex flex-wrap justify-center gap-8 px-4">
+                        {[
+                            { color: 'bg-emerald-500/20 border-emerald-500/50', label: 'Tersedia' },
+                            { color: 'bg-rose-500/20 border-rose-500/50', label: 'Dipesan' },
+                            { color: 'bg-amber-500 border-amber-500', label: 'Pilihanmu' },
+                        ].map(item => (
+                            <div key={item.label} className="flex items-center gap-2.5">
+                                <div className={`h-3 w-3 rounded-full border ${item.color}`} />
+                                <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">{item.label}</span>
+                            </div>
+                        ))}
+                    </div>
+                </motion.div>
+            </div>
 
-                        <form onSubmit={submit} className="space-y-6">
-                            {/* WAKTU & TANGGAL */}
-                            <div className="rounded-2xl border border-border bg-muted/30 p-5">
-                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">1. Kapan Anda datang?</h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-xs font-medium text-foreground">
-                                            <Calendar size={14} className="text-amber-500" /> Tanggal
-                                        </label>
-                                        <Input
-                                            type="date"
-                                            min={minDateLocal}
-                                            value={data.date}
-                                            onChange={(e) => setData('date', e.target.value)}
-                                            className="h-12 rounded-xl border-border bg-card"
-                                            required
-                                        />
-                                        {errors.date && <p className="text-[10px] text-red-500">{errors.date}</p>}
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label className="flex items-center gap-2 text-xs font-medium text-foreground">
-                                            <Clock size={14} className="text-amber-500" /> Waktu
-                                        </label>
-                                        <Input
-                                            type="time"
-                                            value={data.time}
-                                            onChange={(e) => setData('time', e.target.value)}
-                                            className="h-12 rounded-xl border-border bg-card"
-                                            required
-                                        />
-                                        {errors.time && <p className="text-[10px] text-red-500">{errors.time}</p>}
-                                    </div>
+            {/* Right Side: Booking Form */}
+            <div className="relative z-10 flex w-full flex-col py-16 px-6 md:w-1/2 md:p-16 lg:px-24 pt-32 h-screen overflow-y-auto scrollbar-hide">
+                <motion.div 
+                    initial={{ opacity: 0, x: 30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="w-full max-w-lg mx-auto"
+                >
+                    <div className="mb-12 space-y-4">
+                        <h1 className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Konfigurasi <br /><span className="italic font-serif opacity-40">Kehadiran</span></h1>
+                        <p className="text-sm font-medium text-slate-500 dark:text-neutral-500 max-w-xs">
+                            Lengkapi detail di bawah for memastikan pengalaman bersantap yang personal and eksklusif.
+                        </p>
+                    </div>
+
+                    <form onSubmit={submit} className="space-y-10">
+                        {/* Section 1: Schedule */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+                                    <Calendar size={16} />
                                 </div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">1. Schedule & Table</h3>
                             </div>
-
-                            {/* PILIHAN MEJA */}
-                            <div className="rounded-2xl border border-border bg-muted/30 p-5">
-                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">2. Meja Pilihan</h3>
-                                {errors.resto_table_id && <p className="mb-3 rounded-lg bg-destructive/10 p-2 text-xs font-medium text-destructive">{errors.resto_table_id}</p>}
-                                
-                                {data.resto_table_id ? (
-                                    <div className="flex items-center justify-between rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-500 text-white shadow-md">
-                                                <CheckCircle2 size={20} />
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-foreground">
-                                                    Meja {tables.find((t: any) => t.id === data.resto_table_id)?.name}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Maks. {tables.find((t: any) => t.id === data.resto_table_id)?.capacity} Orang
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Button type="button" variant="ghost" size="sm" onClick={() => setData('resto_table_id', '')} className="text-destructive hover:bg-destructive/10">
-                                            Batal
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="rounded-xl border border-dashed border-border bg-card py-6 text-center">
-                                        <p className="text-sm text-muted-foreground/60">
-                                            {data.date && data.time ? 'Silakan klik meja berwarna hijau di Peta (Kiri).' : 'Isi tanggal & waktu terlebih dahulu.'}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* KONTAK DETAIL */}
-                            <div className="rounded-2xl border border-border bg-muted/30 p-5">
-                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">3. Identitas Anda</h3>
-                                <div className="space-y-4">
-                                    <div>
-                                        <Input
-                                            type="text"
-                                            placeholder="Nama Lengkap"
-                                            value={data.customer_name}
-                                            onChange={(e) => setData('customer_name', e.target.value)}
-                                            className="h-12 rounded-xl border-border bg-card"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Input
-                                            type="email"
-                                            placeholder="Email"
-                                            value={data.customer_email}
-                                            onChange={(e) => setData('customer_email', e.target.value)}
-                                            className="h-12 rounded-xl border-border bg-card"
-                                            readOnly={!!auth.user}
-                                            required
-                                        />
-                                        <Input
-                                            type="tel"
-                                            placeholder="No. WhatsApp"
-                                            value={data.customer_phone}
-                                            onChange={(e) => setData('customer_phone', e.target.value)}
-                                            className="h-12 rounded-xl border-border bg-card"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Input
-                                                type="number"
-                                                min="1"
-                                                max="20"
-                                                placeholder="Jumlah Tamu"
-                                                value={data.guest_count}
-                                                onChange={(e) => setData('guest_count', parseInt(e.target.value))}
-                                                className="h-12 rounded-xl border-border bg-card"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-                                    <Textarea
-                                        placeholder="Catatan tambahan (Opsional)"
-                                        value={data.special_requests}
-                                        onChange={(e) => setData('special_requests', e.target.value)}
-                                        className="h-20 resize-none rounded-xl border-border bg-card"
+                            
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Arrival Date</label>
+                                    <Input
+                                        type="date"
+                                        min={minDateLocal}
+                                        value={data.date}
+                                        onChange={(e) => setData('date', e.target.value)}
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Arrival Time</label>
+                                    <Input
+                                        type="time"
+                                        value={data.time}
+                                        onChange={(e) => setData('time', e.target.value)}
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        required
                                     />
                                 </div>
                             </div>
-                            
-                            {/* RINGKASAN PEMBAYARAN */}
-                            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-                                <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-amber-500">Ringkasan Pembayaran</h3>
-                                
-                                {items.length > 0 ? (
-                                    <div className="mb-4 space-y-2 border-b border-amber-500/20 pb-4">
-                                        {items.map(item => (
-                                            <div key={item.id} className="flex justify-between text-sm text-foreground/80">
-                                                <span>{item.quantity}x {item.name}</span>
-                                                <span className="font-medium">Rp {((Number(item.price)) * item.quantity).toLocaleString('id-ID')}</span>
+
+                            <div className="pt-2">
+                                <AnimatePresence mode="wait">
+                                    {data.resto_table_id ? (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex items-center justify-between rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-4"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-black shadow-lg shadow-amber-500/20 font-black">
+                                                    {tables.find((t: any) => t.id === data.resto_table_id)?.name}
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">Selected Table</p>
+                                                    <p className="text-sm font-medium text-slate-500">Kapasitas {tables.find((t: any) => t.id === data.resto_table_id)?.capacity} Tamu</p>
+                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="mb-4 rounded-xl bg-amber-500/10 p-3 text-xs text-amber-500/80">
-                                        Anda belum memilih menu makanan (Pre-order kosong).
-                                    </div>
-                                )}
-                                
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm text-foreground">
-                                        <span>Total Makanan</span>
-                                        <span className="font-bold">Rp {cartTotal.toLocaleString('id-ID')}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm text-foreground">
-                                        <span>Ketentuan DP {cartTotal > 0 ? '(50%)' : '(Tarif Dasar)'}</span>
-                                        <span className="font-bold text-rose-500">Rp {dpAmount.toLocaleString('id-ID')}</span>
+                                            <Button type="button" variant="ghost" onClick={() => setData('resto_table_id', '')} className="text-rose-500 hover:bg-rose-500/10 font-black text-[10px] tracking-widest uppercase">
+                                                Batal
+                                            </Button>
+                                        </motion.div>
+                                    ) : (
+                                        <div className="rounded-2xl border-2 border-dashed border-border p-6 text-center">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <Info size={20} className="text-slate-300 dark:text-neutral-700" />
+                                                <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] leading-relaxed">
+                                                    Pilih meja di peta Interaktif <br /> (Sisi Kiri Di Desktop)
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </div>
+
+                        {/* Section 2: Personal Info */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+                                    <Users size={16} />
+                                </div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">2. Guest Information</h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Input
+                                    type="text"
+                                    placeholder="Nama Lengkap"
+                                    value={data.customer_name}
+                                    onChange={(e) => setData('customer_name', e.target.value)}
+                                    className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                    required
+                                />
+                                <div className="grid grid-cols-2 gap-5">
+                                    <Input
+                                        type="email"
+                                        placeholder="Email Address"
+                                        value={data.customer_email}
+                                        onChange={(e) => setData('customer_email', e.target.value)}
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        readOnly={!!auth.user}
+                                        required
+                                    />
+                                    <Input
+                                        type="tel"
+                                        placeholder="WhatsApp Number"
+                                        value={data.customer_phone}
+                                        onChange={(e) => setData('customer_phone', e.target.value)}
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-5">
+                                    <div className="relative group">
+                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                                        <Input
+                                            type="number"
+                                            min="1"
+                                            max="20"
+                                            placeholder="Guest Count"
+                                            value={data.guest_count}
+                                            onChange={(e) => setData('guest_count', parseInt(e.target.value))}
+                                            className="h-14 pl-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                            required
+                                        />
                                     </div>
                                 </div>
-                                <p className="mt-4 text-center text-xs text-muted-foreground/60 font-medium">
-                                    Anda akan diarahkan ke halaman pembayaran DP setelah konfirmasi.
+                                <Textarea
+                                    placeholder="Special requests or dietary restrictions (Optional)"
+                                    value={data.special_requests}
+                                    onChange={(e) => setData('special_requests', e.target.value)}
+                                    className="h-28 resize-none rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20 p-5"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Section 3: Summary & Payment */}
+                        <div className="glass-card p-10 rounded-[2.5rem] bg-amber-500 shadow-2xl shadow-amber-500/20 text-black overflow-hidden relative">
+                            <CreditCard size={150} className="absolute -bottom-10 -right-10 text-black/5" />
+                            
+                            <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-8 border-b border-black/10 pb-4">
+                                Strategic Summary
+                            </h3>
+                            
+                            <div className="space-y-3 mb-10">
+                                {items.length > 0 ? (
+                                    items.map(item => (
+                                        <div key={item.id} className="flex justify-between text-sm font-bold">
+                                            <span className="opacity-60">{item.quantity}x {item.name}</span>
+                                            <span>Rp {((Number(item.price)) * item.quantity).toLocaleString('id-ID')}</span>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-[10px] font-black uppercase tracking-widest opacity-40 italic">
+                                        No pre-order menu items selected.
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end border-t border-black/10 pt-6">
+                                    <span className="text-xs font-black uppercase tracking-widest opacity-60">Initial Commitment</span>
+                                    <span className="text-3xl font-black tracking-tighter">
+                                        Rp {dpAmount.toLocaleString('id-ID')}
+                                    </span>
+                                </div>
+                                <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-40 leading-relaxed max-w-[200px]">
+                                    Required down payment to secure your exclusive spot and pre-ordered delicacies.
                                 </p>
                             </div>
 
-                            <Button
-                                type="submit"
-                                disabled={processing || !data.resto_table_id}
-                                className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all duration-300 hover:scale-105 disabled:opacity-50"
-                            >
-                                Lanjutkan ke Pembayaran (Rp {dpAmount.toLocaleString('id-ID')})
-                                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                            </Button>
-                        </form>
-                    </div>
-                </div>
+                            <div className="mt-10">
+                                <Button
+                                    type="submit"
+                                    disabled={processing || !data.resto_table_id}
+                                    className="w-full h-16 rounded-[1.25rem] bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:bg-slate-900 active:scale-95 disabled:opacity-50"
+                                >
+                                    Proceed to Settlement
+                                    <ArrowRight size={16} className="ml-3" />
+                                </Button>
+                            </div>
+                        </div>
+                    </form>
+                </motion.div>
                 
                 <AIChatbot />
             </div>
-        </>
+        </div>
     );
 }
+
