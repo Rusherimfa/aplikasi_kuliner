@@ -38,13 +38,32 @@ class ReservationController extends Controller
                     'booking_fee' => $reservation->booking_fee,
                     'menus_count' => $reservation->menus ? $reservation->menus->count() : 0,
                     'special_requests' => $reservation->special_requests,
+                    'table_id' => $reservation->resto_table_id,
                     'table_name' => $reservation->restoTable ? $reservation->restoTable->name : null,
                 ];
             });
 
+        $tables = RestoTable::where('is_active', true)->get();
+
         return Inertia::render('dashboard/reservations', [
             'reservations' => $reservations,
+            'tables' => $tables,
         ]);
+    }
+
+    /**
+     * Update table position from the visual map.
+     */
+    public function updateTablePosition(Request $request, RestoTable $table)
+    {
+        $validated = $request->validate([
+            'pos_x' => 'required|integer',
+            'pos_y' => 'required|integer',
+        ]);
+
+        $table->update($validated);
+
+        return back()->with('success', 'Table layout updated.');
     }
 
     /**

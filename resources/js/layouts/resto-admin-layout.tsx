@@ -9,6 +9,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
         { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
         { title: 'Manajemen Menu', href: '/menus', icon: BookOpen },
         { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar },
+        { title: 'Kitchen View', href: '/kitchen', icon: ChefHat },
     ];
 
     return (

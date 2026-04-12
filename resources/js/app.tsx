@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { Toaster } from 'sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -33,7 +34,10 @@ createInertiaApp({
     withApp(app) {
         return (
             <CartProvider>
-                <TooltipProvider delayDuration={0}>{app}</TooltipProvider>
+                <TooltipProvider delayDuration={0}>
+                    {app}
+                    <Toaster position="bottom-right" theme="dark" closeButton richColors />
+                </TooltipProvider>
             </CartProvider>
         );
     },

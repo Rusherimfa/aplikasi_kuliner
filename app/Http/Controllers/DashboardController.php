@@ -13,10 +13,16 @@ class DashboardController extends Controller
     public function index()
     {
         $today = Carbon::today();
+        $startDate = Carbon::today()->subDays(6);
 
+        // Basic Stats
         $pendingReservations = Reservation::where('status', 'pending')->count();
         $todayReservations = Reservation::whereDate('date', $today)->whereIn('status', ['confirmed', 'completed'])->count();
 
+        $totalMenus = Menu::count();
+        $totalCustomers = User::where('role', 'customer')->count();
+
+        // Estimated Revenue Today
         $reservationsToday = Reservation::whereDate('date', $today)
             ->where('status', '!=', 'rejected')
             ->with('menus')
@@ -25,13 +31,45 @@ class DashboardController extends Controller
         $estimatedRevenue = 0;
         foreach ($reservationsToday as $res) {
             foreach ($res->menus as $m) {
-                $qty = $m->pivot->quantity;
-                $estimatedRevenue += $m->price * $qty;
+                $estimatedRevenue += $m->price * $m->pivot->quantity;
             }
         }
 
-        $totalMenus = Menu::count();
-        $totalCustomers = User::where('role', 'customer')->count();
+        // 1. Revenue Analytics (Last 7 Days)
+        $revenueChart = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $startDate->copy()->addDays($i);
+            $dailyRes = Reservation::whereDate('date', $date)
+                ->where('status', '!=', 'rejected')
+                ->with('menus')
+                ->get();
+
+            $dailyTotal = 0;
+            foreach ($dailyRes as $res) {
+                foreach ($res->menus as $m) {
+                    $dailyTotal += $m->price * $m->pivot->quantity;
+                }
+            }
+
+            $revenueChart[] = [
+                'name' => $date->format('D'),
+                'revenue' => $dailyTotal,
+                'reservations' => $dailyRes->count(),
+            ];
+        }
+
+        // 2. Best Selling Menus (Top 5)
+        $bestSellers = Menu::withSum('reservations as total_sold', 'menu_reservation.quantity')
+            ->orderByDesc('total_sold')
+            ->take(5)
+            ->get()
+            ->map(function ($menu) {
+                return [
+                    'id' => $menu->id,
+                    'name' => $menu->name,
+                    'sold' => (int) $menu->total_sold,
+                ];
+            });
 
         $recentReservations = Reservation::with('user')
             ->orderBy('created_at', 'desc')
@@ -56,6 +94,8 @@ class DashboardController extends Controller
                 'total_menus' => $totalMenus,
                 'total_customers' => $totalCustomers,
             ],
+            'revenue_chart' => $revenueChart,
+            'best_sellers' => $bestSellers,
             'recent_activity' => $recentReservations,
         ]);
     }

@@ -1,17 +1,19 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
+use App\Http\Controllers\TestimonialController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
 Route::get('/catalog', [PublicCatalogController::class, 'catalog'])->name('catalog');
 Route::get('/experience', [PublicCatalogController::class, 'experience'])->name('experience');
-Route::get('/testimonials', [\App\Http\Controllers\TestimonialController::class, 'index'])->name('testimonials.index');
+Route::get('/testimonials', [TestimonialController::class, 'index'])->name('testimonials.index');
 
 // Public reservations (no login required)
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
@@ -34,7 +36,7 @@ Route::middleware(['auth', 'verified'])
         Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 
         // Authenticated Testimonials
-        Route::post('/testimonials', [\App\Http\Controllers\TestimonialController::class, 'store'])->name('testimonials.store');
+        Route::post('/testimonials', [TestimonialController::class, 'store'])->name('testimonials.store');
     });
 
 Route::middleware(['auth', 'verified', 'role:admin,staff'])
@@ -50,6 +52,11 @@ Route::middleware(['auth', 'verified', 'role:admin,staff'])
         // Reservation Dashboard Routes
         Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
         Route::put('reservations/{reservation}', [ReservationController::class, 'update'])->name('reservations.update');
+        Route::patch('tables/{table}/position', [ReservationController::class, 'updateTablePosition'])->name('tables.update_position');
+
+        // Kitchen Display System
+        Route::get('kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
+        Route::patch('kitchen/item/{pivotId}', [KitchenController::class, 'updateItemStatus'])->name('kitchen.item.update');
 
         // QR Code Check-in (Staff only — scan from mobile QR reader)
         Route::get('/checkin/{token}', [ReservationController::class, 'checkin'])->name('reservations.checkin');
