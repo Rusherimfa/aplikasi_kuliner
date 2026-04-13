@@ -130,14 +130,16 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                         </Button>
                                     </Link>
                                 )}
-                                <Link href="/logout" method="post" as="button">
+                                <Link href="/logout" method="post" as="button" title="Logout">
                                     <Button
+                                        asChild
                                         variant="ghost"
                                         size="icon"
                                         className="h-10 w-10 shrink-0 rounded-full text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/30 dark:hover:text-rose-400"
-                                        title="Logout"
                                     >
-                                        <LogOut size={18} />
+                                        <span className="inline-flex h-full w-full items-center justify-center">
+                                            <LogOut size={18} />
+                                        </span>
                                     </Button>
                                 </Link>
                             </div>
@@ -369,13 +371,15 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                         </Button>
                                     </Link>
                                 )}
-                                <Link href="/logout" method="post" as="button" className="shrink-0" onClick={() => setMobileMenuOpen(false)}>
+                                <Link href="/logout" method="post" as="button" className="shrink-0" onClick={() => setMobileMenuOpen(false)} title="Logout">
                                     <Button
+                                        asChild
                                         variant="outline"
                                         className="h-13 w-13 shrink-0 rounded-2xl border-slate-200 bg-white px-4 text-rose-500 hover:bg-rose-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-rose-950/30"
-                                        title="Logout"
                                     >
-                                        <LogOut size={20} />
+                                        <span className="inline-flex h-full w-full items-center justify-center">
+                                            <LogOut size={20} />
+                                        </span>
                                     </Button>
                                 </Link>
                             </div>

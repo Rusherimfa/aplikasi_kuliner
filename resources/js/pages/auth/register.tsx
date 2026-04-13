@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, Link } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { login } from '@/routes';
+import { home, login } from '@/routes';
 import { store } from '@/routes/register';
 import { User, Mail, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -113,6 +113,16 @@ export default function Register() {
                                         <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:translate-x-1 group-hover/btn:opacity-100 transition-all" />
                                     </>
                                 )}
+                            </Button>
+
+                            <Button
+                                asChild
+                                variant="outline"
+                                className="mt-3 h-12 w-full rounded-full border border-border bg-background/80 text-foreground font-semibold hover:bg-background hover:text-foreground transition-all"
+                            >
+                                <Link href={home()} tabIndex={6}>
+                                    Home
+                                </Link>
                             </Button>
                             
                             <div className="relative mt-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">

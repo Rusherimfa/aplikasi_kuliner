@@ -89,20 +89,20 @@ export default function Footer() {
                                         <MapPin size={18} />
                                     </div>
                                     <span className="text-sm font-medium leading-relaxed">
-                                        Sudirman Business District <br /> Central Tower, Jakarta
+                                        Pahri Business District <br /> Baratie, samarinda
                                     </span>
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-amber-500">
                                         <Mail size={18} />
                                     </div>
-                                    <span className="text-sm font-medium">hello@restoweb.premium</span>
+                                    <span className="text-sm font-medium">pahri@restoweb.com</span>
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-amber-500">
                                         <Clock size={18} />
                                     </div>
-                                    <span className="text-sm font-medium uppercase tracking-widest">Open Daily 11:00 — 23:00</span>
+                                    <span className="text-sm font-medium uppercase tracking-widest">Open Daily 09:00 — 23:00</span>
                                 </li>
                             </ul>
                         </div>
