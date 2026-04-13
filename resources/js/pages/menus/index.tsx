@@ -104,12 +104,12 @@ export default function MenuManagement({ menus, filters }: any) {
                                 placeholder="Cari sajian..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-amber-500"
+                                className="pl-9 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-orange-500"
                             />
                         </form>
                         <Button 
                             onClick={openCreateModal}
-                            className="shrink-0 bg-amber-500 hover:bg-amber-600 text-[#0A0A0B] font-semibold"
+                            className="shrink-0 bg-orange-500 hover:bg-orange-600 text-[#0A0A0B] font-semibold"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Tambah Menu
@@ -150,7 +150,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="font-medium text-amber-500">{formatRupiah(menu.price)}</span>
+                                                <span className="font-medium text-orange-500">{formatRupiah(menu.price)}</span>
                                             </TableCell>
                                             <TableCell>
                                                 {menu.is_available ? (
@@ -195,7 +195,7 @@ export default function MenuManagement({ menus, filters }: any) {
                             </div>
                             <h3 className="mb-1 text-lg font-semibold text-foreground/90">Katalog Kosong</h3>
                             <p className="text-sm text-muted-foreground mb-6 max-w-sm">Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.</p>
-                            <Button onClick={openCreateModal} className="bg-amber-500 hover:bg-amber-600 text-[#0A0A0B] font-semibold">
+                            <Button onClick={openCreateModal} className="bg-orange-500 hover:bg-orange-600 text-[#0A0A0B] font-semibold">
                                 Mulai Tambah Menu
                             </Button>
                         </div>
@@ -209,7 +209,7 @@ export default function MenuManagement({ menus, filters }: any) {
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
                     <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         
-                        <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-500/20 blur-3xl"></div>
+                        <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/20 blur-3xl"></div>
                         
                         <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
                             <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
@@ -227,7 +227,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                     id="name" 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-amber-500"
+                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
                                     placeholder="Cth: Wagyu A5 Ribeye"
                                 />
                                 {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
@@ -239,7 +239,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         id="category" 
                                         value={data.category} 
                                         onChange={e => setData('category', e.target.value)}
-                                        className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                        className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500"
                                     >
                                         <option value="" className="bg-card text-muted-foreground">Pilih...</option>
                                         {categories.map(c => <option key={c} value={c} className="bg-card">{c}</option>)}
@@ -253,7 +253,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         type="number"
                                         value={data.price} 
                                         onChange={e => setData('price', e.target.value)}
-                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-amber-500"
+                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
                                         placeholder="75000"
                                     />
                                     {errors.price && <p className="mt-1 text-xs text-destructive">{errors.price}</p>}
@@ -265,7 +265,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                     id="description" 
                                     value={data.description} 
                                     onChange={e => setData('description', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-amber-500 resize-none h-20"
+                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500 resize-none h-20"
                                     placeholder="Sajian istimewa dari dapur kami..."
                                 />
                                 {errors.description && <p className="mt-1 text-xs text-destructive">{errors.description}</p>}
@@ -278,7 +278,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         id="is_available" 
                                         checked={data.is_available} 
                                         onChange={e => setData('is_available', e.target.checked)}
-                                        className="h-4 w-4 rounded border-border bg-muted text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                        className="h-4 w-4 rounded border-border bg-muted text-orange-500 focus:ring-orange-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
                                     <Label htmlFor="is_available" className="text-foreground cursor-pointer font-medium">Tersedia untuk dipesan</Label>
                                 </div>
@@ -288,7 +288,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         id="is_best_seller" 
                                         checked={data.is_best_seller} 
                                         onChange={e => setData('is_best_seller', e.target.checked)}
-                                        className="h-4 w-4 rounded border-border bg-muted text-amber-500 focus:ring-amber-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                        className="h-4 w-4 rounded border-border bg-muted text-orange-500 focus:ring-orange-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
                                     <Label htmlFor="is_best_seller" className="text-foreground cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> Tandai sebagai hidangan "Sangat Laris"</Label>
                                 </div>
@@ -298,7 +298,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-muted">
                                     Batal
                                 </Button>
-                                <Button type="submit" disabled={processing} className="bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold">
+                                <Button type="submit" disabled={processing} className="bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold">
                                     {processing ? 'Menyimpan...' : 'Simpan Menu'}
                                 </Button>
                             </div>

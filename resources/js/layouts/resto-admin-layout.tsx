@@ -9,30 +9,30 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
 
     const navItems = [
         { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
-        { title: 'Manajemen Menu', href: '/menus', icon: BookOpen },
+        { title: 'Manajemen Menu', href: '/menus', icon: BookOpen, roles: ['admin'] },
         { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar },
         { title: 'Kitchen View', href: '/kitchen', icon: ChefHat },
-    ];
+    ].filter(item => !item.roles || item.roles.includes(auth.user.role));
 
     return (
-        <div className="flex h-screen w-full bg-[#0A0A0B] text-foreground font-sans selection:bg-amber-500/30 selection:text-amber-200 overflow-hidden">
+        <div className="flex h-screen w-full bg-[#0A0A0B] text-foreground font-sans selection:bg-orange-500/30 selection:text-orange-200 overflow-hidden">
             {/* Ambient Background Glows */}
-            <div className="fixed -top-24 -left-24 h-96 w-96 rounded-full bg-amber-600/5 blur-[120px] pointer-events-none" />
-            <div className="fixed -bottom-24 -right-24 h-96 w-96 rounded-full bg-amber-800/5 blur-[120px] pointer-events-none" />
+            <div className="fixed -top-24 -left-24 h-96 w-96 rounded-full bg-orange-600/5 blur-[120px] pointer-events-none" />
+            <div className="fixed -bottom-24 -right-24 h-96 w-96 rounded-full bg-orange-800/5 blur-[120px] pointer-events-none" />
 
             {/* Sidebar */}
             <aside className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-white/5 bg-black/40 backdrop-blur-3xl lg:translate-x-0 transition-transform duration-500">
                 {/* Logo Area */}
                 <div className="flex h-24 items-center gap-4 px-8">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-amber-600 shadow-xl shadow-amber-900/40 transform -rotate-3 transition-transform hover:rotate-0">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 shadow-xl shadow-orange-900/40 transform -rotate-3 transition-transform hover:rotate-0">
                         <ChefHat size={22} className="text-black" />
                     </div>
                     <div>
                         <span className="font-['Playfair_Display',serif] text-xl font-black tracking-tight text-white block leading-none">
-                            Resto<span className="text-amber-500">Web</span>
+                            Resto<span className="text-orange-500">Web</span>
                         </span>
                         <span className="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase mt-1 block">
-                            Executive Suite
+                            {auth.user.role === 'admin' ? 'Owner Suite' : 'Staff Station'}
                         </span>
                     </div>
                 </div>
@@ -51,11 +51,11 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                                     href={item.href}
                                     className={`group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-300 ${
                                         isActive
-                                            ? 'bg-amber-500/10 text-amber-500 shadow-[inset_0_0_20px_rgba(245,158,11,0.05)] border border-amber-500/10'
+                                            ? 'bg-orange-500/10 text-orange-500 shadow-[inset_0_0_20px_rgba(249,115,22,0.05)] border border-orange-500/10'
                                             : 'text-white/40 hover:bg-white/5 hover:text-white/80 border border-transparent'
                                     }`}
                                 >
-                                    <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-amber-500/10 text-amber-500' : 'bg-white/5 group-hover:bg-amber-500/10 group-hover:text-amber-500'}`}>
+                                    <div className={`p-2 rounded-xl transition-all duration-300 ${isActive ? 'bg-orange-500/10 text-orange-500' : 'bg-white/5 group-hover:bg-orange-500/10 group-hover:text-orange-500'}`}>
                                         <item.icon
                                             size={18}
                                             strokeWidth={isActive ? 2.5 : 1.5}
@@ -77,13 +77,13 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                 <div className="p-6">
                     <div className="flex items-center gap-4 rounded-3xl bg-white/[0.03] border border-white/5 p-4 transition-all hover:bg-white/[0.05] group cursor-pointer shadow-lg shadow-black/20">
                         <div className="relative">
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/5 text-amber-500 font-black border border-white/10">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-white/10 to-white/5 text-orange-500 font-black border border-white/10">
                                 {auth?.user?.name?.charAt(0) || 'A'}
                             </div>
                             <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-black" />
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="truncate text-sm font-bold text-white group-hover:text-amber-500 transition-colors tracking-tight">{auth?.user?.name || 'Admin User'}</p>
+                            <p className="truncate text-sm font-bold text-white group-hover:text-orange-500 transition-colors tracking-tight">{auth?.user?.name || 'Admin User'}</p>
                             <p className="truncate text-[10px] font-medium text-white/30 uppercase tracking-widest mt-0.5">{auth?.user?.role || 'Administrator'}</p>
                         </div>
                     </div>
@@ -97,7 +97,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                     <div className="flex items-center gap-5">
                         <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5 text-white/40 transition-all hover:bg-white/[0.08] hover:text-white hover:scale-105 active:scale-95 group shadow-lg shadow-black/20">
                             <Bell size={18} strokeWidth={1.5} />
-                            <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.6)] animate-pulse"></span>
+                            <span className="absolute top-3 right-3 h-2 w-2 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)] animate-pulse"></span>
                         </button>
                         
                         <div className="h-6 w-px bg-white/5 mx-1" />

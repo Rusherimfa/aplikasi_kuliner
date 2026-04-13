@@ -11,7 +11,7 @@ export default function AuthSplitLayout({
     const { name } = usePage().props;
 
     return (
-        <div className="relative min-h-dvh w-full flex items-center justify-center selection:bg-amber-500/30 selection:text-amber-200 bg-background transition-colors duration-500">
+        <div className="relative min-h-dvh w-full flex items-center justify-center selection:bg-orange-500/30 selection:text-orange-200 bg-background transition-colors duration-500">
             {/* Full Screen Background Image */}
             <div className="fixed inset-0 z-0">
                 <img
@@ -32,7 +32,7 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="group flex flex-col items-center gap-4 transition-transform hover:scale-105"
                     >
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-700 shadow-xl shadow-amber-900/30 ring-1 ring-white/20 transition-all group-hover:shadow-amber-500/30">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500 to-orange-700 shadow-xl shadow-orange-900/30 ring-1 ring-white/20 transition-all group-hover:shadow-orange-500/30">
                             <ChefHat size={32} className="text-white drop-shadow-md" />
                         </div>
                         <h2 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-widest text-foreground drop-shadow-lg">

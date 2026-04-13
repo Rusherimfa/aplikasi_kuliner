@@ -32,21 +32,21 @@ export default function InfoBar() {
                     backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
                 }}
             />
-            {/* Amber glow accent */}
-            <div className="pointer-events-none absolute left-1/2 top-1/2 h-32 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-amber-200/40 blur-3xl" />
+            {/* orange glow accent */}
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-32 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-200/40 blur-3xl" />
 
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {INFO_ITEMS.map(({ icon: Icon, label, value }) => (
                         <div
                             key={label}
-                            className="group flex items-center gap-4 rounded-2xl border border-amber-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-sm transition-all duration-300 hover:border-amber-200 hover:bg-amber-50 dark:hover:border-amber-900/50 dark:hover:bg-amber-500/10 hover:shadow-md"
+                            className="group flex items-center gap-4 rounded-2xl border border-orange-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-sm transition-all duration-300 hover:border-orange-200 hover:bg-orange-50 dark:hover:border-orange-900/50 dark:hover:bg-orange-500/10 hover:shadow-md"
                         >
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-500 ring-1 ring-amber-200 dark:ring-amber-900 transition-all duration-300 group-hover:bg-amber-500 group-hover:text-white">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-orange-50 dark:bg-orange-500/20 text-orange-600 dark:text-orange-500 ring-1 ring-orange-200 dark:ring-orange-900 transition-all duration-300 group-hover:bg-orange-500 group-hover:text-white">
                                 <Icon size={20} />
                             </div>
                             <div>
-                                <p className="text-xs font-semibold tracking-widest text-amber-700 uppercase">
+                                <p className="text-xs font-semibold tracking-widest text-orange-700 uppercase">
                                     {label}
                                 </p>
                                 <p className="mt-0.5 text-sm font-medium text-slate-800 dark:text-white">{value}</p>

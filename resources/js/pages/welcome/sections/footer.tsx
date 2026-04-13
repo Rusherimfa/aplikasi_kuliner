@@ -7,7 +7,7 @@ export default function Footer() {
     return (
         <footer className="relative bg-[#FAFAFA] dark:bg-[#0A0A0B] text-slate-500 dark:text-neutral-500 border-t border-border dark:border-white/5 transition-colors duration-500 font-['Inter',sans-serif]">
             {/* Top decorative gradient line */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-orange-500/20 to-transparent" />
 
             <div className="mx-auto max-w-7xl px-8 py-24">
                 <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
@@ -39,7 +39,7 @@ export default function Footer() {
                                     key={i}
                                     href={href}
                                     whileHover={{ y: -5 }}
-                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border dark:border-white/5 bg-white dark:bg-white/5 text-slate-400 transition-all hover:bg-amber-500 hover:text-black hover:border-amber-500 shadow-sm"
+                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border dark:border-white/5 bg-white dark:bg-white/5 text-slate-400 transition-all hover:bg-orange-500 hover:text-black hover:border-orange-500 shadow-sm"
                                 >
                                     <Icon size={18} />
                                 </motion.a>
@@ -64,9 +64,9 @@ export default function Footer() {
                                     <li key={link.label}>
                                         <Link
                                             href={link.href}
-                                            className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest transition-all hover:text-amber-500"
+                                            className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest transition-all hover:text-orange-500"
                                         >
-                                            <span className="h-1 w-0 bg-amber-500 transition-all group-hover:w-4" />
+                                            <span className="h-1 w-0 bg-orange-500 transition-all group-hover:w-4" />
                                             {link.label}
                                             <ArrowUpRight
                                                 size={14}
@@ -85,7 +85,7 @@ export default function Footer() {
                             </h4>
                             <ul className="space-y-6">
                                 <li className="flex items-start gap-4">
-                                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-amber-500">
+                                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
                                         <MapPin size={18} />
                                     </div>
                                     <span className="text-sm font-medium leading-relaxed">
@@ -93,13 +93,13 @@ export default function Footer() {
                                     </span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-amber-500">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
                                         <Mail size={18} />
                                     </div>
                                     <span className="text-sm font-medium">hello@restoweb.premium</span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-amber-500">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
                                         <Clock size={18} />
                                     </div>
                                     <span className="text-sm font-medium uppercase tracking-widest">Open Daily 11:00 — 23:00</span>
@@ -119,7 +119,7 @@ export default function Footer() {
                             <a
                                 key={label}
                                 href="#"
-                                className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-amber-500"
+                                className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-orange-500"
                             >
                                 {label}
                             </a>

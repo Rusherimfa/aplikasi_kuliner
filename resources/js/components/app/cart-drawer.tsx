@@ -40,7 +40,7 @@ export default function CartDrawer() {
                                         <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                                             <div className="flex items-start justify-between">
                                                 <Dialog.Title className="text-xl font-['Playfair_Display',serif] font-bold text-foreground flex items-center gap-2">
-                                                    <ShoppingBag size={24} className="text-amber-500" />
+                                                    <ShoppingBag size={24} className="text-orange-500" />
                                                     Pesanan Anda
                                                 </Dialog.Title>
                                                 <div className="ml-3 flex h-7 items-center">
@@ -76,7 +76,7 @@ export default function CartDrawer() {
                                                                          <div>
                                                                              <div className="flex justify-between text-base font-semibold text-foreground">
                                                                                  <h4 className="line-clamp-2 pr-4">{item.name}</h4>
-                                                                                 <p className="ml-4 whitespace-nowrap text-amber-600">
+                                                                                 <p className="ml-4 whitespace-nowrap text-orange-600">
                                                                                      Rp {(Number(item.price) * item.quantity).toLocaleString('id-ID')}
                                                                                  </p>
                                                                              </div>
@@ -92,7 +92,7 @@ export default function CartDrawer() {
                                                                                  <span className="w-4 text-center font-medium text-foreground">{item.quantity}</span>
                                                                                  <button
                                                                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 hover:bg-amber-500/20"
+                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 text-orange-600 hover:bg-orange-500/20"
                                                                                  >
                                                                                      <Plus size={14} />
                                                                                  </button>
@@ -119,10 +119,10 @@ export default function CartDrawer() {
                                             <div className="border-t border-border bg-card px-4 py-6 sm:px-6">
                                                 <div className="flex justify-between text-lg font-bold text-foreground mb-6">
                                                     <p>Total Pesanan</p>
-                                                    <p className="text-amber-600">Rp {cartTotal.toLocaleString('id-ID')}</p>
+                                                    <p className="text-orange-600">Rp {cartTotal.toLocaleString('id-ID')}</p>
                                                 </div>
                                                 <Link href="/checkout" onClick={() => setCartOpen(false)}>
-                                                    <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-lg font-semibold text-white shadow-xl shadow-amber-900/20 hover:from-amber-400 hover:to-amber-600 transition-all hover:scale-[1.02]">
+                                                    <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
                                                         Lanjut ke Pembayaran <ArrowRight className="ml-2" size={20} />
                                                     </Button>
                                                 </Link>
@@ -131,7 +131,7 @@ export default function CartDrawer() {
                                                         atau{' '}
                                                         <button
                                                             type="button"
-                                                            className="font-medium text-amber-600 hover:text-amber-500"
+                                                            className="font-medium text-orange-600 hover:text-orange-500"
                                                             onClick={() => setCartOpen(false)}
                                                         >
                                                             Lanjut Belanja<span aria-hidden="true"> &rarr;</span>
