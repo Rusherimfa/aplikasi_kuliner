@@ -78,7 +78,7 @@ export default function Hero() {
                 
                 {/* Animated Mesh Gradients */}
                 <div className="absolute inset-x-0 top-0 h-[80vh] bg-gradient-to-b from-primary/10 via-background/80 to-background" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,var(--color-primary-0.05)_0%,transparent_50%)]" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,var(--color-primary)/0.05_0%,transparent_50%)]" />
                 
                 {/* Textures */}
                 <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.05]" />

@@ -1,5 +1,5 @@
-import { Link, usePage } from '@inertiajs/react';
-import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote, ShoppingBag } from 'lucide-react';
+import { Link, usePage, router } from '@inertiajs/react';
+import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote, ShoppingBag, User, LayoutDashboard, History } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { login } from '@/routes';
@@ -7,6 +7,14 @@ import { useCart } from '@/hooks/use-cart';
 import { useAppearance } from '@/hooks/use-appearance';
 import CartDrawer from '@/components/app/cart-drawer';
 import { useMagnetic } from '@/hooks/use-magnetic';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface NavbarProps {
     auth: any;
@@ -92,17 +100,56 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                     <div className="flex items-center gap-4">
                         <div className="hidden md:flex items-center gap-4 border-r border-white/10 pr-6 mr-2">
                             {auth.user ? (
-                                <Link 
-                                    href={auth.user.role === 'customer' ? '/reservations/history' : dashboardUrl}
-                                >
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-primary/50 transition-colors overflow-hidden">
-                                        {auth.user.avatar ? (
-                                            <img src={auth.user.avatar} className="h-full w-full object-cover" alt="" />
-                                        ) : (
-                                            <span className="text-xs font-bold">{auth.user.name?.charAt(0)}</span>
-                                        )}
-                                    </div>
-                                </Link>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-primary/50 transition-colors overflow-hidden outline-none cursor-pointer">
+                                            {auth.user.avatar ? (
+                                                <img src={auth.user.avatar} className="h-full w-full object-cover" alt="" />
+                                            ) : (
+                                                <span className="text-xs font-bold">{auth.user.name?.charAt(0)}</span>
+                                            )}
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-64 mt-4 p-2 glass-card border-white/10 backdrop-blur-3xl shadow-4xl animate-in fade-in zoom-in duration-200">
+                                        <DropdownMenuLabel className="px-4 py-5">
+                                            <div className="flex flex-col space-y-1">
+                                                <p className="text-sm font-black leading-none text-foreground">{auth.user.name}</p>
+                                                <p className="text-[10px] leading-none text-muted-foreground font-medium tracking-tight overflow-hidden text-ellipsis whitespace-nowrap">{auth.user.email}</p>
+                                            </div>
+                                        </DropdownMenuLabel>
+                                        <DropdownMenuSeparator className="bg-white/5" />
+                                        
+                                        <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
+                                            <Link href="/settings/profile" className="flex items-center w-full">
+                                                <User className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
+                                                <span className="text-[11px] font-bold uppercase tracking-widest">Pengaturan Profil</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
+                                            <Link href={auth.user.role === 'customer' ? '/reservations/history' : dashboardUrl} className="flex items-center w-full">
+                                                {auth.user.role === 'customer' ? (
+                                                    <History className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
+                                                ) : (
+                                                    <LayoutDashboard className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
+                                                )}
+                                                <span className="text-[11px] font-bold uppercase tracking-widest">
+                                                    {auth.user.role === 'customer' ? 'Riwayat Pesanan' : 'Panel Dashboard'}
+                                                </span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                        
+                                        <DropdownMenuSeparator className="bg-white/5" />
+                                        
+                                        <DropdownMenuItem 
+                                            onClick={() => router.post('/logout')}
+                                            className="rounded-xl px-3 py-3.5 text-rose-500 focus:bg-rose-500 focus:text-white group transition-all duration-300 cursor-pointer"
+                                        >
+                                            <LogOut className="mr-3 h-4 w-4 transition-colors" />
+                                            <span className="text-[11px] font-bold uppercase tracking-widest">Keluar Sesi</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             ) : (
                                 <Link 
                                     href={login().url}
@@ -200,6 +247,36 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             <ChevronRight size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
                         </Link>
                     ))}
+
+                    {/* Profile & Logout for Mobile */}
+                    {auth.user && (
+                        <>
+                            <Link 
+                                href="/settings/profile" 
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="group flex items-center justify-between border-b border-white/5 pb-6"
+                            >
+                                <div className="flex flex-col">
+                                    <span className="text-4xl font-serif text-foreground">Profil Saya</span>
+                                    <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">Pengaturan akun & avatar</span>
+                                </div>
+                                <User size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
+                            </Link>
+                            <button 
+                                onClick={() => {
+                                    setMobileMenuOpen(false);
+                                    router.post('/logout');
+                                }}
+                                className="group flex items-center justify-between border-b border-white/5 pb-6 text-rose-500"
+                            >
+                                <div className="flex flex-col text-left">
+                                    <span className="text-4xl font-serif">Keluar Sesi</span>
+                                    <span className="text-xs opacity-50 uppercase tracking-widest mt-1">Selesaikan kunjungan Anda</span>
+                                </div>
+                                <LogOut size={20} className="opacity-40 group-hover:translate-x-2 transition-transform" />
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 <div className="absolute bottom-12 left-6 right-6">
