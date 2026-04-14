@@ -1,9 +1,26 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, UtensilsCrossed } from 'lucide-react';
+import { 
+    ArrowLeft, 
+    CheckCircle2, 
+    ChevronRight, 
+    CreditCard, 
+    UtensilsCrossed, 
+    ShoppingBag, 
+    Truck, 
+    Store, 
+    Wallet, 
+    Sparkles, 
+    ArrowRight,
+    Utensils,
+    Clock,
+    MapPin,
+    ShieldCheck
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/hooks/use-cart';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Shared Components
 import Navbar from '../welcome/sections/navbar';
@@ -13,6 +30,7 @@ export default function CheckoutIndex() {
     const { items, cartTotal, clearCart } = useCart();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [orderType, setOrderType] = useState<'dine-in' | 'takeaway'>('dine-in');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -23,133 +41,205 @@ export default function CheckoutIndex() {
             setIsSubmitting(false);
             setIsSuccess(true);
             clearCart();
-        }, 1500);
+        }, 2000);
     };
 
     if (isSuccess) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-background font-['Inter',sans-serif] px-4">
-                <div className="max-w-md w-full bg-card p-8 rounded-[2rem] shadow-2xl text-center border border-border">
-                    <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle2 size={40} className="text-green-500" />
+            <div className="min-h-screen flex items-center justify-center bg-[#0A0A0B] font-sans px-4 overflow-hidden relative text-foreground transition-colors duration-500 selection:bg-orange-500/30">
+                {/* Background Glows */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-orange-500/10 blur-[120px] pointer-events-none" />
+                
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    className="max-w-md w-full glass-card p-12 rounded-[3.5rem] text-center border border-white/5 relative z-10"
+                >
+                    <div className="w-24 h-24 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-10 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
+                        <CheckCircle2 size={48} className="text-orange-500" />
                     </div>
-                    <h1 className="font-['Playfair_Display',serif] text-3xl font-bold text-foreground mb-2">Pesanan Berhasil!</h1>
-                    <p className="text-slate-500 mb-8">
-                        Terima kasih atas pesanan Anda. Kami sedang menyiapkan hidangan spesial Anda dengan penuh cinta.
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                        <Sparkles size={16} className="text-orange-500" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Order Confirmed</span>
+                    </div>
+                    <h1 className="font-['Playfair_Display',serif] text-4xl font-black text-white mb-4 tracking-tighter">
+                         Culinary <span className="italic opacity-40 text-orange-500">Secured</span>
+                    </h1>
+                    <p className="text-slate-500 dark:text-neutral-500 font-medium mb-12">
+                        Terima kasih. Pesanan Anda telah masuk ke dapur kami. Chef sedang meracik hidangan istimewa untuk Anda.
                     </p>
                     <Link href="/">
-                        <Button className="w-full h-14 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-white font-semibold shadow-xl shadow-amber-900/20 hover:scale-105 transition-all">
-                            Kembali ke Beranda
+                        <Button className="w-full h-16 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-widest hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-orange-500/10">
+                            Back to Gallery <ArrowRight size={18} className="ml-3" />
                         </Button>
                     </Link>
-                </div>
+                </motion.div>
             </div>
         );
     }
 
     return (
-        <>
-            <Head title="Pembayaran - RestoWeb" />
+        <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-sans text-foreground transition-colors duration-500 overflow-hidden relative">
+            <Head title="Checkout — Gastronomy Suite" />
+            
+            {/* Ambient Background Glows */}
+            <div className="pointer-events-none fixed top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-orange-500/5 blur-[140px]" />
+            <div className="pointer-events-none fixed bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" />
 
-            <div className="min-h-screen bg-background font-['Inter',sans-serif] text-muted-foreground selection:bg-amber-100 selection:text-amber-900">
-                <Navbar auth={{ user: null }} dashboardUrl="/dashboard" mobileMenuOpen={false} setMobileMenuOpen={() => {}} />
+            <Navbar auth={{ user: null }} dashboardUrl="/dashboard" mobileMenuOpen={false} setMobileMenuOpen={() => {}} />
 
-                <main className="mx-auto max-w-7xl px-4 pt-32 pb-24 sm:px-6 lg:px-8">
-                    <div className="mb-8 flex items-center gap-2 text-sm text-muted-foreground/60">
-                        <Link href="/catalog" className="hover:text-foreground transition-colors">Menu</Link>
-                        <ChevronRight size={14} />
-                        <span className="font-medium text-foreground">Pembayaran</span>
+            <main className="pt-32 pb-32 relative z-10">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    {/* Breadcrumbs */}
+                    <div className="mb-8 flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                        <Link href="/catalog" className="hover:text-orange-500 transition-colors">The Gallery</Link>
+                        <ChevronRight size={14} className="opacity-20" />
+                        <span className="text-orange-500">Secure Order</span>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mt-8">
+                    <div className="mb-16">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="h-1 w-8 rounded-full bg-orange-500" />
+                            <span className="text-[10px] font-black tracking-[0.3em] text-orange-500 uppercase">Secure Transaction</span>
+                        </div>
+                        <h1 className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter">
+                            Order <span className="italic font-serif opacity-40 text-orange-500">Suite</span>
+                        </h1>
+                        <p className="mt-4 text-lg font-medium text-slate-500 dark:text-neutral-500 max-w-lg">
+                            Lengkapi detail di bawah ini untuk mengunci pesanan kuliner Anda malam ini.
+                        </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mt-8">
                         {/* Checkout Form */}
-                        <div className="lg:col-span-7 xl:col-span-8">
-                            <h1 className="mb-2 font-['Playfair_Display',serif] text-4xl font-bold text-foreground">
-                                Selesaikan Pesanan
-                            </h1>
-                            <p className="text-muted-foreground mb-10">
-                                Harap lengkapi detail informasi Anda di bawah ini agar kami dapat memproses pesanan dengan cepat.
-                            </p>
-
-                            <form onSubmit={handleSubmit} className="space-y-10">
-                                {/* Contact Info */}
-                                <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-                                    <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 font-bold text-sm">1</div>
-                                        Informasi Kontak
+                        <div className="lg:col-span-7 xl:col-span-8 space-y-12">
+                            <form onSubmit={handleSubmit} className="space-y-12">
+                                {/* Identity */}
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    className="p-10 md:p-12 rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 shadow-3xl backdrop-blur-3xl"
+                                >
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-10 flex items-center gap-4">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20 font-black text-sm">01</div>
+                                        Identity
                                     </h2>
-                                    <div className="space-y-5">
-                                        <div>
-                                            <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Nama Lengkap</label>
-                                            <Input required placeholder="Masukkan nama Anda" className="h-12 bg-muted/30 border-border focus:bg-background focus:border-amber-500" />
+                                    <div className="space-y-8">
+                                        <div className="space-y-3">
+                                            <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Full Name</label>
+                                            <Input required placeholder="Masukkan nama Anda" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                         </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                            <div>
-                                                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">Email</label>
-                                                <Input required type="email" placeholder="contoh@email.com" className="h-12 bg-muted/30 border-border focus:bg-background focus:border-amber-500" />
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Email Address</label>
+                                                <Input required type="email" placeholder="contoh@email.com" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                             </div>
-                                            <div>
-                                                <label className="text-sm font-medium text-muted-foreground mb-1.5 block">No. WhatsApp</label>
-                                                <Input required type="tel" placeholder="+62 8..." className="h-12 bg-muted/30 border-border focus:bg-background focus:border-amber-500" />
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">WhatsApp Contact</label>
+                                                <Input required type="tel" placeholder="+62 8..." className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
-                                {/* Order Type */}
-                                <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-                                    <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 font-bold text-sm">2</div>
-                                        Tipe Pesanan
+                                {/* Experience Mode */}
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="p-10 md:p-12 rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 shadow-3xl backdrop-blur-3xl"
+                                >
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-10 flex items-center gap-4">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20 font-black text-sm">02</div>
+                                        Experience Mode
                                     </h2>
-                                     <div className="grid grid-cols-2 gap-4">
-                                        <label className="cursor-pointer relative rounded-2xl border-2 border-amber-500 bg-amber-500/5 p-4 transition-all">
+                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <label 
+                                            onClick={() => setOrderType('dine-in')}
+                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'dine-in' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
+                                        >
                                             <input type="radio" name="orderType" className="sr-only" defaultChecked />
-                                            <div className="font-semibold text-amber-600">Makan di Tempat</div>
-                                            <div className="text-sm text-amber-600/70 mt-1">Kami siapkan meja untuk Anda.</div>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'dine-in' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                    <Utensils size={24} />
+                                                </div>
+                                                {orderType === 'dine-in' && <CheckCircle2 size={24} className="text-orange-500" />}
+                                            </div>
+                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'dine-in' ? 'text-orange-500' : 'text-slate-400'}`}>Makan di Tempat</div>
+                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Kami siapkan meja terbaik untuk pengalaman dining yang tactile.</div>
                                         </label>
-                                        <label className="cursor-pointer relative rounded-2xl border-2 border-border bg-muted/30 p-4 transition-all hover:border-amber-500/50">
+
+                                        <label 
+                                            onClick={() => setOrderType('takeaway')}
+                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'takeaway' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
+                                        >
                                             <input type="radio" name="orderType" className="sr-only" />
-                                            <div className="font-semibold text-muted-foreground group-hover:text-foreground">Bawa Pulang (Takeaway)</div>
-                                            <div className="text-sm text-muted-foreground/60 mt-1">Ambil sendiri secara langsung.</div>
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'takeaway' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                    <ShoppingBag size={24} />
+                                                </div>
+                                                {orderType === 'takeaway' && <CheckCircle2 size={24} className="text-orange-500" />}
+                                            </div>
+                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'takeaway' ? 'text-orange-500' : 'text-slate-400'}`}>Takeaway Suite</div>
+                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Bawa kemewahan kuliner kami ke mana pun Anda berada.</div>
                                         </label>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* Payment Method */}
-                                <div className="p-8 rounded-[2rem] bg-card border border-border shadow-sm">
-                                    <h2 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 font-bold text-sm">3</div>
-                                        Metode Pembayaran
+                                <motion.div 
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="p-10 md:p-12 rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 shadow-3xl backdrop-blur-3xl"
+                                >
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-10 flex items-center gap-4">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20 font-black text-sm">03</div>
+                                        Secure Payment
                                     </h2>
                                     <div className="space-y-4">
-                                        <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <CreditCard className="text-muted-foreground/40" />
-                                                <span className="font-medium text-foreground">Kartu Kredit / Debit</span>
+                                        <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-slate-200 dark:border-white/5 p-6 hover:bg-white/5 hover:border-orange-500/30 transition-all group">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors">
+                                                    <CreditCard size={20} />
+                                                </div>
+                                                <div className="text-left">
+                                                    <span className="font-black uppercase tracking-widest text-[10px] text-white/20 block mb-0.5">Global Banking</span>
+                                                    <span className="font-bold text-white uppercase tracking-tight">Credit / Debit Card</span>
+                                                </div>
                                             </div>
-                                            <input type="radio" name="payment" className="h-4 w-4 text-amber-600 focus:ring-amber-600" />
+                                            <input type="radio" name="payment" className="h-5 w-5 text-orange-500 border-white/10 bg-white/5 focus:ring-orange-500/20" />
                                         </label>
-                                         <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-muted text-muted-foreground font-bold px-2 py-0.5 rounded text-xs">QRIS</div>
-                                                <span className="font-medium text-foreground">Gopay / OVO / Dana / LinkAja</span>
+                                         <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-orange-500 bg-orange-500/5 p-6 shadow-2xl shadow-orange-500/10 transition-all group">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-xl bg-orange-500 text-black flex items-center justify-center">
+                                                    <div className="font-black text-[10px]">QRIS</div>
+                                                </div>
+                                                <div className="text-left">
+                                                    <span className="font-black uppercase tracking-widest text-[10px] text-orange-500 block mb-0.5">Digital Gateway</span>
+                                                    <span className="font-bold text-white uppercase tracking-tight">E-Wallets / QRIS</span>
+                                                </div>
                                             </div>
-                                            <input type="radio" name="payment" defaultChecked className="h-4 w-4 text-amber-600 focus:ring-amber-600" />
+                                            <input type="radio" name="payment" defaultChecked className="h-5 w-5 text-orange-500 border-orange-500 bg-orange-500 focus:ring-orange-500/20" />
                                         </label>
-                                        <label className="flex cursor-pointer items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/30">
-                                            <div className="flex items-center gap-3">
-                                                <UtensilsCrossed className="text-muted-foreground/40" />
-                                                <span className="font-medium text-foreground">Bayar di Kasir</span>
+                                        <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-slate-200 dark:border-white/5 p-6 hover:bg-white/5 hover:border-orange-500/30 transition-all group">
+                                            <div className="flex items-center gap-4">
+                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors">
+                                                    <UtensilsCrossed size={20} />
+                                                </div>
+                                                <div className="text-left">
+                                                    <span className="font-black uppercase tracking-widest text-[10px] text-white/20 block mb-0.5">In-Person Lounge</span>
+                                                    <span className="font-bold text-white uppercase tracking-tight">Bayar di Kasir</span>
+                                                </div>
                                             </div>
-                                            <input type="radio" name="payment" className="h-4 w-4 text-amber-600 focus:ring-amber-600" />
+                                            <input type="radio" name="payment" className="h-5 w-5 text-orange-500 border-white/10 bg-white/5 focus:ring-orange-500/20" />
                                         </label>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 <div className="lg:hidden">
-                                    <Button disabled={isSubmitting || items.length === 0} type="submit" className="w-full h-14 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 text-white font-bold text-lg shadow-xl shadow-amber-900/20">
-                                        {isSubmitting ? 'Memproses...' : `Bayar Rp ${cartTotal.toLocaleString('id-ID')}`}
+                                    <Button disabled={isSubmitting || items.length === 0} type="submit" className="w-full h-18 rounded-[2rem] bg-orange-500 text-black font-black uppercase tracking-widest shadow-2xl shadow-orange-500/20 hover:bg-white hover:scale-[1.02] transition-all">
+                                        {isSubmitting ? 'Memproses...' : `Finalize & Pay Rp ${cartTotal.toLocaleString('id-ID')}`}
                                     </Button>
                                 </div>
                             </form>
@@ -157,65 +247,88 @@ export default function CheckoutIndex() {
 
                         {/* Order Summary Sidebar */}
                         <div className="lg:col-span-5 xl:col-span-4 sticky top-32">
-                            <div className="rounded-[2.5rem] bg-card border border-border p-8 shadow-2xl">
-                                <h3 className="text-xl font-bold font-['Playfair_Display',serif] mb-6 flex items-center justify-between text-foreground">
-                                    Ringkasan Pesanan
-                                    <span className="bg-amber-500/10 text-amber-600 px-3 py-1 rounded-full text-sm font-sans">{items.length} item</span>
-                                </h3>
-                                                                {items.length > 0 ? (
-                                    <ul className="space-y-4 mb-8">
+                            <motion.div 
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 p-10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] backdrop-blur-3xl ring-1 ring-white/5"
+                            >
+                                <div className="flex items-center justify-between mb-10">
+                                    <h3 className="text-2xl font-black font-['Playfair_Display',serif] text-slate-900 dark:text-white tracking-tight">
+                                        Gastronomy <span className="italic opacity-40 text-orange-500 text-3xl block">Log</span>
+                                    </h3>
+                                    <div className="h-12 w-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/20 font-black text-xs">
+                                        {items.length}
+                                    </div>
+                                </div>
+
+                                {items.length > 0 ? (
+                                    <ul className="space-y-6 mb-10">
                                         {items.map(item => (
-                                            <li key={item.id} className="flex justify-between items-start">
-                                                <div className="flex gap-3 text-foreground">
-                                                    <span className="font-bold text-amber-500">{item.quantity}x</span>
-                                                    <span className="text-muted-foreground line-clamp-2 pr-2">{item.name}</span>
+                                            <li key={item.id} className="flex justify-between items-start group">
+                                                <div className="space-y-1">
+                                                    <p className="text-sm font-black text-white uppercase tracking-tight leading-tight group-hover:text-orange-500 transition-colors">{item.name}</p>
+                                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[.2em] italic">Quantity: {item.quantity}</p>
                                                 </div>
-                                                <span className="font-medium text-foreground whitespace-nowrap">
-                                                    Rp {(Number(item.price) * item.quantity).toLocaleString('id-ID')}
+                                                <span className="font-black text-white italic text-sm whitespace-nowrap">
+                                                    {Number(item.price * item.quantity).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                                                 </span>
                                             </li>
                                         ))}
                                     </ul>
                                  ) : (
-                                    <div className="py-8 text-center text-muted-foreground/40 border-y border-border mb-8">
-                                        <p>Keranjang Anda kosong</p>
-                                        <Link href="/catalog" className="text-amber-500 mt-2 block underline">Kembali ke Menu</Link>
+                                    <div className="py-20 text-center rounded-[2.5rem] border border-dashed border-white/5 bg-white/[0.01] mb-10">
+                                        <ShoppingBag size={48} className="mx-auto text-white/10 mb-6" />
+                                        <p className="text-sm font-medium text-white/20 italic">Keranjang Anda sedang hampa.</p>
+                                        <Link href="/catalog" className="inline-flex items-center gap-2 text-orange-500 text-[10px] font-black uppercase tracking-widest mt-6 hover:text-white transition-colors">
+                                            Return to Menu <ArrowRight size={14} />
+                                        </Link>
                                     </div>
                                 )}
                                 
-                                <div className="space-y-3 pt-6 border-t border-border">
-                                    <div className="flex justify-between text-muted-foreground">
+                                <div className="space-y-4 pt-10 border-t border-white/5">
+                                    <div className="flex justify-between text-[11px] font-bold text-white/40 uppercase tracking-widest">
                                         <span>Subtotal</span>
-                                        <span>Rp {cartTotal.toLocaleString('id-ID')}</span>
+                                        <span className="text-white/60">Rp {cartTotal.toLocaleString('id-ID')}</span>
                                     </div>
-                                    <div className="flex justify-between text-muted-foreground">
-                                        <span>Pajak Restoran (10%)</span>
-                                        <span>Rp {(cartTotal * 0.1).toLocaleString('id-ID')}</span>
+                                    <div className="flex justify-between text-[11px] font-bold text-white/40 uppercase tracking-widest">
+                                        <span>Tax & Service (15%)</span>
+                                        <span className="text-white/60">Rp {(cartTotal * 0.15).toLocaleString('id-ID')}</span>
                                     </div>
-                                    <div className="flex justify-between text-muted-foreground">
-                                        <span>Layanan (5%)</span>
-                                        <span>Rp {(cartTotal * 0.05).toLocaleString('id-ID')}</span>
-                                    </div>
-                                    <div className="flex justify-between text-2xl font-bold mt-6 pt-6 border-t border-border">
-                                        <span className="text-foreground">Total</span>
-                                        <span className="text-amber-500">Rp {(cartTotal * 1.15).toLocaleString('id-ID')}</span>
+                                    <div className="flex justify-between items-end pt-8 mt-4 border-t border-white/10">
+                                        <div className="text-left space-y-1">
+                                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Total Experience</span>
+                                            <p className="text-orange-500 font-serif italic text-sm">Fine Dining Value</p>
+                                        </div>
+                                        <span className="text-4xl font-black text-white tracking-tighter">
+                                            Rp {(cartTotal * 1.15).toLocaleString('id-ID', { minimumFractionDigits: 0, useGrouping: true }).split(',')[0]}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <Button 
                                     onClick={handleSubmit} 
                                     disabled={isSubmitting || items.length === 0} 
-                                    className="hidden lg:flex w-full mt-8 h-14 rounded-full bg-amber-500 text-zinc-950 font-bold text-lg hover:bg-amber-400 transition-all hover:scale-[1.02]"
+                                    className="hidden lg:flex w-full mt-12 h-18 rounded-[2rem] bg-orange-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-orange-500/20 hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-20 flex items-center justify-center gap-3 py-4"
                                 >
-                                    {isSubmitting ? 'Memproses...' : 'Proses Pesanan Sekarang'}
+                                    {isSubmitting ? (
+                                        <>
+                                            <div className="h-5 w-5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                                            Authenticating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ShieldCheck size={20} />
+                                            Confirm Order
+                                        </>
+                                    )}
                                 </Button>
-                            </div>
+                            </motion.div>
                         </div>
                     </div>
-                </main>
+                </div>
+            </main>
 
-                <Footer />
-            </div>
-        </>
+            <Footer />
+        </div>
     );
 }

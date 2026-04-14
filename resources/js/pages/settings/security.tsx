@@ -89,7 +89,7 @@ export default function Security({
                                             id="current_password"
                                             ref={currentPasswordInput}
                                             name="current_password"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-amber-500/50 focus:ring-amber-500/20"
+                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
                                             autoComplete="current-password"
                                             placeholder="Masukkan password saat ini"
                                         />
@@ -107,7 +107,7 @@ export default function Security({
                                             id="password"
                                             ref={passwordInput}
                                             name="password"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-amber-500/50 focus:ring-amber-500/20"
+                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
                                             autoComplete="new-password"
                                             placeholder="Masukkan password baru"
                                         />
@@ -124,7 +124,7 @@ export default function Security({
                                         <PasswordInput
                                             id="password_confirmation"
                                             name="password_confirmation"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-amber-500/50 focus:ring-amber-500/20"
+                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
                                             autoComplete="new-password"
                                             placeholder="Ulangi password baru"
                                         />
@@ -136,7 +136,7 @@ export default function Security({
                                     <Button
                                         disabled={processing}
                                         data-test="update-password-button"
-                                        className="rounded-full bg-amber-500 px-6 font-semibold text-zinc-950 hover:bg-amber-400 transition-all duration-200"
+                                        className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400 transition-all duration-200"
                                     >
                                         Simpan Password
                                     </Button>
@@ -216,7 +216,7 @@ export default function Security({
                                 {hasSetupData ? (
                                     <Button
                                         onClick={() => setShowSetupModal(true)}
-                                        className="rounded-full bg-amber-500 px-6 font-semibold text-zinc-950 hover:bg-amber-400"
+                                        className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400"
                                     >
                                         <ShieldCheck size={16} className="mr-2" />
                                         Lanjutkan Pengaturan 2FA
@@ -230,7 +230,7 @@ export default function Security({
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="rounded-full bg-amber-500 px-6 font-semibold text-zinc-950 hover:bg-amber-400"
+                                                className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400"
                                             >
                                                 <Shield size={16} className="mr-2" />
                                                 Aktifkan 2FA

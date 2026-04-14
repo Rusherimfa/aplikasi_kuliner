@@ -71,7 +71,7 @@ export default function CreateReservation() {
             <div className="relative flex min-h-[60vh] flex-col items-center justify-center overflow-hidden bg-slate-950 px-6 py-24 md:min-h-screen md:w-1/2 lg:p-16 border-r border-white/5">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 z-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
-                <div className="absolute inset-0 z-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent opacity-30" />
+                <div className="absolute inset-0 z-0 bg-gradient-to-br from-orange-500/10 via-transparent to-transparent opacity-30" />
                 
                 <motion.div 
                     initial={{ opacity: 0, x: -30 }}
@@ -79,7 +79,7 @@ export default function CreateReservation() {
                     className="relative z-10 w-full max-w-xl flex flex-col items-center"
                 >
                     <div className="mb-12 text-center space-y-4">
-                        <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/20 bg-amber-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-amber-500 uppercase glow-amber">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-orange-500 uppercase glow-primary">
                             <MapPin size={12} />
                             <span>Interactive Map</span>
                         </div>
@@ -108,7 +108,7 @@ export default function CreateReservation() {
                                 
                                 if (!isDisabled) {
                                     bgClass = isSelected 
-                                        ? 'bg-amber-500 border-amber-400 text-black shadow-[0_0_30px_rgba(245,158,11,0.4)] scale-110 z-20' 
+                                        ? 'bg-orange-500 border-orange-400 text-black shadow-[0_0_30px_rgba(249,115,22,0.4)] scale-110 z-20' 
                                         : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20 hover:scale-105 cursor-pointer';
                                 } else if (isBooked) {
                                     bgClass = 'bg-rose-500/10 border-rose-500/30 text-rose-500 cursor-not-allowed';
@@ -144,7 +144,7 @@ export default function CreateReservation() {
                         {[
                             { color: 'bg-emerald-500/20 border-emerald-500/50', label: 'Tersedia' },
                             { color: 'bg-rose-500/20 border-rose-500/50', label: 'Dipesan' },
-                            { color: 'bg-amber-500 border-amber-500', label: 'Pilihanmu' },
+                            { color: 'bg-orange-500 border-orange-500', label: 'Pilihanmu' },
                         ].map(item => (
                             <div key={item.label} className="flex items-center gap-2.5">
                                 <div className={`h-3 w-3 rounded-full border ${item.color}`} />
@@ -173,7 +173,7 @@ export default function CreateReservation() {
                         {/* Section 1: Schedule */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
                                     <Calendar size={16} />
                                 </div>
                                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">1. Schedule & Table</h3>
@@ -187,7 +187,7 @@ export default function CreateReservation() {
                                         min={minDateLocal}
                                         value={data.date}
                                         onChange={(e) => setData('date', e.target.value)}
-                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                         required
                                     />
                                 </div>
@@ -197,7 +197,7 @@ export default function CreateReservation() {
                                         type="time"
                                         value={data.time}
                                         onChange={(e) => setData('time', e.target.value)}
-                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                         required
                                     />
                                 </div>
@@ -209,10 +209,10 @@ export default function CreateReservation() {
                                         <motion.div 
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
-                                            className="flex items-center justify-between rounded-2xl border border-amber-500/20 bg-amber-500/5 px-6 py-4"
+                                            className="flex items-center justify-between rounded-2xl border border-orange-500/20 bg-orange-500/5 px-6 py-4"
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500 text-black shadow-lg shadow-amber-500/20 font-black">
+                                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500 text-black shadow-lg shadow-orange-500/20 font-black">
                                                     {tables.find((t: any) => t.id === data.resto_table_id)?.name}
                                                 </div>
                                                 <div>
@@ -241,7 +241,7 @@ export default function CreateReservation() {
                         {/* Section 2: Personal Info */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-500">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
                                     <Users size={16} />
                                 </div>
                                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">2. Guest Information</h3>
@@ -253,7 +253,7 @@ export default function CreateReservation() {
                                     placeholder="Nama Lengkap"
                                     value={data.customer_name}
                                     onChange={(e) => setData('customer_name', e.target.value)}
-                                    className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                    className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                     required
                                 />
                                 <div className="grid grid-cols-2 gap-5">
@@ -262,7 +262,7 @@ export default function CreateReservation() {
                                         placeholder="Email Address"
                                         value={data.customer_email}
                                         onChange={(e) => setData('customer_email', e.target.value)}
-                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                         readOnly={!!auth.user}
                                         required
                                     />
@@ -271,13 +271,13 @@ export default function CreateReservation() {
                                         placeholder="WhatsApp Number"
                                         value={data.customer_phone}
                                         onChange={(e) => setData('customer_phone', e.target.value)}
-                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                         required
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-5">
                                     <div className="relative group">
-                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-amber-500 transition-colors" />
+                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                                         <Input
                                             type="number"
                                             min="1"
@@ -285,7 +285,7 @@ export default function CreateReservation() {
                                             placeholder="Guest Count"
                                             value={data.guest_count}
                                             onChange={(e) => setData('guest_count', parseInt(e.target.value))}
-                                            className="h-14 pl-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20"
+                                            className="h-14 pl-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                             required
                                         />
                                     </div>
@@ -294,13 +294,13 @@ export default function CreateReservation() {
                                     placeholder="Special requests or dietary restrictions (Optional)"
                                     value={data.special_requests}
                                     onChange={(e) => setData('special_requests', e.target.value)}
-                                    className="h-28 resize-none rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-amber-500/20 p-5"
+                                    className="h-28 resize-none rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20 p-5"
                                 />
                             </div>
                         </div>
 
                         {/* Section 3: Summary & Payment */}
-                        <div className="glass-card p-10 rounded-[2.5rem] bg-amber-500 shadow-2xl shadow-amber-500/20 text-black overflow-hidden relative">
+                        <div className="glass-card p-10 rounded-[2.5rem] bg-orange-500 shadow-2xl shadow-orange-500/20 text-black overflow-hidden relative">
                             <CreditCard size={150} className="absolute -bottom-10 -right-10 text-black/5" />
                             
                             <h3 className="text-xs font-black uppercase tracking-[0.3em] mb-8 border-b border-black/10 pb-4">

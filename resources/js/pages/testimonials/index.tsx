@@ -63,7 +63,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                 <main className="mx-auto max-w-7xl px-4 pt-32 pb-24 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-16 text-center max-w-3xl mx-auto">
-                        <span className="mb-4 inline-block rounded-full border border-amber-200 bg-amber-50 px-4 py-1 text-xs font-semibold tracking-widest text-amber-700 uppercase dark:border-amber-900/50 dark:bg-amber-500/10 dark:text-amber-500">
+                        <span className="mb-4 inline-block rounded-full border border-orange-200 bg-orange-50 px-4 py-1 text-xs font-semibold tracking-widest text-orange-700 uppercase dark:border-orange-900/50 dark:bg-orange-500/10 dark:text-orange-500">
                             Cerita Tamu
                         </span>
                         <h1 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-5xl">
@@ -80,14 +80,14 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                             {(testimonials && testimonials.length > 0) ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {testimonials.map((t) => (
-                                        <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-300 hover:shadow-xl dark:hover:border-amber-500/30">
-                                            <Quote size={28} className="mb-4 text-amber-500/20" />
+                                        <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl dark:hover:border-orange-500/30">
+                                            <Quote size={28} className="mb-4 text-orange-500/20" />
                                             <p className="mb-6 flex-1 text-sm leading-relaxed text-slate-600 dark:text-neutral-400 italic">
                                                 "{t.quote}"
                                             </p>
                                             <div className="mb-4 flex gap-1">
                                                 {Array.from({ length: 5 }).map((_, i) => (
-                                                    <Star key={i} size={12} className={i < t.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} />
+                                                    <Star key={i} size={12} className={i < t.rating ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} />
                                                 ))}
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -113,7 +113,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
 
                         {/* Right Side - Submission Form */}
                         <div className="w-full lg:w-5/12">
-                            <div className="sticky top-24 rounded-3xl border border-amber-200 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10 p-6 md:p-8 shadow-lg backdrop-blur-md">
+                            <div className="sticky top-24 rounded-3xl border border-orange-200 dark:border-orange-900/30 bg-orange-50/50 dark:bg-orange-900/10 p-6 md:p-8 shadow-lg backdrop-blur-md">
                                 <h2 className="mb-2 font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-white">
                                     Berikan Cerita Anda
                                 </h2>
@@ -143,7 +143,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                                                         onClick={() => setData('rating', star)}
                                                         className="focus:outline-none transition-all hover:scale-110 active:scale-95"
                                                     >
-                                                        <Star size={28} className={star <= data.rating ? "fill-amber-400 text-amber-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700 transition-colors"} />
+                                                        <Star size={28} className={star <= data.rating ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700 transition-colors"} />
                                                     </button>
                                                 ))}
                                             </div>
@@ -158,7 +158,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                                                 id="role"
                                                 value={data.role}
                                                 onChange={e => setData('role', e.target.value)}
-                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-amber-500"
+                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-orange-500"
                                                 placeholder="Cth: Food Blogger, Tamu Keluarga"
                                             />
                                             {errors.role && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.role}</p>}
@@ -172,7 +172,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                                                 id="quote"
                                                 value={data.quote}
                                                 onChange={e => setData('quote', e.target.value)}
-                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-amber-500 min-h-[120px] resize-none"
+                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-orange-500 min-h-[120px] resize-none"
                                                 placeholder="Ceritakan tentang momen favorit Anda, hidangan yang Anda suka, dll..."
                                                 required
                                             />
@@ -182,7 +182,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full mt-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-amber-600/20 transition-all hover:scale-[1.01]"
+                                            className="w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-orange-600/20 transition-all hover:scale-[1.01]"
                                         >
                                             {processing ? 'Mengirim Cerita...' : 'Kirim Cerita Saya'}
                                         </Button>
@@ -197,7 +197,7 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                                             Silakan login menggunakan akun pelanggan untuk identifikasi dan mengisi buku cerita kami.
                                         </p>
                                         <Link href="/login">
-                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-amber-600 dark:hover:bg-amber-700 transition-all active:scale-95 shadow-lg">
+                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-orange-600 dark:hover:bg-orange-700 transition-all active:scale-95 shadow-lg">
                                                 Login Sekarang
                                             </Button>
                                         </Link>

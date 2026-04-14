@@ -1,4 +1,4 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { CartProvider } from '@/hooks/use-cart';
@@ -7,6 +7,14 @@ import AppHeaderLayout from '@/layouts/app/app-header-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { Toaster } from 'sonner';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+import SmoothScroll from '@/components/app/smooth-scroll';
+
+// Refresh ScrollTrigger on each navigation finish
+router.on('finish', () => {
+    ScrollTrigger.refresh();
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -35,7 +43,9 @@ createInertiaApp({
         return (
             <CartProvider>
                 <TooltipProvider delayDuration={0}>
-                    {app}
+                    <SmoothScroll>
+                        {app}
+                    </SmoothScroll>
                     <Toaster position="bottom-right" theme="dark" closeButton richColors />
                 </TooltipProvider>
             </CartProvider>

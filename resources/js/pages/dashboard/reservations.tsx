@@ -77,7 +77,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
     const StatusBadge = ({ status }: { status: string }) => {
         const variants: Record<string, string> = {
             awaiting_payment: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-            pending: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
+            pending: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
             confirmed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
             rejected: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
             completed: 'bg-white/10 text-white/60 border-white/20',
@@ -128,7 +128,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                         <Button
                             variant="ghost"
                             size="sm"
-                            className={`rounded-lg px-4 ${view === 'list' ? 'bg-amber-500 text-[#0A0A0B] hover:bg-amber-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
+                            className={`rounded-lg px-4 ${view === 'list' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
                             onClick={() => setView('list')}
                         >
                             <List className="mr-2 h-4 w-4" />
@@ -137,7 +137,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                         <Button
                             variant="ghost"
                             size="sm"
-                            className={`rounded-lg px-4 ${view === 'map' ? 'bg-amber-500 text-[#0A0A0B] hover:bg-amber-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
+                            className={`rounded-lg px-4 ${view === 'map' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
                             onClick={() => setView('map')}
                         >
                             <MapIcon className="mr-2 h-4 w-4" />
@@ -187,7 +187,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                                                         {new Date(reservation.date).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </div>
                                                     <div className="flex items-center text-xs text-white/40">
-                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-amber-500/70" />
+                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-orange-500/70" />
                                                         {reservation.time.substring(0, 5)}
                                                     </div>
                                                 </TableCell>
@@ -234,7 +234,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                         ) : (
                             <div className="p-20 text-center flex flex-col items-center">
                                 <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
-                                    <Calendar size={32} className="text-amber-500/40" />
+                                    <Calendar size={32} className="text-orange-500/40" />
                                 </div>
                                 <h3 className="text-lg font-bold text-white/90 italic font-['Playfair_Display',serif]">Hening di Sini...</h3>
                                 <p className="mt-2 text-sm text-white/40 max-w-xs">Saat ini tidak ada permintaan reservasi yang masuk dalam antrean Anda.</p>
@@ -248,7 +248,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                         
                         {/* Map Controls Info */}
                         <div className="absolute top-6 left-6 z-10 bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-2xl max-w-[200px] shadow-2xl">
-                            <h4 className="text-xs font-black uppercase tracking-widest text-amber-500 flex items-center gap-2 mb-3">
+                            <h4 className="text-xs font-black uppercase tracking-widest text-orange-500 flex items-center gap-2 mb-3">
                                 <Info size={14} /> Legend
                             </h4>
                             <div className="space-y-2">
@@ -256,7 +256,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                                     <span className="h-3 w-3 rounded-full bg-emerald-500/20 border border-emerald-500/40"></span> Tersedia
                                 </div>
                                 <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-white/60">
-                                    <span className="h-3 w-3 rounded-full bg-amber-500"></span> Dipesan
+                                    <span className="h-3 w-3 rounded-full bg-orange-500"></span> Dipesan
                                 </div>
                             </div>
                             <p className="mt-4 text-[9px] text-white/30 italic leading-relaxed font-medium">
@@ -285,7 +285,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                                         animate={{ x: table.pos_x, y: table.pos_y }}
                                         className={`absolute cursor-grab active:cursor-grabbing w-24 h-24 rounded-2xl flex flex-col items-center justify-center border-2 shadow-2xl transition-all ${
                                             status === 'confirmed' || status === 'pending'
-                                                ? 'bg-amber-500 border-amber-600 text-[#0A0A0B]' 
+                                                ? 'bg-orange-500 border-orange-600 text-[#0A0A0B]' 
                                                 : 'bg-white/5 border-white/10 hover:border-emerald-500/50 text-white group'
                                         }`}
                                         style={{ touchAction: 'none' }}
@@ -295,7 +295,7 @@ export default function ReservationsDashboard({ reservations, tables }: PageProp
                                         <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">{table.capacity}p</span>
                                         
                                         {draggingTableId === table.id && (
-                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-amber-500 text-[#0A0A0B] text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap">
+                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-orange-500 text-[#0A0A0B] text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap">
                                                 DRAGGING...
                                             </div>
                                         )}

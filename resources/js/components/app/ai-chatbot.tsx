@@ -81,12 +81,12 @@ export default function AIChatbot() {
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-white/10 bg-white/5 p-4">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-700 shadow-lg shadow-amber-900/30">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-orange-700 shadow-lg shadow-orange-900/30">
                                 <Bot size={20} className="text-white" />
                             </div>
                             <div>
                                 <h3 className="font-['Playfair_Display',serif] font-bold text-white text-lg leading-none">
-                                    RestoBot <span className="text-amber-500 rounded px-1.5 py-0.5 bg-amber-500/10 text-[10px] ml-1 font-sans align-middle">AI</span>
+                                    RestoBot <span className="text-orange-500 rounded px-1.5 py-0.5 bg-orange-500/10 text-[10px] ml-1 font-sans align-middle">AI</span>
                                 </h3>
                                 <p className="text-xs text-white/50 mt-1">Asisten Daring (Simulasi)</p>
                             </div>
@@ -110,7 +110,7 @@ export default function AIChatbot() {
                                     className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
                                         msg.isBot
                                             ? 'bg-white/10 text-white rounded-tl-sm'
-                                            : 'bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md shadow-amber-900/20 rounded-tr-sm'
+                                            : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-900/20 rounded-tr-sm'
                                     }`}
                                 >
                                     {msg.text}
@@ -120,9 +120,9 @@ export default function AIChatbot() {
                         {isTyping && (
                             <div className="flex justify-start">
                                 <div className="bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-white/5">
-                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                 </div>
                             </div>
                         )}
@@ -136,7 +136,7 @@ export default function AIChatbot() {
                                 <button
                                     key={sug}
                                     onClick={() => handleSend(sug)}
-                                    className="text-[11px] font-medium border border-amber-500/30 text-amber-500/80 rounded-full px-3 py-1.5 hover:bg-amber-500/10 hover:text-amber-400 transition-colors"
+                                    className="text-[11px] font-medium border border-orange-500/30 text-orange-500/80 rounded-full px-3 py-1.5 hover:bg-orange-500/10 hover:text-orange-400 transition-colors"
                                 >
                                     {sug}
                                 </button>
@@ -158,12 +158,12 @@ export default function AIChatbot() {
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder="Tanyakan sesuatu..."
-                                className="w-full rounded-full border border-white/10 bg-white/5 pl-4 pr-12 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-amber-500/50 focus:outline-none focus:ring-1 focus:ring-amber-500/50"
+                                className="w-full rounded-full border border-white/10 bg-white/5 pl-4 pr-12 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-orange-500/50 focus:outline-none focus:ring-1 focus:ring-orange-500/50"
                             />
                             <button
                                 type="submit"
                                 disabled={!inputText.trim()}
-                                className="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-white transition-opacity disabled:opacity-30 disabled:hover:scale-100 hover:scale-105"
+                                className="absolute right-1 flex h-8 w-8 items-center justify-center rounded-full bg-orange-500 text-white transition-opacity disabled:opacity-30 disabled:hover:scale-100 hover:scale-105"
                             >
                                 <Send size={14} className="ml-0.5" />
                             </button>
@@ -173,10 +173,10 @@ export default function AIChatbot() {
             ) : (
                 <button
                     onClick={() => setIsOpen(true)}
-                    className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-700 shadow-xl shadow-amber-900/40 hover:scale-105 transition-all duration-300"
+                    className="group relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-orange-700 shadow-xl shadow-orange-900/40 hover:scale-105 transition-all duration-300"
                 >
-                    <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 opacity-0 group-hover:opacity-100 transition-opacity blur-sm"></div>
-                    <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-500 to-amber-700 rounded-full">
+                    <div className="absolute -inset-0.5 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity blur-sm"></div>
+                    <div className="relative flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-500 to-orange-700 rounded-full">
                         <Sparkles size={16} className="absolute top-3 right-3 text-white/80" />
                         <Bot size={24} className="text-white relative z-10" />
                     </div>

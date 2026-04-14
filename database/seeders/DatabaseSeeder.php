@@ -16,17 +16,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::firstOrCreate([
-            'email' => 'admin@restoweb.test',
-        ], [
-            'name' => 'Admin Boss',
-            'role' => 'admin',
-            'password' => bcrypt('password'),
-        ]);
-
+        // 1. Inisialisasi Team Utama
         $team = Team::firstOrCreate(['slug' => 'restoweb-master'], [
             'name' => 'RestoWeb Master',
             'is_personal' => true,
+        ]);
+
+        // 2. Akun ADMIN / OWNER
+        $admin = User::firstOrCreate([
+            'email' => 'admin@restoweb.test',
+        ], [
+            'name' => 'Admin Boss (Owner)',
+            'role' => 'admin',
+            'password' => bcrypt('password'),
+            'current_team_id' => $team->id,
         ]);
 
         \DB::table('team_members')->updateOrInsert(
@@ -34,26 +37,35 @@ class DatabaseSeeder extends Seeder
             ['role' => 'owner', 'created_at' => now(), 'updated_at' => now()]
         );
 
-        $admin->current_team_id = $team->id;
-        $admin->save();
+        // 3. Akun STAFF (Pelayan/Kasir)
+        $staffs = [
+            ['email' => 'staff@restoweb.test', 'name' => 'Staff Utama (Waiter)'],
+            ['email' => 'kasir@restoweb.test', 'name' => 'Staff Kasir'],
+        ];
 
-        User::firstOrCreate([
-            'email' => 'staff@restoweb.test',
-        ], [
-            'name' => 'Staff Waiter',
-            'role' => 'staff',
-            'password' => bcrypt('password'),
-            'current_team_id' => $team->id,
-        ]);
+        foreach ($staffs as $s) {
+            User::firstOrCreate(['email' => $s['email']], [
+                'name' => $s['name'],
+                'role' => 'staff',
+                'password' => bcrypt('password'),
+                'current_team_id' => $team->id,
+            ]);
+        }
 
-        User::firstOrCreate([
-            'email' => 'test@example.com',
-        ], [
-            'name' => 'Customer Biasa',
-            'role' => 'customer',
-            'password' => bcrypt('password'),
-            'current_team_id' => $team->id,
-        ]);
+        // 4. Akun CUSTOMER (Pelanggan)
+        $customers = [
+            ['email' => 'test@example.com', 'name' => 'Customer Biasa'],
+            ['email' => 'pelanggan@restoweb.test', 'name' => 'Budi Setiawan (VIP User)'],
+        ];
+
+        foreach ($customers as $c) {
+            User::firstOrCreate(['email' => $c['email']], [
+                'name' => $c['name'],
+                'role' => 'customer',
+                'password' => bcrypt('password'),
+                'current_team_id' => $team->id,
+            ]);
+        }
 
         // Default Menus
         $menus = [

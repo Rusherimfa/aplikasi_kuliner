@@ -10,27 +10,28 @@ import { edit } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import { index as teams } from '@/routes/teams';
 import type { NavItem } from '@/types';
+import { User, Lock, Users, Palette, ArrowLeft } from 'lucide-react';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profile',
+        title: 'Profil Akun',
         href: edit(),
-        icon: null,
+        icon: User,
     },
     {
-        title: 'Security',
+        title: 'Keamanan',
         href: editSecurity(),
-        icon: null,
+        icon: Lock,
     },
     {
-        title: 'Teams',
+        title: 'Tim & Akses',
         href: teams(),
-        icon: null,
+        icon: Users,
     },
     {
-        title: 'Appearance',
+        title: 'Personalisasi',
         href: editAppearance(),
-        icon: null,
+        icon: Palette,
     },
 ];
 
@@ -38,43 +39,56 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
 
     return (
-        <div className="px-4 py-6">
-            <Heading
-                title="Settings"
-                description="Manage your profile and account settings"
-            />
+        <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
+            <div className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                <Heading
+                    title="Account Concierge"
+                    description="Kelola preferensi dan detail akun eksklusif Anda."
+                />
+                
+                <Link href="/">
+                    <Button variant="outline" className="rounded-full border-white/10 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest gap-2">
+                        <ArrowLeft size={14} /> Kembali ke Beranda
+                    </Button>
+                </Link>
+            </div>
 
-            <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
+            <div className="flex flex-col lg:flex-row lg:gap-16">
+                <aside className="w-full lg:w-64">
                     <nav
-                        className="flex flex-col space-y-1 space-x-0"
+                        className="flex flex-col space-y-2"
                         aria-label="Settings"
                     >
-                        {sidebarNavItems.map((item, index) => (
-                            <Button
-                                key={`${toUrl(item.href)}-${index}`}
-                                size="sm"
-                                variant="ghost"
-                                asChild
-                                className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentOrParentUrl(item.href),
-                                })}
-                            >
-                                <Link href={item.href}>
-                                    {item.icon && (
-                                        <item.icon className="h-4 w-4" />
+                        {sidebarNavItems.map((item, index) => {
+                            const active = isCurrentOrParentUrl(item.href);
+                            return (
+                                <Button
+                                    key={`${toUrl(item.href)}-${index}`}
+                                    variant="ghost"
+                                    asChild
+                                    className={cn(
+                                        'w-full justify-start rounded-2xl h-14 px-5 text-[11px] font-black uppercase tracking-widest transition-all duration-300', 
+                                        active 
+                                            ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]' 
+                                            : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'
                                     )}
-                                    {item.title}
-                                </Link>
-                            </Button>
-                        ))}
+                                >
+                                    <Link href={item.href}>
+                                        {item.icon && (
+                                            <item.icon className={cn("mr-3 h-4 w-4", active ? "text-primary-foreground" : "text-primary")} />
+                                        )}
+                                        {item.title}
+                                    </Link>
+                                </Button>
+                            );
+                        })}
                     </nav>
                 </aside>
 
-                <Separator className="my-6 lg:hidden" />
+                <Separator className="my-10 lg:hidden opacity-5" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                <div className="flex-1 lg:max-w-3xl">
+                    <section className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {children}
                     </section>
                 </div>

@@ -44,7 +44,7 @@ export default function PhotoGallery() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-amber-600 dark:text-amber-500 uppercase glow-amber"
+                        className="inline-flex items-center gap-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-orange-600 dark:text-orange-500 uppercase glow-primary"
                     >
                         <Camera size={12} />
                         <span>Visual Journey</span>
@@ -87,7 +87,7 @@ export default function PhotoGallery() {
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-0 transition-all duration-700 group-hover:opacity-100">
                                 <motion.div 
                                     whileHover={{ scale: 1.1 }}
-                                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-500 text-black shadow-2xl"
+                                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-black shadow-2xl"
                                 >
                                     <Eye size={24} />
                                 </motion.div>

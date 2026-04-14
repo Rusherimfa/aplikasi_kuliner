@@ -47,7 +47,7 @@ export default function CustomerReservations({ reservations }: any) {
                             <p className="mt-2 text-muted-foreground max-w-sm">
                                 Anda belum memiliki riwayat reservasi bersama kami. Silakan pilih meja dan nikmati makan malam yang eksklusif.
                             </p>
-                            <Button asChild className="mt-6 rounded-full bg-amber-500 hover:bg-amber-600 text-white font-semibold">
+                            <Button asChild className="mt-6 rounded-full bg-orange-500 hover:bg-orange-600 text-white font-semibold">
                                 <Link href="/reservations/create">Mulai Booking Meja</Link>
                             </Button>
                         </div>
@@ -61,7 +61,7 @@ export default function CustomerReservations({ reservations }: any) {
                                         <div className="bg-muted/50 p-6 md:w-1/3 flex flex-col justify-between border-b md:border-b-0 md:border-r border-border">
                                             <div>
                                                 <div className="flex justify-between items-start mb-4">
-                                                    <span className="text-xs font-semibold uppercase tracking-wide text-amber-500">
+                                                    <span className="text-xs font-semibold uppercase tracking-wide text-orange-500">
                                                         Booking ID: #{reservation.id.toString().padStart(6, '0')}
                                                     </span>
                                                     {reservation.status === 'confirmed' ? (
@@ -79,11 +79,11 @@ export default function CustomerReservations({ reservations }: any) {
                                             
                                             <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
                                                 <div className="flex items-center gap-1.5 bg-background/40 px-3 py-1.5 rounded-lg border border-border">
-                                                    <Clock size={16} className="text-amber-500" />
+                                                    <Clock size={16} className="text-orange-500" />
                                                     <span>{reservation.time.substring(0, 5)} WIB</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5 bg-background/40 px-3 py-1.5 rounded-lg border border-border">
-                                                    <Calendar size={16} className="text-amber-500" />
+                                                    <Calendar size={16} className="text-orange-500" />
                                                     <span>{reservation.guest_count} Pax</span>
                                                 </div>
                                             </div>
@@ -93,7 +93,7 @@ export default function CustomerReservations({ reservations }: any) {
                                         <div className="p-6 md:w-2/3 flex flex-col justify-between">
                                             <div>
                                                 <h4 className="font-semibold text-lg flex items-center gap-2 text-foreground">
-                                                    <MapPin size={18} className="text-amber-500" />
+                                                    <MapPin size={18} className="text-orange-500" />
                                                     Meja Eksklusif: {reservation.resto_table?.name || 'Belum Dipilih'}
                                                 </h4>
                                                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
@@ -120,7 +120,7 @@ export default function CustomerReservations({ reservations }: any) {
 
                                             <div className="mt-6 flex flex-col sm:flex-row items-center gap-3 w-full border-t border-border pt-4">
                                                 {reservation.status === 'confirmed' && isUpcoming(reservation.date) && (
-                                                    <Button className="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-900/20" asChild>
+                                                    <Button className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-900/20" asChild>
                                                         <a href={`/reservations/${reservation.id}`} target="_blank" rel="noopener noreferrer">
                                                             <QrCode size={18} className="mr-2" />
                                                             Lihat QR-Code Check In

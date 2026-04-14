@@ -23,7 +23,7 @@ export default function KitchenIndex({ orders }: any) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'preparing': return 'bg-blue-500/20 text-blue-400 border-blue-500/20';
-            case 'ready': return 'bg-amber-500/20 text-amber-500 border-amber-500/20';
+            case 'ready': return 'bg-orange-500/20 text-orange-500 border-orange-500/20';
             case 'served': return 'bg-emerald-500/20 text-emerald-500 border-emerald-500/20';
             default: return 'bg-white/5 text-white/40 border-white/10';
         }
@@ -46,7 +46,7 @@ export default function KitchenIndex({ orders }: any) {
                 <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-white/95 flex items-center gap-3">
-                            <ChefHat className="text-amber-500" size={36} />
+                            <ChefHat className="text-orange-500" size={36} />
                             Kitchen Display System
                         </h1>
                         <p className="mt-2 text-sm text-white/40 max-w-md">
@@ -72,7 +72,7 @@ export default function KitchenIndex({ orders }: any) {
                                         <p className="text-xs font-bold text-white/40 uppercase tracking-widest">{order.customer_name}</p>
                                     </div>
                                     <div className="text-right">
-                                        <Badge variant="outline" className="bg-white/5 text-amber-500 border-amber-500/20 px-2 py-0.5">
+                                        <Badge variant="outline" className="bg-white/5 text-orange-500 border-orange-500/20 px-2 py-0.5">
                                             {order.time}
                                         </Badge>
                                     </div>
@@ -84,7 +84,7 @@ export default function KitchenIndex({ orders }: any) {
                                         <div key={item.pivot_id} className="group border border-white/5 bg-white/[0.01] rounded-xl p-4 transition-all hover:bg-white/[0.03]">
                                             <div className="flex justify-between items-start mb-3">
                                                 <div className="flex gap-3">
-                                                    <div className="h-7 w-7 rounded-lg bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold text-sm">
+                                                    <div className="h-7 w-7 rounded-lg bg-orange-500/20 text-orange-500 flex items-center justify-center font-bold text-sm">
                                                         {item.quantity}x
                                                     </div>
                                                     <div>
@@ -123,7 +123,7 @@ export default function KitchenIndex({ orders }: any) {
                                                     <Button 
                                                         size="sm" 
                                                         variant="ghost" 
-                                                        className="col-span-3 h-8 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 border border-amber-500/10 text-[10px] font-bold uppercase tracking-wider"
+                                                        className="col-span-3 h-8 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20 border border-orange-500/10 text-[10px] font-bold uppercase tracking-wider"
                                                         onClick={() => updateStatus(item.pivot_id, 'ready', item.name)}
                                                         disabled={loadingId === item.pivot_id}
                                                     >

@@ -12,6 +12,22 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $user = auth()->user();
+
+        if ($user->isAdmin()) {
+            return $this->adminDashboard();
+        }
+
+        if ($user->isStaff()) {
+            return $this->staffDashboard();
+        }
+
+        // Default or Customer fall-back if needed
+        return redirect()->route('home');
+    }
+
+    private function adminDashboard()
+    {
         $today = Carbon::today();
         $startDate = Carbon::today()->subDays(6);
 
@@ -63,30 +79,15 @@ class DashboardController extends Controller
             ->orderByDesc('total_sold')
             ->take(5)
             ->get()
-            ->map(function ($menu) {
-                return [
-                    'id' => $menu->id,
-                    'name' => $menu->name,
-                    'sold' => (int) $menu->total_sold,
-                ];
-            });
+            ->map(fn ($menu) => [
+                'id' => $menu->id,
+                'name' => $menu->name,
+                'sold' => (int) $menu->total_sold,
+            ]);
 
-        $recentReservations = Reservation::with('user')
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get()
-            ->map(function ($r) {
-                return [
-                    'id' => $r->id,
-                    'customer_name' => $r->customer_name ?: ($r->user ? $r->user->name : 'Unknown'),
-                    'status' => $r->status,
-                    'date' => $r->date,
-                    'time' => $r->time,
-                    'created_at' => $r->created_at->diffForHumans(),
-                ];
-            });
+        $recentReservations = $this->getRecentReservations();
 
-        return Inertia::render('dashboard', [
+        return Inertia::render('dashboard/admin', [
             'stats' => [
                 'pending_reservations' => $pendingReservations,
                 'today_reservations' => $todayReservations,
@@ -98,5 +99,56 @@ class DashboardController extends Controller
             'best_sellers' => $bestSellers,
             'recent_activity' => $recentReservations,
         ]);
+    }
+
+    private function staffDashboard()
+    {
+        $today = Carbon::today();
+
+        // Focused Operational Stats
+        $pendingReservations = Reservation::where('status', 'pending')->count();
+        $todayReservations = Reservation::whereDate('date', $today)->whereIn('status', ['confirmed', 'completed'])->count();
+        $confirmedToday = Reservation::whereDate('date', $today)->where('status', 'confirmed')->count();
+
+        $todaysSchedule = Reservation::whereDate('date', $today)
+            ->with('user', 'restoTable')
+            ->orderBy('time', 'asc')
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'customer_name' => $r->customer_name ?: ($r->user ? $r->user->name : 'Guest'),
+                'time' => Carbon::parse($r->time)->format('H:i'),
+                'status' => $r->status,
+                'guests' => $r->guest_count,
+                'table' => $r->restoTable ? $r->restoTable->name : 'Unassigned',
+            ]);
+
+        $recentReservations = $this->getRecentReservations();
+
+        return Inertia::render('dashboard/staff', [
+            'stats' => [
+                'pending_reservations' => $pendingReservations,
+                'today_reservations' => $todayReservations,
+                'confirmed_today' => $confirmedToday,
+            ],
+            'todays_schedule' => $todaysSchedule,
+            'recent_activity' => $recentReservations,
+        ]);
+    }
+
+    private function getRecentReservations()
+    {
+        return Reservation::with('user')
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'customer_name' => $r->customer_name ?: ($r->user ? $r->user->name : 'Unknown'),
+                'status' => $r->status,
+                'date' => $r->date,
+                'time' => $r->time,
+                'created_at' => $r->created_at->diffForHumans(),
+            ]);
     }
 }

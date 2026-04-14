@@ -12,6 +12,8 @@ import Navbar from './sections/navbar';
 import PhotoGallery from './sections/photo-gallery';
 import SignatureDishes from './sections/signature-dishes';
 import Testimonials from './sections/testimonials';
+import BentoFeatures from './sections/bento-features';
+import LocationHours from './sections/location-hours';
 import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function Welcome({
@@ -38,7 +40,7 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-amber-100 selection:text-amber-900 dark:selection:bg-amber-500/30 dark:selection:text-amber-200 transition-colors duration-500">
+            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-orange-100 selection:text-orange-900 dark:selection:bg-orange-500/30 dark:selection:text-orange-200 transition-colors duration-500">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -50,11 +52,15 @@ export default function Welcome({
 
                 <InfoBar />
 
+                <BentoFeatures />
+
                 <SignatureDishes bestSellers={bestSellers} auth={auth} />
 
                 <PhotoGallery />
 
                 <HowItWorks />
+
+                <LocationHours />
 
                 <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
 
