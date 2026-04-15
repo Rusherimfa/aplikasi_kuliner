@@ -102,6 +102,26 @@ class Team extends Model
     }
 
     /**
+     * Get all tables for this team.
+     *
+     * @return HasMany<RestaurantTable, $this>
+     */
+    public function restaurantTables(): HasMany
+    {
+        return $this->hasMany(RestaurantTable::class);
+    }
+
+    /**
+     * Get all seats for this team.
+     *
+     * @return HasMany<TableSeat, $this>
+     */
+    public function tableSeats(): HasMany
+    {
+        return $this->hasMany(TableSeat::class);
+    }
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>

@@ -1,20 +1,12 @@
-import { Link, usePage, router } from '@inertiajs/react';
-import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote, ShoppingBag, User, LayoutDashboard, History } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { login } from '@/routes';
-import { useCart } from '@/hooks/use-cart';
-import { useAppearance } from '@/hooks/use-appearance';
 import CartDrawer from '@/components/app/cart-drawer';
-import { useMagnetic } from '@/hooks/use-magnetic';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { useAppearance } from '@/hooks/use-appearance';
+import { useCart } from '@/hooks/use-cart';
+import { login, logout } from '@/routes';
 
 interface NavbarProps {
     auth: any;
@@ -28,58 +20,74 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
     const { resolvedAppearance, updateAppearance } = useAppearance();
     const [scrolled, setScrolled] = useState(false);
     const { url } = usePage();
-    
-    // Magnetic Refs
-    const magneticLogoRef = useMagnetic();
-    const magneticCtaRef = useMagnetic();
-    const magneticThemeRef = useMagnetic();
-    const magneticCartRef = useMagnetic();
-
     const mobileMenuLinks = [
-        { href: '/', label: 'Beranda', subtitle: 'Halaman utama kami', icon: Home },
-        { href: '/catalog', label: 'Menu', subtitle: 'Eksplorasi rasa', icon: BookOpen },
-        { href: '/reservations/create', label: 'Reservasi', subtitle: 'Pesan meja Anda', icon: CalendarPlus },
-        { href: '/experience', label: 'Pengalaman', subtitle: 'Cerita dibalik layar', icon: UtensilsCrossed },
-        { href: '/testimonials', label: 'Cerita Tamu', subtitle: 'Kesan pelanggan', icon: Quote },
+        { href: '/', label: 'Beranda', subtitle: 'Kembali ke halaman utama', icon: Home },
+        { href: '/catalog', label: 'Menu Kami', subtitle: 'Jelajahi hidangan unggulan', icon: BookOpen },
+        { href: '/reservations/create', label: 'Reservasi', subtitle: 'Pesan meja dalam hitungan detik', icon: CalendarPlus },
+        { href: '/experience', label: 'Pengalaman', subtitle: 'Lihat suasana & cerita kami', icon: UtensilsCrossed },
+        { href: '/testimonials', label: 'Cerita Tamu', subtitle: 'Kisah dari pelanggan kami', icon: Quote },
     ];
 
     useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 40);
+        const onScroll = () => setScrolled(window.scrollY > 20);
         window.addEventListener('scroll', onScroll, { passive: true });
+
         return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    // Prevent body scroll when mobile menu is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [mobileMenuOpen]);
 
     const isActive = (path: string) => url.startsWith(path) && (path !== '/' || url === '/');
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-[60] p-4 sm:p-6 lg:p-10 pointer-events-none">
+            {/* Floating Theme Toggle (Mobile/Touch) */}
+            <button
+                type="button"
+                onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
+                className="fixed right-4 top-1/2 z-50 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background/90 text-muted-foreground shadow-lg shadow-black/20 backdrop-blur md:hidden"
+                aria-label="Toggle tema"
+            >
+                {resolvedAppearance === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            {/* Top Pill Header (Desktop + Mobile Logo) */}
+            <header className="fixed top-0 left-0 right-0 z-40 p-4 transition-all duration-500 sm:p-6 lg:p-8 pointer-events-none">
                 <nav
-                    className={`mx-auto flex h-20 max-w-6xl items-center justify-between pointer-events-auto rounded-full border px-6 transition-all duration-700 glass-card glass-highlight shadow-2xl ${
-                        scrolled 
-                            ? 'translate-y-0 opacity-100' 
-                            : 'translate-y-0 opacity-100 border-white/5 bg-background/20'
-                    }`}
+                    className={`mx-auto flex h-16 max-w-6xl items-center justify-between pointer-events-auto rounded-full border px-4 transition-all duration-500 sm:px-6 md:pl-8 ${
+                        scrolled || mobileMenuOpen
+                            ? 'border-border bg-background/90 shadow-xl shadow-background/50 backdrop-blur-2xl'
+                            : 'border-border/50 bg-background/50 backdrop-blur-sm'
+                    } ${mobileMenuOpen ? 'opacity-0 md:opacity-100' : 'opacity-100'}`}
                 >
-                    {/* Logo Section */}
-                    <div ref={magneticLogoRef as any}>
-                        <Link 
-                            href="/" 
-                            className="group flex items-center gap-4 outline-none" 
-                        >
-                            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xl transition-all duration-500 group-hover:rotate-[15deg] group-hover:scale-110">
-                                <UtensilsCrossed size={18} />
-                            </span>
-                            <span className="font-serif text-2xl font-light tracking-tight text-foreground">
-                                Resto<span className="italic text-primary font-medium">Web</span>
-                            </span>
-                        </Link>
-                    </div>
+                    {/* Logo (Centered on mobile, Left on Desktop) */}
+                    <Link 
+                        href="/" 
+                        className="group flex flex-1 md:flex-none items-center justify-center md:justify-start gap-3 outline-none" 
+                        onClick={() => setMobileMenuOpen(false)}
+                    >
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-500 to-amber-700 text-white shadow-lg shadow-amber-900/20 transition-all duration-500 group-hover:scale-110 group-hover:shadow-amber-500/40">
+                            <UtensilsCrossed size={14} />
+                        </span>
+                        <span className="font-['Playfair_Display',serif] text-xl font-semibold tracking-wide text-foreground">
+                            Resto<span className="text-amber-600 italic">Web</span>
+                        </span>
+                    </Link>
 
-                    {/* Desktop Menu */}
+                    {/* Desktop nav */}
                     <div className="hidden flex-1 items-center justify-center space-x-2 md:flex">
                         {[
-                            { href: '/catalog', label: 'Menu' },
+                            { href: '/catalog', label: 'Menu Kami' },
                             { href: '/reservations/create', label: 'Reservasi' },
                             { href: '/experience', label: 'Pengalaman' },
                             { href: '/testimonials', label: 'Cerita Tamu' },
@@ -87,8 +95,8 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className={`rounded-full px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-500 hover:text-primary ${
-                                    isActive(link.href) ? 'text-primary' : 'text-muted-foreground'
+                                className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-muted hover:text-foreground ${
+                                    isActive(link.href) ? 'bg-muted text-amber-700 shadow-sm dark:text-amber-500' : 'text-muted-foreground'
                                 }`}
                             >
                                 {link.label}
@@ -96,200 +104,283 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         ))}
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-4">
-                        <div className="hidden md:flex items-center gap-4 border-r border-white/10 pr-6 mr-2">
-                            {auth.user ? (
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/10 hover:border-primary/50 transition-colors overflow-hidden outline-none cursor-pointer">
-                                            {auth.user.avatar ? (
-                                                <img src={auth.user.avatar} className="h-full w-full object-cover" alt="" />
-                                            ) : (
-                                                <span className="text-xs font-bold">{auth.user.name?.charAt(0)}</span>
-                                            )}
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-64 mt-4 p-2 glass-card border-white/10 backdrop-blur-3xl shadow-4xl animate-in fade-in zoom-in duration-200">
-                                        <DropdownMenuLabel className="px-4 py-5">
-                                            <div className="flex flex-col space-y-1">
-                                                <p className="text-sm font-black leading-none text-foreground">{auth.user.name}</p>
-                                                <p className="text-[10px] leading-none text-muted-foreground font-medium tracking-tight overflow-hidden text-ellipsis whitespace-nowrap">{auth.user.email}</p>
-                                            </div>
-                                        </DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-white/5" />
-                                        
-                                        <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
-                                            <Link href="/settings/profile" className="flex items-center w-full">
-                                                <User className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
-                                                <span className="text-[11px] font-bold uppercase tracking-widest">Pengaturan Profil</span>
-                                            </Link>
-                                        </DropdownMenuItem>
-
-                                        <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
-                                            <Link href={auth.user.role === 'customer' ? '/reservations/history' : dashboardUrl} className="flex items-center w-full">
-                                                {auth.user.role === 'customer' ? (
-                                                    <History className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
-                                                ) : (
-                                                    <LayoutDashboard className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
-                                                )}
-                                                <span className="text-[11px] font-bold uppercase tracking-widest">
-                                                    {auth.user.role === 'customer' ? 'Riwayat Pesanan' : 'Panel Dashboard'}
-                                                </span>
-                                            </Link>
-                                        </DropdownMenuItem>
-                                        
-                                        <DropdownMenuSeparator className="bg-white/5" />
-                                        
-                                        <DropdownMenuItem 
-                                            onClick={() => router.post('/logout')}
-                                            className="rounded-xl px-3 py-3.5 text-rose-500 focus:bg-rose-500 focus:text-white group transition-all duration-300 cursor-pointer"
+                    {/* Desktop CTA */}
+                    <div className="hidden shrink-0 items-center gap-3 md:flex">
+                        {auth.user ? (
+                            <div className="flex items-center gap-3">
+                                {auth.user.avatar ? (
+                                    <img 
+                                        src={auth.user.avatar} 
+                                        alt={auth.user.name} 
+                                        className="h-10 w-10 rounded-full border border-border object-cover shadow-sm bg-card"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                ) : (
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-bold text-muted-foreground border border-border">
+                                        {auth.user.name?.charAt(0)?.toUpperCase() || 'U'}
+                                    </div>
+                                )}
+                                {auth.user.role === 'customer' ? (
+                                    <Link href="/reservations/history">
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 rounded-full border-border bg-background px-6 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition-all hover:bg-muted hover:border-border hover:text-foreground"
                                         >
-                                            <LogOut className="mr-3 h-4 w-4 transition-colors" />
-                                            <span className="text-[11px] font-bold uppercase tracking-widest">Keluar Sesi</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ) : (
-                                <Link 
-                                    href={login().url}
-                                    className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    Login
+                                            Reservasi Saya
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Link href={dashboardUrl}>
+                                        <Button
+                                            variant="outline"
+                                            className="h-10 rounded-full border-border bg-background px-6 text-sm font-medium text-foreground shadow-sm backdrop-blur-sm transition-all hover:bg-muted hover:border-border hover:text-foreground"
+                                        >
+                                            Ke Dasbor
+                                        </Button>
+                                    </Link>
+                                )}
+                                <Link href={logout()} method="post" as="button">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 shrink-0 rounded-full text-rose-500 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/30 dark:hover:text-rose-400"
+                                        title="Logout"
+                                    >
+                                        <LogOut size={18} />
+                                    </Button>
                                 </Link>
+                            </div>
+                        ) : (
+                            <>
+                                <Link
+                                    href={login().url}
+                                    className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                                >
+                                    Login Staf
+                                </Link>
+                                <Link href="/reservations/create">
+                                    <Button className="h-10 rounded-full bg-gradient-to-r from-amber-500 to-amber-700 px-6 text-sm font-semibold text-white shadow-lg shadow-amber-900/20 transition-all duration-300 hover:scale-105 hover:shadow-amber-500/30">
+                                        Pesan Meja
+                                    </Button>
+                                </Link>
+                            </>
+                        )}
+                        <button
+                            onClick={() => setCartOpen(true)}
+                            className="relative flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted/80 hover:text-foreground"
+                        >
+                            <ShoppingBag size={18} />
+                            {cartCount > 0 && (
+                                <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-600 text-[10px] font-bold text-white shadow-sm">
+                                    {cartCount}
+                                </span>
                             )}
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <div ref={magneticThemeRef as any}>
-                                <button
-                                    onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
-                                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white/5 transition-colors hover:bg-white/10"
-                                >
-                                    {resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
-                                </button>
-                            </div>
-                            
-                            <div ref={magneticCartRef as any}>
-                                <button
-                                    onClick={() => setCartOpen(true)}
-                                    className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
-                                >
-                                    <ShoppingBag size={18} />
-                                    {cartCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[9px] font-black text-primary shadow-sm">
-                                            {cartCount}
-                                        </span>
-                                    )}
-                                </button>
-                            </div>
-
-                            {/* Mobile Hamburger */}
-                            <button
-                                className="md:hidden flex h-10 w-10 items-center justify-center rounded-full bg-white/5"
-                                onClick={() => setMobileMenuOpen(true)}
-                            >
-                                <MenuIcon size={20} />
-                            </button>
-                        </div>
+                        </button>
                     </div>
                 </nav>
             </header>
 
-            {/* Mobile Bottom Nav */}
-            {!mobileMenuOpen && (
-                <div className="fixed bottom-8 left-4 right-4 z-[60] md:hidden">
-                    <nav className="mx-auto flex h-16 max-w-sm items-center justify-around rounded-full glass-card glass-highlight px-6 shadow-2xl">
-                        {[
-                            { href: '/', icon: Home },
-                            { href: '/catalog', icon: BookOpen },
-                            { icon: ShoppingBag, onClick: () => setCartOpen(true), count: cartCount },
-                            { href: '/reservations/create', icon: CalendarPlus }
-                        ].map((item, i) => (
-                            item.href ? (
-                                <Link key={i} href={item.href} className={`relative p-2 rounded-full transition-colors ${isActive(item.href) ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
-                                    <item.icon size={22} />
-                                </Link>
-                            ) : (
-                                <button key={i} onClick={item.onClick} className="relative p-2 text-muted-foreground">
-                                    <item.icon size={22} />
-                                    {item.count ? (
-                                        <span className="absolute top-1 right-1 h-3 w-3 rounded-full bg-primary" />
-                                    ) : null}
-                                </button>
-                            )
-                        ))}
-                    </nav>
-                </div>
-            )}
-
-            {/* Full-screen Mobile Menu */}
-            <div className={`fixed inset-0 z-[100] bg-background p-6 transition-all duration-700 md:hidden ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible scale-110'}`}>
-                <div className="flex items-center justify-between mb-12">
-                     <span className="font-serif text-3xl font-light">Resto<span className="italic text-primary">Web</span></span>
-                     <button onClick={() => setMobileMenuOpen(false)} className="h-12 w-12 flex items-center justify-center rounded-full bg-white/5">
-                        <X size={24} />
-                     </button>
-                </div>
-                
-                <div className="flex flex-col gap-6">
-                    {mobileMenuLinks.map((link, idx) => (
-                        <Link 
-                            key={idx} 
-                            href={link.href} 
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="group flex items-center justify-between border-b border-white/5 pb-6"
-                        >
-                            <div className="flex flex-col">
-                                <span className={`text-4xl font-serif ${isActive(link.href) ? 'text-primary italic' : 'text-foreground'}`}>{link.label}</span>
-                                <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">{link.subtitle}</span>
-                            </div>
-                            <ChevronRight size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
-                        </Link>
-                    ))}
-
-                    {/* Profile & Logout for Mobile */}
-                    {auth.user && (
-                        <>
-                            <Link 
-                                href="/settings/profile" 
-                                onClick={() => setMobileMenuOpen(false)}
-                                className="group flex items-center justify-between border-b border-white/5 pb-6"
-                            >
-                                <div className="flex flex-col">
-                                    <span className="text-4xl font-serif text-foreground">Profil Saya</span>
-                                    <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">Pengaturan akun & avatar</span>
-                                </div>
-                                <User size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
-                            </Link>
-                            <button 
-                                onClick={() => {
-                                    setMobileMenuOpen(false);
-                                    router.post('/logout');
-                                }}
-                                className="group flex items-center justify-between border-b border-white/5 pb-6 text-rose-500"
-                            >
-                                <div className="flex flex-col text-left">
-                                    <span className="text-4xl font-serif">Keluar Sesi</span>
-                                    <span className="text-xs opacity-50 uppercase tracking-widest mt-1">Selesaikan kunjungan Anda</span>
-                                </div>
-                                <LogOut size={20} className="opacity-40 group-hover:translate-x-2 transition-transform" />
-                            </button>
-                        </>
-                    )}
-                </div>
-
-                <div className="absolute bottom-12 left-6 right-6">
-                    <Link href="/reservations/create" onClick={() => setMobileMenuOpen(false)}>
-                        <Button className="w-full h-18 rounded-[2rem] bg-primary text-primary-foreground font-black uppercase tracking-[0.3em] overflow-hidden group">
-                           Pesan Meja Sekarang
-                        </Button>
+            {/* Mobile Bottom Navigation Bar */}
+            <div 
+                className={`fixed bottom-0 left-0 right-0 z-40 p-4 transition-transform duration-500 ease-in-out md:hidden ${
+                    mobileMenuOpen ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+                }`}
+            >
+                <nav className="mx-auto flex w-full max-w-sm items-center justify-between rounded-full border border-border/60 bg-background/90 px-6 py-2 pb-3 pt-2 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.1)] backdrop-blur-2xl">
+                    <Link href="/" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
+                            <Home size={20} strokeWidth={isActive('/') ? 2.5 : 2} />
+                        </div>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Beranda</span>
                     </Link>
-                </div>
+                    
+                    <Link href="/catalog" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/catalog') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
+                            <BookOpen size={20} strokeWidth={isActive('/catalog') ? 2.5 : 2} />
+                        </div>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/catalog') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Menu</span>
+                    </Link>
+                    
+                    <button 
+                        onClick={() => setCartOpen(true)}
+                        className="group flex flex-col items-center gap-1 mt-1 transition-colors relative"
+                    >
+                        <div className="p-1.5 rounded-full text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
+                            <ShoppingBag size={20} strokeWidth={2} />
+                            {cartCount > 0 && (
+                                <span className="absolute top-1 right-1 flex h-3 w-3 items-center justify-center rounded-full bg-amber-600 text-[8px] font-bold text-white">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </div>
+                        <span className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground">Keranjang</span>
+                    </button>
+                    
+                    <Link href="/reservations/create" className="group flex flex-col items-center gap-1 mt-1 transition-colors">
+                        <div className={`p-1.5 rounded-full transition-colors ${isActive('/reservations') ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground group-hover:bg-muted'}`}>
+                            <CalendarPlus size={20} strokeWidth={isActive('/reservations') ? 2.5 : 2} />
+                        </div>
+                        <span className={`text-[10px] font-medium tracking-wide ${isActive('/reservations') ? 'text-amber-700 dark:text-amber-500' : 'text-muted-foreground group-hover:text-foreground'}`}>Pesan</span>
+                    </Link>
+                    
+                    <button 
+                        className="group flex flex-col items-center gap-1 mt-1 transition-colors"
+                        onClick={() => setMobileMenuOpen(true)}
+                    >
+                        <div className="p-1.5 rounded-full text-muted-foreground transition-colors group-hover:bg-muted group-hover:text-foreground">
+                            <MenuIcon size={20} strokeWidth={2} />
+                        </div>
+                        <span className="text-[10px] font-medium tracking-wide text-muted-foreground group-hover:text-foreground">Lainnya</span>
+                    </button>
+                </nav>
             </div>
 
+            {/* Premium Full-screen Mobile Overlay */}
+            <div
+                className={`fixed inset-0 z-50 bg-background/95 p-4 backdrop-blur-2xl transition-all duration-500 md:hidden pointer-events-auto ${
+                    mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+                }`}
+            >
+                <div className="pointer-events-none absolute left-1/3 top-0 h-56 w-56 -translate-x-1/2 rounded-full bg-amber-500/15 dark:bg-amber-500/5 blur-[110px]" />
+                <div className="pointer-events-none absolute bottom-0 right-1/4 h-56 w-56 translate-x-1/2 rounded-full bg-amber-600/10 dark:bg-amber-600/5 blur-[110px]" />
+
+                <div className="relative mx-auto flex h-full w-full max-w-md flex-col rounded-[2rem] border border-border bg-card p-5 shadow-[0_18px_60px_-24px_rgba(0,0,0,0.1)] dark:shadow-[0_18px_60px_-24px_rgba(0,0,0,0.5)]">
+                    <div className="flex items-center justify-between rounded-2xl border border-border bg-muted/50 px-3 py-2">
+                        <Link
+                            href="/"
+                            className="group flex items-center gap-3 outline-none"
+                            onClick={() => setMobileMenuOpen(false)}
+                        >
+                             <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-amber-600 to-amber-800 text-white shadow-lg shadow-amber-900/30">
+                                 <UtensilsCrossed size={20} />
+                             </span>
+                             <span className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
+                                 Resto<span className="text-amber-600 dark:text-amber-500">Web</span>
+                             </span>
+                        </Link>
+
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
+                                aria-label="Tutup menu"
+                            >
+                                <X size={18} />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-3">
+                        {mobileMenuLinks.map((link, index) => {
+                            const Icon = link.icon;
+                            const active = isActive(link.href);
+
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={link.href}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={`group flex items-center gap-3 rounded-2xl border px-4 py-3 transition-all ${
+                                        active
+                                            ? 'border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-500/10 shadow-sm'
+                                            : 'border-slate-100 dark:border-neutral-800/60 bg-white dark:bg-neutral-900/50 hover:border-slate-200 hover:bg-slate-50 dark:hover:border-neutral-700 dark:hover:bg-neutral-800'
+                                    }`}
+                                >
+                                    <span
+                                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+                                            active ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400' : 'bg-slate-100 dark:bg-neutral-800 text-slate-500 dark:text-neutral-400 group-hover:text-slate-700 dark:group-hover:text-neutral-200'
+                                        }`}
+                                    >
+                                        <Icon size={18} />
+                                    </span>
+                                    <span className="min-w-0 flex-1">
+                                        <span
+                                            className={`block text-base font-semibold ${
+                                                active ? 'text-amber-900 dark:text-amber-500' : 'text-slate-800 dark:text-neutral-200'
+                                            }`}
+                                        >
+                                            {link.label}
+                                        </span>
+                                        <span className="block truncate text-xs text-slate-500 dark:text-neutral-400">{link.subtitle}</span>
+                                    </span>
+                                    <span className="flex items-center gap-2">
+                                        <span className="text-xs font-medium text-slate-300 dark:text-neutral-600">0{index + 1}</span>
+                                        <ChevronRight
+                                            size={16}
+                                            className={`transition-transform group-hover:translate-x-0.5 ${
+                                                active ? 'text-amber-600 dark:text-amber-500' : 'text-slate-300 dark:text-neutral-600'
+                                            }`}
+                                        />
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+
+                    <div className="mt-auto flex flex-col gap-3 pt-6">
+                        <Link href="/reservations/create" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                            <Button className="h-13 w-full rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-700 text-base font-semibold text-white shadow-xl shadow-amber-900/20 transition-all duration-300 hover:brightness-110">
+                                Pesan Meja Sekarang
+                            </Button>
+                        </Link>
+                        {!auth.user ? (
+                            <Link href={login().url} className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                                <Button
+                                    variant="outline"
+                                    className="h-13 w-full rounded-2xl border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-base font-medium text-slate-700 dark:text-neutral-300 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+                                >
+                                    Login Area Staf
+                                </Button>
+                            </Link>
+                        ) : (
+                            <div className="flex gap-3">
+                                {auth.user.avatar ? (
+                                    <img 
+                                        src={auth.user.avatar} 
+                                        alt={auth.user.name} 
+                                        className="h-13 w-13 shrink-0 rounded-2xl border border-slate-200 dark:border-neutral-700 object-cover shadow-sm bg-white dark:bg-neutral-800"
+                                        referrerPolicy="no-referrer"
+                                    />
+                                ) : (
+                                    <div className="flex h-13 w-13 shrink-0 flex-col items-center justify-center rounded-2xl bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-500 border border-amber-200 dark:border-amber-900/50">
+                                        <span className="text-sm font-bold">{auth.user.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+                                    </div>
+                                )}
+                                {auth.user.role === 'customer' ? (
+                                    <Link href="/reservations/history" className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                                        <Button
+                                            variant="outline"
+                                            className="h-13 w-full rounded-2xl border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-base font-medium text-slate-700 dark:text-neutral-300 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+                                        >
+                                            Reservasi Saya
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Link href={dashboardUrl} className="flex-1" onClick={() => setMobileMenuOpen(false)}>
+                                        <Button
+                                            variant="outline"
+                                            className="h-13 w-full rounded-2xl border-slate-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-base font-medium text-slate-700 dark:text-neutral-300 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50 dark:hover:border-neutral-600 dark:hover:bg-neutral-700"
+                                        >
+                                            Ke Dasbor
+                                        </Button>
+                                    </Link>
+                                )}
+                                <Link href={logout()} method="post" as="button" className="shrink-0" onClick={() => setMobileMenuOpen(false)}>
+                                    <Button
+                                        variant="outline"
+                                        className="h-13 w-13 shrink-0 rounded-2xl border-slate-200 bg-white px-4 text-rose-500 hover:bg-rose-50 dark:border-neutral-700 dark:bg-neutral-800 dark:hover:bg-rose-950/30"
+                                        title="Logout"
+                                    >
+                                        <LogOut size={20} />
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+            
             <CartDrawer />
         </>
     );
 }
-

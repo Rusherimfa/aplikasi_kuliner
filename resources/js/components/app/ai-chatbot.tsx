@@ -1,11 +1,19 @@
+import { Bot, X, Send, Sparkles } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
-import { Bot, X, Send, Sparkles, ChefHat } from 'lucide-react';
 
 interface ChatMessage {
     id: string;
     text: string;
     isBot: boolean;
 }
+
+let nextMessageId = 2;
+
+const getNextMessageId = () => {
+    nextMessageId += 1;
+
+    return nextMessageId.toString();
+};
 
 export default function AIChatbot() {
     const [isOpen, setIsOpen] = useState(false);
@@ -36,24 +44,30 @@ export default function AIChatbot() {
 
     const generateResponse = (prompt: string) => {
         const p = prompt.toLowerCase();
+
         if (p.includes('menu') || p.includes('rekomendasi')) {
             return 'Menu paling populer kami adalah *Wagyu A5 Striploin* dan *Truffle Lobster Risotto*. Kami sangat merekomendasikannya untuk makan malam Anda!';
         }
+
         if (p.includes('reservasi') || p.includes('pesan meja') || p.includes('rombongan')) {
             return 'Anda dapat melakukan reservasi langsung melalui menu "Reservasi" di navigasi atas. Untuk rombongan lebih dari 20 orang, mohon hubungi kami H-3 via WhatsApp: (021) 555-0123.';
         }
+
         if (p.includes('jam') || p.includes('buka')) {
             return 'RestoWeb buka setiap hari. Makan siang (11:00 - 15:00) dan Makan Malam (18:00 - 23:00).';
         }
+
         return 'Maaf, untuk saat ini AI saya masih dalam tahap simulasi dan hanya dapat merespon seputar Menu, Reservasi, dan Jam Operasional. Silakan hubungi staf kami untuk bantuan lebih lanjut!';
     };
 
     const handleSend = (text: string) => {
-        if (!text.trim()) return;
+        if (!text.trim()) {
+            return;
+        }
 
         // User message
         const newUserMsg: ChatMessage = {
-            id: Date.now().toString(),
+            id: getNextMessageId(),
             text: text,
             isBot: false,
         };
@@ -65,7 +79,7 @@ export default function AIChatbot() {
         // Simulate network/bot delay
         setTimeout(() => {
             const botResponse: ChatMessage = {
-                id: (Date.now() + 1).toString(),
+                id: getNextMessageId(),
                 text: generateResponse(text),
                 isBot: true,
             };

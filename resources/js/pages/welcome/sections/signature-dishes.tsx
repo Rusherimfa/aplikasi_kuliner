@@ -1,15 +1,9 @@
 import { Link } from '@inertiajs/react';
-import { UtensilsCrossed, ArrowRight, Flame, ShoppingCart, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { UtensilsCrossed, ArrowRight, Flame, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { login } from '@/routes';
-import { motion } from 'framer-motion';
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface SignatureDishesProps {
     bestSellers: any[];
@@ -17,82 +11,52 @@ interface SignatureDishesProps {
 }
 
 export default function SignatureDishes({ bestSellers, auth }: SignatureDishesProps) {
-    const containerRef = useRef(null);
-    const cardsRef = useRef<HTMLDivElement[]>([]);
-
-    useGSAP(() => {
-        if (!cardsRef.current.length) return;
-
-        // Ensure triggers are calculated correctly after a short delay to account for layout shifts
-        const timeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 500);
-
-        gsap.from(cardsRef.current, {
-            y: 80,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 1.2,
-            ease: "power4.out",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 75%",
-                toggleActions: "play none none none",
-                invalidateOnRefresh: true,
-                fastScrollEnd: true,
-                preventOverlaps: true
-            }
-        });
-
-        return () => clearTimeout(timeout);
-    }, { scope: containerRef, dependencies: [bestSellers] });
-
     return (
-        <section 
-            ref={containerRef} 
-            className="premium-noise bg-background py-40 transition-colors duration-700 relative overflow-hidden"
-        >
-            {/* Decorative background elements */}
-            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-primary/5 to-transparent hidden md:block" />
+        <section className="bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500 relative overflow-hidden">
+            {/* Background Texture */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
             
-            <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 relative z-10">
+            <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
                 {/* Section header */}
-                <div className="mb-24 flex flex-col items-center text-center max-w-3xl mx-auto">
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        className="mb-8 flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-6 py-2 text-[10px] font-black tracking-[0.5em] text-primary uppercase glow-primary"
+                <div className="mb-20 flex flex-col items-center text-center max-w-3xl mx-auto">
+                    <motion.span 
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-6 inline-block rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-amber-600 dark:text-amber-500 uppercase glow-amber"
                     >
-                        <Sparkles size={12} />
                         Chef's Selection
-                    </motion.div>
+                    </motion.span>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="mb-8 font-serif text-6xl md:text-8xl font-light text-foreground leading-[0.9]"
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.2 }}
+                        className="mb-6 font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tight"
                     >
-                        Hidangan <span className="italic">Ikonis</span>
+                        Hidangan <span className="italic font-serif opacity-40">Ikonis</span>
                     </motion.h2>
                     <motion.p 
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        className="mx-auto text-muted-foreground text-lg md:text-xl font-medium leading-relaxed"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 }}
+                        className="mx-auto text-slate-500 dark:text-neutral-400 text-lg font-medium leading-relaxed"
                     >
-                        Eksplorasi mahakarya kuliner yang melampaui tradisi. Sebuah harmoni antara inovasi modern dan keaslian rasa.
+                        Mahakarya kuliner yang mendefinisikan identitas kami. Dibuat dengan presisi tinggi menggunakan bahan-bahan musiman terbaik.
                     </motion.p>
                 </div>
 
                 {/* Cards grid */}
-                <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                     {!bestSellers || bestSellers.length === 0 ? (
                         Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="glass-card flex flex-col overflow-hidden rounded-[3rem] p-6 space-y-6">
-                                <Skeleton className="h-72 w-full rounded-[2.5rem] bg-foreground/5" />
+                            <div key={i} className="flex flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/[0.02] border border-white/5 p-5 space-y-6">
+                                <Skeleton className="h-64 w-full rounded-[2rem] dark:bg-white/5" />
                                 <div className="space-y-4">
-                                    <Skeleton className="h-8 w-3/4 bg-foreground/5" />
-                                    <Skeleton className="h-4 w-full bg-foreground/5" />
-                                    <Skeleton className="h-14 w-full rounded-2xl bg-foreground/5" />
+                                    <Skeleton className="h-6 w-3/4 dark:bg-white/5" />
+                                    <Skeleton className="h-4 w-full dark:bg-white/5" />
+                                    <Skeleton className="h-12 w-full rounded-2xl dark:bg-white/5" />
                                 </div>
                             </div>
                         ))
@@ -100,88 +64,81 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                         bestSellers.map((item: any, index: number) => (
                         <motion.div
                             key={item.id}
-                            ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                            className="glass-card glass-highlight group flex flex-col overflow-hidden rounded-[3rem] transition-all duration-700 hover:-translate-y-4 hover:shadow-orange-500/10"
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1, duration: 0.7 }}
+                            className="group flex flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/[0.02] border border-border dark:border-white/5 shadow-2xl transition-all duration-700 hover:-translate-y-3 hover:border-amber-500/30 hover:shadow-amber-500/10 ring-1 ring-transparent hover:ring-amber-500/10"
                         >
-                            {/* Image area with parallax potential */}
-                            <div className="relative aspect-[3/4] overflow-hidden m-4 rounded-[2.2rem]">
-                                {item.image_path ? (
-                                    <img 
-                                        src={item.image_path} 
-                                        alt={item.name}
-                                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 bg-neutral-900 group-hover:scale-110 transition-transform duration-1000 ease-out">
-                                        {/* Placeholder with Artistic Icon */}
-                                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-background/50">
-                                            <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white/5 backdrop-blur-2xl border border-white/10 text-primary transition-all duration-1000 group-hover:scale-110 group-hover:rotate-[15deg] group-hover:shadow-[0_0_50px_rgba(var(--color-primary),0.2)]">
-                                                <UtensilsCrossed size={48} strokeWidth={1} />
-                                            </div>
-                                        </div>
+                            {/* Image area */}
+                            <div className="relative aspect-[4/5] overflow-hidden m-3 rounded-[2rem]">
+                                {/* Animated background */}
+                                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-transparent transition-opacity duration-700 opacity-100 group-hover:opacity-0" />
+                                
+                                {/* Placeholder icon */}
+                                <div className="absolute inset-0 flex items-center justify-center bg-muted/30 dark:bg-white/5">
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-amber-500 transition-transform duration-1000 group-hover:scale-110 group-hover:rotate-12">
+                                        <UtensilsCrossed size={40} strokeWidth={1.5} />
                                     </div>
-                                )}
+                                </div>
 
-                                {/* Badges */}
-                                <div className="absolute top-6 left-6 rounded-full bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                                {/* Category badge */}
+                                <div className="absolute top-5 left-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 px-4 py-1.5 text-[10px] font-black text-white uppercase tracking-widest">
                                     {item.category}
                                 </div>
 
+                                {/* Popular badge */}
                                 {item.is_best_seller && (
-                                    <div className="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-[10px] font-black text-primary-foreground uppercase tracking-widest shadow-xl">
-                                        <Flame size={14} />
+                                    <div className="absolute top-5 right-5 flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-1.5 text-[10px] font-black text-black uppercase tracking-widest">
+                                        <Flame size={12} />
                                         Signature
                                     </div>
                                 )}
                                 
-                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             </div>
 
                             {/* Content */}
-                            <div className="flex flex-1 flex-col p-10 pt-4">
-                                <div className="flex flex-col mb-4">
-                                    <h3 className="text-2xl font-serif font-light text-foreground mb-1">{item.name}</h3>
-                                    <span className="text-sm font-black text-primary tracking-widest">
+                            <div className="flex flex-1 flex-col p-8 pt-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{item.name}</h3>
+                                    <span className="text-sm font-black text-amber-500">
                                         Rp {Number(item.price).toLocaleString('id-ID')}
                                     </span>
                                 </div>
-                                <p className="mb-10 line-clamp-3 text-sm font-medium leading-relaxed text-muted-foreground/80">
-                                    {item.description || 'Petualangan rasa yang dikurasi dengan presisi for menciptakan kenangan kuliner yang tak terlupakan.'}
+                                <p className="mb-8 line-clamp-2 flex-1 text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-400">
+                                    {item.description || 'Simfoni rasa yang dikurasi khusus for memanjakan setiap indra Anda.'}
                                 </p>
-                                <div className="mt-auto">
-                                    <Link 
-                                        href={auth.user ? '/dashboard' : login().url}
-                                        className="block"
-                                    >
-                                        <Button className="w-full h-16 rounded-[1.5rem] bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em] shadow-xl transition-all hover:scale-105 active:scale-95 group relative z-10">
-                                            Order Experience
-                                            <ShoppingCart size={14} className="ml-3 transition-transform group-hover:translate-x-1" />
-                                        </Button>
-                                    </Link>
-                                </div>
+                                <Link href={auth.user ? '/dashboard' : login().url}>
+                                    <Button className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white/5 border border-transparent dark:border-white/10 text-xs font-black uppercase tracking-widest text-white transition-all hover:bg-amber-500 hover:text-black dark:hover:bg-amber-500 dark:hover:text-black group">
+                                        Pesan Sekarang
+                                        <ShoppingCart size={14} className="ml-2 transition-transform group-hover:scale-110" />
+                                    </Button>
+                                </Link>
                             </div>
                         </motion.div>
                     ))
                     )}
                 </div>
 
-                {/* Master Link */}
-                <div className="mt-32 text-center">
-                    <Link 
-                        href="/catalog"
-                    >
+                {/* Bottom CTA */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mt-20 text-center"
+                >
+                    <Link href="/catalog">
                         <Button
                             variant="outline"
-                            className="h-20 px-16 rounded-full border-primary/20 bg-transparent text-xs font-black uppercase tracking-[0.4em] text-foreground transition-all hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 group shadow-2xl"
+                            className="h-16 px-12 rounded-2xl border-border bg-transparent text-sm font-black uppercase tracking-[0.2em] transition-all hover:bg-white dark:hover:bg-white/5 hover:scale-105 active:scale-95 group"
                         >
-                            Jelajahi Menu Lengkap
-                            <ArrowRight className="ml-4 h-5 w-5 transition-transform group-hover:translate-x-2" />
+                            Jelajahi Menu Lengkap <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Button>
                     </Link>
-                </div>
+                </motion.div>
             </div>
         </section>
     );
 }
-
 

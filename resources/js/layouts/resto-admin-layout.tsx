@@ -1,7 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChefHat, LayoutGrid, BookOpen, Calendar, Bell, LogOut, ChevronRight } from 'lucide-react';
-import { dashboard } from '@/routes';
-import { Button } from '@/components/ui/button';
+import { logout } from '@/routes';
 
 export default function RestoAdminLayout({ children }: { children: React.ReactNode }) {
     const { auth, url } = usePage().props as any;
@@ -45,6 +44,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                     <nav className="space-y-1.5">
                         {navItems.map((item) => {
                             const isActive = currentUrl === item.href || currentUrl.startsWith(item.href + '/');
+
                             return (
                                 <Link
                                     key={item.title}
@@ -103,7 +103,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                         <div className="h-6 w-px bg-white/5 mx-1" />
 
                         <Link
-                            href="/logout"
+                            href={logout()}
                             method="post"
                             as="button"
                             className="flex h-11 items-center gap-2.5 rounded-2xl bg-white/[0.03] border border-white/5 px-6 text-xs font-black tracking-[0.1em] uppercase text-white/50 transition-all hover:bg-rose-500/10 hover:border-rose-500/20 hover:text-rose-500 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/20"
@@ -122,4 +122,3 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
         </div>
     );
 }
-

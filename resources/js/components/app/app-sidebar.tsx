@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid, Utensils, Calendar, PieChart, Settings } from 'lucide-react';
+import { BookOpen, LayoutGrid, Utensils, Calendar, Settings } from 'lucide-react';
 import AppLogo from '@/components/app/app-logo';
 import { NavFooter } from '@/components/app/nav-footer';
 import { NavMain } from '@/components/app/nav-main';
@@ -20,7 +20,7 @@ import type { NavItem } from '@/types';
 export function AppSidebar() {
     const page = usePage();
     const dashboardUrl = page.props.currentTeam
-        ? dashboard(page.props.currentTeam.slug)
+        ? dashboard(page.props.currentTeam.slug).url
         : '/';
 
     const mainNavItems: NavItem[] = [

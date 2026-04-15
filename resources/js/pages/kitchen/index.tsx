@@ -1,17 +1,23 @@
-import { Head, router } from '@inertiajs/react';
-import RestoAdminLayout from '@/layouts/resto-admin-layout';
+import { Head, router, usePage } from '@inertiajs/react';
 import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
+import { update as updateKitchenItem } from '@/routes/kitchen/item';
 
 export default function KitchenIndex({ orders }: any) {
     const [loadingId, setLoadingId] = useState<number | null>(null);
+    const { currentTeam } = usePage().props as { currentTeam?: { slug: string } | null };
 
     const updateStatus = (pivotId: number, status: string, itemName: string) => {
+        if (!currentTeam) {
+            return;
+        }
+
         setLoadingId(pivotId);
-        router.patch(route('kitchen.item.update', pivotId), { status }, {
+        router.patch(updateKitchenItem({ current_team: currentTeam.slug, pivotId }).url, { status }, {
             preserveScroll: true,
             onSuccess: () => {
                 toast.success(`Dish "${itemName}" is now ${status.toUpperCase()}`);

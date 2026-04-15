@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
-import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
-import { login } from '@/routes';
 import { motion } from 'framer-motion';
+import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Mail, Clock, ArrowUpRight } from 'lucide-react';
+import { login } from '@/routes';
 
 export default function Footer() {
     return (
@@ -130,4 +130,3 @@ export default function Footer() {
         </footer>
     );
 }
-

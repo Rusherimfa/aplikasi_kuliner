@@ -1,4 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
+import { Mail, ArrowRight, Sparkles } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -7,10 +8,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { home, register } from '@/routes';
+import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Mail, ArrowRight, Sparkles } from 'lucide-react';
 
 type Props = {
     status?: string;
@@ -36,8 +36,8 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                     Email address
                                 </Label>
                                 <Input
@@ -49,21 +49,21 @@ export default function Login({
                                     tabIndex={1}
                                     autoComplete="email"
                                     placeholder="Enter your email address"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="group relative grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                        <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                    <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                        <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                         Password
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-xs font-medium text-orange-600 hover:text-orange-500 transition-colors"
+                                            className="ml-auto text-xs font-medium text-amber-600 hover:text-amber-500 transition-colors"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -77,7 +77,7 @@ export default function Login({
                                     tabIndex={2}
                                     autoComplete="current-password"
                                     placeholder="Enter your password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -87,7 +87,7 @@ export default function Login({
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                    className="border-border data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                                    className="border-border data-[state=checked]:bg-amber-600 data-[state=checked]:border-amber-600"
                                 />
                                 <Label htmlFor="remember" className="font-normal text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
                                     Keep me signed in
@@ -96,7 +96,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-700 font-semibold text-white shadow-xl shadow-orange-900/20 hover:scale-[1.02] hover:from-orange-400 hover:to-orange-600 transition-all duration-300 group/btn"
+                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-700 font-semibold text-white shadow-xl shadow-amber-900/20 hover:scale-[1.02] hover:from-amber-400 hover:to-amber-600 transition-all duration-300 group/btn"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -111,16 +111,6 @@ export default function Login({
                                 )}
                             </Button>
 
-                            <Button
-                                asChild
-                                variant="outline"
-                                className="mt-3 h-12 w-full rounded-full border border-border bg-background/80 text-foreground font-semibold hover:bg-background hover:text-foreground transition-all"
-                            >
-                                <Link href={home()} tabIndex={5}>
-                                    Home
-                                </Link>
-                            </Button>
-
                             <div className="relative mt-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-border"></div>
@@ -133,7 +123,7 @@ export default function Login({
                             <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
                                 <a 
                                     href="/auth/google"
-                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:text-base cursor-pointer"
+                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-amber-500/20 sm:text-base cursor-pointer"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -161,7 +151,7 @@ export default function Login({
                         {canRegister && (
                             <div className="mt-6 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300 fill-mode-both">
                                 Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5} className="font-semibold text-orange-600 hover:text-orange-500">
+                                <TextLink href={register()} tabIndex={5} className="font-semibold text-amber-600 hover:text-amber-500">
                                     Create one now
                                 </TextLink>
                             </div>

@@ -1,223 +1,162 @@
 import { Link } from '@inertiajs/react';
-import { ArrowRight, Star, CalendarDays, Flame, ChevronDown, Trophy, Medal } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { ArrowRight, Star, CalendarDays, Trophy, Medal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
-import { useRef, useEffect } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-import { useMagnetic } from '@/hooks/use-magnetic';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
-    const containerRef = useRef(null);
-    const bgRef = useRef(null);
-    const magneticBadgeRef = useMagnetic();
-    const orbsRef = useRef<HTMLDivElement[]>([]);
-    const titleRef = useRef<HTMLHeadingElement>(null);
-
-    useGSAP(() => {
-        // Character reveal for title
-        if (titleRef.current) {
-            const text = titleRef.current.innerText;
-            titleRef.current.innerHTML = text.split('').map(char => `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
-            
-            gsap.from(titleRef.current.querySelectorAll('.char'), {
-                y: 100,
-                opacity: 0,
-                rotateX: -90,
-                stagger: 0.02,
-                duration: 1.5,
-                ease: "expo.out",
-                delay: 0.5
-            });
-        }
-
-        // Background Parallax
-        gsap.to(bgRef.current, {
-            yPercent: 15,
-            scale: 1.15,
-            ease: "none",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-
-        // Ambient Orbs Subtle Movement
-        orbsRef.current.forEach((orb, i) => {
-            gsap.to(orb, {
-                y: (i + 1) * 150,
-                x: i % 2 === 0 ? 80 : -80,
-                scale: 1.2,
-                opacity: 0.15,
-                duration: 10 + i * 5,
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut"
-            });
-        });
-
-    }, { scope: containerRef });
+    const { scrollY } = useScroll();
+    const y1 = useTransform(scrollY, [0, 1000], [0, 250]);
+    const scaleBg = useTransform(scrollY, [0, 1000], [1, 1.15]);
     
     return (
-        <main 
-            ref={containerRef} 
-            className="premium-noise relative min-h-[115vh] overflow-hidden bg-background transition-colors duration-700"
-        >
-            {/* Cinematic Background */}
-            <div ref={bgRef} className="absolute inset-0 z-0 origin-top">
+        <main className="relative min-h-[110vh] overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] transition-colors duration-500">
+            {/* Background layers */}
+            <motion.div className="absolute inset-0 z-0" style={{ scale: scaleBg }}>
                 <img
                     src="https://images.unsplash.com/photo-1550966841-3ee5ad40bf3c?q=80&w=2670&auto=format&fit=crop"
                     alt="Fine dining table setup"
-                    className="h-full w-full object-cover opacity-[0.4] dark:opacity-[0.12] transition-transform duration-1000"
+                    className="h-full w-full object-cover opacity-[0.2] dark:opacity-[0.08]"
                 />
-                
-                {/* Animated Mesh Gradients */}
-                <div className="absolute inset-x-0 top-0 h-[80vh] bg-gradient-to-b from-primary/10 via-background/80 to-background" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,var(--color-primary)/0.05_0%,transparent_50%)]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#FAFAFA] dark:from-[#0A0A0B] via-[#FAFAFA]/95 dark:via-[#0A0A0B]/95 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] dark:from-[#0A0A0B] via-transparent to-transparent" />
                 
                 {/* Textures */}
                 <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.05]" />
-            </div>
+            </motion.div>
 
-            {/* Atmospheric Orbs */}
-            <div 
-                ref={(el) => { if (el) orbsRef.current[0] = el; }}
-                className="pointer-events-none absolute -top-48 -right-48 h-[800px] w-[800px] rounded-full bg-primary/10 blur-[160px]" 
-            />
-            <div 
-                ref={(el) => { if (el) orbsRef.current[1] = el; }}
-                className="pointer-events-none absolute bottom-1/4 -left-48 h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" 
-            />
+            {/* Premium Ambient Orbs */}
+            <div className="pointer-events-none absolute -top-24 -right-24 h-[600px] w-[600px] rounded-full bg-amber-500/10 blur-[140px] animate-pulse" />
+            <div className="pointer-events-none absolute bottom-1/4 -left-24 h-[400px] w-[400px] rounded-full bg-amber-600/5 blur-[100px]" />
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-32 pb-24 lg:px-8">
-                <div className="grid items-center gap-24 lg:grid-cols-2">
+                <div className="grid items-center gap-20 lg:grid-cols-2">
                     {/* Left column - Content */}
-                    <div className="max-w-2xl">
+                    <div className="max-w-2x animate-in fade-in slide-in-from-left-8 duration-1000">
                         {/* Award badge */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="mb-12 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-6 py-2.5 text-[10px] font-black tracking-[0.4em] text-primary uppercase shadow-[0_0_40px_rgba(var(--color-primary),0.1)] glow-primary"
-                        >
-                            <Trophy size={14} className="text-primary" />
-                            <span>Distingsi Michelin 2024</span>
-                        </motion.div>
+                        <div className="mb-10 inline-flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-amber-600 dark:text-amber-500 uppercase shadow-[0_0_30px_rgba(245,158,11,0.1)] glow-amber">
+                            <Trophy size={12} className="text-amber-500" />
+                            <span>Michelin Recognized Excellence 2024</span>
+                        </div>
 
                         {/* Headline */}
-                        <h1 
-                            ref={titleRef}
-                            className="mb-10 font-serif text-7xl font-light leading-[0.85] text-slate-950 dark:text-white sm:text-8xl lg:text-9xl tracking-tightest"
-                        >
-                            Mahakarya Gastronomi
+                        <h1 className="mb-8 font-['Playfair_Display',serif] text-6xl font-black leading-[0.95] text-slate-900 dark:text-white sm:text-7xl lg:text-8xl tracking-tighter">
+                            Mahakarya <br />
+                            <span className="relative inline-block text-amber-500 italic font-medium mt-2">
+                                Gastronomi
+                                <motion.span 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: '100%' }}
+                                    transition={{ delay: 1, duration: 1.5, ease: "circOut" }}
+                                    className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-amber-500 to-transparent" 
+                                />
+                            </span>
                         </h1>
 
                         {/* Subtext */}
-                        <motion.p 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1.5, duration: 1 }}
-                            className="mb-14 max-w-lg text-lg leading-relaxed font-medium text-slate-600 dark:text-neutral-400 sm:text-xl"
-                        >
-                            Sebuah narasi rasa yang dikurasi melampaui batas ekspektasi. Selamat datang di pusat keunggulan kuliner modern.
-                        </motion.p>
+                        <p className="mb-12 max-w-lg text-lg leading-relaxed font-medium text-slate-600 dark:text-neutral-400 sm:text-xl">
+                            Selamat datang di simfoni rasa, di mana setiap hidangan adalah kanvas dan setiap bahan adalah cerita yang dikurasi khusus for lidah Anda.
+                        </p>
 
                         {/* CTA buttons */}
-                        <div className="flex flex-col gap-6 sm:flex-row">
-                            <Link 
-                                href="/reservations/create"
-                            >
+                        <div className="flex flex-col gap-5 sm:flex-row">
+                            <Link href="/reservations/create">
                                 <Button
                                     size="lg"
-                                    className="group h-18 w-full rounded-full bg-primary px-12 text-sm font-black uppercase tracking-widest text-primary-foreground shadow-2xl transition-all hover:scale-105 sm:w-auto"
+                                    className="group h-16 w-full rounded-2xl bg-amber-500 px-10 text-sm font-black uppercase tracking-widest text-black shadow-2xl shadow-amber-500/20 transition-all hover:bg-white hover:scale-105 sm:w-auto"
                                 >
                                     Pesan Meja
                                     <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                 </Button>
                             </Link>
-                            <Link 
-                                href="/catalog"
-                            >
+                            <Link href="/catalog">
                                 <Button
                                     size="lg"
                                     variant="outline"
-                                    className="h-18 w-full rounded-full border-border bg-transparent px-12 text-sm font-bold tracking-wide text-foreground shadow-sm transition-all hover:bg-white/5 hover:scale-105 sm:w-auto"
+                                    className="h-16 w-full rounded-2xl border-border bg-transparent px-10 text-sm font-bold tracking-wide text-foreground shadow-sm transition-all hover:bg-white/5 hover:scale-105 sm:w-auto"
                                 >
-                                    Eksplorasi Menu
+                                    Jelajahi Menu
                                 </Button>
                             </Link>
+                        </div>
+
+                        {/* Refined Stats */}
+                        <div className="mt-20 flex flex-wrap items-center gap-x-12 gap-y-8 border-t border-border pt-12">
+                            {[
+                                { value: '4.9', label: 'Global Rating', icon: Star },
+                                { value: '15+', label: 'Year Heritage', icon: Medal },
+                            ].map((stat) => (
+                                <div key={stat.label} className="group flex items-center gap-4">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 border border-white/10 group-hover:border-amber-500/50 transition-colors">
+                                        <stat.icon size={20} className="text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl font-black text-slate-900 dark:text-white leading-none tracking-tight">
+                                            {stat.value}
+                                        </p>
+                                        <p className="mt-1.5 text-[10px] font-black tracking-[0.2em] text-slate-500 dark:text-neutral-500 uppercase">{stat.label}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     {/* Right column — Visual Card */}
-                    <div className="relative hidden lg:block">
-                        <motion.div 
-                            initial={{ opacity: 0, scale: 0.95, x: 30 }}
-                            animate={{ opacity: 1, scale: 1, x: 0 }}
-                            transition={{ duration: 1.5, ease: "circOut" }}
-                            className="relative"
-                        >
-                            {/* Main frame with glass-highlight */}
-                            <div className="glass-highlight relative aspect-[4/5] overflow-hidden rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
-                                <img
-                                    src="https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2670&auto=format&fit=crop"
-                                    alt="Culinary art preparation"
-                                    className="h-full w-full scale-105 object-cover transition-transform duration-1000 hover:scale-100"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-80" />
-                                
-                                {/* Inner Overlay Label */}
-                                <div className="absolute bottom-12 left-12 z-20">
-                                    <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-4 block font-sans">Filosofi Kami</span>
-                                    <h3 className="font-serif text-5xl font-light text-white leading-tight italic">
-                                        Sensory <br /> Perfection.
-                                    </h3>
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9, x: 50 }}
+                        animate={{ opacity: 1, scale: 1, x: 0 }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        style={{ y: y1 }}
+                        className="relative hidden lg:block"
+                    >
+                        {/* Main frame */}
+                        <div className="relative aspect-[4/5] overflow-hidden rounded-[3.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
+                            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent z-10 pointer-events-none" />
+                            <img
+                                src="https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2670&auto=format&fit=crop"
+                                alt="Culinary art preparation"
+                                className="h-full w-full scale-105 object-cover transition-transform duration-1000 hover:scale-100"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent opacity-60" />
+                            
+                            {/* Inner Overlay Label */}
+                            <div className="absolute bottom-10 left-10 z-20">
+                                <span className="text-[10px] font-black tracking-[0.4em] text-white/40 uppercase mb-2 block">Our Philosophy</span>
+                                <h3 className="font-['Playfair_Display',serif] text-3xl font-black text-white leading-tight">Authenticity in <br /> Every Sizzle.</h3>
+                            </div>
+                        </div>
+
+                        {/* Floating elements using new glass-card classes */}
+                        <div className="absolute -bottom-10 -left-12 glass-card rounded-[2.5rem] p-8 shadow-3xl animate-float">
+                            <div className="flex items-center gap-5">
+                                <div className="flex h-14 w-14 items-center justify-center rounded-[1.25rem] bg-amber-500 text-black shadow-xl shadow-amber-500/30">
+                                    <CalendarDays size={26} />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black tracking-[0.3em] text-white/30 uppercase mb-1">
+                                        Next Reservation
+                                    </p>
+                                    <p className="text-lg font-bold text-white tracking-tight">Available Tonight 19:30</p>
                                 </div>
                             </div>
-                        </motion.div>
-
-                        {/* THE ELITE STATUS BADGE (Magnetic) */}
-                        <div 
-                            ref={magneticBadgeRef as any}
-                            className="absolute -bottom-10 -left-20 z-40 hidden xl:block"
-                        >
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1, duration: 1 }}
-                                className="group flex items-center gap-5 rounded-full border border-white/20 bg-slate-950/80 p-3 pr-8 backdrop-blur-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] ring-1 ring-white/10 transition-all hover:border-primary/40 hover:bg-slate-950 cursor-pointer"
-                            >
-                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl glow-primary">
-                                    <CalendarDays size={24} />
-                                </div>
-                                <div className="flex flex-col">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-orange" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase font-sans">Ketersediaan</span>
-                                    </div>
-                                    <p className="font-serif text-xl text-white tracking-tight leading-none mt-1 italic">
-                                        Tersedia Malam Ini
-                                    </p>
-                                </div>
-                            </motion.div>
                         </div>
-                    </div>
+
+                        {/* Floating dynamic badge */}
+                        <div className="absolute top-10 -right-8 flex items-center gap-3 glass-card rounded-2xl px-6 py-4 shadow-2xl border-amber-500/20">
+                            <div className="h-3 w-3 rounded-full bg-amber-500 animate-pulse shadow-[0_0_15px_rgba(245,158,11,1)]" />
+                            <span className="text-xs font-black tracking-widest text-white uppercase">Sangat Populer</span>
+                        </div>
+                    </motion.div>
                 </div>
 
                 {/* Refined Scroll guide */}
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 2.5, duration: 1.5 }}
-                    className="absolute bottom-12 left-1/2 flex -translate-x-1/2 flex-col items-center gap-5"
+                    transition={{ delay: 2, duration: 1 }}
+                    className="absolute bottom-12 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4"
                 >
-                    <div className="h-16 w-[1px] bg-gradient-to-b from-primary/50 to-transparent" />
-                    <span className="text-[10px] font-black tracking-[0.6em] text-neutral-500 uppercase">Telusuri</span>
+                    <div className="h-12 w-[2px] bg-gradient-to-b from-amber-500 to-transparent" />
+                    <span className="text-[10px] font-black tracking-[0.5em] text-slate-400 dark:text-neutral-500 uppercase">Jelajahi</span>
                 </motion.div>
             </div>
         </main>

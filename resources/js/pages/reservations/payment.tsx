@@ -1,7 +1,7 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Lock, QrCode, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ChevronRight, CreditCard, Lock, QrCode, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
 import { useCart } from '@/hooks/use-cart';
 
 import Navbar from '../welcome/sections/navbar';

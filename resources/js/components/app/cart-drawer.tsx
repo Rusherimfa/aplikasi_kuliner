@@ -1,9 +1,9 @@
-import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import { X, Minus, Plus, ShoppingBag, ArrowRight, UtensilsCrossed } from 'lucide-react';
-import { useCart } from '@/hooks/use-cart';
-import { Button } from '@/components/ui/button';
 import { Link } from '@inertiajs/react';
+import { X, Minus, Plus, ShoppingBag, ArrowRight, UtensilsCrossed } from 'lucide-react';
+import { Fragment } from 'react';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/hooks/use-cart';
 
 export default function CartDrawer() {
     const { isCartOpen, setCartOpen, items, removeItem, updateQuantity, cartTotal } = useCart();

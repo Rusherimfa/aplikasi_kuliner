@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
 import { Calendar, Clock, MapPin, QrCode, Search, Star, ReceiptText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,14 +18,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CustomerReservations({ reservations }: any) {
-    const formatRupiah = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
-    };
-
     const isUpcoming = (date: string) => {
         const resDate = new Date(date);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
+
         return resDate >= today;
     };
 

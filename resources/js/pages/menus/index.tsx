@@ -1,12 +1,10 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { useState } from 'react';
-import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame } from 'lucide-react';
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -15,6 +13,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
 
 export default function MenuManagement({ menus, filters }: any) {
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
@@ -61,6 +61,7 @@ export default function MenuManagement({ menus, filters }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (editingMenu) {
             put(`/menus/${editingMenu.id}`, {
                 onSuccess: () => setIsModalOpen(false),
@@ -139,7 +140,14 @@ export default function MenuManagement({ menus, filters }: any) {
                                                         <BookOpen size={18} />
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-foreground/90 flex items-center gap-2">{menu.name} {menu.is_best_seller && <Flame size={14} className="text-rose-500" title="Sangat Laris" />}</p>
+                                                        <p className="font-semibold text-foreground/90 flex items-center gap-2">
+                                                            {menu.name}
+                                                            {menu.is_best_seller && (
+                                                                <span title="Sangat Laris" className="inline-flex">
+                                                                    <Flame size={14} className="text-rose-500" />
+                                                                </span>
+                                                            )}
+                                                        </p>
                                                         <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
                                                     </div>
                                                 </div>

@@ -1,4 +1,5 @@
-import { Form, Head, Link } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
+import { User, Mail, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -6,9 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
-import { home, login } from '@/routes';
+import { login } from '@/routes';
 import { store } from '@/routes/register';
-import { User, Mail, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function Register() {
     return (
@@ -24,8 +24,8 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="name" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <User size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                <Label htmlFor="name" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                    <User size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                     Full Name
                                 </Label>
                                 <Input
@@ -37,7 +37,7 @@ export default function Register() {
                                     autoComplete="name"
                                     name="name"
                                     placeholder="Enter your full name"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError
                                     message={errors.name}
@@ -46,8 +46,8 @@ export default function Register() {
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                     Email address
                                 </Label>
                                 <Input
@@ -58,14 +58,14 @@ export default function Register() {
                                     autoComplete="email"
                                     name="email"
                                     placeholder="email@example.com"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                    <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                     Password
                                 </Label>
                                 <PasswordInput
@@ -75,14 +75,14 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Create a strong password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="password_confirmation" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <CheckCircle2 size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
+                                <Label htmlFor="password_confirmation" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-amber-500 transition-colors">
+                                    <CheckCircle2 size={16} className="text-muted-foreground/60 group-focus-within:text-amber-500 transition-colors" />
                                     Confirm password
                                 </Label>
                                 <PasswordInput
@@ -92,7 +92,7 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm your password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-amber-500/50 focus:ring-amber-500/50 rounded-xl transition-all"
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
@@ -101,7 +101,7 @@ export default function Register() {
 
                             <Button
                                 type="submit"
-                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-700 font-semibold text-white shadow-xl shadow-orange-900/20 hover:scale-[1.02] hover:from-orange-400 hover:to-orange-600 transition-all duration-300 group/btn"
+                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-amber-500 to-amber-700 font-semibold text-white shadow-xl shadow-amber-900/20 hover:scale-[1.02] hover:from-amber-400 hover:to-amber-600 transition-all duration-300 group/btn"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
@@ -113,16 +113,6 @@ export default function Register() {
                                         <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:translate-x-1 group-hover/btn:opacity-100 transition-all" />
                                     </>
                                 )}
-                            </Button>
-
-                            <Button
-                                asChild
-                                variant="outline"
-                                className="mt-3 h-12 w-full rounded-full border border-border bg-background/80 text-foreground font-semibold hover:bg-background hover:text-foreground transition-all"
-                            >
-                                <Link href={home()} tabIndex={6}>
-                                    Home
-                                </Link>
                             </Button>
                             
                             <div className="relative mt-4 mb-2 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
@@ -137,7 +127,7 @@ export default function Register() {
                             <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
                                 <a 
                                     href="/auth/google" 
-                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:text-base cursor-pointer"
+                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-amber-500/20 sm:text-base cursor-pointer"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -164,7 +154,7 @@ export default function Register() {
 
                         <div className="mt-4 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300 fill-mode-both">
                             Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6} className="font-semibold text-orange-600 hover:text-orange-500">
+                            <TextLink href={login()} tabIndex={6} className="font-semibold text-amber-600 hover:text-amber-500">
                                 Sign In
                             </TextLink>
                         </div>

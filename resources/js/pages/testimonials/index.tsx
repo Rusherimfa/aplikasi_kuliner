@@ -1,12 +1,12 @@
 import { Head, usePage, useForm, Link } from '@inertiajs/react';
-import { useState } from 'react';
 import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import Navbar from '../welcome/sections/navbar';
-import Footer from '../welcome/sections/footer';
 import { dashboard } from '@/routes';
+import Footer from '../welcome/sections/footer';
+import Navbar from '../welcome/sections/navbar';
 
 interface Testimonial {
     id: number;
@@ -17,15 +17,8 @@ interface Testimonial {
 }
 
 export default function TestimonialIndex({ testimonials = [] }: { testimonials?: Testimonial[] }) {
-    const { auth, flash } = usePage().props as any;
-    
-    // Safely generate dashboard URL
-    let dashboardUrl = '/';
-    try {
-        dashboardUrl = dashboard().url;
-    } catch (e) {
-        console.error('Wayfinder dashboard route failed:', e);
-    }
+    const { auth, flash, currentTeam } = usePage().props as any;
+    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
     
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
