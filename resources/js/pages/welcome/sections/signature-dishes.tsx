@@ -55,7 +55,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
     return (
         <section 
             ref={containerRef} 
-            className="premium-noise bg-background py-20 md:py-40 transition-colors duration-700 relative overflow-hidden"
+            className="premium-noise bg-background py-16 md:py-24 transition-colors duration-700 relative overflow-hidden"
         >
             {/* Decorative background elements */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
@@ -63,7 +63,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
             
             <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10 relative z-10">
                 {/* Section header */}
-                <div className="mb-24 flex flex-col items-center text-center max-w-3xl mx-auto">
+                <div className="mb-12 flex flex-col items-center text-center max-w-3xl mx-auto">
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
@@ -75,7 +75,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="mb-8 font-serif text-5xl md:text-8xl font-light text-foreground leading-[0.9]"
+                        className="mb-8 font-serif text-4xl md:text-6xl font-light text-foreground leading-[0.9]"
                     >
                         Hidangan <span className="italic">Ikonis</span>
                     </motion.h2>
@@ -143,7 +143,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                             </div>
 
                             {/* Content */}
-                            <div className="flex flex-1 flex-col p-6 md:p-10 pt-4">
+                            <div className="flex flex-1 flex-col p-6 md:p-8 pt-4">
                                 <div className="flex flex-col mb-4">
                                     <h3 className="text-2xl font-serif font-light text-foreground mb-1">{item.name}</h3>
                                     <span className="text-sm font-black text-primary tracking-widest">
@@ -171,7 +171,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                 </div>
 
                 {/* Master Link */}
-                <div className="mt-32 text-center">
+                <div className="mt-16 text-center">
                     <Link 
                         href="/catalog"
                     >

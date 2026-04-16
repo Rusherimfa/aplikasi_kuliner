@@ -9,7 +9,7 @@ export default function CTASection() {
     const magneticCatalogRef = useMagnetic();
 
     return (
-        <section className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500 font-['Inter',sans-serif]">
+        <section className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-16 md:py-24 transition-colors duration-500 font-['Inter',sans-serif]">
             {/* Background Texture & Ambient */}
             <div className="absolute inset-0 z-0">
                 <img
@@ -29,7 +29,7 @@ export default function CTASection() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="glass-card relative overflow-hidden rounded-[3rem] bg-slate-900 dark:bg-white/[0.02] border border-white/5 p-12 md:p-24 text-center shadow-3xl"
+                    className="glass-card relative overflow-hidden rounded-[3rem] bg-slate-900 dark:bg-white/[0.02] border border-white/5 p-10 md:p-16 text-center shadow-3xl"
                 >
                     {/* Inner Decoration */}
                     <div className="absolute top-0 left-0 h-40 w-40 bg-orange-500/10 blur-[80px]" />
@@ -52,7 +52,7 @@ export default function CTASection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="font-['Playfair_Display',serif] text-5xl font-black text-white md:text-7xl tracking-tight leading-tight"
+                            className="font-['Playfair_Display',serif] text-4xl font-black text-white md:text-6xl tracking-tight leading-tight"
                         >
                             Malam Sempurnamu <br />
                             <span className="italic font-serif opacity-40">Menanti Anda</span>

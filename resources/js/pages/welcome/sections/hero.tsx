@@ -15,24 +15,9 @@ export default function Hero() {
     const bgRef = useRef(null);
     const magneticBadgeRef = useMagnetic();
     const orbsRef = useRef<HTMLDivElement[]>([]);
-    const titleRef = useRef<HTMLHeadingElement>(null);
 
     useGSAP(() => {
-        // Character reveal for title
-        if (titleRef.current) {
-            const text = titleRef.current.innerText;
-            titleRef.current.innerHTML = text.split('').map(char => `<span class="char">${char === ' ' ? '&nbsp;' : char}</span>`).join('');
-            
-            gsap.from(titleRef.current.querySelectorAll('.char'), {
-                y: 100,
-                opacity: 0,
-                rotateX: -90,
-                stagger: 0.02,
-                duration: 1.5,
-                ease: "expo.out",
-                delay: 0.5
-            });
-        }
+
 
         // Background Parallax
         gsap.to(bgRef.current, {
@@ -66,7 +51,7 @@ export default function Hero() {
     return (
         <main 
             ref={containerRef} 
-            className="premium-noise relative min-h-[115vh] overflow-hidden bg-background transition-colors duration-700"
+            className="premium-noise relative min-h-screen overflow-hidden bg-background transition-colors duration-700"
         >
             {/* Cinematic Background */}
             <div ref={bgRef} className="absolute inset-0 z-0 origin-top">
@@ -94,10 +79,10 @@ export default function Hero() {
                 className="pointer-events-none absolute bottom-1/4 -left-48 h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" 
             />
 
-            <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-32 pb-24 lg:px-8">
-                <div className="grid items-center gap-24 lg:grid-cols-2">
+            <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-24 pb-16 lg:px-8">
+                <div className="grid items-center gap-12 md:gap-20 lg:grid-cols-2">
                     {/* Left column - Content */}
-                    <div className="max-w-2xl">
+                    <div className="max-w-2xl py-12">
                         {/* Award badge */}
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
@@ -111,19 +96,39 @@ export default function Hero() {
 
                         {/* Headline */}
                         <h1 
-                            ref={titleRef}
-                            className="mb-8 font-serif text-6xl leading-[0.85] font-light tracking-tighter text-foreground md:text-8xl lg:text-[10rem] xl:text-[12rem] text-wrap-balance"
+                            className="mb-6 font-serif text-4xl leading-[1.1] font-light tracking-tighter text-foreground sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-wrap-balance"
                         >
-                            Simfoni <br /> 
-                            <span className="italic">Gastronomi</span> <br />
-                            <span className="text-primary font-medium tracking-[-0.05em]">Luar Biasa.</span>
+                            <motion.span 
+                                initial={{ y: 40, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
+                                className="block"
+                            >
+                                Simfoni
+                            </motion.span>
+                            <motion.span 
+                                initial={{ y: 40, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
+                                className="block italic"
+                            >
+                                Gastronomi
+                            </motion.span>
+                            <motion.span 
+                                initial={{ y: 40, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 1, ease: "easeOut", delay: 0.9 }}
+                                className="block text-primary font-medium tracking-[-0.05em]"
+                            >
+                                Luar Biasa.
+                            </motion.span>
                         </h1>
 
                         {/* Subtext */}
                         <motion.p 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ delay: 1.5, duration: 1 }}
+                            transition={{ delay: 1.4, duration: 1 }}
                             className="mb-14 max-w-lg text-sm leading-relaxed font-medium text-slate-600 dark:text-neutral-400 sm:text-lg"
                         >
                             Sebuah narasi rasa yang dikurasi melampaui batas ekspektasi. Selamat datang di pusat keunggulan kuliner modern.

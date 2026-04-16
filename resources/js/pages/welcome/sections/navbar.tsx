@@ -54,7 +54,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
 
     return (
         <>
-            <header className="fixed top-0 left-0 right-0 z-[60] p-4 sm:p-6 lg:p-10 pointer-events-none">
+            <header className="fixed top-0 left-0 right-0 z-[60] p-4 sm:p-6 lg:p-6 pointer-events-none">
                 <nav
                     className={`mx-auto flex h-20 max-w-6xl items-center justify-between pointer-events-auto rounded-full border px-6 transition-all duration-700 glass-card glass-highlight shadow-2xl ${
                         scrolled 

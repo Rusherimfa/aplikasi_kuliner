@@ -97,7 +97,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
     }, { scope: containerRef, dependencies: [displayData] });
 
     return (
-        <section ref={containerRef} className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500">
+        <section ref={containerRef} className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-16 md:py-24 transition-colors duration-500">
             {/* Premium Decorative Ambient */}
             <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
             <div className="pointer-events-none absolute left-[-10%] top-[-5%] h-[600px] w-[600px] rounded-full bg-orange-500/5 blur-[120px]" />
@@ -105,7 +105,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
 
             <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
                 {/* Header */}
-                <div className="mb-20 text-center max-w-3xl mx-auto">
+                <div className="mb-12 text-center max-w-3xl mx-auto">
                     <motion.span 
                         initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -119,7 +119,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="mb-8 font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tight leading-tight"
+                        className="mb-6 font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white md:text-5xl lg:text-6xl tracking-tight leading-tight"
                     >
                         Simfoni <span className="italic font-serif opacity-40">Kepuasan</span>
                     </motion.h2>
@@ -144,7 +144,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                             <div
                                 key={t.id}
                                 ref={(el) => { if (el) cardsArray.current[index] = el; }}
-                                className="group glass-card flex flex-col p-10 relative overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:border-orange-500/30 hover:shadow-orange-500/10"
+                                className="group glass-card flex flex-col p-6 md:p-8 relative overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:border-orange-500/30 hover:shadow-orange-500/10"
                             >
                                 {/* Subtle Quote Icon Overlay */}
                                 <Quote size={120} className="absolute -top-6 -right-6 text-orange-500/5 group-hover:text-orange-500/10 transition-colors" strokeWidth={1} />
@@ -169,7 +169,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                                 </div>
 
                                 {/* Quote text */}
-                                <p className="mb-10 flex-1 text-lg font-medium leading-relaxed text-slate-600 dark:text-neutral-400 italic relative z-10">
+                                <p className="mb-6 flex-1 text-base md:text-lg font-medium leading-relaxed text-slate-600 dark:text-neutral-400 italic relative z-10">
                                     "{t.quote}"
                                 </p>
 
@@ -193,7 +193,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                 {/* Bottom Action */}
                 <div 
                     ref={magneticButtonRef as any}
-                    className="mt-24 flex flex-col items-center gap-6"
+                    className="mt-12 md:mt-16 flex flex-col items-center gap-6"
                 >
                     <Link href={auth?.user ? "/testimonials" : "/login"}>
                         <Button 

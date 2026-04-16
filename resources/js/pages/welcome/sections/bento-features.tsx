@@ -40,10 +40,10 @@ export default function BentoFeatures() {
     ];
 
     return (
-        <section className="premium-noise relative py-32 px-6 lg:px-8 bg-background overflow-hidden">
+        <section className="premium-noise relative py-16 md:py-24 px-6 lg:px-8 bg-background overflow-hidden">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-20 text-center md:text-left">
+                <div className="mb-12 text-center md:text-left">
                     <motion.span 
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
@@ -54,7 +54,7 @@ export default function BentoFeatures() {
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="font-serif text-5xl md:text-7xl font-light text-foreground text-wrap-balance"
+                        className="font-serif text-4xl md:text-6xl font-light text-foreground text-wrap-balance"
                     >
                         Detail yang <span className="italic">Mendefinisikan</span> Kami
                     </motion.h2>

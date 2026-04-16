@@ -29,7 +29,7 @@ export default function LocationHours() {
         <section 
             id="location-hours"
             ref={containerRef}
-            className="relative py-20 md:py-32 bg-[#FFF9F2] dark:bg-neutral-900/50 transition-colors duration-700 overflow-hidden"
+            className="relative py-12 md:py-20 bg-[#FFF9F2] dark:bg-neutral-900/50 transition-colors duration-700 overflow-hidden"
         >
             {/* Artistic background grain/textures */}
             <div className="absolute inset-0 premium-noise opacity-[0.03] pointer-events-none" />
@@ -42,7 +42,7 @@ export default function LocationHours() {
                         initial={{ opacity: 0, x: -30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="bg-white dark:bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 lg:p-16 shadow-[0_30px_60px_-15px_rgba(180,140,100,0.1)] border border-white/40 dark:border-white/5 flex flex-col justify-between"
+                        className="bg-white dark:bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 lg:p-12 shadow-[0_30px_60px_-15px_rgba(180,140,100,0.1)] border border-white/40 dark:border-white/5 flex flex-col justify-between"
                     >
                         <div>
                             <div className="flex items-center gap-4 mb-10">
@@ -89,7 +89,7 @@ export default function LocationHours() {
                         initial={{ opacity: 0, x: 30 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className="bg-white dark:bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-12 lg:p-16 shadow-[0_30px_60px_-15px_rgba(180,140,100,0.1)] border border-white/40 dark:border-white/5 flex flex-col"
+                        className="bg-white dark:bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 lg:p-12 shadow-[0_30px_60px_-15px_rgba(180,140,100,0.1)] border border-white/40 dark:border-white/5 flex flex-col"
                     >
                         <div className="flex items-center gap-4 mb-10">
                             <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
