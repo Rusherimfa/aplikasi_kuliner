@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Review;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class TestimonialController extends Controller
@@ -14,8 +16,15 @@ class TestimonialController extends Controller
             ->latest()
             ->get();
 
+        $reviews = Review::with('user:id,name,avatar')
+            ->where('is_approved', true)
+            ->whereNotNull('message')
+            ->latest()
+            ->get();
+
         return Inertia::render('testimonials/index', [
             'testimonials' => $testimonials,
+            'reviews' => $reviews,
         ]);
     }
 
@@ -33,6 +42,9 @@ class TestimonialController extends Controller
         $validated['is_approved'] = true; // Auto-approve as requested
 
         Testimonial::create($validated);
+
+        // Bersihkan cache landing page
+        Cache::forget('welcome_reviews');
 
         return back()->with('success', 'Terima kasih atas ceritamu! Pengalamanmu telah ditambahkan.');
     }

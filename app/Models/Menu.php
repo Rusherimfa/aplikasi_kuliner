@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['team_id', 'name', 'description', 'category', 'price', 'image_path', 'is_available', 'is_best_seller'])]
@@ -30,16 +29,6 @@ class Menu extends Model
         return $this->belongsToMany(Reservation::class)
             ->withPivot('quantity', 'notes')
             ->withTimestamps();
-    }
-
-    /**
-     * Get booking items that include this menu.
-     *
-     * @return HasMany<BookingItem, $this>
-     */
-    public function bookingItems(): HasMany
-    {
-        return $this->hasMany(BookingItem::class);
     }
 
     /**

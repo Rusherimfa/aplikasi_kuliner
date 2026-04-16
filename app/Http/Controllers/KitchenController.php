@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DishStatusUpdated;
 use App\Models\Reservation;
+use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -63,6 +65,28 @@ class KitchenController extends Controller
                 'status' => $validated['status'],
                 'updated_at' => now(),
             ]);
+
+        // Fetch item name and reservation_id for broadcasting
+        $item = DB::table('menu_reservation')
+            ->join('menus', 'menu_reservation.menu_id', '=', 'menus.id')
+            ->where('menu_reservation.id', $pivotId)
+            ->select('menus.name', 'menu_reservation.reservation_id')
+            ->first();
+
+        if ($item) {
+            event(new DishStatusUpdated($item->reservation_id, $pivotId, $validated['status'], $item->name));
+
+            // WA Simulation if Ready
+            if ($validated['status'] === 'ready') {
+                $reservation = Reservation::find($item->reservation_id);
+                if ($reservation) {
+                    WhatsAppService::send(
+                        $reservation->customer_phone,
+                        "Chef Insight: Piring '{$item->name}' Anda sudah siap saji! Pelayan kami akan segera mengantarkannya ke meja Anda."
+                    );
+                }
+            }
+        }
 
         return back()->with('success', 'Item status updated.');
     }

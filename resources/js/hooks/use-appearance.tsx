@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 export type ResolvedAppearance = 'light' | 'dark';
 export type Appearance = ResolvedAppearance | 'system';
@@ -88,22 +88,14 @@ export function initializeTheme(): void {
 }
 
 export function useAppearance(): UseAppearanceReturn {
-    const [hydrated, setHydrated] = useState(false);
-
-    useEffect(() => {
-        setHydrated(true);
-    }, []);
-
     const appearance: Appearance = useSyncExternalStore(
         subscribe,
         () => currentAppearance,
         () => 'system',
     );
 
-    const resolvedAppearance: ResolvedAppearance = hydrated
-        ? isDarkMode(appearance)
-            ? 'dark'
-            : 'light'
+    const resolvedAppearance: ResolvedAppearance = isDarkMode(appearance)
+        ? 'dark'
         : 'light';
 
     const updateAppearance = (mode: Appearance): void => {

@@ -34,8 +34,9 @@ class PublicCatalogController extends Controller
         $reviews = Cache::remember('welcome_reviews', 3600, function () {
             return Review::with('user:id,name,avatar')
                 ->where('is_approved', true)
-                ->where('rating', 5)
+                ->where('rating', '>=', 4)
                 ->whereNotNull('message')
+                ->orderBy('rating', 'desc')
                 ->latest()
                 ->take(3)
                 ->get()

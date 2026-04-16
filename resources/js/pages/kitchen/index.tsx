@@ -1,30 +1,45 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { update as updateKitchenItem } from '@/routes/kitchen/item';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function KitchenIndex({ orders }: any) {
     const [loadingId, setLoadingId] = useState<number | null>(null);
-    const { currentTeam } = usePage().props as { currentTeam?: { slug: string } | null };
 
     const updateStatus = (pivotId: number, status: string, itemName: string) => {
-        if (!currentTeam) {
-            return;
-        }
-
         setLoadingId(pivotId);
-        router.patch(updateKitchenItem({ current_team: currentTeam.slug, pivotId }).url, { status }, {
+        router.patch(route('kitchen.item.update', pivotId), { status }, {
             preserveScroll: true,
             onSuccess: () => {
-                toast.success(`Dish "${itemName}" is now ${status.toUpperCase()}`);
+                // Notifikasi lokal akan muncul, tapi Echo juga akan mengirim broadcast ke staff lain
             },
             onFinish: () => setLoadingId(null),
         });
     };
+
+    useEffect(() => {
+        // Listen for dish updates from other staff
+        const kitchenChannel = window.Echo.channel('kitchen')
+            .listen('.DishStatusUpdated', (e: any) => {
+                router.reload({ preserveScroll: true });
+                toast.info(`Dish Update: ${e.itemName} is ${e.status.toUpperCase()}`);
+            });
+
+        // Listen for new reservations
+        const reservationChannel = window.Echo.channel('reservations')
+            .listen('.ReservationStatusUpdated', (e: any) => {
+                router.reload({ preserveScroll: true });
+                toast.warning('New Reservation/Order Updated!');
+            });
+
+        return () => {
+            kitchenChannel.stopListening('.DishStatusUpdated');
+            reservationChannel.stopListening('.ReservationStatusUpdated');
+        };
+    }, []);
 
     const getStatusColor = (status: string) => {
         switch (status) {

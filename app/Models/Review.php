@@ -15,6 +15,7 @@ class Review extends Model
         'reservation_id',
         'rating',
         'message',
+        'is_approved',
     ];
 
     public function user(): BelongsTo

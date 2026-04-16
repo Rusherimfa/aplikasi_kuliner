@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChefHat, LayoutGrid, BookOpen, Calendar, Bell, LogOut, ChevronRight } from 'lucide-react';
-import { logout } from '@/routes';
+import { dashboard } from '@/routes';
+import { Button } from '@/components/ui/button';
 
 export default function RestoAdminLayout({ children }: { children: React.ReactNode }) {
     const { auth, url } = usePage().props as any;
@@ -9,8 +10,9 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
     const navItems = [
         { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
         { title: 'Manajemen Menu', href: '/menus', icon: BookOpen, roles: ['admin'] },
-        { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar },
-        { title: 'Kitchen View', href: '/kitchen', icon: ChefHat },
+        { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar, roles: ['admin', 'staff'] },
+        { title: 'Kitchen View', href: '/kitchen', icon: ChefHat, roles: ['admin', 'staff'] },
+        { title: 'Service Hub', href: '/service-requests', icon: Bell, roles: ['admin', 'staff'] },
     ].filter(item => !item.roles || item.roles.includes(auth.user.role));
 
     return (
@@ -31,7 +33,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                             Resto<span className="text-orange-500">Web</span>
                         </span>
                         <span className="text-[10px] font-bold tracking-[0.2em] text-white/30 uppercase mt-1 block">
-                            {auth.user.role === 'admin' ? 'Owner Suite' : 'Staff Station'}
+                            {auth.user.role === 'admin' ? 'Owner Suite' : auth.user.role === 'kurir' ? 'Delivery Hub' : 'Staff Station'}
                         </span>
                     </div>
                 </div>
@@ -44,7 +46,6 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                     <nav className="space-y-1.5">
                         {navItems.map((item) => {
                             const isActive = currentUrl === item.href || currentUrl.startsWith(item.href + '/');
-
                             return (
                                 <Link
                                     key={item.title}
@@ -103,7 +104,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                         <div className="h-6 w-px bg-white/5 mx-1" />
 
                         <Link
-                            href={logout()}
+                            href="/logout"
                             method="post"
                             as="button"
                             className="flex h-11 items-center gap-2.5 rounded-2xl bg-white/[0.03] border border-white/5 px-6 text-xs font-black tracking-[0.1em] uppercase text-white/50 transition-all hover:bg-rose-500/10 hover:border-rose-500/20 hover:text-rose-500 hover:scale-[1.02] active:scale-95 shadow-lg shadow-black/20"
@@ -122,3 +123,4 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
         </div>
     );
 }
+

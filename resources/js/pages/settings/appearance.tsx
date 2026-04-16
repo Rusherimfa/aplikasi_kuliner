@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { Monitor } from 'lucide-react';
 import AppearanceTabs from '@/components/app/appearance-tabs';
 import { edit as editAppearance } from '@/routes/appearance';
+import { Monitor } from 'lucide-react';
 
 export default function Appearance() {
     return (

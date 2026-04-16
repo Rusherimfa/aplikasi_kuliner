@@ -54,14 +54,14 @@ export default function BentoFeatures() {
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        className="font-serif text-5xl md:text-7xl font-light text-foreground"
+                        className="font-serif text-5xl md:text-7xl font-light text-foreground text-wrap-balance"
                     >
                         Detail yang <span className="italic">Mendefinisikan</span> Kami
                     </motion.h2>
                 </div>
 
                 {/* Bento Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[240px]">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:auto-rows-[240px]">
                     {features.map((feature, idx) => (
                         <motion.div
                             key={feature.subtitle}
@@ -69,7 +69,7 @@ export default function BentoFeatures() {
                             whileInView={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ delay: idx * 0.1, duration: 0.8 }}
                             viewport={{ once: true }}
-                            className={`group relative overflow-hidden rounded-[2.5rem] border p-10 flex flex-col justify-end transition-all hover:shadow-2xl hover:shadow-primary/5 ${feature.className}`}
+                            className={`group relative overflow-hidden rounded-[2.5rem] border p-8 md:p-10 min-h-[320px] md:min-h-0 flex flex-col justify-end transition-all hover:shadow-2xl hover:shadow-primary/5 ${feature.className}`}
                         >
                             {/* Background Image (for the large card) */}
                             {feature.image && (
@@ -90,7 +90,7 @@ export default function BentoFeatures() {
                                 <h3 className="font-serif text-3xl font-light text-foreground mb-4">
                                     {feature.subtitle}
                                 </h3>
-                                <p className="text-sm text-muted-foreground leading-relaxed max-w-xs md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                                <p className="text-sm text-muted-foreground leading-relaxed max-w-xs md:opacity-0 md:group-hover:opacity-100 transition-all duration-500 md:translate-y-4 group-hover:translate-y-0">
                                     {feature.description}
                                 </p>
                             </div>

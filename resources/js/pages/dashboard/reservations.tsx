@@ -1,5 +1,5 @@
-import { Head, router, usePage } from '@inertiajs/react';
-import { Calendar, Clock, Users, Check, X, Filter } from 'lucide-react';
+import { Head, router, usePage, useHttp } from '@inertiajs/react';
+import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,245 +10,339 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { dashboard as dashboardRoute } from '@/routes';
-import { update as updateReservation } from '@/routes/reservations';
-import { availability as updateSeatAvailability } from '@/routes/seats';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+import BoutiqueChat from '@/components/app/boutique-chat';
+import { useEffect } from 'react';
+import { Bell, Sparkles, Receipt, Droplets } from 'lucide-react';
 
 interface Reservation {
     id: number;
-    user_name: string;
-    user_email: string;
-    table_code: string | null;
-    seat_label: string | null;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
     date: string;
     time: string;
     guest_count: number;
-    status: 'pending' | 'confirmed' | 'rejected' | 'completed';
+    status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment';
+    payment_status?: string;
+    booking_fee?: string | number;
+    menus_count?: number;
     special_requests: string | null;
+    table_id: number | null;
+    courier_id?: number | null;
+    courier_name?: string | null;
+    delivery_status?: string;
+    delivery_address?: string | null;
+}
+
+interface RestoTable {
+    id: number;
+    name: string;
+    capacity: number;
+    category: string;
+    pos_x: number;
+    pos_y: number;
+    is_active: boolean;
+}
+
+interface ServiceRequest {
+    id: number;
+    reservation_id: number;
+    type: 'waiter' | 'bill' | 'refill' | 'napkins' | 'other';
+    status: 'pending' | 'ongoing' | 'resolved';
+    notes?: string;
+    created_at: string;
+    reservation?: {
+        customer_name: string;
+        resto_table?: {
+            name: string;
+        };
+    };
 }
 
 interface PageProps {
     reservations: Reservation[];
-    seatingLayout?: Array<{
-        id: number;
-        code: string;
-        name: string;
-        seat_count: number;
-        seats: Array<{
-            id: number;
-            label: string;
-            seat_number: number;
-            is_active: boolean;
-            is_reserved: boolean;
-        }>;
-    }>;
+    tables: RestoTable[];
+    couriers: { id: number; name: string }[];
+    serviceRequests: ServiceRequest[];
 }
 
-export default function ReservationsDashboard({ reservations, seatingLayout = [] }: PageProps) {
-    const { currentTeam } = usePage().props;
+export default function ReservationsDashboard({ reservations, tables, couriers, serviceRequests }: PageProps) {
+    const [view, setView] = useState<'list' | 'map'>('list');
+    const [draggingTableId, setDraggingTableId] = useState<number | null>(null);
+    const [assigningId, setAssigningId] = useState<number | null>(null);
+    const [activeChatId, setActiveChatId] = useState<number | null>(null);
+    const [activeRequests, setActiveRequests] = useState<ServiceRequest[]>(serviceRequests);
+    const { auth } = usePage().props as any;
+    const http = useHttp();
 
     const updateStatus = (id: number, status: string) => {
-        if (!currentTeam) {
-            return;
-        }
-
         router.put(
-            updateReservation({ current_team: currentTeam.slug, reservation: id }).url,
+            `/reservations/${id}`,
             { status },
+            { 
+                preserveScroll: true,
+                onSuccess: () => toast.success(`Reservation status updated to ${status.toUpperCase()}`)
+            },
+        );
+    };
+
+    const updateTablePosition = (id: number, x: number, y: number) => {
+        router.patch(route('tables.update_position', id), {
+            pos_x: Math.round(x),
+            pos_y: Math.round(y)
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDraggingTableId(null);
+                toast.success('Table layout saved successfully');
+            }
+        });
+    };
+
+    const assignCourier = (reservationId: number, courierId: number) => {
+        router.patch(
+            `/reservations/${reservationId}/assign-courier`,
+            { courier_id: courierId },
             {
                 preserveScroll: true,
-            },
+                onSuccess: () => {
+                    setAssigningId(null);
+                    toast.success('Kurir berhasil ditugaskan!');
+                }
+            }
         );
     };
 
     const StatusBadge = ({ status }: { status: string }) => {
         const variants: Record<string, string> = {
-            pending: 'bg-amber-100 text-amber-800 border-amber-200',
-            confirmed: 'bg-green-100 text-green-800 border-green-200',
-            rejected: 'bg-red-100 text-red-800 border-red-200',
-            completed: 'bg-slate-100 text-slate-800 border-slate-200',
+            awaiting_payment: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
+            pending: 'bg-orange-500/10 text-orange-500 border-orange-500/20',
+            confirmed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            rejected: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+            completed: 'bg-white/10 text-white/60 border-white/20',
+        };
+
+        const labels: Record<string, string> = {
+            awaiting_payment: 'Menunggu DP',
+            pending: 'Menunggu',
+            confirmed: 'Dikonfirmasi',
+            rejected: 'Ditolak',
+            completed: 'Selesai'
         };
 
         return (
             <Badge
                 variant="outline"
-                className={`${variants[status]} px-2.5 py-0.5 font-medium capitalize`}
+                className={`${variants[status]} px-2.5 py-0.5 font-medium`}
             >
-                {status}
+                {labels[status] || status}
             </Badge>
         );
     };
 
-    const toggleSeat = (seatId: number, nextState: boolean) => {
-        if (!currentTeam) {
-            return;
-        }
+    // Helper to find reservation for a table today
+    const getTableStatus = (tableId: number) => {
+        const today = new Date().toISOString().split('T')[0];
+        const res = reservations.find(r => r.table_id === tableId && r.date === today && (r.status === 'confirmed' || r.status === 'pending'));
+        if (!res) return 'available';
+        return res.status;
+    };
 
-        router.patch(
-            updateSeatAvailability({ current_team: currentTeam.slug, seat: seatId }).url,
-            { is_active: nextState },
-            { preserveScroll: true },
-        );
+    useEffect(() => {
+        const channel = (window as any).Echo.channel('staff-notifications')
+            .listen('.service.request.created', (e: any) => {
+                const request = e.serviceRequest;
+                
+                // If it's a new or updated request
+                setActiveRequests(prev => {
+                    const exists = prev.find(r => r.id === request.id);
+                    if (exists) {
+                        return prev.map(r => r.id === request.id ? request : r).filter(r => r.status !== 'resolved');
+                    }
+                    return [request, ...prev];
+                });
+
+                if (request.status === 'pending') {
+                    toast.info(`Concierge Alert: #RES-${request.reservation_id}`, {
+                        description: `Tamu di Meja ${request.reservation?.resto_table?.name || '?'} butuh ${request.type.toUpperCase()}`
+                    });
+                }
+            });
+
+        return () => channel.stopListening('.service.request.created');
+    }, []);
+
+    const updateRequestStatus = (id: number, status: string) => {
+        http.patch(`/service-requests/${id}`, { status }, {
+            onSuccess: () => {
+                setActiveRequests(prev => prev.map(r => r.id === id ? { ...r, status: status as any } : r).filter(r => status !== 'resolved' ? true : r.id !== id));
+                toast.success(`Permintaan #${id} diperbarui menjadi ${status.toUpperCase()}`);
+            },
+            onError: () => {
+                toast.error('Gagal memperbarui status permintaan.');
+            }
+        });
     };
 
     return (
         <>
-            <Head title="Reservations Management" />
+            <Head title="Manajemen Reservasi - RestoWeb" />
 
-            <div className="mx-auto max-w-7xl px-4 py-8 font-['Inter',sans-serif] sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-white font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="font-['Playfair_Display',serif] text-2xl font-bold tracking-tight text-slate-900">
-                            Table Reservations
+                        <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-white/95">
+                            Reservasi & Layout
                         </h1>
-                        <p className="mt-1 text-sm text-slate-500">
-                            Manage incoming booking requests from customers.
+                        <p className="mt-1 text-sm text-white/40">
+                            Kelola pemesanan masuk dan atur tata letak meja restoran secara visual.
                         </p>
                     </div>
-                    <div className="flex items-center gap-2">
+                    
+                    <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
                         <Button
-                            variant="outline"
-                            className="border-slate-200 bg-white"
+                            variant="ghost"
+                            size="sm"
+                            className={`rounded-lg px-4 ${view === 'list' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
+                            onClick={() => setView('list')}
                         >
-                            <Filter className="mr-2 h-4 w-4 text-slate-500" />
-                            Filter by Date
+                            <List className="mr-2 h-4 w-4" />
+                            Daftar
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`rounded-lg px-4 ${view === 'map' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
+                            onClick={() => setView('map')}
+                        >
+                            <MapIcon className="mr-2 h-4 w-4" />
+                            Peta Meja
                         </Button>
                     </div>
                 </div>
 
-                <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-                    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                {view === 'list' ? (
+                    <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl transition-all">
                         {reservations.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <Table>
-                                    <TableHeader className="bg-slate-50">
-                                        <TableRow className="hover:bg-transparent">
-                                            <TableHead className="font-semibold text-slate-700">
-                                                Customer
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-slate-700">
-                                                Date & Time
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-slate-700">
-                                                Details
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-slate-700">
-                                                Notes
-                                            </TableHead>
-                                            <TableHead className="font-semibold text-slate-700">
-                                                Status
-                                            </TableHead>
-                                            <TableHead className="text-right font-semibold text-slate-700">
-                                                Actions
-                                            </TableHead>
+                                    <TableHeader className="border-b border-white/5 bg-white/5">
+                                        <TableRow className="hover:bg-transparent border-white/5">
+                                            <TableHead className="font-semibold text-white/70">Pelanggan</TableHead>
+                                            <TableHead className="font-semibold text-white/70">Tanggal & Waktu</TableHead>
+                                            <TableHead className="font-semibold text-white/70">Meja & Tamu</TableHead>
+                                            <TableHead className="font-semibold text-white/70">Status</TableHead>
+                                            <TableHead className="text-right font-semibold text-white/70">Aksi</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {reservations.map((reservation) => (
-                                            <TableRow
-                                                key={reservation.id}
-                                                className="hover:bg-slate-50/50"
-                                            >
+                                            <TableRow key={reservation.id} className="hover:bg-white/5 border-white/5 transition-colors group">
                                                 <TableCell>
-                                                    <div className="font-medium text-slate-900">
-                                                        {reservation.user_name}
-                                                    </div>
-                                                    <div className="text-xs text-slate-500">
-                                                        {reservation.user_email}
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20">
+                                                            <Users size={18} />
+                                                        </div>
+                                                        <div className="min-w-0">
+                                                            <h3 className="truncate font-bold text-white/95 text-base">{reservation.customer_name}</h3>
+                                                            <div className="text-xs text-white/40 flex flex-col gap-0.5 mt-0.5">
+                                                                <a 
+                                                                    href={`https://wa.me/${reservation.customer_phone?.replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(reservation.customer_name)},%0A%0AMengenai%20reservasi%20di%20RestoWeb...`}
+                                                                    target="_blank" rel="noopener noreferrer"
+                                                                    className="inline-flex items-center gap-1 text-emerald-500/80 hover:text-emerald-400 transition-colors"
+                                                                >
+                                                                    <MessageCircle size={12} /> {reservation.customer_phone}
+                                                                </a>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="mb-1 flex items-center text-sm text-slate-700">
-                                                        <Calendar className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
-                                                        {new Date(
-                                                            reservation.date,
-                                                        ).toLocaleDateString(
-                                                            'en-US',
-                                                            {
-                                                                month: 'short',
-                                                                day: 'numeric',
-                                                                year: 'numeric',
-                                                            },
-                                                        )}
+                                                    <div className="mb-1 flex items-center text-sm font-medium text-white/80">
+                                                        {new Date(reservation.date).toLocaleDateString('id-ID', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </div>
-                                                    <div className="flex items-center text-xs text-slate-500">
-                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-slate-400" />
-                                                        {reservation.time.substring(
-                                                            0,
-                                                            5,
-                                                        )}
+                                                    <div className="flex items-center text-xs text-white/40">
+                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-orange-500/70" />
+                                                        {reservation.time.substring(0, 5)}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="flex items-center text-sm text-slate-700">
-                                                        <Users className="mr-1.5 h-3.5 w-3.5 text-amber-600" />
-                                                        <span className="font-medium">
-                                                            {
-                                                                reservation.guest_count
-                                                            }
-                                                        </span>
-                                                        <span className="ml-1 text-slate-500">
-                                                            Guests
-                                                        </span>
-                                                    </div>
-                                                    <div className="mt-1 text-xs text-slate-500">
-                                                        {reservation.table_code && reservation.seat_label
-                                                            ? `${reservation.table_code} · ${reservation.seat_label}`
-                                                            : 'Tanpa kursi'}
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center text-sm font-semibold text-white/90">
+                                                            <Badge variant="outline" className="bg-white/5 border-white/10 text-white/60">
+                                                                Meja {reservation.table_id || '?'}
+                                                            </Badge>
+                                                        </div>
+                                                        <span className="text-xs text-white/40 ml-1">{reservation.guest_count} Orang</span>
                                                     </div>
                                                 </TableCell>
-                                                <TableCell className="max-w-[200px]">
-                                                    {reservation.special_requests ? (
-                                                        <p
-                                                            className="truncate text-xs text-slate-600"
-                                                            title={
-                                                                reservation.special_requests
-                                                            }
-                                                        >
-                                                            {
-                                                                reservation.special_requests
-                                                            }
-                                                        </p>
-                                                    ) : (
-                                                        <span className="text-xs text-slate-400 italic">
-                                                            None
-                                                        </span>
+                                                <TableCell>
+                                                    <StatusBadge status={reservation.status} />
+                                                    {reservation.courier_name && (
+                                                        <div className="mt-2 text-[10px] font-bold text-blue-400 uppercase flex items-center gap-1">
+                                                            <Truck size={10} /> {reservation.courier_name}
+                                                        </div>
                                                     )}
                                                 </TableCell>
-                                                <TableCell>
-                                                    <StatusBadge
-                                                        status={reservation.status}
-                                                    />
-                                                </TableCell>
                                                 <TableCell className="text-right">
-                                                    {reservation.status ===
-                                                        'pending' && (
+                                                     {(reservation.status === 'pending' || reservation.status === 'awaiting_payment' || reservation.status === 'confirmed') && (
                                                         <div className="flex items-center justify-end gap-2">
+                                                            {/* Courier Assignment Button */}
+                                                            <div className="relative">
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className={`h-8 w-8 ${reservation.courier_id ? 'border-blue-500/20 bg-blue-500/10 text-blue-500' : 'border-white/10 text-white/40'} hover:bg-blue-500/20`}
+                                                                    onClick={() => setAssigningId(assigningId === reservation.id ? null : reservation.id)}
+                                                                >
+                                                                    <Truck className="h-4 w-4" />
+                                                                </Button>
+                                                                
+                                                                {assigningId === reservation.id && (
+                                                                    <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border border-white/10 bg-black p-2 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+                                                                        <p className="px-2 py-1.5 text-[9px] font-black uppercase text-white/30 tracking-widest border-b border-white/5 mb-1">Pilih Kurir</p>
+                                                                        {couriers.map(courier => (
+                                                                            <button
+                                                                                key={courier.id}
+                                                                                onClick={() => assignCourier(reservation.id, courier.id)}
+                                                                                className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+                                                                            >
+                                                                                {courier.name}
+                                                                            </button>
+                                                                        ))}
+                                                                        {couriers.length === 0 && (
+                                                                            <p className="px-3 py-2 text-[10px] text-white/20 italic">Belum ada kurir tersedia</p>
+                                                                        )}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
                                                             <Button
                                                                 size="icon"
                                                                 variant="outline"
-                                                                className="h-8 w-8 border-green-200 bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700"
-                                                                onClick={() =>
-                                                                    updateStatus(
-                                                                        reservation.id,
-                                                                        'confirmed',
-                                                                    )
-                                                                }
-                                                                title="Confirm Booking"
+                                                                className={`h-8 w-8 ${activeChatId === reservation.id ? 'bg-orange-500 text-black border-orange-600' : 'border-white/10 text-white/40'} hover:bg-orange-500/20`}
+                                                                onClick={() => setActiveChatId(activeChatId === reservation.id ? null : reservation.id)}
+                                                            >
+                                                                <MessageCircle className="h-4 w-4" />
+                                                            </Button>
+
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                                                onClick={() => updateStatus(reservation.id, 'confirmed')}
                                                             >
                                                                 <Check className="h-4 w-4" />
                                                             </Button>
                                                             <Button
                                                                 size="icon"
                                                                 variant="outline"
-                                                                className="h-8 w-8 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700"
-                                                                onClick={() =>
-                                                                    updateStatus(
-                                                                        reservation.id,
-                                                                        'rejected',
-                                                                    )
-                                                                }
-                                                                title="Reject Booking"
+                                                                className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                                                                onClick={() => updateStatus(reservation.id, 'rejected')}
                                                             >
                                                                 <X className="h-4 w-4" />
                                                             </Button>
@@ -261,83 +355,165 @@ export default function ReservationsDashboard({ reservations, seatingLayout = []
                                 </Table>
                             </div>
                         ) : (
-                            <div className="p-12 text-center">
-                                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-                                    <Calendar className="h-6 w-6 text-slate-400" />
+                            <div className="p-20 text-center flex flex-col items-center">
+                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
+                                    <Calendar size={32} className="text-orange-500/40" />
                                 </div>
-                                <h3 className="text-sm font-medium text-slate-900">
-                                    No reservations
-                                </h3>
-                                <p className="mt-1 text-sm text-slate-500">
-                                    There are currently no reservations pending or
-                                    booked.
-                                </p>
+                                <h3 className="text-lg font-bold text-white/90 italic font-['Playfair_Display',serif]">Hening di Sini...</h3>
+                                <p className="mt-2 text-sm text-white/40 max-w-xs">Saat ini tidak ada permintaan reservasi yang masuk dalam antrean Anda.</p>
                             </div>
                         )}
                     </div>
-
-                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                        <div className="mb-4">
-                            <h2 className="text-base font-semibold text-slate-900">Kursi & Ketersediaan</h2>
-                            <p className="mt-1 text-xs text-slate-500">Matikan kursi jika sedang rusak atau penuh.</p>
+                ) : (
+                    <div className="relative h-[600px] w-full bg-[#0A0A0B] rounded-3xl border border-white/10 overflow-hidden shadow-2xl group/map">
+                        {/* Map Background/Grid */}
+                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+                        
+                        {/* Map Controls Info */}
+                        <div className="absolute top-6 left-6 z-10 bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-2xl max-w-[200px] shadow-2xl">
+                            <h4 className="text-xs font-black uppercase tracking-widest text-orange-500 flex items-center gap-2 mb-3">
+                                <Info size={14} /> Legend
+                            </h4>
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-white/60">
+                                    <span className="h-3 w-3 rounded-full bg-emerald-500/20 border border-emerald-500/40"></span> Tersedia
+                                </div>
+                                <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-white/60">
+                                    <span className="h-3 w-3 rounded-full bg-orange-500"></span> Dipesan
+                                </div>
+                            </div>
+                            <p className="mt-4 text-[9px] text-white/30 italic leading-relaxed font-medium">
+                                Drag meja untuk mengatur tata letak. Klik Simpan untuk memperbarui database.
+                            </p>
                         </div>
-                        <div className="space-y-4">
-                            {seatingLayout.length === 0 && (
-                                <p className="text-sm text-slate-500">Belum ada data kursi.</p>
-                            )}
-                            {seatingLayout.map((table) => (
-                                <div key={table.id} className="rounded-lg border border-slate-200 p-3">
-                                    <div className="mb-2 flex items-center justify-between">
-                                        <div>
-                                            <p className="text-sm font-semibold text-slate-900">{table.code} · {table.name}</p>
-                                            <p className="text-[11px] text-slate-500">{table.seat_count} kursi</p>
-                                        </div>
-                                        <span className="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-600">
-                                            {table.seats.filter((seat) => seat.is_active).length} aktif
+
+                        {/* Visual Tables Container */}
+                        <div className="absolute inset-0 p-12">
+                            {tables.map((table) => {
+                                const status = getTableStatus(table.id);
+                                return (
+                                    <motion.div
+                                        key={table.id}
+                                        drag
+                                        dragMomentum={false}
+                                        onDragStart={() => setDraggingTableId(table.id)}
+                                        onDragEnd={(_, info) => {
+                                            // Simulated saving logic (in a real app we'd handle scale/offset)
+                                            // For this demo, we assume the absolute movement is saved
+                                            const newX = table.pos_x + info.offset.x;
+                                            const newY = table.pos_y + info.offset.y;
+                                            updateTablePosition(table.id, newX, newY);
+                                        }}
+                                        initial={false}
+                                        animate={{ x: table.pos_x, y: table.pos_y }}
+                                        className={`absolute cursor-grab active:cursor-grabbing w-24 h-24 rounded-2xl flex flex-col items-center justify-center border-2 shadow-2xl transition-all ${
+                                            status === 'confirmed' || status === 'pending'
+                                                ? 'bg-orange-500 border-orange-600 text-[#0A0A0B]' 
+                                                : 'bg-white/5 border-white/10 hover:border-emerald-500/50 text-white group'
+                                        }`}
+                                        style={{ touchAction: 'none' }}
+                                    >
+                                        <Users size={20} className={status === 'available' ? 'text-white/20 group-hover:text-emerald-500 transition-colors' : 'text-[#0A0A0B]/60'} />
+                                        <span className="text-xs font-black mt-1 uppercase tracking-tighter">{table.name}</span>
+                                        <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">{table.capacity}p</span>
+                                        
+                                        {draggingTableId === table.id && (
+                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-orange-500 text-[#0A0A0B] text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap">
+                                                DRAGGING...
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+
+                        {tables.length === 0 && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <p className="text-white/20 font-medium italic">Belum ada meja yang dikonfigurasi.</p>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Concierge Hub Sidebar Overlay */}
+                <div className="fixed top-24 right-4 sm:top-32 sm:right-8 z-40 flex flex-col gap-4 w-[calc(100vw-2rem)] sm:w-80 pointer-events-none">
+                    <AnimatePresence>
+                        {activeRequests.map((request) => (
+                            <motion.div
+                                key={request.id}
+                                layout
+                                initial={{ opacity: 0, x: 50, scale: 0.9 }}
+                                animate={{ opacity: 1, x: 0, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9, x: 20 }}
+                                className="pointer-events-auto bg-black/80 backdrop-blur-2xl border border-orange-500/30 rounded-3xl p-6 shadow-3xl ring-1 ring-orange-500/10 overflow-hidden group"
+                            >
+                                <div className="absolute top-0 right-0 p-3 opacity-5 group-hover:opacity-10 transition-opacity">
+                                    {request.type === 'waiter' && <Bell size={60} />}
+                                    {request.type === 'bill' && <Receipt size={60} />}
+                                    {request.type === 'refill' && <Droplets size={60} />}
+                                    {request.type === 'napkins' && <Sparkles size={60} />}
+                                </div>
+
+                                <div className="relative z-10 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-0 ${
+                                            request.status === 'pending' ? 'bg-orange-500 text-black' : 'bg-blue-500 text-white'
+                                        }`}>
+                                            {request.status}
+                                        </Badge>
+                                        <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
+                                            #{request.reservation_id}
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {table.seats.map((seat) => (
-                                            <button
-                                                key={seat.id}
-                                                type="button"
-                                                onClick={() => toggleSeat(seat.id, !seat.is_active)}
-                                                disabled={seat.is_reserved}
-                                                className={`rounded-lg border px-2 py-2 text-[11px] font-semibold transition ${
-                                                    seat.is_reserved
-                                                        ? 'cursor-not-allowed border-rose-200 bg-rose-50 text-rose-600'
-                                                        : seat.is_active
-                                                          ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                                          : 'border-slate-200 bg-slate-100 text-slate-500 hover:bg-slate-200'
-                                                }`}
-                                                title={seat.is_reserved ? 'Sudah dipesan' : seat.is_active ? 'Klik untuk nonaktifkan' : 'Klik untuk aktifkan'}
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="h-10 w-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 border border-orange-500/20">
+                                            {request.type === 'waiter' && <Bell size={18} />}
+                                            {request.type === 'bill' && <Receipt size={18} />}
+                                            {request.type === 'refill' && <Droplets size={18} />}
+                                            {request.type === 'napkins' && <Sparkles size={18} />}
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-black text-white uppercase tracking-tight">Meja {request.reservation?.resto_table?.name || '?'}</p>
+                                            <p className="text-[10px] font-bold text-orange-500/60 uppercase">{request.type}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2 pt-2">
+                                        {request.status === 'pending' && (
+                                            <Button 
+                                                onClick={() => updateRequestStatus(request.id, 'ongoing')}
+                                                className="flex-1 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest border border-white/5"
                                             >
-                                                {seat.label}
-                                            </button>
-                                        ))}
+                                                Layani
+                                            </Button>
+                                        )}
+                                        <Button 
+                                            onClick={() => updateRequestStatus(request.id, 'resolved')}
+                                            className="flex-1 h-9 rounded-xl bg-orange-500 text-black hover:bg-white text-[9px] font-black uppercase tracking-widest shadow-lg"
+                                        >
+                                            Selesai
+                                        </Button>
                                     </div>
                                 </div>
-                            ))}
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
+                    
+                    {activeRequests.length === 0 && (
+                        <div className="p-6 text-center rounded-[2rem] border border-dashed border-white/5 text-white/10">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em]">No Active Requests</p>
                         </div>
-                    </div>
+                    )}
                 </div>
+
+                {/* Active Chat Component */}
+                {activeChatId && (
+                    <BoutiqueChat reservationId={activeChatId} currentUser={auth.user} />
+                )}
             </div>
         </>
     );
 }
 
-ReservationsDashboard.layout = (props: {
-    currentTeam?: { slug: string } | null;
-}) => ({
-    breadcrumbs: [
-        {
-            title: 'Dashboard',
-            href: props.currentTeam
-                ? dashboardRoute(props.currentTeam.slug)
-                : '/',
-        },
-        {
-            title: 'Reservations',
-        },
-    ],
-});
+ReservationsDashboard.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Reservation;
 use App\Models\Review;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class ReviewController extends Controller
 {
@@ -29,7 +30,11 @@ class ReviewController extends Controller
             'user_id' => $request->user()->id,
             'rating' => $validated['rating'],
             'message' => $validated['message'],
+            'is_approved' => true,
         ]);
+
+        // Bersihkan cache landing page
+        Cache::forget('welcome_reviews');
 
         return back()->with('success', 'Terima kasih atas ulasan Anda!');
     }

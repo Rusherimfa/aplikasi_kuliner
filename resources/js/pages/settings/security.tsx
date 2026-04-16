@@ -45,7 +45,6 @@ export default function Security({
         if (prevTwoFactorEnabled.current && !twoFactorEnabled) {
             clearTwoFactorAuthData();
         }
-
         prevTwoFactorEnabled.current = twoFactorEnabled;
     }, [twoFactorEnabled, clearTwoFactorAuthData]);
 
@@ -73,13 +72,8 @@ export default function Security({
                         resetOnError={['password', 'password_confirmation', 'current_password']}
                         resetOnSuccess
                         onError={(errs) => {
-                            if (errs.password) {
-passwordInput.current?.focus();
-}
-
-                            if (errs.current_password) {
-currentPasswordInput.current?.focus();
-}
+                            if (errs.password) passwordInput.current?.focus();
+                            if (errs.current_password) currentPasswordInput.current?.focus();
                         }}
                         className="space-y-5"
                     >

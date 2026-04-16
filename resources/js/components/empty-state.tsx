@@ -1,5 +1,5 @@
 import { UtensilsCrossed } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface EmptyStateProps {
     icon?: ReactNode;

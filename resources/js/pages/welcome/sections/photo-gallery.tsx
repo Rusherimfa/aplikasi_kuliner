@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { Eye, Camera } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const GALLERY_IMAGES = [
     {

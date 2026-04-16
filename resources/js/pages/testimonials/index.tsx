@@ -1,12 +1,12 @@
 import { Head, usePage, useForm, Link } from '@inertiajs/react';
-import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
+import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { dashboard } from '@/routes';
-import Footer from '../welcome/sections/footer';
 import Navbar from '../welcome/sections/navbar';
+import Footer from '../welcome/sections/footer';
+import { dashboard } from '@/routes';
 
 interface Testimonial {
     id: number;
@@ -16,9 +16,43 @@ interface Testimonial {
     rating: number;
 }
 
-export default function TestimonialIndex({ testimonials = [] }: { testimonials?: Testimonial[] }) {
-    const { auth, flash, currentTeam } = usePage().props as any;
-    const dashboardUrl = currentTeam ? dashboard(currentTeam.slug).url : '/';
+const DEFAULT_TESTIMONIALS = [
+    {
+        id: 't-1',
+        name: 'Budi Santoso',
+        role: 'Pecinta Kuliner',
+        quote: 'Pelayanan yang sangat ramah and rasa makanan yang autentik. Wagyu Steak-nya bener-bener juara!',
+        rating: 5,
+        avatarColor: 'bg-orange-500'
+    },
+    {
+        id: 't-2',
+        name: 'Sari Wijaya',
+        role: 'Food Blogger',
+        quote: 'Suasana restorannya sangat cozy, cocok for makan malam romantis. Dessert-nya juga variatif.',
+        rating: 4,
+        avatarColor: 'bg-indigo-500'
+    },
+    {
+        id: 't-3',
+        name: 'Andi Pratama',
+        role: 'Pengusaha',
+        quote: 'Sistem reservasi online-nya sangat memudahkan. Tidak perlu antre lama saat sampai di lokasi.',
+        rating: 5,
+        avatarColor: 'bg-emerald-500'
+    }
+];
+
+export default function TestimonialIndex({ testimonials = [], reviews = [] }: { testimonials?: Testimonial[], reviews?: any[] }) {
+    const { auth, flash } = usePage().props as any;
+    
+    // Safely generate dashboard URL
+    let dashboardUrl = '/';
+    try {
+        dashboardUrl = dashboard().url;
+    } catch (e) {
+        console.error('Wayfinder dashboard route failed:', e);
+    }
     
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,6 +74,26 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
             },
         });
     };
+
+    // Combine both sources
+    const allQuotes = [
+        ...reviews.map(r => ({
+            id: r.id,
+            name: r.user?.name || r.name,
+            role: r.user ? 'Verified Guest' : 'Regular Guest',
+            quote: r.message,
+            rating: r.rating,
+            isReview: true
+        })),
+        ...testimonials.map(t => ({
+            ...t,
+            quote: t.quote || (t as any).message,
+            role: t.role || 'Gourmet Enthusiast',
+            isReview: false
+        }))
+    ];
+
+    const displayData = allQuotes.length > 0 ? allQuotes : DEFAULT_TESTIMONIALS;
 
     return (
         <>
@@ -70,30 +124,49 @@ export default function TestimonialIndex({ testimonials = [] }: { testimonials?:
                     <div className="flex flex-col lg:flex-row gap-12">
                         {/* Left Side - Testimonial Grid */}
                         <div className="w-full lg:w-7/12">
-                            {(testimonials && testimonials.length > 0) ? (
+                            {(displayData && displayData.length > 0) ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {testimonials.map((t) => (
+                                    {displayData.map((t: any) => {
+                                        const avatarLetters = t.name ? t.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+                                        const avatarBg = t.avatarColor || 'bg-slate-200 dark:bg-neutral-800';
+
+                                        return (
                                         <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl dark:hover:border-orange-500/30">
-                                            <Quote size={28} className="mb-4 text-orange-500/20" />
-                                            <p className="mb-6 flex-1 text-sm leading-relaxed text-slate-600 dark:text-neutral-400 italic">
+                                            <Quote size={28} className="mb-4 text-orange-500/20 group-hover:text-orange-500/40 transition-colors" />
+                                            
+                                            <div className="mb-2 flex justify-between items-start">
+                                                <div className="flex gap-1">
+                                                    {Array.from({ length: 5 }).map((_, i) => (
+                                                        <Star 
+                                                            key={i} 
+                                                            size={14} 
+                                                            className={i < (t.rating || 5) ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} 
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {t.isReview && (
+                                                    <div className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] font-bold text-orange-600 dark:text-orange-500 uppercase tracking-widest border border-orange-500/20">
+                                                        <CheckCircle2 size={10} />
+                                                        Authentic
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <p className="mb-6 mt-2 flex-1 text-sm leading-relaxed text-slate-600 dark:text-neutral-400 italic">
                                                 "{t.quote}"
                                             </p>
-                                            <div className="mb-4 flex gap-1">
-                                                {Array.from({ length: 5 }).map((_, i) => (
-                                                    <Star key={i} size={12} className={i < t.rating ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} />
-                                                ))}
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-200 to-slate-300 dark:from-neutral-700 dark:to-neutral-800 text-sm font-bold text-slate-600 dark:text-neutral-300">
-                                                    {t.name ? t.name.substring(0, 1).toUpperCase() : 'U'}
+
+                                            <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-neutral-800">
+                                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${avatarBg.includes('bg-') ? avatarBg : 'bg-slate-100 dark:bg-neutral-700'} text-sm font-bold ${avatarBg.includes('bg-') ? 'text-white' : 'text-slate-600 dark:text-neutral-300'}`}>
+                                                    {avatarLetters}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-semibold text-slate-900 dark:text-white capitalize">{t.name || 'Tamu'}</p>
-                                                    {t.role && <p className="text-xs text-slate-500 dark:text-neutral-500">{t.role}</p>}
+                                                    <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{t.name || 'Tamu'}</p>
+                                                    {t.role && <p className="text-xs font-semibold text-slate-500 dark:text-neutral-500 tracking-wide uppercase">{t.role}</p>}
                                                 </div>
                                             </div>
                                         </div>
-                                    ))}
+                                    )})}
                                 </div>
                             ) : (
                                 <div className="rounded-3xl border border-dashed border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 py-16 text-center">
