@@ -61,33 +61,39 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
     ];
 
     const displayData = allQuotes.length > 0 ? allQuotes : DEFAULT_TESTIMONIALS;
+    const cardsArray = useRef<HTMLDivElement[]>([]);
 
     useGSAP(() => {
-        if (!cardsRef.current.length) return;
+        if (!cardsArray.current.length) return;
 
-        // Ensure triggers are calculated correctly
-        const timeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 500);
+        // Reset state awal untuk menghindari bug 'kadang tidak muncul'
+        gsap.set(cardsArray.current, { opacity: 1, y: 0, scale: 1 });
 
-        gsap.from(cardsRef.current, {
+        const animation = gsap.from(cardsArray.current, {
             y: 60,
             opacity: 0,
             scale: 0.95,
             stagger: 0.1,
-            duration: 1,
-            ease: "power2.out",
+            duration: 1.2,
+            ease: "expo.out",
             scrollTrigger: {
                 trigger: containerRef.current,
-                start: "top 75%",
+                start: "top 80%",
                 toggleActions: "play none none none",
-                invalidateOnRefresh: true,
-                fastScrollEnd: true,
-                preventOverlaps: true
+                onEnter: () => {
+                    ScrollTrigger.refresh();
+                }
             }
         });
 
-        return () => clearTimeout(timeout);
+        const timeout = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 1000);
+
+        return () => {
+            clearTimeout(timeout);
+            animation.kill();
+        };
     }, { scope: containerRef, dependencies: [displayData] });
 
     return (
@@ -137,7 +143,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                         return (
                             <div
                                 key={t.id}
-                                ref={(el) => { if (el) cardsRef.current[index] = el; }}
+                                ref={(el) => { if (el) cardsArray.current[index] = el; }}
                                 className="group glass-card flex flex-col p-10 relative overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:border-orange-500/30 hover:shadow-orange-500/10"
                             >
                                 {/* Subtle Quote Icon Overlay */}
