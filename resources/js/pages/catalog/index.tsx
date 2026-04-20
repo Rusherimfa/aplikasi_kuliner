@@ -43,11 +43,18 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
     const [selectedDish, setSelectedDish] = useState<any>(null);
 
     const rawCategories = Array.from(new Set(menus.map((item) => item.category)));
-    const categories = ['Semua', ...rawCategories];
+    const categories = ['Semua', 'Best Seller', ...rawCategories];
 
     const filteredMenus = menus.filter((item) => {
-        const matchesCategory =
-            activeCategory === 'Semua' || item.category === activeCategory;
+        let matchesCategory = false;
+        if (activeCategory === 'Semua') {
+            matchesCategory = true;
+        } else if (activeCategory === 'Best Seller') {
+            matchesCategory = !!item.is_best_seller;
+        } else {
+            matchesCategory = item.category === activeCategory;
+        }
+
         const matchesSearch = item.name
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
@@ -192,7 +199,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                 
                                                 {/* Labels */}
                                                 <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
-                                                    {item.is_best_seller && (
+                                                    {!!item.is_best_seller && (
                                                         <div className="flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-1.5 text-[10px] font-black text-black uppercase tracking-widest shadow-xl">
                                                             <Flame size={12} />
                                                             Best Seller
@@ -228,13 +235,22 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                     {item.description || 'Simfoni rasa yang dirancang oleh chef untuk memanjakan indera Anda.'}
                                                 </p>
 
-                                                <Button
-                                                    onClick={() => addItem({ id: item.id, name: item.name, price: item.price })}
-                                                    className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-orange-500 hover:text-black dark:hover:bg-orange-500 dark:hover:text-black group active:scale-95 shadow-xl"
-                                                >
-                                                    <ShoppingBag size={14} className="mr-3" />
-                                                    Add to Order
-                                                </Button>
+                                                {item.is_available ? (
+                                                    <Button
+                                                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price })}
+                                                        className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-orange-500 hover:text-black dark:hover:bg-orange-500 dark:hover:text-black group active:scale-95 shadow-xl border border-transparent"
+                                                    >
+                                                        <ShoppingBag size={14} className="mr-3" />
+                                                        Add to Order
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        disabled
+                                                        className="w-full h-14 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/30 text-[10px] font-black uppercase tracking-[0.2em] border border-slate-200 dark:border-white/10 opacity-80 cursor-not-allowed"
+                                                    >
+                                                        Tidak Tersedia
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     </motion.div>

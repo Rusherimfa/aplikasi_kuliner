@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import { 
     ArrowLeft, 
     CheckCircle2, 
@@ -28,55 +28,33 @@ import Footer from '../welcome/sections/footer';
 
 export default function CheckoutIndex() {
     const { items, cartTotal, clearCart } = useCart();
+    const { auth, flash } = usePage().props as any;
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
-    const [orderType, setOrderType] = useState<'dine-in' | 'takeaway'>('dine-in');
+    const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery');
+    const [formData, setFormData] = useState({
+        customer_name: auth?.user?.name || '',
+        customer_email: auth?.user?.email || '',
+        customer_phone: auth?.user?.phone || '',
+    });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
         
-        // Simulating API request to create order
-        setTimeout(() => {
-            setIsSubmitting(false);
-            setIsSuccess(true);
-            clearCart();
-        }, 2000);
+        router.post('/orders/checkout', {
+            ...formData,
+            order_type: orderType,
+            items: items,
+            cart_total: cartTotal,
+        }, {
+            onSuccess: () => {
+                clearCart();
+            },
+            onFinish: () => setIsSubmitting(false),
+        });
     };
 
-    if (isSuccess) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-[#0A0A0B] font-sans px-4 overflow-hidden relative text-foreground transition-colors duration-500 selection:bg-orange-500/30">
-                {/* Background Glows */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-orange-500/10 blur-[120px] pointer-events-none" />
-                
-                <motion.div 
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    className="max-w-md w-full glass-card p-12 rounded-[3.5rem] text-center border border-white/5 relative z-10"
-                >
-                    <div className="w-24 h-24 bg-orange-500/10 rounded-full flex items-center justify-center mx-auto mb-10 border border-orange-500/20 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
-                        <CheckCircle2 size={48} className="text-orange-500" />
-                    </div>
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                        <Sparkles size={16} className="text-orange-500" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30">Order Confirmed</span>
-                    </div>
-                    <h1 className="font-['Playfair_Display',serif] text-4xl font-black text-white mb-4 tracking-tighter">
-                         Culinary <span className="italic opacity-40 text-orange-500">Secured</span>
-                    </h1>
-                    <p className="text-slate-500 dark:text-neutral-500 font-medium mb-12">
-                        Terima kasih. Pesanan Anda telah masuk ke dapur kami. Chef sedang meracik hidangan istimewa untuk Anda.
-                    </p>
-                    <Link href="/">
-                        <Button className="w-full h-16 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-widest hover:bg-white hover:scale-[1.02] transition-all shadow-xl shadow-orange-500/10">
-                            Back to Gallery <ArrowRight size={18} className="ml-3" />
-                        </Button>
-                    </Link>
-                </motion.div>
-            </div>
-        );
-    }
+
 
     return (
         <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-sans text-foreground transition-colors duration-500 overflow-hidden relative">
@@ -86,7 +64,7 @@ export default function CheckoutIndex() {
             <div className="pointer-events-none fixed top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-orange-500/5 blur-[140px]" />
             <div className="pointer-events-none fixed bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" />
 
-            <Navbar auth={{ user: null }} dashboardUrl="/dashboard" mobileMenuOpen={false} setMobileMenuOpen={() => {}} />
+            <Navbar auth={auth} dashboardUrl="/dashboard" mobileMenuOpen={false} setMobileMenuOpen={() => {}} />
 
             <main className="pt-32 pb-32 relative z-10">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -127,16 +105,16 @@ export default function CheckoutIndex() {
                                     <div className="space-y-8">
                                         <div className="space-y-3">
                                             <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Full Name</label>
-                                            <Input required placeholder="Masukkan nama Anda" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
+                                            <Input required value={formData.customer_name} onChange={(e) => setFormData({...formData, customer_name: e.target.value})} placeholder="Masukkan nama Anda" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                         </div>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                             <div className="space-y-3">
                                                 <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Email Address</label>
-                                                <Input required type="email" placeholder="contoh@email.com" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
+                                                <Input required value={formData.customer_email} onChange={(e) => setFormData({...formData, customer_email: e.target.value})} type="email" placeholder="contoh@email.com" className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                             </div>
                                             <div className="space-y-3">
                                                 <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">WhatsApp Contact</label>
-                                                <Input required type="tel" placeholder="+62 8..." className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
+                                                <Input required value={formData.customer_phone} onChange={(e) => setFormData({...formData, customer_phone: e.target.value})} type="tel" placeholder="+62 8..." className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-orange-500/20" />
                                             </div>
                                         </div>
                                     </div>
@@ -155,91 +133,42 @@ export default function CheckoutIndex() {
                                     </h2>
                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <label 
-                                            onClick={() => setOrderType('dine-in')}
-                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'dine-in' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
+                                            onClick={() => setOrderType('delivery')}
+                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'delivery' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
                                         >
                                             <input type="radio" name="orderType" className="sr-only" defaultChecked />
                                             <div className="flex items-center justify-between mb-4">
-                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'dine-in' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
-                                                    <Utensils size={24} />
+                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'delivery' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                    <Truck size={24} />
                                                 </div>
-                                                {orderType === 'dine-in' && <CheckCircle2 size={24} className="text-orange-500" />}
+                                                {orderType === 'delivery' && <CheckCircle2 size={24} className="text-orange-500" />}
                                             </div>
-                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'dine-in' ? 'text-orange-500' : 'text-slate-400'}`}>Makan di Tempat</div>
-                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Kami siapkan meja terbaik untuk pengalaman dining yang tactile.</div>
+                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'delivery' ? 'text-orange-500' : 'text-slate-400'}`}>Delivery</div>
+                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Pesanan akan diantarkan langsung ke lokasi Anda.</div>
                                         </label>
 
                                         <label 
-                                            onClick={() => setOrderType('takeaway')}
-                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'takeaway' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
+                                            onClick={() => setOrderType('pickup')}
+                                            className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'pickup' ? 'border-orange-500 bg-orange-500/5 shadow-2xl shadow-orange-500/10' : 'border-slate-200 dark:border-white/10 hover:border-orange-500/30'}`}
                                         >
                                             <input type="radio" name="orderType" className="sr-only" />
                                             <div className="flex items-center justify-between mb-4">
-                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'takeaway' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
-                                                    <ShoppingBag size={24} />
+                                                <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'pickup' ? 'bg-orange-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                    <Store size={24} />
                                                 </div>
-                                                {orderType === 'takeaway' && <CheckCircle2 size={24} className="text-orange-500" />}
+                                                {orderType === 'pickup' && <CheckCircle2 size={24} className="text-orange-500" />}
                                             </div>
-                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'takeaway' ? 'text-orange-500' : 'text-slate-400'}`}>Takeaway Suite</div>
-                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Bawa kemewahan kuliner kami ke mana pun Anda berada.</div>
+                                            <div className={`font-black uppercase tracking-widest text-xs ${orderType === 'pickup' ? 'text-orange-500' : 'text-slate-400'}`}>Ambil Di Tempat</div>
+                                            <div className="text-sm font-medium text-slate-500 dark:text-neutral-500 mt-2">Ambil pesanan Anda langsung dari cabang kami tanpa antri.</div>
                                         </label>
                                     </div>
                                 </motion.div>
 
-                                {/* Payment Method */}
-                                <motion.div 
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.2 }}
-                                    className="p-10 md:p-12 rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 shadow-3xl backdrop-blur-3xl"
-                                >
-                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-10 flex items-center gap-4">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 border border-orange-500/20 font-black text-sm">03</div>
-                                        Secure Payment
-                                    </h2>
-                                    <div className="space-y-4">
-                                        <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-slate-200 dark:border-white/5 p-6 hover:bg-white/5 hover:border-orange-500/30 transition-all group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors">
-                                                    <CreditCard size={20} />
-                                                </div>
-                                                <div className="text-left">
-                                                    <span className="font-black uppercase tracking-widest text-[10px] text-white/20 block mb-0.5">Global Banking</span>
-                                                    <span className="font-bold text-white uppercase tracking-tight">Credit / Debit Card</span>
-                                                </div>
-                                            </div>
-                                            <input type="radio" name="payment" className="h-5 w-5 text-orange-500 border-white/10 bg-white/5 focus:ring-orange-500/20" />
-                                        </label>
-                                         <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-orange-500 bg-orange-500/5 p-6 shadow-2xl shadow-orange-500/10 transition-all group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-xl bg-orange-500 text-black flex items-center justify-center">
-                                                    <div className="font-black text-[10px]">QRIS</div>
-                                                </div>
-                                                <div className="text-left">
-                                                    <span className="font-black uppercase tracking-widest text-[10px] text-orange-500 block mb-0.5">Digital Gateway</span>
-                                                    <span className="font-bold text-white uppercase tracking-tight">E-Wallets / QRIS</span>
-                                                </div>
-                                            </div>
-                                            <input type="radio" name="payment" defaultChecked className="h-5 w-5 text-orange-500 border-orange-500 bg-orange-500 focus:ring-orange-500/20" />
-                                        </label>
-                                        <label className="flex cursor-pointer items-center justify-between rounded-[1.5rem] border border-slate-200 dark:border-white/5 p-6 hover:bg-white/5 hover:border-orange-500/30 transition-all group">
-                                            <div className="flex items-center gap-4">
-                                                <div className="h-12 w-12 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:text-orange-500 transition-colors">
-                                                    <UtensilsCrossed size={20} />
-                                                </div>
-                                                <div className="text-left">
-                                                    <span className="font-black uppercase tracking-widest text-[10px] text-white/20 block mb-0.5">In-Person Lounge</span>
-                                                    <span className="font-bold text-white uppercase tracking-tight">Bayar di Kasir</span>
-                                                </div>
-                                            </div>
-                                            <input type="radio" name="payment" className="h-5 w-5 text-orange-500 border-white/10 bg-white/5 focus:ring-orange-500/20" />
-                                        </label>
-                                    </div>
-                                </motion.div>
+
 
                                 <div className="lg:hidden">
                                     <Button disabled={isSubmitting || items.length === 0} type="submit" className="w-full h-18 rounded-[2rem] bg-orange-500 text-black font-black uppercase tracking-widest shadow-2xl shadow-orange-500/20 hover:bg-white hover:scale-[1.02] transition-all">
-                                        {isSubmitting ? 'Memproses...' : `Finalize & Pay Rp ${cartTotal.toLocaleString('id-ID')}`}
+                                        {isSubmitting ? 'Memproses...' : `Confirm Order Rp ${cartTotal.toLocaleString('id-ID')}`}
                                     </Button>
                                 </div>
                             </form>

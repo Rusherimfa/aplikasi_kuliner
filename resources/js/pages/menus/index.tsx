@@ -1,4 +1,4 @@
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame } from 'lucide-react';
@@ -17,6 +17,8 @@ import {
 } from '@/components/ui/table';
 
 export default function MenuManagement({ menus, filters }: any) {
+    const { auth } = usePage().props as any;
+    const isStaff = auth.user.role === 'staff';
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMenu, setEditingMenu] = useState<any>(null);
@@ -72,6 +74,13 @@ export default function MenuManagement({ menus, filters }: any) {
         }
     };
 
+    const toggleStatus = (menu: any, field: string) => {
+        router.put(`/menus/${menu.id}`, {
+            ...menu,
+            [field]: !menu[field]
+        }, { preserveScroll: true, preserveState: true });
+    };
+
     const handleDelete = (id: number) => {
         if (confirm('Yakin ingin menghapus menu ini?')) {
             destroy(`/menus/${id}`);
@@ -107,13 +116,15 @@ export default function MenuManagement({ menus, filters }: any) {
                                 className="pl-9 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-orange-500"
                             />
                         </form>
-                        <Button 
-                            onClick={openCreateModal}
-                            className="shrink-0 bg-orange-500 hover:bg-orange-600 text-[#0A0A0B] font-semibold"
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Tambah Menu
-                        </Button>
+                        {!isStaff && (
+                            <Button 
+                                onClick={openCreateModal}
+                                className="shrink-0 bg-orange-500 hover:bg-orange-600 text-[#0A0A0B] font-semibold"
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Tambah Menu
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -164,24 +175,41 @@ export default function MenuManagement({ menus, filters }: any) {
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <Button 
-                                                        size="icon" 
-                                                        variant="ghost" 
-                                                        onClick={() => openEditModal(menu)}
-                                                        className="h-8 w-8 text-foreground/60 hover:text-foreground hover:bg-muted"
-                                                    >
-                                                        <Edit2 size={16} />
-                                                    </Button>
-                                                    <Button 
-                                                        size="icon" 
-                                                        variant="ghost" 
-                                                        onClick={() => handleDelete(menu.id)}
-                                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                                    >
-                                                        <Trash2 size={16} />
-                                                    </Button>
-                                                </div>
+                                                {isStaff ? (
+                                                    <div className="flex flex-col items-end gap-1.5">
+                                                        <button 
+                                                            onClick={() => toggleStatus(menu, 'is_available')}
+                                                            className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${menu.is_available ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20' : 'bg-rose-500/10 border-rose-500/30 text-rose-500 hover:bg-rose-500/20'}`}
+                                                        >
+                                                            {menu.is_available ? 'Set Habis' : 'Set Tersedia'}
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => toggleStatus(menu, 'is_best_seller')}
+                                                            className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${menu.is_best_seller ? 'bg-orange-500/10 border-orange-500/30 text-orange-500 hover:bg-orange-500/20' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white/60'}`}
+                                                        >
+                                                            {menu.is_best_seller ? '- Best Seller' : '+ Best Seller'}
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        <Button 
+                                                            size="icon" 
+                                                            variant="ghost" 
+                                                            onClick={() => openEditModal(menu)}
+                                                            className="h-8 w-8 text-foreground/60 hover:text-foreground hover:bg-muted"
+                                                        >
+                                                            <Edit2 size={16} />
+                                                        </Button>
+                                                        <Button 
+                                                            size="icon" 
+                                                            variant="ghost" 
+                                                            onClick={() => handleDelete(menu.id)}
+                                                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}

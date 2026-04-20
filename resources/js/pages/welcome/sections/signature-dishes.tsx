@@ -128,22 +128,21 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 )}
 
                                 {/* Badges */}
-                                <div className="absolute top-6 left-6 rounded-full bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                                <div className="absolute top-6 left-6 rounded-full bg-black/40 backdrop-blur-md border border-white/10 px-5 py-2 text-[10px] font-black text-white uppercase tracking-[0.3em] z-10">
                                     {item.category}
                                 </div>
-
-                                {item.is_best_seller && (
-                                    <div className="absolute top-6 right-6 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-[10px] font-black text-primary-foreground uppercase tracking-widest shadow-xl">
-                                        <Flame size={14} />
-                                        Signature
-                                    </div>
-                                )}
                                 
-                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60 pointer-events-none" />
                             </div>
 
                             {/* Content */}
                             <div className="flex flex-1 flex-col p-6 md:p-8 pt-4">
+                                {!!item.is_best_seller && (
+                                    <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 w-max text-[10px] font-black text-primary uppercase tracking-widest">
+                                        <Flame size={12} />
+                                        Signature
+                                    </div>
+                                )}
                                 <div className="flex flex-col mb-4">
                                     <h3 className="text-2xl font-serif font-light text-foreground mb-1">{item.name}</h3>
                                     <span className="text-sm font-black text-primary tracking-widest">
@@ -154,15 +153,21 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                     {item.description || 'Petualangan rasa yang dikurasi dengan presisi for menciptakan kenangan kuliner yang tak terlupakan.'}
                                 </p>
                                 <div className="mt-auto">
-                                    <Link 
-                                        href={auth.user ? '/dashboard' : login().url}
-                                        className="block"
-                                    >
-                                        <Button className="w-full h-16 rounded-[1.5rem] bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em] shadow-xl transition-all hover:scale-105 active:scale-95 group relative z-10">
-                                            Order Experience
-                                            <ShoppingCart size={14} className="ml-3 transition-transform group-hover:translate-x-1" />
+                                    {item.is_available ? (
+                                        <Link 
+                                            href={auth.user ? '/dashboard' : login().url}
+                                            className="block"
+                                        >
+                                            <Button className="w-full h-16 rounded-[1.5rem] bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em] shadow-xl transition-all hover:scale-105 active:scale-95 group relative z-10 border border-transparent">
+                                                Order Experience
+                                                <ShoppingCart size={14} className="ml-3 transition-transform group-hover:translate-x-1" />
+                                            </Button>
+                                        </Link>
+                                    ) : (
+                                        <Button disabled className="w-full h-16 rounded-[1.5rem] bg-foreground/5 text-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] opacity-80 border border-foreground/10 cursor-not-allowed">
+                                            Sedang Habis
                                         </Button>
-                                    </Link>
+                                    )}
                                 </div>
                             </div>
                         </motion.div>

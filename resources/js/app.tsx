@@ -29,12 +29,14 @@ createInertiaApp({
             case name.startsWith('catalog'):
             case name.startsWith('reservations'):
             case name.startsWith('testimonials'):
+            case name.startsWith('checkout'):
+            case name.startsWith('orders'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):
             case name.startsWith('teams/'):
-                return [AppHeaderLayout, SettingsLayout];
+                return SettingsLayout;
             default:
                 return AppLayout;
         }

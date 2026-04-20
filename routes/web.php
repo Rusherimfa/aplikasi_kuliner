@@ -6,6 +6,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\ReviewController;
@@ -24,8 +25,7 @@ Route::get('/testimonials', [TestimonialController::class, 'index'])->name('test
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
-// Checkout (Public)
-Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
+// Checkout (Public) - Removed, moved to Auth group
 
 // Google Socialite Login
 Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
@@ -39,6 +39,15 @@ Route::middleware(['auth', 'verified'])
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
         Route::put('/reservations/{reservation}/customer', [ReservationController::class, 'updateCustomer'])->name('reservations.update_customer');
         Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
+
+        // Checkout (Authenticated)
+        Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
+        Route::post('/orders/checkout', [OrderController::class, 'store'])->name('orders.checkout');
+        Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
+        Route::get('/orders/payment/{order}', [OrderController::class, 'payment'])->name('orders.payment');
+        Route::post('/orders/payment/{order}', [OrderController::class, 'processPayment'])->name('orders.payment.process');
+        Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+        Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
         // Authenticated Testimonials
         Route::post('/testimonials', [TestimonialController::class, 'store'])->name('testimonials.store');
@@ -86,6 +95,9 @@ Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
         Route::middleware('role:admin,staff')->group(function () {
             Route::get('kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
             Route::patch('kitchen/item/{pivotId}', [KitchenController::class, 'updateItemStatus'])->name('kitchen.item.update');
+            Route::post('kitchen/orders/{order}/accept', [KitchenController::class, 'acceptOrder'])->name('kitchen.orders.accept');
+            Route::post('kitchen/orders/{order}/reject', [KitchenController::class, 'rejectOrder'])->name('kitchen.orders.reject');
+            Route::patch('kitchen/orders/{order}/status', [KitchenController::class, 'updateOrderStatus'])->name('kitchen.orders.update_status');
 
             // Analytics Dashboard
             Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');

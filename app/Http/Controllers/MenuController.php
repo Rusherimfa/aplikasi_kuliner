@@ -40,6 +40,10 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $team = Team::first();
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -60,6 +64,16 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
+        if (auth()->user()->role === 'staff') {
+            $validated = $request->validate([
+                'is_available' => 'boolean',
+                'is_best_seller' => 'boolean',
+            ]);
+            $menu->update($validated);
+
+            return back()->with('success', 'Status menu diperbarui.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -79,6 +93,10 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
         $menu->delete();
 
         return back()->with('success', 'Menu berhasil dihapus.');

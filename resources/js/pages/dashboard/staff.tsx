@@ -57,7 +57,7 @@ export default function StaffDashboard({ stats, todays_schedule, recent_activity
                     ))}
                 </div>
 
-                <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] mb-12">
+                <div className="mb-12">
                     {/* Today's Schedule - Crucial for Staff */}
                     <div className="rounded-[3rem] border border-white/5 bg-white/[0.02] shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-white/5">
                         <div className="p-10 border-b border-white/5 flex justify-between items-center text-left">
@@ -112,39 +112,7 @@ export default function StaffDashboard({ stats, todays_schedule, recent_activity
                         </div>
                     </div>
 
-                    {/* Quick Access / Recent Log */}
-                    <div className="flex flex-col gap-8">
-                        {/* Quick Actions */}
-                        <div className="rounded-[2.5rem] bg-gradient-to-br from-emerald-500 to-emerald-700 p-10 shadow-3xl flex flex-col items-center text-center group transition-all hover:scale-[1.02]">
-                            <div className="h-20 w-20 rounded-[1.75rem] bg-black shadow-2xl flex items-center justify-center mb-8 transform -rotate-6 transition-transform group-hover:rotate-6">
-                                <UserPlus className="text-emerald-500" size={32} />
-                            </div>
-                            <h3 className="text-xl font-black text-white uppercase tracking-tight mb-3 italic font-serif">Tambah Reservasi</h3>
-                            <p className="text-xs text-black/50 font-bold leading-relaxed mb-10 max-w-[200px]">Pelanggan tanpa janji temu? Daftarkan langsung disini.</p>
-                            <Link href="/reservations/create" className="w-full h-14 bg-black text-emerald-500 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all hover:bg-white hover:text-black">
-                                Inisiasi Sekarang
-                            </Link>
-                        </div>
 
-                        {/* Recent activity Feed */}
-                        <div className="rounded-[2.5rem] border border-white/5 bg-white/[0.02] p-8 shadow-3xl ring-1 ring-white/5 flex-1">
-                            <h3 className="text-sm font-black text-white/30 uppercase tracking-[0.3em] mb-8 text-left">Aktivitas Terbaru</h3>
-                            <div className="space-y-6">
-                                {recent_activity.map((act: any) => (
-                                    <div key={act.id} className="flex items-center gap-4 text-left group">
-                                        <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500 text-xs font-black shrink-0 border border-white/10">
-                                            {act.customer_name?.charAt(0)}
-                                        </div>
-                                        <div className="flex-1 overflow-hidden">
-                                            <p className="text-xs font-bold text-white truncate">{act.customer_name}</p>
-                                            <p className="text-[9px] font-bold text-white/20 uppercase tracking-widest mt-0.5">{act.created_at}</p>
-                                        </div>
-                                        <div className="h-2 w-2 rounded-full bg-emerald-500/40" />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 

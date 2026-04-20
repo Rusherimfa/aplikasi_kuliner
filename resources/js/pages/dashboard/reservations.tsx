@@ -202,30 +202,10 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                             Kelola pemesanan masuk dan atur tata letak meja restoran secara visual.
                         </p>
                     </div>
-                    
-                    <div className="flex items-center gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className={`rounded-lg px-4 ${view === 'list' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
-                            onClick={() => setView('list')}
-                        >
-                            <List className="mr-2 h-4 w-4" />
-                            Daftar
-                        </Button>
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className={`rounded-lg px-4 ${view === 'map' ? 'bg-orange-500 text-[#0A0A0B] hover:bg-orange-600 hover:text-[#0A0A0B]' : 'text-white/60 hover:text-white'}`}
-                            onClick={() => setView('map')}
-                        >
-                            <MapIcon className="mr-2 h-4 w-4" />
-                            Peta Meja
-                        </Button>
-                    </div>
                 </div>
 
-                {view === 'list' ? (
+                <div className="w-full">
+                    {/* List Section */}
                     <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl transition-all">
                         {reservations.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -289,65 +269,38 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                     )}
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                     {(reservation.status === 'pending' || reservation.status === 'awaiting_payment' || reservation.status === 'confirmed') && (
-                                                        <div className="flex items-center justify-end gap-2">
-                                                            {/* Courier Assignment Button */}
-                                                            <div className="relative">
+                                                    <div className="flex items-center justify-end gap-2">
+                                                        {(reservation.status === 'pending' || reservation.status === 'awaiting_payment') && (
+                                                            <>
                                                                 <Button
                                                                     size="icon"
                                                                     variant="outline"
-                                                                    className={`h-8 w-8 ${reservation.courier_id ? 'border-blue-500/20 bg-blue-500/10 text-blue-500' : 'border-white/10 text-white/40'} hover:bg-blue-500/20`}
-                                                                    onClick={() => setAssigningId(assigningId === reservation.id ? null : reservation.id)}
+                                                                    className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                                                    onClick={() => updateStatus(reservation.id, 'confirmed')}
                                                                 >
-                                                                    <Truck className="h-4 w-4" />
+                                                                    <Check className="h-4 w-4" />
                                                                 </Button>
-                                                                
-                                                                {assigningId === reservation.id && (
-                                                                    <div className="absolute right-0 top-10 z-50 w-48 rounded-xl border border-white/10 bg-black p-2 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
-                                                                        <p className="px-2 py-1.5 text-[9px] font-black uppercase text-white/30 tracking-widest border-b border-white/5 mb-1">Pilih Kurir</p>
-                                                                        {couriers.map(courier => (
-                                                                            <button
-                                                                                key={courier.id}
-                                                                                onClick={() => assignCourier(reservation.id, courier.id)}
-                                                                                className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-white/80 hover:bg-white/10 hover:text-white transition-colors"
-                                                                            >
-                                                                                {courier.name}
-                                                                            </button>
-                                                                        ))}
-                                                                        {couriers.length === 0 && (
-                                                                            <p className="px-3 py-2 text-[10px] text-white/20 italic">Belum ada kurir tersedia</p>
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                                                                    onClick={() => updateStatus(reservation.id, 'rejected')}
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </Button>
+                                                            </>
+                                                        )}
+                                                        {reservation.status === 'confirmed' && (
                                                             <Button
-                                                                size="icon"
+                                                                size="sm"
                                                                 variant="outline"
-                                                                className={`h-8 w-8 ${activeChatId === reservation.id ? 'bg-orange-500 text-black border-orange-600' : 'border-white/10 text-white/40'} hover:bg-orange-500/20`}
-                                                                onClick={() => setActiveChatId(activeChatId === reservation.id ? null : reservation.id)}
+                                                                className="h-8 px-3 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 text-[10px] font-black uppercase tracking-widest"
+                                                                onClick={() => updateStatus(reservation.id, 'completed')}
                                                             >
-                                                                <MessageCircle className="h-4 w-4" />
+                                                                Reservasi Selesai
                                                             </Button>
-
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                                                                onClick={() => updateStatus(reservation.id, 'confirmed')}
-                                                            >
-                                                                <Check className="h-4 w-4" />
-                                                            </Button>
-                                                            <Button
-                                                                size="icon"
-                                                                variant="outline"
-                                                                className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                                                                onClick={() => updateStatus(reservation.id, 'rejected')}
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                            </Button>
-                                                        </div>
-                                                    )}
+                                                        )}
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -364,76 +317,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                             </div>
                         )}
                     </div>
-                ) : (
-                    <div className="relative h-[600px] w-full bg-[#0A0A0B] rounded-3xl border border-white/10 overflow-hidden shadow-2xl group/map">
-                        {/* Map Background/Grid */}
-                        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-                        
-                        {/* Map Controls Info */}
-                        <div className="absolute top-6 left-6 z-10 bg-black/60 backdrop-blur-md border border-white/10 p-4 rounded-2xl max-w-[200px] shadow-2xl">
-                            <h4 className="text-xs font-black uppercase tracking-widest text-orange-500 flex items-center gap-2 mb-3">
-                                <Info size={14} /> Legend
-                            </h4>
-                            <div className="space-y-2">
-                                <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-white/60">
-                                    <span className="h-3 w-3 rounded-full bg-emerald-500/20 border border-emerald-500/40"></span> Tersedia
-                                </div>
-                                <div className="flex items-center gap-3 text-[10px] uppercase font-bold text-white/60">
-                                    <span className="h-3 w-3 rounded-full bg-orange-500"></span> Dipesan
-                                </div>
-                            </div>
-                            <p className="mt-4 text-[9px] text-white/30 italic leading-relaxed font-medium">
-                                Drag meja untuk mengatur tata letak. Klik Simpan untuk memperbarui database.
-                            </p>
-                        </div>
-
-                        {/* Visual Tables Container */}
-                        <div className="absolute inset-0 p-12">
-                            {tables.map((table) => {
-                                const status = getTableStatus(table.id);
-                                return (
-                                    <motion.div
-                                        key={table.id}
-                                        drag
-                                        dragMomentum={false}
-                                        onDragStart={() => setDraggingTableId(table.id)}
-                                        onDragEnd={(_, info) => {
-                                            // Simulated saving logic (in a real app we'd handle scale/offset)
-                                            // For this demo, we assume the absolute movement is saved
-                                            const newX = table.pos_x + info.offset.x;
-                                            const newY = table.pos_y + info.offset.y;
-                                            updateTablePosition(table.id, newX, newY);
-                                        }}
-                                        initial={false}
-                                        animate={{ x: table.pos_x, y: table.pos_y }}
-                                        className={`absolute cursor-grab active:cursor-grabbing w-24 h-24 rounded-2xl flex flex-col items-center justify-center border-2 shadow-2xl transition-all ${
-                                            status === 'confirmed' || status === 'pending'
-                                                ? 'bg-orange-500 border-orange-600 text-[#0A0A0B]' 
-                                                : 'bg-white/5 border-white/10 hover:border-emerald-500/50 text-white group'
-                                        }`}
-                                        style={{ touchAction: 'none' }}
-                                    >
-                                        <Users size={20} className={status === 'available' ? 'text-white/20 group-hover:text-emerald-500 transition-colors' : 'text-[#0A0A0B]/60'} />
-                                        <span className="text-xs font-black mt-1 uppercase tracking-tighter">{table.name}</span>
-                                        <span className="text-[10px] font-bold opacity-40 uppercase tracking-widest mt-1">{table.capacity}p</span>
-                                        
-                                        {draggingTableId === table.id && (
-                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-orange-500 text-[#0A0A0B] text-[8px] font-bold px-2 py-1 rounded-full whitespace-nowrap">
-                                                DRAGGING...
-                                            </div>
-                                        )}
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
-
-                        {tables.length === 0 && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <p className="text-white/20 font-medium italic">Belum ada meja yang dikonfigurasi.</p>
-                            </div>
-                        )}
-                    </div>
-                )}
+                </div>
 
                 {/* Concierge Hub Sidebar Overlay */}
                 <div className="fixed top-24 right-4 sm:top-32 sm:right-8 z-40 flex flex-col gap-4 w-[calc(100vw-2rem)] sm:w-80 pointer-events-none">

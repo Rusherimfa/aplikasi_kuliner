@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Events\DishStatusUpdated;
+use App\Models\Order;
 use App\Models\Reservation;
+use App\Models\User;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,37 +19,41 @@ class KitchenController extends Controller
      */
     public function index()
     {
-        // Fetch reservations that are confirmed or pending and have menus NOT yet served
-        $activeOrders = Reservation::whereIn('status', ['confirmed', 'pending'])
-            ->whereHas('menus', function ($query) {
-                $query->where('menu_reservation.status', '!=', 'served');
-            })
-            ->with(['menus' => function ($query) {
-                $query->withPivot('id', 'quantity', 'notes', 'status');
-            }, 'restoTable', 'user'])
-            ->orderBy('date', 'asc')
-            ->orderBy('time', 'asc')
+        // 1. Fetch all online orders for today
+        $allOrders = Order::whereDate('created_at', now()->toDateString())
+            ->with(['items.menu', 'courier'])
+            ->latest()
             ->get()
-            ->map(function ($res) {
+            ->map(function ($order) {
                 return [
-                    'id' => $res->id,
-                    'customer_name' => $res->customer_name ?? $res->user?->name ?? 'Guest',
-                    'table' => $res->restoTable?->name ?? '?',
-                    'time' => $res->time,
-                    'items' => $res->menus->map(function ($menu) {
+                    'id' => $order->id,
+                    'type' => 'order',
+                    'order_number' => $order->order_number,
+                    'customer_name' => $order->customer_name,
+                    'order_type' => $order->order_type,
+                    'payment_status' => $order->payment_status,
+                    'order_status' => $order->order_status,
+                    'total_price' => $order->total_price,
+                    'courier' => $order->courier ? $order->courier->name : null,
+                    'time' => $order->created_at->format('H:i'),
+                    'items' => $order->items->map(function ($item) {
                         return [
-                            'pivot_id' => $menu->pivot->id,
-                            'name' => $menu->name,
-                            'quantity' => $menu->pivot->quantity,
-                            'notes' => $menu->pivot->notes,
-                            'status' => $menu->pivot->status,
+                            'id' => $item->id,
+                            'name' => $item->menu->name,
+                            'quantity' => $item->quantity,
+                            'status' => $item->status ?? 'pending',
                         ];
                     }),
                 ];
             });
 
+        $couriers = User::where('role', Role::KURIR->value)->get(['id', 'name']);
+
         return Inertia::render('kitchen/index', [
-            'orders' => $activeOrders,
+            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered'])),
+            'online_completed' => $allOrders->filter(fn ($o) => $o['order_status'] === 'complete'),
+            'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected'])),
+            'couriers' => $couriers,
         ]);
     }
 
@@ -89,5 +96,39 @@ class KitchenController extends Controller
         }
 
         return back()->with('success', 'Item status updated.');
+    }
+
+    /**
+     * Manage Online Order workflow.
+     */
+    public function updateOrderStatus(Request $request, Order $order)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string',
+            'courier_id' => 'nullable|exists:users,id',
+        ]);
+
+        $updateData = ['order_status' => $validated['status']];
+        if (isset($validated['courier_id'])) {
+            $updateData['courier_id'] = $validated['courier_id'];
+        }
+
+        $order->update($updateData);
+
+        return back()->with('success', "Pesanan #{$order->order_number} diperbarui ke ".ucfirst($validated['status']));
+    }
+
+    public function acceptOrder(Order $order)
+    {
+        $order->update(['order_status' => 'waiting_for_payment']);
+
+        return back()->with('success', "Pesanan #{$order->order_number} diterima.");
+    }
+
+    public function rejectOrder(Order $order)
+    {
+        $order->update(['order_status' => 'rejected']);
+
+        return back()->with('success', "Pesanan #{$order->order_number} ditolak.");
     }
 }

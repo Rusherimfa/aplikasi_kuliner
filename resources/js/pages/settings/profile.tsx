@@ -112,6 +112,21 @@ export default function Profile({
                                     <InputError className="mt-1" message={errors.email} />
                                 </div>
 
+                                <div className="grid gap-2">
+                                    <Label htmlFor="phone" className="text-sm font-medium text-muted-foreground">
+                                        Nomor Ponsel (WhatsApp)
+                                    </Label>
+                                    <Input
+                                        id="phone"
+                                        type="tel"
+                                        className="rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20 transition-colors"
+                                        defaultValue={auth.user.phone ?? ''}
+                                        name="phone"
+                                        placeholder="08123456789"
+                                    />
+                                    <InputError className="mt-1" message={errors.phone} />
+                                </div>
+
                                 {mustVerifyEmail && auth.user.email_verified_at === null && (
                                     <div className="rounded-xl border border-orange-500/20 bg-orange-500/5 p-4">
                                         <p className="text-sm text-orange-400/80">

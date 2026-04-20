@@ -127,18 +127,29 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                             </Link>
                                         </DropdownMenuItem>
 
-                                        <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
-                                            <Link href={auth.user.role === 'customer' ? '/reservations/history' : dashboardUrl} className="flex items-center w-full">
-                                                {auth.user.role === 'customer' ? (
-                                                    <History className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
-                                                ) : (
+                                        {auth.user.role === 'customer' ? (
+                                            <>
+                                                <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
+                                                    <Link href="/reservations/history" className="flex items-center w-full">
+                                                        <CalendarPlus className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
+                                                        <span className="text-[11px] font-bold uppercase tracking-widest">Riwayat Reservasi</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
+                                                    <Link href="/orders/history" className="flex items-center w-full">
+                                                        <ShoppingBag className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
+                                                        <span className="text-[11px] font-bold uppercase tracking-widest">Riwayat Pemesanan</span>
+                                                    </Link>
+                                                </DropdownMenuItem>
+                                            </>
+                                        ) : (
+                                            <DropdownMenuItem asChild className="rounded-xl px-3 py-3.5 focus:bg-primary focus:text-primary-foreground group transition-all duration-300">
+                                                <Link href={dashboardUrl} className="flex items-center w-full">
                                                     <LayoutDashboard className="mr-3 h-4 w-4 text-primary group-focus:text-primary-foreground transition-colors" />
-                                                )}
-                                                <span className="text-[11px] font-bold uppercase tracking-widest">
-                                                    {auth.user.role === 'customer' ? 'Riwayat Pesanan' : 'Panel Dashboard'}
-                                                </span>
-                                            </Link>
-                                        </DropdownMenuItem>
+                                                    <span className="text-[11px] font-bold uppercase tracking-widest">Panel Dashboard</span>
+                                                </Link>
+                                            </DropdownMenuItem>
+                                        )}
                                         
                                         <DropdownMenuSeparator className="bg-white/5" />
                                         
@@ -268,6 +279,45 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 </div>
                                 <User size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
                             </Link>
+
+                            {auth.user.role === 'customer' ? (
+                                <>
+                                    <Link 
+                                        href="/reservations/history" 
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="group flex items-center justify-between border-b border-white/5 pb-6"
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="text-4xl font-serif text-foreground">Riwayat Reservasi</span>
+                                            <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">Pesanan meja Anda</span>
+                                        </div>
+                                        <CalendarPlus size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
+                                    </Link>
+                                    <Link 
+                                        href="/orders/history" 
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="group flex items-center justify-between border-b border-white/5 pb-6"
+                                    >
+                                        <div className="flex flex-col">
+                                            <span className="text-4xl font-serif text-foreground">Riwayat Pemesanan</span>
+                                            <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">Pembelian kuliner Anda</span>
+                                        </div>
+                                        <ShoppingBag size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
+                                    </Link>
+                                </>
+                            ) : (
+                                <Link 
+                                    href={dashboardUrl} 
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className="group flex items-center justify-between border-b border-white/5 pb-6"
+                                >
+                                    <div className="flex flex-col">
+                                        <span className="text-4xl font-serif text-foreground">Panel Dashboard</span>
+                                        <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">Manajemen restoran</span>
+                                    </div>
+                                    <LayoutDashboard size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
+                                </Link>
+                            )}
                             <button 
                                 onClick={() => {
                                     setMobileMenuOpen(false);

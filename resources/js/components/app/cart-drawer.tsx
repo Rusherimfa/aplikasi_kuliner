@@ -3,10 +3,11 @@ import { Dialog, Transition } from '@headlessui/react';
 import { X, Minus, Plus, ShoppingBag, ArrowRight, UtensilsCrossed } from 'lucide-react';
 import { useCart } from '@/hooks/use-cart';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 
 export default function CartDrawer() {
     const { isCartOpen, setCartOpen, items, removeItem, updateQuantity, cartTotal } = useCart();
+    const { auth } = usePage().props as any;
 
     return (
         <Transition.Root show={isCartOpen} as={Fragment}>
@@ -121,11 +122,19 @@ export default function CartDrawer() {
                                                     <p>Total Pesanan</p>
                                                     <p className="text-orange-600">Rp {cartTotal.toLocaleString('id-ID')}</p>
                                                 </div>
-                                                <Link href="/checkout" onClick={() => setCartOpen(false)}>
-                                                    <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
-                                                        Lanjut ke Pembayaran <ArrowRight className="ml-2" size={20} />
-                                                    </Button>
-                                                </Link>
+                                                {auth?.user ? (
+                                                    <Link href="/checkout" onClick={() => setCartOpen(false)}>
+                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
+                                                            Lanjutkan Pemesanan <ArrowRight className="ml-2" size={20} />
+                                                        </Button>
+                                                    </Link>
+                                                ) : (
+                                                    <a href="/checkout" onClick={() => setCartOpen(false)} className="block">
+                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
+                                                            Lanjutkan Pemesanan <ArrowRight className="ml-2" size={20} />
+                                                        </Button>
+                                                    </a>
+                                                )}
                                                 <div className="mt-4 flex justify-center text-center text-sm text-muted-foreground">
                                                     <p>
                                                         atau{' '}

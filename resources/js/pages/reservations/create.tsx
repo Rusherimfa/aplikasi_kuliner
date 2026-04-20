@@ -19,7 +19,7 @@ export default function CreateReservation() {
     const { data, setData, post, processing, errors } = useForm({
         customer_name: auth.user ? auth.user.name : '',
         customer_email: auth.user ? auth.user.email : '',
-        customer_phone: '',
+        customer_phone: auth.user && auth.user.phone ? auth.user.phone : '',
         date: '',
         time: '',
         guest_count: 2,

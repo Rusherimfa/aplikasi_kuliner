@@ -9,14 +9,14 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
 
     const navItems = [
         { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
-        { title: 'Manajemen Menu', href: '/menus', icon: BookOpen, roles: ['admin'] },
+        { title: 'Katalog Menu', href: '/menus', icon: BookOpen, roles: ['admin', 'staff'] },
         { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar, roles: ['admin', 'staff'] },
         { title: 'Kitchen View', href: '/kitchen', icon: ChefHat, roles: ['admin', 'staff'] },
         { title: 'Service Hub', href: '/service-requests', icon: Bell, roles: ['admin', 'staff'] },
     ].filter(item => !item.roles || item.roles.includes(auth.user.role));
 
     return (
-        <div className="flex h-screen w-full bg-[#0A0A0B] text-foreground font-sans selection:bg-orange-500/30 selection:text-orange-200 overflow-hidden">
+        <div className="flex min-h-screen w-full bg-[#0A0A0B] text-foreground font-sans selection:bg-orange-500/30 selection:text-orange-200">
             {/* Ambient Background Glows */}
             <div className="fixed -top-24 -left-24 h-96 w-96 rounded-full bg-orange-600/5 blur-[120px] pointer-events-none" />
             <div className="fixed -bottom-24 -right-24 h-96 w-96 rounded-full bg-orange-800/5 blur-[120px] pointer-events-none" />
@@ -92,9 +92,9 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex flex-1 flex-col pl-72 relative z-10">
+            <main className="flex flex-1 flex-col pl-72 relative z-10 w-full min-h-screen">
                 {/* Top Header */}
-                <header className="sticky top-0 z-40 flex h-24 items-center justify-end border-b border-white/5 bg-black/20 px-10 backdrop-blur-3xl">
+                <header className="sticky top-0 z-40 flex h-24 items-center justify-end border-b border-white/5 bg-[#0A0A0B]/80 px-10 backdrop-blur-3xl">
                     <div className="flex items-center gap-5">
                         <button className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-white/[0.03] border border-white/5 text-white/40 transition-all hover:bg-white/[0.08] hover:text-white hover:scale-105 active:scale-95 group shadow-lg shadow-black/20">
                             <Bell size={18} strokeWidth={1.5} />
@@ -116,7 +116,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                 </header>
 
                 {/* Page Content */}
-                <div className="flex-1 overflow-y-auto px-10 py-10 scrollbar-hide">
+                <div className="px-10 py-10 w-full relative z-20">
                     {children}
                 </div >
             </main>

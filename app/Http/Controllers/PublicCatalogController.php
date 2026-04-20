@@ -20,15 +20,13 @@ class PublicCatalogController extends Controller
     {
         $defaultTeam = Team::first();
 
-        // 4 Menus for the landing page (random or latest) cached for 1 hour to reduce DB hits
-        $bestSellers = Cache::remember('welcome_best_sellers', 3600, function () use ($defaultTeam) {
-            return $defaultTeam ? $defaultTeam->menus()
-                ->where('is_available', true)
-                ->orderBy('is_best_seller', 'desc')
-                ->inRandomOrder()
-                ->take(4)
-                ->get()->toArray() : [];
-        });
+        // 4 Menus for the landing page
+        $bestSellers = $defaultTeam ? $defaultTeam->menus()
+            ->where('is_available', true)
+            ->orderBy('is_best_seller', 'desc')
+            ->inRandomOrder()
+            ->take(4)
+            ->get()->toArray() : [];
 
         // 3 Real Reviews - now filtered by is_approved
         $reviews = Cache::remember('welcome_reviews', 3600, function () {
@@ -64,19 +62,20 @@ class PublicCatalogController extends Controller
     {
         $defaultTeam = Team::first();
 
-        $cacheKey = 'catalog_menus_'.md5(json_encode($request->only(['search', 'category'])));
-
-        $menus = Cache::remember($cacheKey, 3600, function () use ($defaultTeam, $request) {
-            return $defaultTeam ? $defaultTeam->menus()
-                ->where('is_available', true)
-                ->when($request->query('category'), function ($query, $category) {
+        $menus = $defaultTeam ? $defaultTeam->menus()
+            ->when($request->query('category'), function ($query, $category) {
+                if ($category === 'Best Seller') {
+                    $query->where('is_best_seller', true);
+                } else {
                     $query->where('category', $category);
-                })
-                ->when($request->query('search'), function ($query, $search) {
-                    $query->where('name', 'like', "%{$search}%");
-                })
-                ->get()->toArray() : [];
-        });
+                }
+            })
+            ->when($request->query('search'), function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('is_best_seller', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get()->toArray() : [];
 
         return Inertia::render('catalog/index', [
             'menus' => $menus,
