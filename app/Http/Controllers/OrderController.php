@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CourierLocationUpdated;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -129,5 +130,34 @@ class OrderController extends Controller
         ]);
 
         return redirect()->route('orders.history')->with('success', 'Pesanan berhasil dibatalkan.');
+    }
+
+    public function updateDeliveryStatus(Request $request, Order $order)
+    {
+        if ($order->courier_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'delivery_status' => 'required|in:delivering,delivered',
+        ]);
+
+        $order->update([
+            'order_status' => $request->delivery_status,
+        ]);
+
+        return back()->with('success', 'Status pengiriman berhasil diupdate.');
+    }
+
+    public function simulateTracking(Order $order)
+    {
+        $startLat = -6.2088;
+        $startLng = 106.8456;
+        $endLat = -6.2188;
+        $endLng = 106.8556;
+
+        broadcast(new CourierLocationUpdated($order->id, $startLat, $startLng));
+
+        return response()->json(['message' => 'Simulation started']);
     }
 }

@@ -29,26 +29,13 @@ export default function AIChatbot() {
     }, [messages, isTyping]);
 
     const suggestions = [
-        'Ulasan & Rekomendasi Menu',
+        'Menu Best Seller',
+        'Daftar Harga Menu',
         'Cara Reservasi Meja',
         'Jam Buka Restoran',
     ];
 
-    const generateResponse = (prompt: string) => {
-        const p = prompt.toLowerCase();
-        if (p.includes('menu') || p.includes('rekomendasi')) {
-            return 'Menu paling populer kami adalah *Wagyu A5 Striploin* dan *Truffle Lobster Risotto*. Kami sangat merekomendasikannya untuk makan malam Anda!';
-        }
-        if (p.includes('reservasi') || p.includes('pesan meja') || p.includes('rombongan')) {
-            return 'Anda dapat melakukan reservasi langsung melalui menu "Reservasi" di navigasi atas. Untuk rombongan lebih dari 20 orang, mohon hubungi kami H-3 via WhatsApp: (021) 555-0123.';
-        }
-        if (p.includes('jam') || p.includes('buka')) {
-            return 'RestoWeb buka setiap hari. Makan siang (11:00 - 15:00) dan Makan Malam (18:00 - 23:00).';
-        }
-        return 'Maaf, untuk saat ini AI saya masih dalam tahap simulasi dan hanya dapat merespon seputar Menu, Reservasi, dan Jam Operasional. Silakan hubungi staf kami untuk bantuan lebih lanjut!';
-    };
-
-    const handleSend = (text: string) => {
+    const handleSend = async (text: string) => {
         if (!text.trim()) return;
 
         // User message
@@ -62,16 +49,47 @@ export default function AIChatbot() {
         setInputText('');
         setIsTyping(true);
 
-        // Simulate network/bot delay
-        setTimeout(() => {
+        try {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            const response = await fetch('/chatbot/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token || ''
+                },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await response.json();
+            
             const botResponse: ChatMessage = {
                 id: (Date.now() + 1).toString(),
-                text: generateResponse(text),
+                text: data.reply || 'Maaf, sistem bot sedang mengalami gangguan.',
                 isBot: true,
             };
             setMessages((prev) => [...prev, botResponse]);
+        } catch (error) {
+            const errorMsg: ChatMessage = {
+                id: (Date.now() + 1).toString(),
+                text: 'Koneksi terputus. Gagal menyambung ke server.',
+                isBot: true,
+            };
+            setMessages((prev) => [...prev, errorMsg]);
+        } finally {
             setIsTyping(false);
-        }, 1000);
+        }
+    };
+
+    const formatMessage = (text: string) => {
+        return text.split('\n').map((line, i) => {
+            let formattedLine = line.replace(/\*([^*]+)\*/g, '<strong class="font-black text-orange-400">$1</strong>');
+            formattedLine = formattedLine.replace(/_([^_]+)_/g, '<em class="text-white/70">$1</em>');
+            return (
+                <span key={i}>
+                    <span dangerouslySetInnerHTML={{ __html: formattedLine }} />
+                    {i !== text.split('\n').length - 1 && <br />}
+                </span>
+            );
+        });
     };
 
     return (
@@ -88,7 +106,7 @@ export default function AIChatbot() {
                                 <h3 className="font-['Playfair_Display',serif] font-bold text-white text-lg leading-none">
                                     RestoBot <span className="text-orange-500 rounded px-1.5 py-0.5 bg-orange-500/10 text-[10px] ml-1 font-sans align-middle">AI</span>
                                 </h3>
-                                <p className="text-xs text-white/50 mt-1">Asisten Daring (Simulasi)</p>
+                                <p className="text-xs text-white/50 mt-1">Asisten Daring RestoWeb</p>
                             </div>
                         </div>
                         <button
@@ -100,33 +118,35 @@ export default function AIChatbot() {
                     </div>
 
                     {/* Chat Body */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        {messages.map((msg) => (
-                            <div
-                                key={msg.id}
-                                className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
-                            >
+                    <div className="relative flex-1 w-full bg-[#0A0A0B]/50">
+                        <div className="absolute inset-0 overflow-y-auto p-4 space-y-4 scroll-smooth overscroll-contain scrollbar-thin scrollbar-thumb-orange-500/50 scrollbar-track-transparent">
+                            {messages.map((msg) => (
                                 <div
-                                    className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
-                                        msg.isBot
-                                            ? 'bg-white/10 text-white rounded-tl-sm'
-                                            : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-900/20 rounded-tr-sm'
-                                    }`}
+                                    key={msg.id}
+                                    className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}
                                 >
-                                    {msg.text}
+                                    <div
+                                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                                            msg.isBot
+                                                ? 'bg-white/10 text-white rounded-tl-sm'
+                                                : 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-md shadow-orange-900/20 rounded-tr-sm'
+                                        }`}
+                                    >
+                                        {formatMessage(msg.text)}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                        {isTyping && (
-                            <div className="flex justify-start">
-                                <div className="bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-white/5">
-                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                            ))}
+                            {isTyping && (
+                                <div className="flex justify-start">
+                                    <div className="bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5 border border-white/5">
+                                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
                     </div>
 
                     {/* Suggestions */}

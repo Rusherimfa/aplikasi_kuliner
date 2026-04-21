@@ -1,5 +1,5 @@
-import { Head, router, usePage, useHttp } from '@inertiajs/react';
-import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck } from 'lucide-react';
+import { Head, router, usePage, useHttp, Link } from '@inertiajs/react';
+import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck, CheckCircle2, DollarSign } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,6 +10,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +37,10 @@ interface Reservation {
     status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment';
     payment_status?: string;
     booking_fee?: string | number;
+    total_after_discount?: string | number;
+    discount_amount?: string | number;
+    type?: string;
+    menus?: any[];
     menus_count?: number;
     special_requests: string | null;
     table_id: number | null;
@@ -75,6 +87,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     const [draggingTableId, setDraggingTableId] = useState<number | null>(null);
     const [assigningId, setAssigningId] = useState<number | null>(null);
     const [activeChatId, setActiveChatId] = useState<number | null>(null);
+    const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [activeRequests, setActiveRequests] = useState<ServiceRequest[]>(serviceRequests);
     const { auth } = usePage().props as any;
     const http = useHttp();
@@ -216,7 +229,9 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                             <TableHead className="font-semibold text-white/70">Tanggal & Waktu</TableHead>
                                             <TableHead className="font-semibold text-white/70">Meja & Tamu</TableHead>
                                             <TableHead className="font-semibold text-white/70">Status</TableHead>
-                                            <TableHead className="text-right font-semibold text-white/70">Aksi</TableHead>
+                                            <TableHead className="text-right font-black tracking-widest uppercase text-[10px] text-white/50 w-[150px]">
+                                                Aksi
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -270,35 +285,62 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                 </TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        {(reservation.status === 'pending' || reservation.status === 'awaiting_payment') && (
+                                                        <Button
+                                                            size="icon"
+                                                            variant="outline"
+                                                            className="h-8 w-8 border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+                                                            onClick={() => setSelectedReservation(reservation)}
+                                                            title="Lihat Detail"
+                                                        >
+                                                            <Info className="h-4 w-4" />
+                                                        </Button>
+                                                        {auth.user?.role !== 'admin' && (
                                                             <>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                                                                    onClick={() => updateStatus(reservation.id, 'confirmed')}
-                                                                >
-                                                                    <Check className="h-4 w-4" />
-                                                                </Button>
-                                                                <Button
-                                                                    size="icon"
-                                                                    variant="outline"
-                                                                    className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                                                                    onClick={() => updateStatus(reservation.id, 'rejected')}
-                                                                >
-                                                                    <X className="h-4 w-4" />
-                                                                </Button>
+                                                                {reservation.status === 'pending' && (
+                                                                    <>
+                                                                        <Button
+                                                                            size="icon"
+                                                                            variant="outline"
+                                                                            className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                                                            onClick={() => updateStatus(reservation.id, 'awaiting_payment')}
+                                                                            title="Terima & Menunggu Pembayaran"
+                                                                        >
+                                                                            <CheckCircle2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="icon"
+                                                                            variant="outline"
+                                                                            className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                                                                            onClick={() => updateStatus(reservation.id, 'rejected')}
+                                                                            title="Tolak Reservasi"
+                                                                        >
+                                                                            <X className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                                {reservation.status === 'awaiting_payment' && (
+                                                                    <Button
+                                                                        size="icon"
+                                                                        variant="outline"
+                                                                        className="h-8 w-8 border-orange-500/20 bg-orange-500/10 text-orange-500 hover:bg-orange-500/20"
+                                                                        onClick={() => updateStatus(reservation.id, 'confirmed')}
+                                                                        title="Tandai Sudah Bayar (Confirmed)"
+                                                                    >
+                                                                        <DollarSign className="h-4 w-4" />
+                                                                    </Button>
+                                                                )}
+                                                                {reservation.status === 'confirmed' && (
+                                                                    <Button
+                                                                        size="icon"
+                                                                        variant="outline"
+                                                                        className="h-8 w-8 border-blue-500/20 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
+                                                                        onClick={() => updateStatus(reservation.id, 'completed')}
+                                                                        title="Tandai Selesai"
+                                                                    >
+                                                                        <CheckCircle2 className="h-4 w-4" />
+                                                                    </Button>
+                                                                )}
                                                             </>
-                                                        )}
-                                                        {reservation.status === 'confirmed' && (
-                                                            <Button
-                                                                size="sm"
-                                                                variant="outline"
-                                                                className="h-8 px-3 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 text-[10px] font-black uppercase tracking-widest"
-                                                                onClick={() => updateStatus(reservation.id, 'completed')}
-                                                            >
-                                                                Reservasi Selesai
-                                                            </Button>
                                                         )}
                                                     </div>
                                                 </TableCell>
@@ -363,22 +405,24 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2 pt-2">
-                                        {request.status === 'pending' && (
+                                    {auth.user?.role !== 'admin' && (
+                                        <div className="flex gap-2 pt-2">
+                                            {request.status === 'pending' && (
+                                                <Button 
+                                                    onClick={() => updateRequestStatus(request.id, 'ongoing')}
+                                                    className="flex-1 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest border border-white/5"
+                                                >
+                                                    Layani
+                                                </Button>
+                                            )}
                                             <Button 
-                                                onClick={() => updateRequestStatus(request.id, 'ongoing')}
-                                                className="flex-1 h-9 rounded-xl bg-white/5 hover:bg-white/10 text-[9px] font-black uppercase tracking-widest border border-white/5"
+                                                onClick={() => updateRequestStatus(request.id, 'resolved')}
+                                                className="flex-1 h-9 rounded-xl bg-orange-500 text-black hover:bg-white text-[9px] font-black uppercase tracking-widest shadow-lg"
                                             >
-                                                Layani
+                                                Selesai
                                             </Button>
-                                        )}
-                                        <Button 
-                                            onClick={() => updateRequestStatus(request.id, 'resolved')}
-                                            className="flex-1 h-9 rounded-xl bg-orange-500 text-black hover:bg-white text-[9px] font-black uppercase tracking-widest shadow-lg"
-                                        >
-                                            Selesai
-                                        </Button>
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         ))}
@@ -395,6 +439,116 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                 {activeChatId && (
                     <BoutiqueChat reservationId={activeChatId} currentUser={auth.user} />
                 )}
+
+                {/* Detail Dialog */}
+                <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && setSelectedReservation(null)}>
+                    <DialogContent className="sm:max-w-xl bg-[#0A0A0B] border-white/5 text-white p-0 overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+                            <DialogHeader>
+                                <DialogTitle className="font-['Playfair_Display',serif] text-2xl font-bold">
+                                    Detail Reservasi #{selectedReservation?.id.toString().padStart(4, '0')}
+                                </DialogTitle>
+                                <DialogDescription className="text-white/40">
+                                    Info lengkap tamu, pesanan pre-order, dan tagihan.
+                                </DialogDescription>
+                            </DialogHeader>
+                        </div>
+                        
+                        {selectedReservation && (
+                            <div className="p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
+                                {/* Customer Info */}
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-orange-500">Informasi Tamu</h4>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Nama</p>
+                                            <p className="text-sm font-semibold">{selectedReservation.customer_name}</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Kontak</p>
+                                            <p className="text-sm font-semibold">{selectedReservation.customer_phone}</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Jadwal</p>
+                                            <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString('id-ID')} - {selectedReservation.time.substring(0,5)} WIB</p>
+                                        </div>
+                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
+                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">Alokasi Meja</p>
+                                            <p className="text-sm font-semibold">Meja {selectedReservation.table_id || '?'} ({selectedReservation.guest_count} Tamu)</p>
+                                        </div>
+                                    </div>
+                                    {selectedReservation.special_requests && (
+                                        <div className="bg-orange-500/5 rounded-xl p-3 border border-orange-500/10">
+                                            <p className="text-[10px] text-orange-400 uppercase font-bold tracking-wider mb-1">Catatan Spesial</p>
+                                            <p className="text-sm font-medium text-white/80">{selectedReservation.special_requests}</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Pre-order Menu */}
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Pre-order Menu</h4>
+                                    <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden">
+                                        {selectedReservation.menus && selectedReservation.menus.length > 0 ? (
+                                            <div className="divide-y divide-white/5">
+                                                {selectedReservation.menus.map((m: any) => (
+                                                    <div key={m.id} className="p-4 flex items-center justify-between">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-10 w-10 rounded-lg bg-white/10 flex-shrink-0 overflow-hidden">
+                                                                <img src={`/storage/${m.image_url}`} alt={m.name} className="h-full w-full object-cover" />
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-white/90">{m.name}</p>
+                                                                <p className="text-xs text-white/40">{m.pivot.quantity}x @ Rp {Number(m.price).toLocaleString('id-ID')}</p>
+                                                            </div>
+                                                        </div>
+                                                        <p className="text-sm font-bold text-emerald-400">
+                                                            Rp {(m.price * m.pivot.quantity).toLocaleString('id-ID')}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="p-8 text-center">
+                                                <p className="text-xs font-bold text-white/40 uppercase tracking-widest">Tidak ada pre-order makanan</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Payment Details */}
+                                <div className="space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-500">Ringkasan Tagihan (DP)</h4>
+                                    <div className="bg-white/5 rounded-2xl border border-white/5 p-4 space-y-3">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-white/60">Estimasi Total DP (50%)</span>
+                                            <span className="font-bold">Rp {Number(selectedReservation.booking_fee).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-white/60">Diskon Loyalty Points</span>
+                                            <span className="font-bold text-rose-400">- Rp {Number(selectedReservation.discount_amount || 0).toLocaleString('id-ID')}</span>
+                                        </div>
+                                        <div className="pt-3 border-t border-white/10 flex justify-between items-center">
+                                            <span className="font-bold text-white/90">Total Harus Dibayar</span>
+                                            <span className="text-xl font-black text-blue-400">Rp {Number(selectedReservation.total_after_discount || selectedReservation.booking_fee).toLocaleString('id-ID')}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Status Reservasi:</span>
+                                            <StatusBadge status={selectedReservation.status} />
+                                        </div>
+                                        {selectedReservation.status !== 'rejected' && selectedReservation.status !== 'cancelled' && (
+                                            <Badge variant={selectedReservation.payment_status === 'paid' ? 'default' : 'destructive'} className={selectedReservation.payment_status === 'paid' ? 'bg-emerald-500/20 text-emerald-500 border-0' : 'bg-rose-500/20 text-rose-500 border-0'}>
+                                                {selectedReservation.payment_status?.toUpperCase()}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

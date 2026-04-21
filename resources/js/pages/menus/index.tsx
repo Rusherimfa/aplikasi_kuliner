@@ -138,6 +138,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         <TableHead className="font-semibold text-foreground/70">Kategori</TableHead>
                                         <TableHead className="font-semibold text-foreground/70">Harga</TableHead>
                                         <TableHead className="font-semibold text-foreground/70">Wujud</TableHead>
+                                        <TableHead className="font-semibold text-foreground/70 text-center">Terjual</TableHead>
                                         <TableHead className="text-right font-semibold text-foreground/70">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -173,6 +174,9 @@ export default function MenuManagement({ menus, filters }: any) {
                                                         <EyeOff size={14} className="mr-1" /> Habis (Hidden)
                                                     </span>
                                                 )}
+                                            </TableCell>
+                                            <TableCell className="text-center font-black text-orange-500 bg-orange-500/5 sm:bg-transparent sm:border-l sm:border-r border-border min-w-[100px]">
+                                                {menu.total_sold || 0} porsi
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {isStaff ? (

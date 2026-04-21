@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ChefHat, LayoutGrid, BookOpen, Calendar, Bell, LogOut, ChevronRight } from 'lucide-react';
+import { ChefHat, LayoutGrid, BookOpen, Calendar, Bell, LogOut, ChevronRight, Users } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { Button } from '@/components/ui/button';
 
@@ -12,7 +12,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
         { title: 'Katalog Menu', href: '/menus', icon: BookOpen, roles: ['admin', 'staff'] },
         { title: 'Meja & Reservasi', href: '/reservations', icon: Calendar, roles: ['admin', 'staff'] },
         { title: 'Kitchen View', href: '/kitchen', icon: ChefHat, roles: ['admin', 'staff'] },
-        { title: 'Service Hub', href: '/service-requests', icon: Bell, roles: ['admin', 'staff'] },
+        { title: 'Manajemen Akun', href: '/accounts', icon: Users, roles: ['admin'] },
     ].filter(item => !item.roles || item.roles.includes(auth.user.role));
 
     return (

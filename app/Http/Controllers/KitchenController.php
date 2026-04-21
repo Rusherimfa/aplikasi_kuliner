@@ -19,9 +19,8 @@ class KitchenController extends Controller
      */
     public function index()
     {
-        // 1. Fetch all online orders for today
-        $allOrders = Order::whereDate('created_at', now()->toDateString())
-            ->with(['items.menu', 'courier'])
+        // 1. Fetch ALL online orders
+        $allOrders = Order::with(['items.menu', 'courier'])
             ->latest()
             ->get()
             ->map(function ($order) {
@@ -50,9 +49,9 @@ class KitchenController extends Controller
         $couriers = User::where('role', Role::KURIR->value)->get(['id', 'name']);
 
         return Inertia::render('kitchen/index', [
-            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered'])),
-            'online_completed' => $allOrders->filter(fn ($o) => $o['order_status'] === 'complete'),
-            'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected'])),
+            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered']))->values(),
+            'online_completed' => $allOrders->filter(fn ($o) => $o['order_status'] === 'complete')->values(),
+            'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected']))->values(),
             'couriers' => $couriers,
         ]);
     }

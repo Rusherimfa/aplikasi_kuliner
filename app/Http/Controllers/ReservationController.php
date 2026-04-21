@@ -41,6 +41,10 @@ class ReservationController extends Controller
                     'status' => $reservation->status,
                     'payment_status' => $reservation->payment_status,
                     'booking_fee' => $reservation->booking_fee,
+                    'total_after_discount' => $reservation->total_after_discount,
+                    'discount_amount' => $reservation->discount_amount,
+                    'type' => $reservation->type,
+                    'menus' => $reservation->menus,
                     'menus_count' => $reservation->menus ? $reservation->menus->count() : 0,
                     'special_requests' => $reservation->special_requests,
                     'table_id' => $reservation->resto_table_id,
@@ -125,6 +129,7 @@ class ReservationController extends Controller
     public function create(Request $request)
     {
         $tables = RestoTable::where('is_active', true)->get();
+        $availableMenus = Menu::where('is_available', true)->get();
 
         $bookedTableIds = [];
         if ($request->has('date') && $request->has('time')) {
@@ -138,6 +143,7 @@ class ReservationController extends Controller
 
         return Inertia::render('reservations/create', [
             'tables' => $tables,
+            'availableMenus' => $availableMenus,
             'bookedTableIds' => array_values($bookedTableIds),
             'queries' => $request->only(['date', 'time']), // Pass back to remember
         ]);
@@ -227,7 +233,7 @@ class ReservationController extends Controller
             'resto_table_id' => $validated['type'] === 'dine_in' ? $validated['resto_table_id'] : null,
             'type' => $validated['type'],
             'delivery_address' => $validated['type'] === 'delivery' ? $validated['delivery_address'] : null,
-            'status' => 'awaiting_payment',
+            'status' => 'pending',
             'booking_fee' => $dpAmount,
             'points_used' => $pointsUsed,
             'discount_amount' => $discountAmount,
@@ -240,7 +246,7 @@ class ReservationController extends Controller
             $reservation->menus()->sync($syncData);
         }
 
-        return redirect()->route('reservations.payment', $reservation->id);
+        return redirect()->route('reservations.history')->with('success', 'Reservasi berhasil diajukan. Kami akan segera mengonfirmasi ketersediaan kursi dan menu Anda.');
     }
 
     /**
@@ -274,7 +280,7 @@ class ReservationController extends Controller
 
         $reservation->update([
             'payment_status' => 'paid',
-            'status' => 'pending',
+            'status' => 'confirmed',
         ]);
 
         if ($reservation->points_used > 0 && $user = $reservation->user) {
@@ -336,7 +342,7 @@ class ReservationController extends Controller
     public function update(Request $request, Reservation $reservation)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,confirmed,rejected,completed',
+            'status' => 'required|in:pending,awaiting_payment,confirmed,rejected,completed',
         ]);
 
         $reservation->update(['status' => $validated['status']]);

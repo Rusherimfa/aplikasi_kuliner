@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import kitchen from '@/routes/kitchen';
 
 export default function KitchenIndex({ online_active = [], online_completed = [], online_cancelled = [], couriers = [] }: any) {
+    const { auth } = usePage().props as any;
     const [loadingId, setLoadingId] = useState<string | number | null>(null);
     const [selectedCourier, setSelectedCourier] = useState<Record<number, string>>({});
 
@@ -85,10 +86,13 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                 </div>
                 <h3 className="text-xl font-black text-white tracking-tight leading-none">{order.customer_name}</h3>
                 
-                <div className="mt-4 flex items-center gap-2">
+                <div className="mt-4 flex items-center justify-between">
                     <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-500' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/40')}`}>
                         {order.order_status.replace(/_/g, ' ')}
                     </Badge>
+                    <div className="text-[10px] font-black text-white/60">
+                        Rp {Number(order.total_price).toLocaleString('id-ID')}
+                    </div>
                 </div>
             </div>
 
@@ -105,8 +109,8 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                 </ul>
             </div>
 
-            {/* Workflow Actions (Only for Active) */}
-            {statusType === 'active' && (
+            {/* Workflow Actions (Only for Active and not admin) */}
+            {statusType === 'active' && auth?.user?.role !== 'admin' && (
                 <div className="p-6 pt-0 mt-auto border-t border-white/5 bg-white/[0.01]">
                     <div className="pt-6">
                         {order.order_status === 'pending' && (
@@ -236,49 +240,55 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                 </div>
 
                 {/* MULTIPLE HISTORY SECTIONS */}
-                <div className="grid md:grid-cols-2 gap-12">
+                <div className="space-y-12">
+                    <div className="border-b border-white/5 pb-6">
+                        <h2 className="font-['Playfair_Display',serif] text-2xl font-bold tracking-tight text-white/95">
+                            Order History
+                        </h2>
+                    </div>
+
                     {/* Section: COMPLETED */}
                     <div>
                         <div className="mb-8 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="h-1 w-6 rounded-full bg-emerald-500"></div>
-                                <h2 className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500/60">Service History (Completed)</h2>
+                                <div className="h-1.5 w-8 rounded-full bg-emerald-500"></div>
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500/80">Service History (Completed)</h2>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {online_completed.length > 0 ? (
-                                online_completed.map((order: any) => (
+                        {online_completed.length > 0 ? (
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {online_completed.map((order: any) => (
                                     <OrderCard key={order.id} order={order} statusType="history" />
-                                ))
-                            ) : (
-                                <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
-                                    <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">History is Empty</p>
-                                </div>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
+                                <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">History is Empty</p>
+                            </div>
+                        )}
                     </div>
 
                     {/* Section: CANCELLED / REJECTED */}
                     <div>
                         <div className="mb-8 flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className="h-1 w-6 rounded-full bg-rose-500"></div>
-                                <h2 className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-500/60">Cancelled & Rejected</h2>
+                                <div className="h-1.5 w-8 rounded-full bg-rose-500"></div>
+                                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500/80">Cancelled & Rejected</h2>
                             </div>
                         </div>
 
-                        <div className="space-y-4">
-                            {online_cancelled.length > 0 ? (
-                                online_cancelled.map((order: any) => (
+                        {online_cancelled.length > 0 ? (
+                            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                {online_cancelled.map((order: any) => (
                                     <OrderCard key={order.id} order={order} statusType="cancelled" />
-                                ))
-                            ) : (
-                                <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
-                                    <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">No Cancelled Orders</p>
-                                </div>
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
+                                <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">No Cancelled Orders</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

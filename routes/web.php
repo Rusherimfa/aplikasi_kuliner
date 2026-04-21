@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\OTPController;
 use App\Http\Controllers\ChatController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\TestimonialController;
+use App\Http\Controllers\BotController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
@@ -27,12 +29,19 @@ Route::post('/reservations', [ReservationController::class, 'store'])->name('res
 
 // Checkout (Public) - Removed, moved to Auth group
 
+// Chatbot API (Public)
+Route::post('/chatbot/ask', [BotController::class, 'ask'])->name('chatbot.ask');
+
 // Google Socialite Login
 Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
 Route::middleware(['auth', 'verified'])
     ->group(function () {
+        Route::get('/reservations/auth-intent', function () {
+            return redirect()->route('reservations.create');
+        })->name('reservations.auth-intent');
+
         Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
         Route::get('/reservations/payment/{reservation}', [ReservationController::class, 'payment'])->name('reservations.payment');
         Route::post('/reservations/payment/{reservation}', [ReservationController::class, 'processPayment'])->name('reservations.payment.process');
@@ -61,6 +70,7 @@ Route::middleware(['auth', 'verified'])
 
         // Simulation Route for Mapping Tracking
         Route::post('/reservations/{reservation}/simulate-tracking', [ReservationController::class, 'simulateTracking'])->name('reservations.simulate_tracking');
+        Route::post('/orders/{order}/simulate-tracking', [OrderController::class, 'simulateTracking'])->name('orders.simulate_tracking');
 
         Route::get('/verify-otp', [OTPController::class, 'show'])->name('otp.verify');
         Route::post('/verify-otp', [OTPController::class, 'verify']);
@@ -73,6 +83,11 @@ Route::middleware(['auth', 'verified'])
 Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Admin Only Routes
+        Route::middleware('role:admin')->group(function () {
+            Route::apiResource('accounts', AccountController::class)->except(['create', 'edit', 'show']);
+        });
 
         // Menu Routes
         Route::middleware('role:admin,staff')->group(function () {
@@ -89,6 +104,7 @@ Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
             Route::patch('reservations/{reservation}/assign-courier', [ReservationController::class, 'assignCourier'])->name('reservations.assign_courier');
         });
         Route::patch('reservations/{reservation}/delivery-status', [ReservationController::class, 'updateDeliveryStatus'])->name('reservations.update_delivery_status');
+        Route::patch('orders/{order}/delivery-status', [OrderController::class, 'updateDeliveryStatus'])->name('orders.update_delivery_status');
         Route::patch('tables/{table}/position', [ReservationController::class, 'updateTablePosition'])->name('tables.update_position')->middleware('role:admin,staff');
 
         // Kitchen Display System

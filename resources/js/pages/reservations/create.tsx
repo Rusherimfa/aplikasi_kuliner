@@ -1,4 +1,4 @@
-import { Head, useForm, usePage, router } from '@inertiajs/react';
+import { Head, useForm, usePage, router, Link } from '@inertiajs/react';
 import { Calendar, Clock, Users, ArrowRight, CheckCircle2, Lock, MapPin, Info, CreditCard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import Navbar from '../welcome/sections/navbar';
 import AIChatbot from '@/components/app/ai-chatbot';
 
 export default function CreateReservation() {
-    const { auth, tables = [], bookedTableIds = [] } = usePage().props as any;
+    const { auth, tables = [], availableMenus = [], bookedTableIds = [] } = usePage().props as any;
     const dashboardUrl = dashboard()?.url || '/dashboard';
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -25,13 +25,15 @@ export default function CreateReservation() {
         guest_count: 2,
         special_requests: '',
         resto_table_id: '',
-        type: 'dine_in' as 'dine_in' | 'delivery' | 'takeaway',
-        delivery_address: '',
+        type: 'dine_in',
         use_points: false,
     });
 
-    const { items, cartTotal } = useCart();
-    const dpAmount = cartTotal > 0 ? cartTotal * 0.5 : 50000;
+    const [selectedMenus, setSelectedMenus] = useState<any[]>([]);
+    const [preorder, setPreorder] = useState(false);
+
+    const foodTotal = selectedMenus.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const dpAmount = foodTotal > 0 ? foodTotal * 0.5 : 50000;
 
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -51,11 +53,40 @@ export default function CreateReservation() {
         }
     }, [data.date, data.time]);
 
+    useEffect(() => {
+        if (data.resto_table_id) {
+            const table = tables.find((t: any) => t.id === data.resto_table_id);
+            if (table) {
+                setData('guest_count', table.capacity);
+            }
+        } else {
+            setData('guest_count', 0);
+        }
+    }, [data.resto_table_id]);
+
+    useEffect(() => {
+        if (auth.user) {
+            const savedState = sessionStorage.getItem('pending_reservation');
+            if (savedState) {
+                try {
+                    const parsed = JSON.parse(savedState);
+                    setData(prev => ({
+                        ...prev,
+                        date: parsed.date || prev.date,
+                        time: parsed.time || prev.time,
+                        resto_table_id: parsed.resto_table_id || prev.resto_table_id
+                    }));
+                } catch(e) {}
+                sessionStorage.removeItem('pending_reservation');
+            }
+        }
+    }, [auth.user]);
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         router.post('/reservations', {
             ...data,
-            menus: items.map(i => ({ id: i.id, quantity: i.quantity, notes: '' }))
+            menus: preorder ? selectedMenus.map(i => ({ id: i.id, quantity: i.quantity, notes: '' })) : []
         });
     };
 
@@ -75,15 +106,13 @@ export default function CreateReservation() {
                 {/* Background Pattern */}
                 <div className="absolute inset-0 z-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:24px_24px] opacity-40" />
                 
-                <AnimatePresence mode="wait">
-                    {data.type === 'dine_in' ? (
-                        <motion.div 
-                            key="map-view"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 1.1 }}
-                            className="relative z-10 w-full max-w-xl flex flex-col items-center"
-                        >
+                <motion.div 
+                    key="map-view"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.1 }}
+                    className="relative z-10 w-full max-w-xl flex flex-col items-center"
+                >
                             <div className="mb-12 text-center space-y-4">
                                 <div className="inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-orange-500 uppercase">
                                     <MapPin size={12} />
@@ -162,29 +191,6 @@ export default function CreateReservation() {
                                 </div>
                             </div>
                         </motion.div>
-                    ) : (
-                        <motion.div 
-                            key="minimal-view"
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="relative z-10 w-full max-w-md text-center space-y-8"
-                        >
-                            <div className="h-40 w-40 rounded-[3rem] bg-orange-500/10 border border-orange-500/20 flex items-center justify-center mx-auto text-orange-500 glow-primary mb-10">
-                                {data.type === 'takeaway' ? <Users size={60} /> : <MapPin size={60} />}
-                            </div>
-                            <h2 className="font-['Playfair_Display',serif] text-5xl font-black text-white tracking-tight">
-                                {data.type === 'takeaway' ? 'Self ' : 'Gourmet '}
-                                <span className="italic font-serif opacity-40">{data.type === 'takeaway' ? 'Pick-up' : 'Delivery'}</span>
-                            </h2>
-                            <p className="text-slate-400 text-lg font-medium leading-relaxed">
-                                {data.type === 'takeaway' 
-                                    ? 'Nikmati hidangan kami di mana pun Anda inginkan. Siap diambil sesuai jadwal pilihan Anda.'
-                                    : 'Pengalaman Chef di rumah Anda. Kami mengantarkan eksklusivitas langsung ke pintu Anda.'}
-                            </p>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </div>
 
             {/* Right Side: Booking Form */}
@@ -195,19 +201,8 @@ export default function CreateReservation() {
                     className="w-full max-w-lg mx-auto"
                 >
                     <div className="mb-12 space-y-6">
-                        <div className="flex p-1.5 bg-slate-100 dark:bg-white/[0.03] rounded-[2rem] border border-slate-200 dark:border-white/5">
-                            {(['dine_in', 'delivery', 'takeaway'] as const).map((type) => (
-                                <button
-                                    key={type}
-                                    type="button"
-                                    onClick={() => setData('type', type)}
-                                    className={`flex-1 py-3 h-12 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all ${data.type === type ? 'bg-orange-500 text-black shadow-lg scale-105' : 'text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
-                                >
-                                    {type.replace('_', ' ')}
-                                </button>
-                            ))}
-                        </div>
-                        <h1 className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Konfigurasi <br /><span className="italic font-serif opacity-40">Kehadiran</span></h1>
+                        <h1 className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">Makan di Tempat &<br /><span className="italic font-serif opacity-40">Reservasi Meja</span></h1>
+                        <p className="text-slate-500 text-sm font-medium">Boking meja untuk acara spesial Anda di restoran kami.</p>
                     </div>
 
                     <form onSubmit={submit} className="space-y-10">
@@ -244,8 +239,7 @@ export default function CreateReservation() {
                                 </div>
                             </div>                             <div className="pt-2">
                                 <AnimatePresence mode="wait">
-                                    {data.type === 'dine_in' ? (
-                                        data.resto_table_id ? (
+                                        {data.resto_table_id ? (
                                             <motion.div 
                                                 key="table-selected"
                                                 initial={{ opacity: 0, y: 10 }}
@@ -269,36 +263,10 @@ export default function CreateReservation() {
                                             <motion.div key="table-not-selected" className="rounded-2xl border-2 border-dashed border-border p-6 text-center">
                                                 <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Pilih meja di peta Interaktif</p>
                                             </motion.div>
-                                        )
-                                    ) : data.type === 'delivery' ? (
-                                        <motion.div 
-                                            key="delivery-address"
-                                            initial={{ opacity: 0, scale: 0.95 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            className="space-y-4"
-                                        >
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Gourmet Delivery Address</label>
-                                            <Textarea 
-                                                placeholder="Lengkapi alamat pengiriman eksklusif Anda..."
-                                                value={data.delivery_address}
-                                                onChange={e => setData('delivery_address', e.target.value)}
-                                                className="h-28 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold p-5"
-                                                required={data.type === 'delivery'}
-                                            />
-                                        </motion.div>
-                                    ) : (
-                                        <motion.div 
-                                            key="takeaway-info"
-                                            className="rounded-2xl border border-orange-500/20 bg-orange-500/5 p-6 text-center"
-                                        >
-                                            <p className="text-xs font-bold text-orange-500 uppercase tracking-widest">Siap Diambil di Restoran</p>
-                                            <p className="text-[10px] text-slate-500 mt-1 uppercase">Tanpa Reservasi Meja</p>
-                                        </motion.div>
-                                    )}
+                                        )}
                                 </AnimatePresence>
                             </div>
                         </div>
->
 
                         {/* Section 2: Personal Info */}
                         <div className="space-y-6">
@@ -309,56 +277,168 @@ export default function CreateReservation() {
                                 <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">2. Guest Information</h3>
                             </div>
 
-                            <div className="space-y-4">
-                                <Input
-                                    type="text"
-                                    placeholder="Nama Lengkap"
-                                    value={data.customer_name}
-                                    onChange={(e) => setData('customer_name', e.target.value)}
-                                    className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
-                                    required
-                                />
-                                <div className="grid grid-cols-2 gap-5">
+                            {auth.user ? (
+                                <div className="space-y-4">
                                     <Input
-                                        type="email"
-                                        placeholder="Email Address"
-                                        value={data.customer_email}
-                                        onChange={(e) => setData('customer_email', e.target.value)}
-                                        className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
-                                        readOnly={!!auth.user}
-                                        required
-                                    />
-                                    <Input
-                                        type="tel"
-                                        placeholder="WhatsApp Number"
-                                        value={data.customer_phone}
-                                        onChange={(e) => setData('customer_phone', e.target.value)}
+                                        type="text"
+                                        placeholder="Nama Lengkap"
+                                        value={data.customer_name}
+                                        onChange={(e) => setData('customer_name', e.target.value)}
                                         className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                         required
                                     />
-                                </div>
-                                <div className="grid grid-cols-2 gap-5">
-                                    <div className="relative group">
-                                        <Users className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                                    <div className="grid grid-cols-2 gap-5">
                                         <Input
-                                            type="number"
-                                            min="1"
-                                            max="20"
-                                            placeholder="Guest Count"
-                                            value={data.guest_count}
-                                            onChange={(e) => setData('guest_count', parseInt(e.target.value))}
-                                            className="h-14 pl-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
+                                            type="email"
+                                            placeholder="Email Address"
+                                            value={data.customer_email}
+                                            onChange={(e) => setData('customer_email', e.target.value)}
+                                            className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
+                                            readOnly={!!auth.user}
+                                            required
+                                        />
+                                        <Input
+                                            type="tel"
+                                            placeholder="WhatsApp Number"
+                                            value={data.customer_phone}
+                                            onChange={(e) => setData('customer_phone', e.target.value)}
+                                            className="h-14 rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20"
                                             required
                                         />
                                     </div>
+                                    <div className="grid grid-cols-2 gap-5">
+                                        <div className="relative group">
+                                            <Users className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
+                                            <Input
+                                                type="text"
+                                                value={data.resto_table_id ? `${tables.find((t: any) => t.id === data.resto_table_id)?.capacity} Tamu (Sesuai Meja)` : 'Pilih Meja Terlebih Dahulu'}
+                                                className="h-14 pl-14 rounded-2xl border-border bg-slate-50 dark:bg-white/[0.01] font-semibold focus:ring-0 text-slate-500 cursor-not-allowed"
+                                                readOnly
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <Textarea
+                                        placeholder="Special requests or dietary restrictions (Optional)"
+                                        value={data.special_requests}
+                                        onChange={(e) => setData('special_requests', e.target.value)}
+                                        className="h-28 resize-none rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20 p-5"
+                                    />
                                 </div>
-                                <Textarea
-                                    placeholder="Special requests or dietary restrictions (Optional)"
-                                    value={data.special_requests}
-                                    onChange={(e) => setData('special_requests', e.target.value)}
-                                    className="h-28 resize-none rounded-2xl border-border bg-white dark:bg-white/[0.02] font-semibold focus:ring-orange-500/20 p-5"
-                                />
+                            ) : (
+                                <div className="p-8 text-center bg-orange-500/5 border border-orange-500/20 rounded-3xl">
+                                    <Users size={48} className="mx-auto text-orange-500/50 mb-4" />
+                                    <h4 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">Autentikasi Diperlukan</h4>
+                                    <p className="text-xs text-slate-500 mb-6 max-w-sm mx-auto">Silakan login terlebih dahulu untuk melanjutkan proses reservasi. Data Anda aman bersama kami.</p>
+                                    <a 
+                                        href="/reservations/auth-intent"
+                                        onClick={() => {
+                                            sessionStorage.setItem('pending_reservation', JSON.stringify({
+                                                date: data.date,
+                                                time: data.time,
+                                                resto_table_id: data.resto_table_id,
+                                            }));
+                                        }}
+                                        className="inline-flex h-12 px-8 items-center justify-center rounded-xl bg-orange-500 text-black text-[10px] font-black uppercase tracking-widest hover:bg-orange-400 transition-colors"
+                                    >
+                                        Login untuk Melanjutkan
+                                    </a>
+                                </div>
+                            )}
+                        </div>
+
+                        {auth.user && (
+                            <>
+                                {/* Section 3: Pre-order Menu */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-2">
+                                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+                                    <CheckCircle2 size={16} />
+                                </div>
+                                <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">3. Pilihan Menu Berkelas</h3>
                             </div>
+                            
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setPreorder(!preorder);
+                                    if(preorder) setSelectedMenus([]); // clear if unchecked
+                                }}
+                                className={`w-full p-6 rounded-[1.5rem] border-2 transition-all flex items-center justify-between text-left group ${preorder ? 'bg-emerald-500/5 border-emerald-500 shadow-xl' : 'bg-white dark:bg-white/[0.02] border-slate-200 dark:border-white/5 hover:border-emerald-500/30'}`}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`h-12 w-12 rounded-xl flex items-center justify-center transition-colors ${preorder ? 'bg-emerald-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:text-emerald-500'}`}>
+                                        <Info size={20} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-widest">Pre-order Makanan?</p>
+                                        <p className="text-[10px] font-medium text-slate-500 mt-0.5">Siapkan santapan sebelum tiba untuk menghemat waktu.</p>
+                                    </div>
+                                </div>
+                                <div className={`h-6 w-12 rounded-full relative transition-colors ${preorder ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-white/10'}`}>
+                                    <motion.div 
+                                        animate={{ x: preorder ? 24 : 4 }}
+                                        className="absolute top-1 h-4 w-4 rounded-full bg-white shadow-sm"
+                                    />
+                                </div>
+                            </button>
+
+                            <AnimatePresence>
+                                {preorder && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: 'auto' }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="overflow-hidden space-y-4"
+                                    >
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                            {availableMenus.map((menu: any) => {
+                                                const selectedItem = selectedMenus.find(i => i.id === menu.id);
+                                                const quantity = selectedItem ? selectedItem.quantity : 0;
+
+                                                const handleAdd = () => {
+                                                    setSelectedMenus(prev => {
+                                                        const exists = prev.find(i => i.id === menu.id);
+                                                        if(exists) return prev.map(i => i.id === menu.id ? {...i, quantity: i.quantity + 1} : i);
+                                                        return [...prev, { id: menu.id, name: menu.name, price: menu.price, quantity: 1 }];
+                                                    });
+                                                };
+
+                                                const handleRemove = () => {
+                                                    setSelectedMenus(prev => {
+                                                        const exists = prev.find(i => i.id === menu.id);
+                                                        if(!exists) return prev;
+                                                        if(exists.quantity === 1) return prev.filter(i => i.id !== menu.id);
+                                                        return prev.map(i => i.id === menu.id ? {...i, quantity: i.quantity - 1} : i);
+                                                    });
+                                                };
+
+                                                return (
+                                                    <div key={menu.id} className="flex flex-col gap-2 p-4 rounded-2xl border border-border bg-white dark:bg-white/[0.02]">
+                                                        <div className="flex gap-4 items-center">
+                                                            <div className="h-16 w-16 bg-slate-100 dark:bg-white/5 rounded-xl overflow-hidden shrink-0">
+                                                                <img src={`/storage/${menu.image_url}`} alt={menu.name} className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <div className="flex flex-col flex-1">
+                                                                <span className="text-sm font-black tracking-tight">{menu.name}</span>
+                                                                <span className="text-[10px] text-orange-500 font-bold mt-1">Rp {Number(menu.price).toLocaleString('id-ID')}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center justify-between border-t border-border pt-3 mt-2">
+                                                            <span className="text-[10px] text-slate-400 font-bold">Qty</span>
+                                                            <div className="flex items-center gap-3">
+                                                                <button type="button" onClick={handleRemove} className="h-6 w-6 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center font-bold text-xs">-</button>
+                                                                <span className="text-xs font-black w-4 text-center">{quantity}</span>
+                                                                <button type="button" onClick={handleAdd} className="h-6 w-6 rounded-full bg-orange-500 text-black flex items-center justify-center font-bold text-xs">+</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* Optional: Loyalty Redemption */}
@@ -368,7 +448,7 @@ export default function CreateReservation() {
                                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-500/10 text-orange-500">
                                         <Lock size={16} />
                                     </div>
-                                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">3. Loyalty Privileges</h3>
+                                    <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white">4. Loyalty Privileges</h3>
                                 </div>
                                 
                                 <button
@@ -405,11 +485,11 @@ export default function CreateReservation() {
                             </h3>
                             
                             <div className="space-y-3 mb-10">
-                                {items.length > 0 ? (
-                                    items.map(item => (
-                                        <div key={item.id} className="flex justify-between text-sm font-bold">
-                                            <span className="opacity-60">{item.quantity}x {item.name}</span>
-                                            <span>Rp {((Number(item.price)) * item.quantity).toLocaleString('id-ID')}</span>
+                                {selectedMenus.length > 0 ? (
+                                    selectedMenus.map(item => (
+                                        <div key={item.id} className="flex justify-between text-sm font-bold opacity-80">
+                                            <span>{item.quantity}x {item.name}</span>
+                                            <span>Rp {(item.price * item.quantity).toLocaleString('id-ID')}</span>
                                         </div>
                                     ))
                                 ) : (
@@ -441,14 +521,16 @@ export default function CreateReservation() {
                             <div className="mt-10">
                                 <Button
                                     type="submit"
-                                    disabled={processing || (data.type === 'dine_in' && !data.resto_table_id)}
+                                    disabled={processing || !data.resto_table_id}
                                     className="w-full h-16 rounded-[1.25rem] bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:bg-slate-900 active:scale-95 disabled:opacity-50"
                                 >
-                                    Proceed to Settlement
+                                    Kirim Pengajuan Reservasi
                                     <ArrowRight size={16} className="ml-3" />
                                 </Button>
                             </div>
                         </div>
+                        </>
+                        )}
                     </form>
                 </motion.div>
                 

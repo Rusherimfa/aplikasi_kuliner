@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { 
     AreaChart, 
     Area, 
+    BarChart,
+    Bar,
     XAxis, 
     YAxis, 
     Tooltip, 
@@ -13,7 +15,7 @@ import {
 import { index as reservationsRoute } from '@/routes/reservations';
 import { index as menusRoute } from '@/routes/menus';
 
-export default function AdminDashboard({ stats, recent_activity, revenue_chart, best_sellers }: any) {
+export default function AdminDashboard({ stats, recent_activity, revenue_chart, best_sellers, reservation_chart }: any) {
     const formatRupiah = (amount: number) => {
         return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
     };
@@ -23,7 +25,8 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
             'pending': { label: 'Menunggu', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20' },
             'confirmed': { label: 'Dikonfirmasi', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
             'completed': { label: 'Selesai', color: 'bg-white/5 text-white/50 border-white/10' },
-            'cancelled': { label: 'Dibatalkan', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' }
+            'cancelled': { label: 'Dibatalkan', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' },
+            'rejected': { label: 'Ditolak', color: 'bg-rose-500/10 text-rose-500 border-rose-500/20' }
         };
         const config = variants[status] || variants.pending;
         return <Badge className={`${config.color} hover:bg-transparent px-3 py-1 font-bold text-[10px] uppercase tracking-wider border transition-all`}>{config.label}</Badge>;
@@ -37,7 +40,7 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
                     <p className="text-orange-500 text-xl font-black tracking-tight">{formatRupiah(payload[0].value)}</p>
                     <div className="flex items-center gap-2 mt-2">
                         <div className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                        <p className="text-white/50 text-[10px] font-bold uppercase tracking-widest">{payload[0].payload.reservations} Reservasi</p>
+                        <p className="text-white/50 text-[10px] font-bold uppercase tracking-widest">{payload[0].payload.sales ?? payload[0].payload.reservations} Transaksi/Reservasi</p>
                     </div>
                 </div>
             );
@@ -67,9 +70,7 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
                     </div>
                     
                     <div className="flex bg-white/5 rounded-2xl p-1 border border-white/5">
-                        <button className="px-5 py-2 text-[10px] font-black uppercase tracking-wider bg-orange-500 text-black rounded-xl shadow-lg shadow-orange-500/20 transition-all">Today</button>
-                        <button className="px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white/40 hover:text-white transition-all">Weekly</button>
-                        <button className="px-5 py-2 text-[10px] font-black uppercase tracking-wider text-white/40 hover:text-white transition-all">Monthly</button>
+                        <div className="px-6 py-2.5 text-[10px] font-black uppercase tracking-wider bg-orange-500/20 text-orange-500 rounded-xl shadow-lg border border-orange-500/20">Today</div>
                     </div>
                 </div>
 
@@ -77,8 +78,8 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
                     {[
                         { title: 'Pending Res.', val: stats.pending_reservations, icon: Clock, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                        { title: 'Today Guests', val: stats.today_reservations, icon: CalendarCheck, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-                        { title: 'Omset Hari Ini', val: formatRupiah(stats.estimated_revenue), icon: Wallet, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                        { title: 'Pesanan Aktif', val: stats.active_orders, icon: CalendarCheck, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                        { title: 'Omset Hari Ini', val: formatRupiah(stats.today_revenue), icon: Wallet, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                         { title: 'Menu Items', val: stats.total_menus, icon: HandPlatter, color: 'text-purple-500', bg: 'bg-purple-500/10' }
                     ].map((card, idx) => (
                         <div 
@@ -190,7 +191,73 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
                     </div>
                 </div>
 
-                <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
+                <div className="grid gap-8 lg:grid-cols-2 mb-12">
+                    {/* Reservation Analytics Chart */}
+                    <div className="lg:col-span-2 rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-3xl backdrop-blur-3xl flex flex-col h-[500px] ring-1 ring-white/5">
+                        <div className="flex items-center justify-between mb-12 text-left">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-orange-500/10 rounded-2xl text-orange-400 border border-orange-500/20 shadow-xl">
+                                    <CalendarCheck size={22} strokeWidth={2.5} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-black text-white font-['Playfair_Display',serif] tracking-tight">Reservation Analytics</h2>
+                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[0.2em] mt-0.5">Reservasi & Pendapatan DP 7 Hari Terakhir</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex-1 w-full -ml-8">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={reservation_chart} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+                                    <defs>
+                                        <linearGradient id="colorAdminRevDP" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.8}/>
+                                            <stop offset="95%" stopColor="#f97316" stopOpacity={0.1}/>
+                                        </linearGradient>
+                                    </defs>
+                                    <XAxis 
+                                        dataKey="name" 
+                                        stroke="#ffffff11" 
+                                        fontSize={10} 
+                                        tickLine={false} 
+                                        axisLine={false} 
+                                        tick={{fill: '#ffffff33', fontWeight: 600}}
+                                        dy={15}
+                                    />
+                                    <YAxis 
+                                        yAxisId="left"
+                                        stroke="#ffffff11" 
+                                        fontSize={9} 
+                                        tickLine={false} 
+                                        axisLine={false} 
+                                        tickFormatter={(val) => `Rp${val/1000}k`}
+                                        tick={{fill: '#ffffff33', fontWeight: 600}}
+                                        dx={-10}
+                                    />
+                                    <YAxis 
+                                        yAxisId="right"
+                                        orientation="right"
+                                        stroke="#ffffff11" 
+                                        fontSize={9} 
+                                        tickLine={false} 
+                                        axisLine={false} 
+                                        tick={{fill: '#ffffff33', fontWeight: 600}}
+                                        dx={10}
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <Bar 
+                                        yAxisId="left"
+                                        dataKey="revenue" 
+                                        fill="url(#colorAdminRevDP)" 
+                                        radius={[4, 4, 0, 0]}
+                                        barSize={40}
+                                    />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-12">
                     {/* Recent Activity */}
                     <div className="rounded-[3rem] border border-white/5 bg-white/[0.02] shadow-3xl backdrop-blur-3xl flex flex-col overflow-hidden ring-1 ring-white/5">
                         <div className="border-b border-white/5 p-8 flex justify-between items-center bg-white/[0.01]">
@@ -222,24 +289,6 @@ export default function AdminDashboard({ stats, recent_activity, revenue_chart, 
                                 ))}
                             </ul>
                         </div>
-                    </div>
-
-                    {/* Marketing/Stats Card */}
-                    <div className="rounded-[3rem] bg-[#0A0A0B] border border-orange-500/20 p-10 shadow-3xl relative overflow-hidden flex flex-col items-center justify-center text-center ring-1 ring-orange-500/5 transition-all hover:border-orange-500/40 group">
-                        <div className="absolute inset-0 bg-grid-white opacity-20" />
-                        
-                        <div className="relative h-32 w-32 rounded-[2.5rem] bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-10 shadow-2xl transform -rotate-12 transition-transform duration-700 group-hover:rotate-0 group-hover:scale-110">
-                            <Users size={56} className="text-black" />
-                        </div>
-                        
-                        <h3 className="relative font-['Playfair_Display',serif] text-7xl font-black text-white mb-3 tracking-tighter">
-                            {stats.total_customers}
-                        </h3>
-                        <p className="relative text-[10px] font-black text-orange-500 uppercase tracking-[0.5em] mb-10">Loyal Clientele</p>
-                        
-                        <Link href={menusRoute.url()} className="relative inline-flex h-16 items-center justify-center rounded-[1.5rem] bg-orange-500 px-10 text-[10px] font-black uppercase tracking-[2px] text-black shadow-xl transition-all hover:bg-white w-full">
-                            Optimasi Sajian <BookOpen size={18} className="ml-3 opacity-60" />
-                        </Link>
                     </div>
                 </div>
             </div>

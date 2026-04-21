@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Role;
 use App\Models\Menu;
 use App\Models\Team;
 use Illuminate\Http\Request;
@@ -26,6 +27,11 @@ class MenuController extends Controller
             ->when($request->query('category'), function ($query, $category) {
                 $query->where('category', $category);
             })
+            ->withSum(['orderItems as total_sold' => function ($query) {
+                $query->whereHas('order', function ($q) {
+                    $q->where('order_status', 'complete');
+                });
+            }], 'quantity')
             ->latest()
             ->get();
 
@@ -40,7 +46,7 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (! auth()->user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -64,7 +70,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        if (auth()->user()->role === 'staff') {
+        if (auth()->user()->role === Role::STAFF) {
             $validated = $request->validate([
                 'is_available' => 'boolean',
                 'is_best_seller' => 'boolean',
@@ -93,7 +99,7 @@ class MenuController extends Controller
      */
     public function destroy(Menu $menu)
     {
-        if (auth()->user()->role !== 'admin') {
+        if (! auth()->user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
