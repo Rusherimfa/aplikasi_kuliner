@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+﻿import { Head, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { dashboard } from '@/routes';
 
@@ -31,7 +31,7 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="RestoWeb — Taste the Extraordinary">
+            <Head title="Ocean's Resto â€” Taste the Extraordinary">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link
@@ -40,7 +40,7 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-orange-100 selection:text-orange-900 dark:selection:bg-orange-500/30 dark:selection:text-orange-200 transition-colors duration-500">
+            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-500">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -73,3 +73,4 @@ export default function Welcome({
         </>
     );
 }
+

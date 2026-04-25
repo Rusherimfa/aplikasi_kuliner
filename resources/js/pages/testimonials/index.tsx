@@ -1,4 +1,4 @@
-import { Head, usePage, useForm, Link } from '@inertiajs/react';
+﻿import { Head, usePage, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ const DEFAULT_TESTIMONIALS = [
         role: 'Pecinta Kuliner',
         quote: 'Pelayanan yang sangat ramah and rasa makanan yang autentik. Wagyu Steak-nya bener-bener juara!',
         rating: 5,
-        avatarColor: 'bg-orange-500'
+        avatarColor: 'bg-sky-500'
     },
     {
         id: 't-2',
@@ -97,7 +97,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
 
     return (
         <>
-            <Head title="Cerita Tamu - RestoWeb" />
+            <Head title="Cerita Tamu - Ocean's Resto" />
 
             <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 transition-colors duration-500">
                 <Navbar
@@ -110,7 +110,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                 <main className="mx-auto max-w-7xl px-4 pt-32 pb-24 sm:px-6 lg:px-8">
                     {/* Header */}
                     <div className="mb-16 text-center max-w-3xl mx-auto">
-                        <span className="mb-4 inline-block rounded-full border border-orange-200 bg-orange-50 px-4 py-1 text-xs font-semibold tracking-widest text-orange-700 uppercase dark:border-orange-900/50 dark:bg-orange-500/10 dark:text-orange-500">
+                        <span className="mb-4 inline-block rounded-full border border-sky-200 bg-sky-50 px-4 py-1 text-xs font-semibold tracking-widest text-sky-700 uppercase dark:border-sky-900/50 dark:bg-sky-500/10 dark:text-sky-500">
                             Cerita Tamu
                         </span>
                         <h1 className="mb-4 font-['Playfair_Display',serif] text-4xl font-bold text-slate-900 dark:text-white md:text-5xl">
@@ -131,8 +131,8 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                         const avatarBg = t.avatarColor || 'bg-slate-200 dark:bg-neutral-800';
 
                                         return (
-                                        <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-orange-300 hover:shadow-xl dark:hover:border-orange-500/30">
-                                            <Quote size={28} className="mb-4 text-orange-500/20 group-hover:text-orange-500/40 transition-colors" />
+                                        <div key={t.id} className="group relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-sky-300 hover:shadow-xl dark:hover:border-sky-500/30">
+                                            <Quote size={28} className="mb-4 text-sky-500/20 group-hover:text-sky-500/40 transition-colors" />
                                             
                                             <div className="mb-2 flex justify-between items-start">
                                                 <div className="flex gap-1">
@@ -140,12 +140,12 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                                         <Star 
                                                             key={i} 
                                                             size={14} 
-                                                            className={i < (t.rating || 5) ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} 
+                                                            className={i < (t.rating || 5) ? "fill-sky-400 text-sky-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700"} 
                                                         />
                                                     ))}
                                                 </div>
                                                 {t.isReview && (
-                                                    <div className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[10px] font-bold text-orange-600 dark:text-orange-500 uppercase tracking-widest border border-orange-500/20">
+                                                    <div className="flex items-center gap-1 rounded-full bg-sky-500/10 px-2 py-0.5 text-[10px] font-bold text-sky-600 dark:text-sky-500 uppercase tracking-widest border border-sky-500/20">
                                                         <CheckCircle2 size={10} />
                                                         Authentic
                                                     </div>
@@ -179,7 +179,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
 
                         {/* Right Side - Submission Form */}
                         <div className="w-full lg:w-5/12">
-                            <div className="sticky top-24 rounded-3xl border border-orange-200 dark:border-orange-900/30 bg-orange-50/50 dark:bg-orange-900/10 p-6 md:p-8 shadow-lg backdrop-blur-md">
+                            <div className="sticky top-24 rounded-3xl border border-sky-200 dark:border-sky-900/30 bg-sky-50/50 dark:bg-sky-900/10 p-6 md:p-8 shadow-lg backdrop-blur-md">
                                 <h2 className="mb-2 font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-white">
                                     Berikan Cerita Anda
                                 </h2>
@@ -209,7 +209,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                                         onClick={() => setData('rating', star)}
                                                         className="focus:outline-none transition-all hover:scale-110 active:scale-95"
                                                     >
-                                                        <Star size={28} className={star <= data.rating ? "fill-orange-400 text-orange-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700 transition-colors"} />
+                                                        <Star size={28} className={star <= data.rating ? "fill-sky-400 text-sky-400" : "fill-slate-200 text-slate-200 dark:fill-neutral-700 dark:text-neutral-700 transition-colors"} />
                                                     </button>
                                                 ))}
                                             </div>
@@ -224,7 +224,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                                 id="role"
                                                 value={data.role}
                                                 onChange={e => setData('role', e.target.value)}
-                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-orange-500"
+                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-sky-500"
                                                 placeholder="Cth: Food Blogger, Tamu Keluarga"
                                             />
                                             {errors.role && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.role}</p>}
@@ -238,7 +238,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                                 id="quote"
                                                 value={data.quote}
                                                 onChange={e => setData('quote', e.target.value)}
-                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-orange-500 min-h-[120px] resize-none"
+                                                className="bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-700 focus-visible:ring-sky-500 min-h-[120px] resize-none"
                                                 placeholder="Ceritakan tentang momen favorit Anda, hidangan yang Anda suka, dll..."
                                                 required
                                             />
@@ -248,7 +248,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                         <Button
                                             type="submit"
                                             disabled={processing}
-                                            className="w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-orange-600/20 transition-all hover:scale-[1.01]"
+                                            className="w-full mt-2 bg-sky-600 hover:bg-sky-700 text-white rounded-xl py-6 font-semibold shadow-md shadow-sky-600/20 transition-all hover:scale-[1.01]"
                                         >
                                             {processing ? 'Mengirim Cerita...' : 'Kirim Cerita Saya'}
                                         </Button>
@@ -263,7 +263,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                             Silakan login menggunakan akun pelanggan untuk identifikasi dan mengisi buku cerita kami.
                                         </p>
                                         <Link href="/login">
-                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-orange-600 dark:hover:bg-orange-700 transition-all active:scale-95 shadow-lg">
+                                            <Button className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl py-6 dark:bg-sky-600 dark:hover:bg-sky-700 transition-all active:scale-95 shadow-lg">
                                                 Login Sekarang
                                             </Button>
                                         </Link>
@@ -279,3 +279,4 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
         </>
     );
 }
+

@@ -1,4 +1,4 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -11,6 +11,7 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 import { Mail, ArrowRight, Sparkles } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 type Props = {
     status?: string;
@@ -23,9 +24,14 @@ export default function Login({
     canResetPassword,
     canRegister,
 }: Props) {
+    const { __ } = useTranslations();
+    const { flash } = usePage().props as any;
+    const displayStatus = status || flash?.status;
+    const displayError = flash?.error;
+
     return (
         <>
-            <Head title="Log in" />
+            <Head title={__('Log in')} />
 
             <Form
                 {...store.form()}
@@ -36,9 +42,9 @@ export default function Login({
                     <>
                         <div className="grid gap-6">
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                    Email address
+                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                    {__('Email address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -48,25 +54,25 @@ export default function Login({
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="Enter your email address"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    placeholder={__('Enter your email address')}
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="group relative grid gap-2">
                                 <div className="flex items-center">
-                                    <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                        <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                        Password
+                                    <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                        <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                        {__('Password')}
                                     </Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-xs font-medium text-orange-600 hover:text-orange-500 transition-colors"
+                                            className="ml-auto text-xs font-medium text-sky-600 hover:text-sky-500 transition-colors"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            {__('Forgot password?')}
                                         </TextLink>
                                     )}
                                 </div>
@@ -76,8 +82,8 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Enter your password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    placeholder={__('Enter your password')}
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -87,16 +93,16 @@ export default function Login({
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
-                                    className="border-border data-[state=checked]:bg-orange-600 data-[state=checked]:border-orange-600"
+                                    className="border-border data-[state=checked]:bg-sky-600 data-[state=checked]:border-sky-600"
                                 />
                                 <Label htmlFor="remember" className="font-normal text-muted-foreground cursor-pointer hover:text-foreground transition-colors">
-                                    Keep me signed in
+                                    {__('Keep me signed in')}
                                 </Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-700 font-semibold text-white shadow-xl shadow-orange-900/20 hover:scale-[1.02] hover:from-orange-400 hover:to-orange-600 transition-all duration-300 group/btn"
+                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-sky-500 to-sky-700 font-semibold text-white shadow-xl shadow-sky-900/20 hover:scale-[1.02] hover:from-sky-400 hover:to-sky-600 transition-all duration-300 group/btn"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
@@ -105,7 +111,7 @@ export default function Login({
                                     <Spinner className="mr-2" />
                                 ) : (
                                     <>
-                                        Sign In
+                                        {__('Sign In')}
                                         <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:translate-x-1 group-hover/btn:opacity-100 transition-all" />
                                     </>
                                 )}
@@ -116,14 +122,14 @@ export default function Login({
                                     <div className="w-full border-t border-border"></div>
                                 </div>
                                 <div className="relative flex justify-center text-xs">
-                                    <span className="bg-background/80 px-2 text-muted-foreground/60 backdrop-blur-sm">Atau lanjutkan dengan</span>
+                                    <span className="bg-background/80 px-2 text-muted-foreground/60 backdrop-blur-sm">{__('Atau lanjutkan dengan')}</span>
                                 </div>
                             </div>
                             
                             <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
                                 <a 
                                     href="/auth/google"
-                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:text-base cursor-pointer"
+                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-sky-500/20 sm:text-base cursor-pointer"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -143,16 +149,16 @@ export default function Login({
                                             fill="#EA4335"
                                         />
                                     </svg>
-                                    Selalu Masuk dengan Google
+                                    {__('Selalu Masuk dengan Google')}
                                 </a>
                             </div>
                         </div>
 
                         {canRegister && (
                             <div className="mt-6 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300 fill-mode-both">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5} className="font-semibold text-orange-600 hover:text-orange-500">
-                                    Create one now
+                                {__("Don't have an account?")}{' '}
+                                <TextLink href={register()} tabIndex={5} className="font-semibold text-sky-600 hover:text-sky-500">
+                                    {__('Create one now')}
                                 </TextLink>
                             </div>
                         )}
@@ -160,9 +166,15 @@ export default function Login({
                 )}
             </Form>
 
-            {status && (
+            {displayStatus && (
                 <div className="mb-4 mt-6 rounded-xl border border-emerald-500/20 bg-emerald-500/10 p-4 text-center text-sm font-medium text-emerald-600 dark:text-emerald-400 backdrop-blur-md">
-                    {status}
+                    {displayStatus}
+                </div>
+            )}
+
+            {displayError && (
+                <div className="mb-4 mt-6 rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-center text-sm font-medium text-red-600 dark:text-red-400 backdrop-blur-md">
+                    {displayError}
                 </div>
             )}
         </>
@@ -173,3 +185,4 @@ Login.layout = {
     title: 'Welcome Back',
     description: 'Enter your credentials to access your account',
 };
+

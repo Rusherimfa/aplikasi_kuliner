@@ -1,6 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { Form, Head } from '@inertiajs/react';
-import { CheckCircle2, KeyRound, Lock, Shield, ShieldCheck, ShieldOff } from 'lucide-react';
+import { CheckCircle2, KeyRound, Lock, Shield, ShieldCheck, ShieldOff, Zap, ShieldAlert } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import TwoFactorRecoveryCodes from '@/components/auth/two-factor-recovery-codes';
@@ -12,6 +12,8 @@ import { Label } from '@/components/ui/label';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import { edit } from '@/routes/security';
 import { disable, enable } from '@/routes/two-factor';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 type Props = {
     canManageTwoFactor?: boolean;
@@ -19,11 +21,15 @@ type Props = {
     twoFactorEnabled?: boolean;
 };
 
+import { useTranslations } from '@/hooks/use-translations';
+import SettingsLayout from '@/layouts/settings/layout';
+
 export default function Security({
     canManageTwoFactor = false,
     requiresConfirmation = false,
     twoFactorEnabled = false,
 }: Props) {
+    const { __ } = useTranslations();
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -50,19 +56,29 @@ export default function Security({
 
     return (
         <>
-            <Head title="Keamanan Akun" />
-            <h1 className="sr-only">Keamanan Akun</h1>
-
-            <div className="space-y-8">
-                {/* Change Password Card */}
-                <div className="rounded-2xl border border-border bg-card p-8 shadow-xl">
-                    <div className="mb-6 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400">
-                            <KeyRound size={20} />
+            <Head title={__('Account Security')} />
+            
+            <div className="space-y-12 pb-20 sm:pb-0">
+                {/* Change Password Card - Cinematic Glass */}
+                <motion.div 
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="rounded-[3rem] border border-black/5 dark:border-white/5 bg-muted/20 dark:bg-white/[0.02] p-8 sm:p-12 shadow-xl dark:shadow-2xl backdrop-blur-xl"
+                >
+                    <div className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                        <div className="flex items-center gap-6">
+                            <div className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-sky-500/10 text-sky-600 dark:text-sky-400 ring-1 ring-sky-500/20 shadow-[0_0_30px_rgba(14,165,233,0.1)]">
+                                <KeyRound size={32} strokeWidth={1.5} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-black tracking-tight text-foreground uppercase italic">{__('Security Protocol')}</h2>
+                                <p className="text-muted-foreground/60 font-medium">{__('Fortify your presence with a complex digital cipher.')}</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="font-semibold tracking-tight text-foreground">Ubah Password</h2>
-                            <p className="text-xs text-muted-foreground">Gunakan kata sandi yang panjang dan acak agar akun Anda tetap aman</p>
+                        <div className="flex items-center gap-2 px-5 py-2 rounded-full bg-sky-500/10 border border-sky-500/20">
+                            <Zap size={14} className="text-sky-500 animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">{__('High Strength Required')}</span>
                         </div>
                     </div>
 
@@ -75,127 +91,149 @@ export default function Security({
                             if (errs.password) passwordInput.current?.focus();
                             if (errs.current_password) currentPasswordInput.current?.focus();
                         }}
-                        className="space-y-5"
+                        className="grid gap-10 sm:grid-cols-2"
                     >
-                        {({ errors: formErrors, processing, recentlySuccessful }) => (
+                        {({ errors: formErrors, processing, recentlySuccessful, setData }) => (
                             <>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="current_password" className="text-sm font-medium text-muted-foreground">
-                                        Password Saat Ini
+                                <div className="sm:col-span-2 grid gap-3">
+                                    <Label htmlFor="current_password" className="ml-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/70">
+                                        {__('Current Cipher')}
                                     </Label>
-                                    <div className="relative">
-                                        <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                                    <div className="group relative">
+                                        <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within:text-sky-600 dark:group-focus-within:text-sky-500 transition-all duration-500" />
                                         <PasswordInput
                                             id="current_password"
                                             ref={currentPasswordInput}
                                             name="current_password"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
+                                            className="h-16 pl-14 rounded-2xl border-black/5 dark:border-white/5 bg-muted/30 dark:bg-white/5 text-foreground dark:text-white text-lg font-medium placeholder:text-muted-foreground/20 focus:border-sky-500/50 focus:ring-sky-500/20 focus:bg-sky-500/5 transition-all duration-500"
                                             autoComplete="current-password"
-                                            placeholder="Masukkan password saat ini"
+                                            placeholder={__('Verify your existing access...')}
+                                            onChange={(e) => setData('current_password', e.target.value)}
                                         />
+                                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-sky-500/10 to-transparent opacity-0 group-focus-within:opacity-100 pointer-events-none transition-opacity duration-500" />
                                     </div>
-                                    <InputError message={formErrors.current_password} />
+                                    <InputError className="ml-2" message={formErrors.current_password} />
                                 </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password" className="text-sm font-medium text-muted-foreground">
-                                        Password Baru
+                                <div className="grid gap-3">
+                                    <Label htmlFor="password" className="ml-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/70">
+                                        {__('New Cipher')}
                                     </Label>
-                                    <div className="relative">
-                                        <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                                    <div className="group relative">
+                                        <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within:text-sky-600 dark:group-focus-within:text-sky-500 transition-all duration-500" />
                                         <PasswordInput
                                             id="password"
                                             ref={passwordInput}
                                             name="password"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
+                                            className="h-16 pl-14 rounded-2xl border-black/5 dark:border-white/5 bg-muted/30 dark:bg-white/5 text-foreground dark:text-white text-lg font-medium placeholder:text-muted-foreground/20 focus:border-sky-500/50 focus:ring-sky-500/20 focus:bg-sky-500/5 transition-all duration-500"
                                             autoComplete="new-password"
-                                            placeholder="Masukkan password baru"
+                                            placeholder={__('The new sequence...')}
+                                            onChange={(e) => setData('password', e.target.value)}
                                         />
                                     </div>
-                                    <InputError message={formErrors.password} />
+                                    <InputError className="ml-2" message={formErrors.password} />
                                 </div>
 
-                                <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation" className="text-sm font-medium text-muted-foreground">
-                                        Konfirmasi Password Baru
+                                <div className="grid gap-3">
+                                    <Label htmlFor="password_confirmation" className="ml-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/70">
+                                        {__('Confirm Sequence')}
                                     </Label>
-                                    <div className="relative">
-                                        <Lock size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground/50" />
+                                    <div className="group relative">
+                                        <Lock size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground/30 group-focus-within:text-sky-600 dark:group-focus-within:text-sky-500 transition-all duration-500" />
                                         <PasswordInput
                                             id="password_confirmation"
                                             name="password_confirmation"
-                                            className="pl-9 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground/50 focus:border-orange-500/50 focus:ring-orange-500/20"
+                                            className="h-16 pl-14 rounded-2xl border-black/5 dark:border-white/5 bg-muted/30 dark:bg-white/5 text-foreground dark:text-white text-lg font-medium placeholder:text-muted-foreground/20 focus:border-sky-500/50 focus:ring-sky-500/20 focus:bg-sky-500/5 transition-all duration-500"
                                             autoComplete="new-password"
-                                            placeholder="Ulangi password baru"
+                                            placeholder={__('Mirror the cipher...')}
+                                            onChange={(e) => setData('password_confirmation', e.target.value)}
                                         />
                                     </div>
-                                    <InputError message={formErrors.password_confirmation} />
+                                    <InputError className="ml-2" message={formErrors.password_confirmation} />
                                 </div>
 
-                                <div className="flex items-center gap-4 pt-2">
+                                <div className="sm:col-span-2 flex flex-col sm:flex-row items-center gap-8 pt-6">
                                     <Button
                                         disabled={processing}
-                                        data-test="update-password-button"
-                                        className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400 transition-all duration-200"
+                                        className="h-18 px-12 rounded-full bg-sky-600 dark:bg-sky-500 text-white dark:text-black text-[11px] font-black uppercase tracking-[0.3em] shadow-xl dark:shadow-[0_15px_40px_rgba(14,165,233,0.4)] hover:scale-105 active:scale-95 transition-all duration-500 disabled:opacity-50"
                                     >
-                                        Simpan Password
+                                        {processing ? __('Processing...') : __('Sync New Cipher')}
                                     </Button>
 
                                     <Transition
                                         show={recentlySuccessful}
-                                        enter="transition ease-in-out duration-300"
-                                        enterFrom="opacity-0"
-                                        leave="transition ease-in-out duration-200"
+                                        enter="transition ease-out duration-700"
+                                        enterFrom="opacity-0 translate-x-8"
+                                        leave="transition ease-in duration-300"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-400">
-                                            <CheckCircle2 size={16} />
-                                            Password berhasil diperbarui!
+                                        <p className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.4em] text-emerald-600 dark:text-emerald-400">
+                                            <CheckCircle2 size={20} /> {__('Protocol Updated')}
                                         </p>
                                     </Transition>
                                 </div>
                             </>
                         )}
                     </Form>
-                </div>
+                </motion.div>
 
-                {/* Two Factor Auth Card */}
+                {/* Two Factor Auth Card - Advanced Security Layer */}
                 {canManageTwoFactor && (
-                    <div className="rounded-2xl border border-border bg-card p-8 shadow-xl">
-                        <div className="mb-6 flex items-center gap-3">
-                            <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${twoFactorEnabled ? 'bg-emerald-500/15 text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
-                                <Shield size={20} />
-                            </div>
-                            <div>
-                                <h2 className="font-semibold tracking-tight text-foreground">Autentikasi Dua Faktor (2FA)</h2>
-                                <p className="text-xs text-muted-foreground">Tambahkan lapisan keamanan ekstra pada akun Anda</p>
+                    <motion.div 
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="rounded-[3rem] border border-black/5 dark:border-white/5 bg-muted/20 dark:bg-white/[0.02] p-8 sm:p-12 shadow-xl dark:shadow-2xl backdrop-blur-xl"
+                    >
+                        <div className="mb-12 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                            <div className="flex items-center gap-6">
+                                <div className={cn(
+                                    "flex h-16 w-16 items-center justify-center rounded-[1.5rem] transition-all duration-700 shadow-[0_0_30px_rgba(0,0,0,0.1)]",
+                                    twoFactorEnabled ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-1 ring-emerald-500/20" : "bg-muted text-muted-foreground ring-1 ring-black/5 dark:ring-white/5"
+                                )}>
+                                    <Shield size={32} strokeWidth={1.5} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-black tracking-tight text-foreground uppercase italic">{__('Multi-Factor Gateway')}</h2>
+                                    <p className="text-muted-foreground/60 font-medium">{__('Add an impenetrable layer to your digital sanctuary.')}</p>
+                                </div>
                             </div>
                             {twoFactorEnabled && (
-                                <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                    Aktif
-                                </span>
+                                <motion.div 
+                                    initial={{ scale: 0.9, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    className="flex items-center gap-3 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-6 py-3"
+                                >
+                                    <span className="relative flex h-3 w-3">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500" />
+                                    </span>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">{__('Shield Active')}</span>
+                                </motion.div>
                             )}
                         </div>
 
                          {twoFactorEnabled ? (
-                            <div className="space-y-5">
-                                <div className="rounded-xl border border-emerald-500/15 bg-emerald-500/5 p-4">
-                                    <p className="text-sm text-emerald-300/80">
-                                        Autentikasi dua faktor sedang aktif. Anda akan diminta memasukkan kode aman saat login dari perangkat baru.
+                            <div className="space-y-10">
+                                <div className="rounded-[2rem] border border-emerald-500/10 bg-emerald-500/[0.03] p-8 flex items-start gap-6">
+                                    <div className="h-12 w-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    <p className="text-emerald-700 dark:text-emerald-300/80 font-medium leading-relaxed italic">
+                                        {__('Gateway protection is fully operational. You will be challenged with a secondary verification cipher upon every new session entrance.')}
                                     </p>
                                 </div>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-6">
                                     <Form {...disable.form()}>
                                         {({ processing }) => (
                                             <Button
                                                 variant="destructive"
                                                 type="submit"
                                                 disabled={processing}
-                                                className="rounded-full"
+                                                className="h-16 px-10 rounded-full text-[11px] font-black uppercase tracking-widest shadow-2xl shadow-rose-500/20 hover:scale-105 transition-all"
                                             >
-                                                <ShieldOff size={16} className="mr-2" />
-                                                Nonaktifkan 2FA
+                                                <ShieldOff size={18} className="mr-3" />
+                                                {__('Dissolve Shield')}
                                             </Button>
                                         )}
                                     </Form>
@@ -207,19 +245,22 @@ export default function Security({
                                 />
                             </div>
                         ) : (
-                            <div className="space-y-5">
-                                <div className="rounded-xl border border-border bg-muted/30 p-4">
-                                    <p className="text-sm text-muted-foreground">
-                                        Saat Anda mengaktifkan 2FA, Anda akan diminta memasukkan kode aman selama login. Kode ini dapat diambil dari aplikasi TOTP di ponsel Anda (mis. Google Authenticator).
+                            <div className="space-y-10">
+                                <div className="rounded-[2rem] border border-black/5 dark:border-white/5 bg-muted/30 dark:bg-white/5 p-8 flex items-start gap-6">
+                                    <div className="h-12 w-12 rounded-2xl bg-muted dark:bg-white/5 flex items-center justify-center text-muted-foreground shrink-0">
+                                        <ShieldAlert size={24} />
+                                    </div>
+                                    <p className="text-muted-foreground font-medium leading-relaxed italic">
+                                        {__('Enabling the gateway will require you to provide a temporary dynamic cipher from your verified TOTP terminal (e.g., Google Authenticator) during every login ritual.')}
                                     </p>
                                 </div>
                                 {hasSetupData ? (
                                     <Button
                                         onClick={() => setShowSetupModal(true)}
-                                        className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400"
+                                        className="h-18 px-12 rounded-full bg-sky-600 dark:bg-sky-500 text-white dark:text-black text-[11px] font-black uppercase tracking-[0.3em] shadow-xl dark:shadow-[0_15px_40px_rgba(14,165,233,0.4)] hover:scale-105 transition-all"
                                     >
-                                        <ShieldCheck size={16} className="mr-2" />
-                                        Lanjutkan Pengaturan 2FA
+                                        <ShieldCheck size={18} className="mr-3" />
+                                        {__('Complete Gateway Link')}
                                     </Button>
                                 ) : (
                                     <Form
@@ -230,10 +271,10 @@ export default function Security({
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="rounded-full bg-orange-500 px-6 font-semibold text-zinc-950 hover:bg-orange-400"
+                                                className="h-18 px-12 rounded-full bg-sky-600 dark:bg-sky-500 text-white dark:text-black text-[11px] font-black uppercase tracking-[0.3em] shadow-xl dark:shadow-[0_15px_40px_rgba(14,165,233,0.4)] hover:scale-105 transition-all"
                                             >
-                                                <Shield size={16} className="mr-2" />
-                                                Aktifkan 2FA
+                                                <Shield size={18} className="mr-3" />
+                                                {__('Initialize Shield')}
                                             </Button>
                                         )}
                                     </Form>
@@ -252,18 +293,14 @@ export default function Security({
                             fetchSetupData={fetchSetupData}
                             errors={errors}
                         />
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </>
     );
 }
 
-Security.layout = {
-    breadcrumbs: [
-        {
-            title: 'Keamanan Akun',
-            href: edit(),
-        },
-    ],
-};
+Security.layout = (page: any) => (
+    <SettingsLayout>{page}</SettingsLayout>
+);
+

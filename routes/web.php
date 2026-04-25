@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\OTPController;
+use App\Http\Controllers\BotController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KitchenController;
@@ -15,7 +16,7 @@ use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\TestimonialController;
-use App\Http\Controllers\BotController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
@@ -53,6 +54,7 @@ Route::middleware(['auth', 'verified'])
         Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
         Route::post('/orders/checkout', [OrderController::class, 'store'])->name('orders.checkout');
         Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
+        Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         Route::get('/orders/payment/{order}', [OrderController::class, 'payment'])->name('orders.payment');
         Route::post('/orders/payment/{order}', [OrderController::class, 'processPayment'])->name('orders.payment.process');
         Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
@@ -67,6 +69,9 @@ Route::middleware(['auth', 'verified'])
         // Chat Routes
         Route::get('/reservations/{reservation}/messages', [ChatController::class, 'index'])->name('chat.index');
         Route::post('/reservations/{reservation}/messages', [ChatController::class, 'store'])->name('chat.store');
+        Route::get('/orders/{order}/messages', [ChatController::class, 'indexOrder'])->name('chat.order.index');
+        Route::post('/orders/{order}/messages', [ChatController::class, 'storeOrder'])->name('chat.order.store');
+        Route::post('/chat/{id}/read', [ChatController::class, 'markAsRead'])->name('chat.mark_read');
 
         // Simulation Route for Mapping Tracking
         Route::post('/reservations/{reservation}/simulate-tracking', [ReservationController::class, 'simulateTracking'])->name('reservations.simulate_tracking');
@@ -130,5 +135,15 @@ Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
 Route::middleware(['auth'])->group(function () {
     Route::get('invitations/{invitation}/accept', [TeamInvitationController::class, 'accept'])->name('invitations.accept');
 });
+
+Route::post('locale', function (Request $request) {
+    $request->validate([
+        'locale' => 'required|string|in:en,id',
+    ]);
+
+    session()->put('locale', $request->locale);
+
+    return back();
+})->name('locale.update');
 
 require __DIR__.'/settings.php';

@@ -1,12 +1,19 @@
 import { Head, Link, router, useHttp } from '@inertiajs/react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Truck, Package, CheckCircle2, MapPin, Clock } from 'lucide-react';
+import { Bike, Package, CheckCircle2, MapPin, Clock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import BoutiqueChat from '@/components/app/boutique-chat';
+import { useState } from 'react';
+import { MessageCircle } from 'lucide-react';
+import { usePage } from '@inertiajs/react';
 
 export default function CourierDashboard({ stats, deliveries }: any) {
     const http = useHttp();
+    const { auth } = usePage().props as any;
+    const [activeChatId, setActiveChatId] = useState<number | null>(null);
+
     return (
         <>
             <Head title="Courier Station - Dashboard" />
@@ -30,7 +37,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                 {/* Courier Stat Cards */}
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
                     {[
-                        { title: 'Pengiriman Aktif', val: stats.pending_deliveries, icon: Truck, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                        { title: 'Pengiriman Aktif', val: stats.pending_deliveries, icon: Bike, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                         { title: 'Selesai Hari Ini', val: stats.completed_today, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
                         { title: 'Pesanan Selesai', val: stats.total_completed, icon: Package, color: 'text-purple-400', bg: 'bg-purple-400/10' },
                     ].map((card, idx) => (
@@ -95,44 +102,156 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                         </div>
 
                                         <div className="flex items-center gap-3 w-full md:w-auto">
+                                            <Button 
+                                                onClick={() => setActiveChatId(activeChatId === delivery.id ? null : delivery.id)}
+                                                variant="outline"
+                                                className={`h-10 w-10 flex items-center justify-center rounded-xl transition-all ${
+                                                    activeChatId === delivery.id ? 'bg-sky-500 text-black border-sky-500' : 'border-white/10 hover:bg-white/5 text-white/40'
+                                                }`}
+                                            >
+                                                <MessageCircle size={18} />
+                                            </Button>
+
                                             {delivery.status === 'preparing' && (
-                                                <Button 
-                                                    onClick={() => router.patch(`/orders/${delivery.id}/delivery-status`, { delivery_status: 'delivering' })}
-                                                    className="w-full md:w-auto bg-blue-500 text-white hover:bg-blue-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
-                                                >
-                                                    <Truck className="mr-2 h-4 w-4" /> Mulai Kirim
-                                                </Button>
+                                                <div className="flex flex-col gap-2 w-full md:w-auto">
+                                                    <Button 
+                                                        onClick={() => toast.success('Berhasil mengirim status: Menunggu di Restoran')}
+                                                        variant="outline"
+                                                        className="border-blue-500/50 text-blue-500 hover:bg-blue-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                                                    >
+                                                        <MapPin className="mr-2 h-4 w-4" /> Saya di Resto
+                                                    </Button>
+                                                    
+                                                    <Button 
+                                                        onClick={() => router.patch(`/orders/${delivery.id}/delivery-status`, { delivery_status: 'delivering' })}
+                                                        className="bg-blue-500 text-white hover:bg-blue-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                                                    >
+                                                        <Bike className="mr-2 h-4 w-4" /> Ambil & Kirim
+                                                    </Button>
+                                                </div>
                                             )}
-                                             {delivery.status === 'delivering' && (
-                                                 <div className="flex flex-col gap-2 w-full md:w-auto">
-                                                     <Button 
-                                                         onClick={() => {
-                                                             http.post(`/orders/${delivery.id}/simulate-tracking`);
-                                                             toast.success('Simulation started - Movement broadcasting...');
-                                                             
-                                                             // Client side simulation for demo loop
-                                                             let i = 0;
-                                                             const interval = setInterval(() => {
-                                                                 if(i > 10) { clearInterval(interval); return; }
-                                                                 const lat = -6.2088 + (i * 0.001);
-                                                                 const lng = 106.8456 + (i * 0.001);
-                                                                 http.post(`/orders/${delivery.id}/simulate-tracking`, { latitude: lat, longitude: lng });
-                                                                 i++;
-                                                             }, 2000);
-                                                         }}
-                                                         variant="outline"
-                                                         className="border-orange-500/50 text-orange-500 hover:bg-orange-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
-                                                     >
-                                                         <MapPin className="mr-2 h-4 w-4" /> Simulate GPS
-                                                     </Button>
-                                                     <Button 
-                                                         onClick={() => router.patch(`/orders/${delivery.id}/delivery-status`, { delivery_status: 'delivered' })}
-                                                         className="bg-emerald-500 text-white hover:bg-emerald-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
-                                                     >
-                                                         <CheckCircle2 className="mr-2 h-4 w-4" /> Selesaikan
-                                                     </Button>
-                                                 </div>
-                                             )}
+
+                                            {delivery.status === 'delivering' && (
+                                                <div className="flex flex-col gap-2 w-full md:w-auto">
+                                                    <Button 
+                                                        onClick={() => {
+                                                            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                                                                toast.error('GPS Asli memerlukan koneksi HTTPS (SSL) untuk berfungsi.');
+                                                                return;
+                                                            }
+
+                                                            if ((window as any).simInterval) {
+                                                                clearInterval((window as any).simInterval);
+                                                                (window as any).simInterval = null;
+                                                            }
+
+                                                            if ((window as any).watchId) {
+                                                                navigator.geolocation.clearWatch((window as any).watchId);
+                                                                (window as any).watchId = null;
+                                                                toast.error('GPS Pelacakan Dimatikan');
+                                                                return;
+                                                            }
+
+                                                            if (!navigator.geolocation) {
+                                                                toast.error('Browser Anda tidak mendukung GPS');
+                                                                return;
+                                                            }
+
+                                                            const watchId = navigator.geolocation.watchPosition(
+                                                                (position) => {
+                                                                    const { latitude, longitude, accuracy } = position.coords;
+                                                                    
+                                                                    // Visual feedback that data is being sent
+                                                                    toast.loading(`Mengirim Sinyal GPS (Akurasi: ${accuracy.toFixed(0)}m)...`, { id: 'gps-sync' });
+
+                                                                    fetch(`/orders/${delivery.id}/simulate-tracking`, {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/json',
+                                                                            'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
+                                                                        },
+                                                                        body: JSON.stringify({ latitude, longitude })
+                                                                    }).then(() => {
+                                                                        toast.success(`Lokasi Terkirim! (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`, { 
+                                                                            id: 'gps-sync',
+                                                                            duration: 2000
+                                                                        });
+                                                                    });
+                                                                },
+                                                                (error) => {
+                                                                    toast.error(`GPS Bermasalah: ${error.message}`, { id: 'gps-sync' });
+                                                                },
+                                                                { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+                                                            );
+
+                                                            (window as any).watchId = watchId;
+                                                            toast.success('GPS Asli Aktif! Melacak posisi real-time Anda.');
+                                                        }}
+                                                        variant="outline"
+                                                        className={`border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${ (window as any).watchId ? 'bg-emerald-500 text-white' : ''}`}
+                                                    >
+                                                        <MapPin className="mr-2 h-4 w-4" /> {(window as any).watchId ? 'Stop Pelacakan GPS' : 'Aktifkan GPS Asli'}
+                                                    </Button>
+
+                                                    <Button 
+                                                        onClick={() => {
+                                                            if ((window as any).watchId) {
+                                                                navigator.geolocation.clearWatch((window as any).watchId);
+                                                                (window as any).watchId = null;
+                                                            }
+
+                                                            if ((window as any).simInterval) {
+                                                                clearInterval((window as any).simInterval);
+                                                                (window as any).simInterval = null;
+                                                                toast.error('Simulasi Dimatikan');
+                                                                return;
+                                                            }
+
+                                                            toast.info('Memulai Simulasi Perjalanan...');
+                                                            let i = 0;
+                                                            const interval = setInterval(() => {
+                                                                if(i > 40) {
+                                                                    clearInterval(interval); 
+                                                                    (window as any).simInterval = null;
+                                                                    return; 
+                                                                }
+                                                                const startLat = Number(delivery.courier_lat) || -1.2654;
+                                                                const startLng = Number(delivery.courier_lng) || 116.8312;
+                                                                const lat = startLat + (i * 0.0003);
+                                                                const lng = startLng + (i * 0.0003);
+                                                                
+                                                                fetch(`/orders/${delivery.id}/simulate-tracking`, {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json',
+                                                                        'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '',
+                                                                    },
+                                                                    body: JSON.stringify({ latitude: lat, longitude: lng })
+                                                                });
+                                                                i++;
+                                                            }, 1500);
+
+                                                            (window as any).simInterval = interval;
+                                                        }}
+                                                        variant="outline"
+                                                        className={`border-sky-500/50 text-sky-500 hover:bg-sky-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${ (window as any).simInterval ? 'bg-sky-500 text-white' : ''}`}
+                                                    >
+                                                        <Bike className="mr-2 h-4 w-4" /> {(window as any).simInterval ? 'Stop Simulasi' : 'Jalankan Simulasi'}
+                                                    </Button>
+
+                                                    <Button 
+                                                        onClick={() => {
+                                                            if ((window as any).watchId) navigator.geolocation.clearWatch((window as any).watchId);
+                                                            if ((window as any).simInterval) clearInterval((window as any).simInterval);
+                                                            router.patch(`/orders/${delivery.id}/delivery-status`, { delivery_status: 'delivered' });
+                                                        }}
+                                                        className="bg-emerald-500 text-white hover:bg-emerald-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                                                    >
+                                                        <CheckCircle2 className="mr-2 h-4 w-4" /> Selesaikan Pengiriman
+                                                    </Button>
+                                                </div>
+                                            )}
+
                                             {['delivered', 'complete'].includes(delivery.status) && (
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 flex items-center gap-2">
                                                     <CheckCircle2 size={14} /> Berhasil Terkirim
@@ -151,9 +270,13 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                         )}
                     </div>
                 </div>
+
+                {activeChatId && (
+                    <BoutiqueChat orderId={activeChatId} currentUser={auth.user} />
+                )}
             </div>
         </>
     );
 }
 
-CourierDashboard.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;
+CourierDashboard.layout = (page: any) => <RestoAdminLayout>{page}</RestoAdminLayout>;

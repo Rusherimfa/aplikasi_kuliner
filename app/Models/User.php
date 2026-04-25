@@ -13,7 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'phone', 'password', 'current_team_id', 'role', 'google_id', 'avatar', 'email_verified_at', 'points', 'otp_code', 'otp_expires_at', 'is_verified'])]
+#[Fillable(['name', 'email', 'phone', 'password', 'current_team_id', 'role', 'google_id', 'avatar', 'email_verified_at', 'points', 'otp_code', 'otp_expires_at', 'is_verified', 'is_available', 'latitude', 'longitude'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'otp_code'])]
 class User extends Authenticatable
 {
@@ -43,6 +43,8 @@ class User extends Authenticatable
             'password' => 'hashed',
             'two_factor_confirmed_at' => 'datetime',
             'role' => Role::class,
+            'latitude' => 'decimal:7',
+            'longitude' => 'decimal:7',
         ];
     }
 
@@ -59,6 +61,14 @@ class User extends Authenticatable
     public function isCourier(): bool
     {
         return $this->role === Role::KURIR;
+    }
+
+    /**
+     * Determine if the courier is currently available.
+     */
+    public function isAvailable(): bool
+    {
+        return (bool) $this->is_available;
     }
 
     public function isCustomer(): bool

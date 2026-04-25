@@ -3,6 +3,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { UtensilsCrossed, Flame, Leaf, Wheat, Info, ShoppingBag, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslations } from '@/hooks/use-translations';
+import { usePage } from '@inertiajs/react';
 
 interface DishDetailModalProps {
     dish: any;
@@ -12,10 +14,18 @@ interface DishDetailModalProps {
 }
 
 export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: DishDetailModalProps) {
+    const { __ } = useTranslations();
+    const { locale } = usePage().props as any;
+
     if (!dish) return null;
 
-    const formatRupiah = (amount: number) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    const formatCurrency = (amount: number) => {
+        return amount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).replace('IDR', 'Rp');
     };
 
     return (
@@ -31,7 +41,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                         {/* Tags over image */}
                         <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
                             {dish.is_best_seller && (
-                                <Badge className="bg-orange-500 text-black border-none px-4 py-2 font-black text-[10px] uppercase tracking-widest shadow-2xl">
+                                <Badge className="bg-sky-500 text-black border-none px-4 py-2 font-black text-[10px] uppercase tracking-widest shadow-2xl">
                                     <Flame size={12} className="mr-2" /> Signature
                                 </Badge>
                             )}
@@ -52,25 +62,25 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                                     <h2 className="font-['Playfair_Display',serif] text-4xl font-black text-white tracking-tight leading-none">
                                         {dish.name}
                                     </h2>
-                                    <p className="text-2xl font-black text-orange-500 italic">
-                                        {formatRupiah(dish.price)}
+                                    <p className="text-2xl font-black text-sky-500 italic">
+                                        {formatCurrency(Number(dish.price))}
                                     </p>
                                 </div>
                             </div>
 
                             <p className="text-white/40 leading-relaxed font-medium text-lg">
-                                {dish.description || 'Simfoni rasa yang dirancang dengan dedikasi tinggi oleh chef kami untuk memberikan pengalaman kuliner yang belum pernah ada sebelumnya.'}
+                                {dish.description || __('A symphony of flavors crafted with high dedication by our chefs to provide a culinary experience like never before.')}
                             </p>
 
                             {/* Infographic Stats */}
                             <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/5">
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Waktu Persiapan</p>
-                                    <p className="text-white font-bold tracking-tight uppercase">15 - 20 Menit</p>
+                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Preparation Time')}</p>
+                                    <p className="text-white font-bold tracking-tight uppercase">15 - 20 {__('Minutes')}</p>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">Tingkat Kesulitan</p>
-                                    <p className="text-white font-bold tracking-tight uppercase">Masterpiece</p>
+                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Complexity Level')}</p>
+                                    <p className="text-white font-bold tracking-tight uppercase">{__('Masterpiece')}</p>
                                 </div>
                             </div>
 
@@ -81,7 +91,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                                     <span className="text-[10px] font-black uppercase tracking-widest">Vegan Friendly</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-white/40">
-                                    <Wheat size={16} className="text-orange-300" />
+                                    <Wheat size={16} className="text-sky-300" />
                                     <span className="text-[10px] font-black uppercase tracking-widest">Non-Gluten</span>
                                 </div>
                             </div>
@@ -93,7 +103,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                                     onAddToCart(dish);
                                     onClose();
                                 }}
-                                className="flex-1 h-16 rounded-2xl bg-orange-500 text-black font-black uppercase tracking-[0.2em] text-xs transition-all hover:bg-white hover:scale-[1.02] active:scale-95 shadow-2xl shadow-orange-500/20"
+                                className="flex-1 h-16 rounded-2xl bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs transition-all hover:bg-white hover:scale-[1.02] active:scale-95 shadow-2xl shadow-sky-500/20"
                             >
                                 <ShoppingBag size={18} className="mr-3" />
                                 Add to Experience
@@ -105,3 +115,4 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
         </Dialog>
     );
 }
+

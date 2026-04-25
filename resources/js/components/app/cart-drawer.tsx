@@ -4,10 +4,21 @@ import { X, Minus, Plus, ShoppingBag, ArrowRight, UtensilsCrossed } from 'lucide
 import { useCart } from '@/hooks/use-cart';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function CartDrawer() {
     const { isCartOpen, setCartOpen, items, removeItem, updateQuantity, cartTotal } = useCart();
-    const { auth } = usePage().props as any;
+    const { auth, locale } = usePage().props as any;
+    const { __ } = useTranslations();
+
+    const formatCurrency = (amount: number) => {
+        return amount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).replace('IDR', 'Rp');
+    };
 
     return (
         <Transition.Root show={isCartOpen} as={Fragment}>
@@ -41,8 +52,8 @@ export default function CartDrawer() {
                                         <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                                             <div className="flex items-start justify-between">
                                                 <Dialog.Title className="text-xl font-['Playfair_Display',serif] font-bold text-foreground flex items-center gap-2">
-                                                    <ShoppingBag size={24} className="text-orange-500" />
-                                                    Pesanan Anda
+                                                    <ShoppingBag size={24} className="text-sky-500" />
+                                                    {__('Your Selection')}
                                                 </Dialog.Title>
                                                 <div className="ml-3 flex h-7 items-center">
                                                     <button
@@ -63,9 +74,9 @@ export default function CartDrawer() {
                                                         <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center mb-6">
                                                             <UtensilsCrossed size={40} className="text-muted-foreground/40" />
                                                         </div>
-                                                        <h3 className="text-lg font-medium text-foreground mb-2">Keranjang Kosong</h3>
+                                                        <h3 className="text-lg font-medium text-foreground mb-2">{__('Empty Cart')}</h3>
                                                         <p className="text-muted-foreground max-w-[200px]">
-                                                            Silakan telusuri katalog untuk menambahkan hidangan.
+                                                            {__('Please browse our catalog to add gourmet dishes.')}
                                                         </p>
                                                     </div>
                                                 ) : (
@@ -77,8 +88,8 @@ export default function CartDrawer() {
                                                                          <div>
                                                                              <div className="flex justify-between text-base font-semibold text-foreground">
                                                                                  <h4 className="line-clamp-2 pr-4">{item.name}</h4>
-                                                                                 <p className="ml-4 whitespace-nowrap text-orange-600">
-                                                                                     Rp {(Number(item.price) * item.quantity).toLocaleString('id-ID')}
+                                                                                 <p className="ml-4 whitespace-nowrap text-sky-600">
+                                                                                     {formatCurrency(Number(item.price) * item.quantity)}
                                                                                  </p>
                                                                              </div>
                                                                          </div>
@@ -93,7 +104,7 @@ export default function CartDrawer() {
                                                                                  <span className="w-4 text-center font-medium text-foreground">{item.quantity}</span>
                                                                                  <button
                                                                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-500/10 text-orange-600 hover:bg-orange-500/20"
+                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20"
                                                                                  >
                                                                                      <Plus size={14} />
                                                                                  </button>
@@ -104,7 +115,7 @@ export default function CartDrawer() {
                                                                                 onClick={() => removeItem(item.id)}
                                                                                 className="font-medium text-red-500 hover:text-red-700 transition-colors"
                                                                             >
-                                                                                Hapus
+                                                                                {__('Remove')}
                                                                             </button>
                                                                         </div>
                                                                     </div>
@@ -119,31 +130,31 @@ export default function CartDrawer() {
                                         {items.length > 0 && (
                                             <div className="border-t border-border bg-card px-4 py-6 sm:px-6">
                                                 <div className="flex justify-between text-lg font-bold text-foreground mb-6">
-                                                    <p>Total Pesanan</p>
-                                                    <p className="text-orange-600">Rp {cartTotal.toLocaleString('id-ID')}</p>
+                                                    <p>{__('Order Total')}</p>
+                                                    <p className="text-sky-600">{formatCurrency(cartTotal)}</p>
                                                 </div>
                                                 {auth?.user ? (
                                                     <Link href="/checkout" onClick={() => setCartOpen(false)}>
-                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
-                                                            Lanjutkan Pemesanan <ArrowRight className="ml-2" size={20} />
+                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-sky-500 to-sky-700 text-lg font-semibold text-white shadow-xl shadow-sky-900/20 hover:from-sky-400 hover:to-sky-600 transition-all hover:scale-[1.02]">
+                                                            {__('Continue to Checkout')} <ArrowRight className="ml-2" size={20} />
                                                         </Button>
                                                     </Link>
                                                 ) : (
                                                     <a href="/checkout" onClick={() => setCartOpen(false)} className="block">
-                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-orange-500 to-orange-700 text-lg font-semibold text-white shadow-xl shadow-orange-900/20 hover:from-orange-400 hover:to-orange-600 transition-all hover:scale-[1.02]">
-                                                            Lanjutkan Pemesanan <ArrowRight className="ml-2" size={20} />
+                                                        <Button className="w-full flex items-center justify-center h-14 rounded-full bg-gradient-to-r from-sky-500 to-sky-700 text-lg font-semibold text-white shadow-xl shadow-sky-900/20 hover:from-sky-400 hover:to-sky-600 transition-all hover:scale-[1.02]">
+                                                            {__('Continue to Checkout')} <ArrowRight className="ml-2" size={20} />
                                                         </Button>
                                                     </a>
                                                 )}
                                                 <div className="mt-4 flex justify-center text-center text-sm text-muted-foreground">
                                                     <p>
-                                                        atau{' '}
+                                                        {__('or')}{' '}
                                                         <button
                                                             type="button"
-                                                            className="font-medium text-orange-600 hover:text-orange-500"
+                                                            className="font-medium text-sky-600 hover:text-sky-500"
                                                             onClick={() => setCartOpen(false)}
                                                         >
-                                                            Lanjut Belanja<span aria-hidden="true"> &rarr;</span>
+                                                            {__('Continue Shopping')}<span aria-hidden="true"> &rarr;</span>
                                                         </button>
                                                     </p>
                                                 </div>
@@ -159,3 +170,4 @@ export default function CartDrawer() {
         </Transition.Root>
     );
 }
+

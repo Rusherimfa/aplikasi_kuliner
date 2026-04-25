@@ -14,50 +14,52 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useTranslations } from '@/hooks/use-translations';
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 export function AppSidebar() {
+    const { __ } = useTranslations();
     const page = usePage();
     const dashboardUrl = page.props.currentTeam
         ? dashboard(page.props.currentTeam.slug)
         : '/';
 
-    const userRole = page.props.auth.user.role;
+    const userRole = (page.props.auth as any).user.role;
 
     let mainNavItems: NavItem[] = [];
 
     if (userRole === 'admin') {
         mainNavItems = [
-            { title: 'Overview', href: dashboardUrl, icon: LayoutGrid },
-            { title: 'Intelligence', href: '/analytics', icon: PieChart },
-            { title: 'Manajemen Reservasi', href: '/reservations', icon: Calendar },
-            { title: 'Buku Menu', href: '/menus', icon: BookOpen },
-            { title: 'Dapur (KDS)', href: '/kitchen', icon: Utensils },
-            { title: 'Service Hub', href: '/service-requests', icon: Settings }, // Or another icon
-            { title: 'Pengaturan', href: '/settings/profile', icon: Settings },
+            { title: __('Overview'), href: dashboardUrl, icon: LayoutGrid },
+            { title: __('Intelligence'), href: '/analytics', icon: PieChart },
+            { title: __('Reservation Control'), href: '/reservations', icon: Calendar },
+            { title: __('Gourmet Ledger'), href: '/menus', icon: BookOpen },
+            { title: __('Kitchen Operations'), href: '/kitchen', icon: Utensils },
+            { title: __('Concierge Hub'), href: '/service-requests', icon: Settings }, // Or another icon
+            { title: __('Settings'), href: '/settings/profile', icon: Settings },
         ];
     } else if (userRole === 'staff') {
         mainNavItems = [
-            { title: 'Operasional', href: dashboardUrl, icon: LayoutGrid },
-            { title: 'Manajemen Reservasi', href: '/reservations', icon: Calendar },
-            { title: 'Dapur (KDS)', href: '/kitchen', icon: Utensils },
-            { title: 'Service Hub', href: '/service-requests', icon: BookOpen },
-            { title: 'Pengaturan', href: '/settings/profile', icon: Settings },
+            { title: __('Operational Command'), href: dashboardUrl, icon: LayoutGrid },
+            { title: __('Reservation Control'), href: '/reservations', icon: Calendar },
+            { title: __('Kitchen Operations'), href: '/kitchen', icon: Utensils },
+            { title: __('Concierge Hub'), href: '/service-requests', icon: BookOpen },
+            { title: __('Settings'), href: '/settings/profile', icon: Settings },
         ];
     } else if (userRole === 'kurir') {
         mainNavItems = [
-            { title: 'Dashboard Delivery', href: dashboardUrl, icon: Truck },
-            { title: 'Pengaturan', href: '/settings/profile', icon: Settings },
+            { title: __('Logistics Hub'), href: dashboardUrl, icon: Truck },
+            { title: __('Settings'), href: '/settings/profile', icon: Settings },
         ];
     } else {
         // Customer
         mainNavItems = [
-            { title: 'Beranda', href: '/', icon: LayoutGrid },
-            { title: 'Katalog Menu', href: '/catalog', icon: Utensils },
-            { title: 'Buat Reservasi', href: '/reservations/create', icon: Calendar },
-            { title: 'Aktivitas Saya', href: '/reservations/history', icon: BookOpen },
-            { title: 'Pengaturan', href: '/settings/profile', icon: Settings },
+            { title: __('Sanctuary'), href: '/', icon: LayoutGrid },
+            { title: __('Culinary Catalog'), href: '/catalog', icon: Utensils },
+            { title: __('Secure a Table'), href: '/reservations/create', icon: Calendar },
+            { title: __('Activity Record'), href: '/reservations/history', icon: BookOpen },
+            { title: __('Settings'), href: '/settings/profile', icon: Settings },
         ];
     }
 

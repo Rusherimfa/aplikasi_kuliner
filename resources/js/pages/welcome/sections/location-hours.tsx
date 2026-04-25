@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion';
 import { Clock, MapPin, ExternalLink, Navigation } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function LocationHours() {
+    const { __ } = useTranslations();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef(null);
 
@@ -47,19 +49,19 @@ export default function LocationHours() {
                         <div>
                             <div className="flex items-center gap-4 mb-10">
                                 <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                                    <Clock size={24} strokeWidth={1.5} />
-                                </div>
-                                <h2 className="font-serif text-3xl md:text-4xl text-slate-900 dark:text-white">Jam Operasional</h2>
+                                     <Clock size={24} strokeWidth={1.5} />
+                                 </div>
+                                 <h2 className="font-serif text-3xl md:text-4xl text-slate-900 dark:text-white">{__('Operational Hours')}</h2>
                             </div>
 
                             <div className="space-y-10">
                                 <div className="group">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">Senin — Jumat</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">{__('Monday — Friday')}</p>
                                     <p className="font-serif text-2xl md:text-3xl text-slate-800 dark:text-neutral-200 group-hover:text-primary transition-colors duration-500">08:00 AM — 10:00 PM</p>
                                 </div>
                                 
                                 <div className="group">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">Sabtu — Minggu</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">{__('Saturday — Sunday')}</p>
                                     <p className="font-serif text-2xl md:text-3xl text-slate-800 dark:text-neutral-200 group-hover:text-primary transition-colors duration-500">09:00 AM — 11:00 PM</p>
                                 </div>
                             </div>
@@ -78,7 +80,7 @@ export default function LocationHours() {
                             >
                                 <div className={`h-2 w-2 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'} `} />
                                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">
-                                    {isOpen ? 'Kami Buka Sekarang' : 'Kami Tutup Sekarang'}
+                                    {isOpen ? __('We Are Open Now') : __('We Are Closed Now')}
                                 </span>
                             </motion.div>
                         </div>
@@ -95,18 +97,17 @@ export default function LocationHours() {
                             <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                                 <MapPin size={24} strokeWidth={1.5} />
                             </div>
-                            <h2 className="font-serif text-3xl md:text-4xl text-slate-900 dark:text-white">Lokasi Kami</h2>
+                            <h2 className="font-serif text-3xl md:text-4xl text-slate-900 dark:text-white">{__('Our Location')}</h2>
                         </div>
 
-                        <p className="font-serif text-xl md:text-2xl text-slate-600 dark:text-neutral-400 leading-relaxed mb-12 italic">
-                            11, Jalan Telawi 3, Bangsar, <br />
-                            59100 Kuala Lumpur
+                        <p className="font-serif text-lg md:text-xl text-slate-600 dark:text-neutral-400 leading-relaxed mb-12 italic">
+                            Kompleks Ruko Bandar, Jl. Jenderal Sudirman No.26 Blok N1, RT.01, Klandasan Ulu, Kec. Balikpapan Kota, Kota Balikpapan, Kalimantan Timur 76112
                         </p>
 
                         <div className="relative flex-1 min-h-[300px] rounded-[2.5rem] overflow-hidden group ring-1 ring-slate-200 dark:ring-white/10">
                             {/* Map Placeholder with high-end look */}
                             <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15935.340942082269!2d101.661706!3d3.127814!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31cc498ef0253725%3A0xe543e597c4146a78!2sBangsar%2C%20Kuala%20Lumpur%2C%20Federal%20Territory%20of%20Kuala%20Lumpur!5e0!3m2!1sen!2smy!4v1713022500000!5m2!1sen!2smy" 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.899665596486!2d116.8091722!3d-1.2721869!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df147ac52b75a13%3A0x67fa50df185d9200!2sOcean&#39;s%20Resto%20Balikpapan!5e0!3m2!1sen!2sid!4v1713022500000!5m2!1sen!2sid" 
                                 width="100%" 
                                 height="100%" 
                                 style={{ border: 0, filter: 'grayscale(1) contrast(1.1) opacity(0.8)' }} 
@@ -118,12 +119,12 @@ export default function LocationHours() {
                             
                             <div className="absolute top-6 right-6">
                                 <a 
-                                    href="https://maps.app.goo.gl/YourMapLink" 
+                                    href="https://maps.app.goo.gl/g5LkqGHRnbGva1sV8" 
                                     target="_blank" 
                                     rel="noreferrer"
                                     className="flex items-center gap-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-5 py-2.5 rounded-full text-[10px] font-black text-primary uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95"
                                 >
-                                    Buka di Maps
+                                    {__('Open in Maps')}
                                     <ExternalLink size={12} />
                                 </a>
                             </div>

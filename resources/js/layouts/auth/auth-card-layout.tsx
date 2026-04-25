@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 import {
@@ -23,8 +23,8 @@ export default function AuthCardLayout({
     return (
         <div className="relative flex min-h-svh flex-col items-center justify-center gap-6 bg-[#FAFAFA] dark:bg-[#0A0A0B] p-6 md:p-10 transition-colors duration-500 overflow-hidden font-['Inter',sans-serif]">
             {/* Premium Decorative Ambient */}
-            <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-orange-500/5 blur-[120px]" />
-            <div className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-orange-600/5 blur-[100px]" />
+            <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[600px] w-[600px] rounded-full bg-sky-500/5 blur-[120px]" />
+            <div className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[500px] w-[500px] rounded-full bg-sky-600/5 blur-[100px]" />
 
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ export default function AuthCardLayout({
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: 0.2 }}
-                                className="mx-auto inline-flex items-center gap-2 rounded-full border border-orange-500/20 bg-orange-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-orange-500 uppercase glow-primary"
+                                className="mx-auto inline-flex items-center gap-2 rounded-full border border-sky-500/20 bg-sky-500/5 px-4 py-1.5 text-[10px] font-black tracking-[0.3em] text-sky-500 uppercase glow-primary"
                             >
                                 Security Gate
                             </motion.div>
@@ -66,10 +66,11 @@ export default function AuthCardLayout({
                 </div>
 
                 <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-neutral-600">
-                    &copy; {new Date().getFullYear()} RestoWeb Premium. All rights reserved.
+                    &copy; {new Date().getFullYear()} Ocean's Resto Premium. All rights reserved.
                 </p>
             </motion.div>
         </div>
     );
 }
+
 

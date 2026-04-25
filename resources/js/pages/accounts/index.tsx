@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+﻿import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { Users, Plus, Edit2, Trash2, X, ChefHat, Bike, User as UserIcon } from 'lucide-react';
@@ -145,7 +145,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
 
     return (
         <>
-            <Head title="Manajemen Akun - RestoWeb Admin" />
+            <Head title="Manajemen Akun - Ocean's Resto Admin" />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-foreground font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
@@ -160,7 +160,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                     <div className="flex w-full sm:w-auto items-center gap-3">
                         <Button 
                             onClick={openCreateModal}
-                            className="shrink-0 bg-orange-500 hover:bg-orange-600 text-[#0A0A0B] font-semibold"
+                            className="shrink-0 bg-sky-500 hover:bg-sky-600 text-[#0A0A0B] font-semibold"
                         >
                             <Plus className="mr-2 h-4 w-4" />
                             Tambah Personil Baru
@@ -179,7 +179,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                     <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
                     <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         
-                        <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/20 blur-3xl"></div>
+                        <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/20 blur-3xl"></div>
                         
                         <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
                             <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
@@ -197,7 +197,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                     id="role" 
                                     value={data.role} 
                                     onChange={e => setData('role', e.target.value)}
-                                    className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500"
                                 >
                                     <option value="staff" className="bg-card">Staff / Kru</option>
                                     <option value="kurir" className="bg-card">Kurir Truk</option>
@@ -213,7 +213,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                         id="name" 
                                         value={data.name} 
                                         onChange={e => setData('name', e.target.value)}
-                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
+                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
                                     />
                                     {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
                                 </div>
@@ -223,7 +223,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                         id="phone" 
                                         value={data.phone} 
                                         onChange={e => setData('phone', e.target.value)}
-                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
+                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
                                     />
                                     {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
                                 </div>
@@ -236,7 +236,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                     type="email"
                                     value={data.email} 
                                     onChange={e => setData('email', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
+                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
                                     autoComplete="none"
                                 />
                                 {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
@@ -251,7 +251,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                     type="password"
                                     value={data.password} 
                                     onChange={e => setData('password', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-orange-500"
+                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
                                     autoComplete="new-password"
                                 />
                                 {errors.password && <p className="mt-1 text-xs text-destructive">{errors.password}</p>}
@@ -261,7 +261,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-muted">
                                     Batal
                                 </Button>
-                                <Button type="submit" disabled={processing} className="bg-orange-500 hover:bg-orange-600 text-zinc-950 font-bold">
+                                <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600 text-zinc-950 font-bold">
                                     {processing ? 'Menyimpan...' : 'Simpan Konfigurasi'}
                                 </Button>
                             </div>
@@ -274,3 +274,4 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
 }
 
 AccountManagement.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;
+

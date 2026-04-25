@@ -30,7 +30,7 @@ export default function AnalyticsDashboard({ stats }: any) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Business Intelligence - RestoWeb" />
+            <Head title="Business Intelligence - Ocean's Resto" />
             
             <div className="flex h-full flex-1 flex-col gap-8 p-8 max-w-7xl mx-auto w-full">
                 
@@ -47,7 +47,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                         value={formatRupiah(stats.revenue)} 
                         subtitle="Gross from confirmed bookings"
                         icon={CreditCard}
-                        color="orange"
+                        color="sky"
                     />
                     <StatCard 
                         title="Total Patrons" 
@@ -77,7 +77,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                     <div className="lg:col-span-2 rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-sm">
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-black flex items-center gap-3">
-                                <Clock className="text-orange-500" size={20} /> Peak Dining Hours
+                                <Clock className="text-sky-500" size={20} /> Peak Dining Hours
                             </h3>
                         </div>
                         
@@ -94,7 +94,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                                             <motion.div 
                                                 initial={{ height: 0 }}
                                                 animate={{ height: `${height}%` }}
-                                                className={`w-full rounded-t-lg transition-all duration-500 ${height > 70 ? 'bg-orange-500' : 'bg-orange-500/20 group-hover:bg-orange-500/40'}`}
+                                                className={`w-full rounded-t-lg transition-all duration-500 ${height > 70 ? 'bg-sky-500' : 'bg-sky-500/20 group-hover:bg-sky-500/40'}`}
                                             />
                                             {data && (
                                                 <div className="absolute -top-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black text-white text-[8px] font-black px-2 py-1 rounded-full whitespace-nowrap">
@@ -113,20 +113,20 @@ export default function AnalyticsDashboard({ stats }: any) {
                     {/* Service Distribution */}
                     <div className="rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-sm">
                         <h3 className="text-xl font-black mb-8 flex items-center gap-3">
-                            <PieChart className="text-orange-500" size={20} /> Service Mix
+                            <PieChart className="text-sky-500" size={20} /> Service Mix
                         </h3>
                         <div className="space-y-6">
                             {stats.serviceDistribution.map((item: any) => (
                                 <div key={item.type} className="space-y-2">
                                     <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                        <span className={item.type === 'dine_in' ? 'text-orange-500' : 'text-blue-400'}>{item.type.replace('_', ' ')}</span>
+                                        <span className={item.type === 'dine_in' ? 'text-sky-500' : 'text-blue-400'}>{item.type.replace('_', ' ')}</span>
                                         <span>{item.count}</span>
                                     </div>
                                     <div className="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
                                         <motion.div 
                                             initial={{ width: 0 }}
                                             animate={{ width: `${(item.count / stats.monthlyReservations.reduce((acc: any, curr: any) => acc + curr.count, 0) || 1) * 100}%` }}
-                                            className={`h-full rounded-full ${item.type === 'dine_in' ? 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-blue-400'}`}
+                                            className={`h-full rounded-full ${item.type === 'dine_in' ? 'bg-sky-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]' : 'bg-blue-400'}`}
                                         />
                                     </div>
                                 </div>
@@ -140,7 +140,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                     <div className="rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-sm">
                         <div className="flex items-center justify-between mb-8">
                             <h3 className="text-xl font-black flex items-center gap-3">
-                                <Trophy className="text-orange-500" size={20} /> Most Desired Courses
+                                <Trophy className="text-sky-500" size={20} /> Most Desired Courses
                             </h3>
                         </div>
                         
@@ -148,7 +148,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                             {stats.topMenus.map((menu: any, idx: number) => (
                                 <div key={idx} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.01] border border-slate-100 dark:border-white/5">
                                     <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 font-black text-xs">
+                                        <div className="h-10 w-10 rounded-full bg-sky-500/10 flex items-center justify-center text-sky-500 font-black text-xs">
                                             #{idx + 1}
                                         </div>
                                         <div>
@@ -156,7 +156,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                                             <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Orders: {menu.total_sold}</p>
                                         </div>
                                     </div>
-                                    <ArrowUpRight size={14} className="text-orange-500/20" />
+                                    <ArrowUpRight size={14} className="text-sky-500/20" />
                                 </div>
                             ))}
                         </div>
@@ -165,7 +165,7 @@ export default function AnalyticsDashboard({ stats }: any) {
                     {/* Recent Feedback */}
                     <div className="rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-sm">
                         <h3 className="text-xl font-black mb-8 flex items-center gap-3">
-                            <Star className="text-orange-500" size={20} /> Latest Feedback
+                            <Star className="text-sky-500" size={20} /> Latest Feedback
                         </h3>
                         <div className="space-y-6">
                             {stats.recentReviews.length === 0 ? (
@@ -174,10 +174,10 @@ export default function AnalyticsDashboard({ stats }: any) {
                                 stats.recentReviews.map((review: any) => (
                                     <div key={review.id} className="space-y-2 pb-6 border-b border-slate-100 dark:border-white/5 last:border-0 last:pb-0">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-xs font-black uppercase tracking-widest text-orange-500">{review.user?.name}</p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-sky-500">{review.user?.name}</p>
                                             <div className="flex gap-0.5">
                                                 {[...Array(review.rating)].map((_, i) => (
-                                                    <Star key={i} size={10} className="fill-orange-500 text-orange-500" />
+                                                    <Star key={i} size={10} className="fill-sky-500 text-sky-500" />
                                                 ))}
                                             </div>
                                         </div>
@@ -196,7 +196,7 @@ export default function AnalyticsDashboard({ stats }: any) {
 
 function StatCard({ title, value, subtitle, icon: Icon, color }: any) {
     const colors: any = {
-        orange: 'text-orange-500 bg-orange-500/10 border-orange-500/20',
+        sky: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
         blue: 'text-blue-500 bg-blue-500/10 border-blue-500/20',
         emerald: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
         amber: 'text-amber-500 bg-amber-500/10 border-amber-500/20'
@@ -221,3 +221,4 @@ function StatCard({ title, value, subtitle, icon: Icon, color }: any) {
         </motion.div>
     );
 }
+

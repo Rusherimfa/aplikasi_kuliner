@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Navigation, MapPin } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface TrackingMapProps {
     reservationId: number;
@@ -10,6 +11,7 @@ interface TrackingMapProps {
 }
 
 export default function GourmetTrackingMap({ reservationId, initialLat = -6.2088, initialLng = 106.8456, destinationAddress }: TrackingMapProps) {
+    const { __ } = useTranslations();
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<any>(null);
     const markerRef = useRef<any>(null);
@@ -39,7 +41,7 @@ export default function GourmetTrackingMap({ reservationId, initialLat = -6.2088
             // Custom Iconic Marker
             const courierIcon = L.divIcon({
                 className: 'custom-courier-icon',
-                html: `<div class="relative h-10 w-10 flex items-center justify-center bg-orange-500 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.6)] border-2 border-white ring-4 ring-orange-500/20">
+                html: `<div class="relative h-10 w-10 flex items-center justify-center bg-sky-500 rounded-full shadow-[0_0_20px_rgba(249,115,22,0.6)] border-2 border-white ring-4 ring-sky-500/20">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-black"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                        </div>`,
                 iconSize: [40, 40],
@@ -77,7 +79,7 @@ export default function GourmetTrackingMap({ reservationId, initialLat = -6.2088
             <div className="absolute top-6 left-6 z-10 flex flex-col gap-3">
                 <div className="bg-black/40 backdrop-blur-xl border border-white/10 px-4 py-2 rounded-2xl flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white">Live Tracking</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white">{__('Live Tracking')}</span>
                 </div>
             </div>
 
@@ -88,20 +90,21 @@ export default function GourmetTrackingMap({ reservationId, initialLat = -6.2088
                     className="bg-black/60 backdrop-blur-2xl border border-white/10 p-5 rounded-[2rem] flex items-center justify-between"
                 >
                     <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500">
+                        <div className="h-12 w-12 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500">
                             <Navigation size={24} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Destination</p>
-                            <p className="text-xs font-bold text-white truncate max-w-[200px]">{destinationAddress || 'Alamat Pengiriman Chef'}</p>
+                            <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">{__('Destination')}</p>
+                            <p className="text-xs font-bold text-white truncate max-w-[200px]">{destinationAddress || __('Chef\'s Delivery Address')}</p>
                         </div>
                     </div>
                     <div className="text-right">
-                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Arriving in</p>
-                        <p className="text-lg font-black text-white tracking-tighter">~12 Min</p>
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{__('Arriving in')}</p>
+                        <p className="text-lg font-black text-white tracking-tighter">~12 {__('Min')}</p>
                     </div>
                 </motion.div>
             </div>
         </div>
     );
 }
+

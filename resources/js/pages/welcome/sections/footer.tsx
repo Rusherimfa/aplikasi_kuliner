@@ -2,12 +2,14 @@ import { Link } from '@inertiajs/react';
 import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
 import { login } from '@/routes';
 import { motion } from 'framer-motion';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Footer() {
+    const { __ } = useTranslations();
     return (
         <footer className="relative bg-[#FAFAFA] dark:bg-[#0A0A0B] text-slate-500 dark:text-neutral-500 border-t border-border dark:border-white/5 transition-colors duration-500 font-['Inter',sans-serif]">
             {/* Top decorative gradient line */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-orange-500/20 to-transparent" />
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
 
             <div className="mx-auto max-w-7xl px-8 py-24">
                 <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
@@ -15,18 +17,17 @@ export default function Footer() {
                     <div className="lg:col-span-5 space-y-8">
                         <div className="flex items-center gap-4">
                             <motion.div 
-                                whileHover={{ rotate: 15 }}
-                                className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black shadow-xl"
+                                whileHover={{ scale: 1.05 }}
+                                className="flex h-16 items-center justify-center"
                             >
-                                <UtensilsCrossed size={24} />
+                                <div className="h-16 w-16 overflow-hidden rounded-full bg-white/10 p-0.5 shadow-xl">
+                                    <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-full drop-shadow-md" />
+                                </div>
                             </motion.div>
-                            <span className="font-['Playfair_Display',serif] text-3xl font-black text-slate-900 dark:text-white tracking-tighter">
-                                Resto<span className="italic opacity-40">Web</span>
-                            </span>
                         </div>
                         
                         <p className="max-w-md text-base leading-relaxed font-medium">
-                            Destinasi di mana tradisi bertemu inovasi. Kami kurasikan setiap hidangan dengan presisi gastronomi untuk menciptakan memori yang abadi.
+                            {__('A destination where tradition meets innovation. We curate every dish with gastronomic precision to create eternal memories.')}
                         </p>
 
                         <div className="flex gap-4">
@@ -39,7 +40,7 @@ export default function Footer() {
                                     key={i}
                                     href={href}
                                     whileHover={{ y: -5 }}
-                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border dark:border-white/5 bg-white dark:bg-white/5 text-slate-400 transition-all hover:bg-orange-500 hover:text-black hover:border-orange-500 shadow-sm"
+                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border dark:border-white/5 bg-white dark:bg-white/5 text-slate-400 transition-all hover:bg-sky-500 hover:text-white hover:border-sky-500 shadow-sm"
                                 >
                                     <Icon size={18} />
                                 </motion.a>
@@ -52,21 +53,21 @@ export default function Footer() {
                         {/* Quick Links */}
                         <div className="space-y-8">
                             <h4 className="text-[10px] font-black tracking-[0.3em] text-slate-900 dark:text-white uppercase px-1">
-                                Exploration
+                                {__('Exploration')}
                             </h4>
                             <ul className="space-y-4">
                                 {[
-                                    { label: 'Our Selection', href: '/catalog' },
-                                    { label: 'Private Booking', href: '/reservations/create' },
-                                    { label: 'The Experience', href: '/experience' },
-                                    { label: 'Strategic Portal', href: login().url },
+                                    { label: __('Our Selection'), href: '/catalog' },
+                                    { label: __('Private Booking'), href: '/reservations/create' },
+                                    { label: __('The Experience'), href: '/experience' },
+                                    { label: __('Strategic Portal'), href: login().url },
                                 ].map((link) => (
                                     <li key={link.label}>
                                         <Link
                                             href={link.href}
-                                            className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest transition-all hover:text-orange-500"
+                                            className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest transition-all hover:text-sky-500"
                                         >
-                                            <span className="h-1 w-0 bg-orange-500 transition-all group-hover:w-4" />
+                                            <span className="h-1 w-0 bg-sky-500 transition-all group-hover:w-4" />
                                             {link.label}
                                             <ArrowUpRight
                                                 size={14}
@@ -81,28 +82,28 @@ export default function Footer() {
                         {/* Contact & Status */}
                         <div className="space-y-8">
                             <h4 className="text-[10px] font-black tracking-[0.3em] text-slate-900 dark:text-white uppercase px-1">
-                                Headquarters
+                                {__('Headquarters')}
                             </h4>
                             <ul className="space-y-6">
                                 <li className="flex items-start gap-4">
-                                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
+                                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <MapPin size={18} />
                                     </div>
                                     <span className="text-sm font-medium leading-relaxed">
-                                        Sudirman Business District <br /> Central Tower, Jakarta
+                                        {__('Melawai Beach Area Balikpapan')}
                                     </span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <Mail size={18} />
                                     </div>
-                                    <span className="text-sm font-medium">hello@restoweb.premium</span>
+                                    <span className="text-sm font-medium">hello@oceansresto.com</span>
                                 </li>
                                 <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-orange-500">
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <Clock size={18} />
                                     </div>
-                                    <span className="text-sm font-medium uppercase tracking-widest">Open Daily 11:00 — 23:00</span>
+                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Open Daily 08:00 — 23:00')}</span>
                                 </li>
                             </ul>
                         </div>
@@ -112,14 +113,14 @@ export default function Footer() {
                 {/* Bottom Ecosystem Bar */}
                 <div className="mt-20 pt-10 border-t border-border dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
-                        © {new Date().getFullYear()} RestoWeb Gastronomy Ecosystem. Engineered for Excellence.
+                        © {new Date().getFullYear()} Ocean's Resto The Fish Connection.
                     </p>
                     <div className="flex gap-8">
-                        {['Privacy Protocol', 'Terms of Engagement'].map((label) => (
+                        {[__('Privacy Protocol'), __('Terms of Engagement')].map((label) => (
                             <a
                                 key={label}
                                 href="#"
-                                className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-orange-500"
+                                className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-sky-500"
                             >
                                 {label}
                             </a>

@@ -53,10 +53,16 @@ class OTPController extends Controller
                 'email_verified_at' => now(),
             ]);
 
+            if (session('intent') === 'password_update') {
+                session(['otp_verified_for_password' => true]);
+
+                return redirect()->route('security.edit')->with('status', __('Keamanan terverifikasi. Anda dapat mengubah password sekarang.'));
+            }
+
             return redirect()->intended('/dashboard');
         }
 
-        return back()->withErrors(['otp' => 'Kode OTP salah atau telah kadaluarsa.']);
+        return back()->withErrors(['otp' => __('Kode OTP salah atau telah kadaluarsa.')]);
     }
 
     /**
@@ -69,6 +75,6 @@ class OTPController extends Controller
         // Send Premium Email
         Mail::to(Auth::user()->email)->send(new OTPMail($otp));
 
-        return back()->with('status', 'Kode OTP baru telah dikirim ke email Anda.');
+        return back()->with('status', __('Kode OTP baru telah dikirim ke email Anda.'));
     }
 }

@@ -9,11 +9,13 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 import { User, Mail, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function Register() {
+    const { __ } = useTranslations();
     return (
         <>
-            <Head title="Register" />
+            <Head title={__('Register')} />
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -24,9 +26,9 @@ export default function Register() {
                     <>
                         <div className="grid gap-6">
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="name" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <User size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                    Full Name
+                                <Label htmlFor="name" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <User size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                    {__('Full Name')}
                                 </Label>
                                 <Input
                                     id="name"
@@ -36,8 +38,8 @@ export default function Register() {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder="Enter your full name"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    placeholder={__('Enter your full name')}
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError
                                     message={errors.name}
@@ -46,9 +48,9 @@ export default function Register() {
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                    Email address
+                                <Label htmlFor="email" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <Mail size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                    {__('Email address')}
                                 </Label>
                                 <Input
                                     id="email"
@@ -58,15 +60,15 @@ export default function Register() {
                                     autoComplete="email"
                                     name="email"
                                     placeholder="email@example.com"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                    Password
+                                <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                    {__('Password')}
                                 </Label>
                                 <PasswordInput
                                     id="password"
@@ -74,16 +76,16 @@ export default function Register() {
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="Create a strong password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    placeholder={__('Create a strong password')}
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError message={errors.password} />
                             </div>
 
                             <div className="group relative grid gap-2">
-                                <Label htmlFor="password_confirmation" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-orange-500 transition-colors">
-                                    <CheckCircle2 size={16} className="text-muted-foreground/60 group-focus-within:text-orange-500 transition-colors" />
-                                    Confirm password
+                                <Label htmlFor="password_confirmation" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <CheckCircle2 size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
+                                    {__('Confirm password')}
                                 </Label>
                                 <PasswordInput
                                     id="password_confirmation"
@@ -91,8 +93,8 @@ export default function Register() {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="Confirm your password"
-                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-orange-500/50 focus:ring-orange-500/50 rounded-xl transition-all"
+                                    placeholder={__('Confirm your password')}
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
@@ -101,7 +103,7 @@ export default function Register() {
 
                             <Button
                                 type="submit"
-                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-orange-500 to-orange-700 font-semibold text-white shadow-xl shadow-orange-900/20 hover:scale-[1.02] hover:from-orange-400 hover:to-orange-600 transition-all duration-300 group/btn"
+                                className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-sky-500 to-sky-700 font-semibold text-white shadow-xl shadow-sky-900/20 hover:scale-[1.02] hover:from-sky-400 hover:to-sky-600 transition-all duration-300 group/btn"
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
@@ -109,7 +111,7 @@ export default function Register() {
                                     <Spinner className="mr-2" />
                                 ) : (
                                     <>
-                                        Create Account
+                                        {__('Create Account')}
                                         <ArrowRight className="ml-2 h-4 w-4 opacity-70 group-hover/btn:translate-x-1 group-hover/btn:opacity-100 transition-all" />
                                     </>
                                 )}
@@ -120,14 +122,14 @@ export default function Register() {
                                     <div className="w-full border-t border-border"></div>
                                 </div>
                                 <div className="relative flex justify-center text-xs">
-                                    <span className="bg-background/80 px-2 text-muted-foreground/60 backdrop-blur-sm">Atau lanjutkan dengan</span>
+                                    <span className="bg-background/80 px-2 text-muted-foreground/60 backdrop-blur-sm">{__('Atau lanjutkan dengan')}</span>
                                 </div>
                             </div>
                             
                             <div className="flex gap-4 animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300">
                                 <a 
                                     href="/auth/google" 
-                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-orange-500/20 sm:text-base cursor-pointer"
+                                    className="flex w-full items-center justify-center gap-3 rounded-full border border-border bg-background/50 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background hover:shadow-[0_0_20px_-5px_rgba(255,255,255,0.1)] focus:outline-none focus:ring-2 focus:ring-sky-500/20 sm:text-base cursor-pointer"
                                 >
                                     <svg className="h-5 w-5" viewBox="0 0 24 24">
                                         <path
@@ -147,15 +149,15 @@ export default function Register() {
                                             fill="#EA4335"
                                         />
                                     </svg>
-                                    Selalu Masuk dengan Google
+                                    {__('Selalu Masuk dengan Google')}
                                 </a>
                             </div>
                         </div>
 
                         <div className="mt-4 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300 fill-mode-both">
-                            Already have an account?{' '}
-                            <TextLink href={login()} tabIndex={6} className="font-semibold text-orange-600 hover:text-orange-500">
-                                Sign In
+                            {__('Already have an account?')}{' '}
+                            <TextLink href={login()} tabIndex={6} className="font-semibold text-sky-600 hover:text-sky-500">
+                                {__('Sign In')}
                             </TextLink>
                         </div>
                     </>
@@ -166,6 +168,7 @@ export default function Register() {
 }
 
 Register.layout = {
-    title: 'Join RestoWeb',
+    title: "Join Ocean's Resto",
     description: 'Create your account to experience premium dining',
 };
+

@@ -1,9 +1,10 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { UtensilsCrossed, ArrowRight, Flame, ShoppingCart, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { login } from '@/routes';
 import { motion } from 'framer-motion';
+import { useTranslations } from '@/hooks/use-translations';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -17,8 +18,19 @@ interface SignatureDishesProps {
 }
 
 export default function SignatureDishes({ bestSellers, auth }: SignatureDishesProps) {
+    const { __ } = useTranslations();
+    const { locale } = usePage().props as any;
     const containerRef = useRef(null);
     const cardsRef = useRef<HTMLDivElement[]>([]);
+
+    const formatCurrency = (amount: number) => {
+        return amount.toLocaleString(locale === 'id' ? 'id-ID' : 'en-US', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).replace('IDR', 'Rp');
+    };
 
     useGSAP(() => {
         const validCards = cardsRef.current.filter(Boolean);
@@ -70,21 +82,21 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                         className="mb-8 flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-6 py-2 text-[10px] font-black tracking-[0.5em] text-primary uppercase glow-primary"
                     >
                         <Sparkles size={12} />
-                        Chef's Selection
+                        {__("Chef's Selection")}
                     </motion.div>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         className="mb-8 font-serif text-4xl md:text-6xl font-light text-foreground leading-[0.9]"
                     >
-                        Hidangan <span className="italic">Ikonis</span>
+                        {__('Signature')} <span className="italic">{__('Dishes')}</span>
                     </motion.h2>
                     <motion.p 
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         className="mx-auto text-muted-foreground text-lg md:text-xl font-medium leading-relaxed"
                     >
-                        Eksplorasi mahakarya kuliner yang melampaui tradisi. Sebuah harmoni antara inovasi modern dan keaslian rasa.
+                        {__('Explore culinary masterpieces that transcend tradition. A harmony between modern innovation and authentic flavors.')}
                     </motion.p>
                 </div>
 
@@ -106,7 +118,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                         <motion.div
                             key={item.id}
                             ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                            className="glass-card glass-highlight group flex flex-col overflow-hidden rounded-[2.5rem] md:rounded-[3rem] transition-all duration-700 hover:-translate-y-4 hover:shadow-orange-500/10"
+                            className="glass-card glass-highlight group flex flex-col overflow-hidden rounded-[2.5rem] md:rounded-[3rem] transition-all duration-700 hover:-translate-y-4 hover:shadow-sky-500/10"
                         >
                             {/* Image area with parallax potential */}
                             <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden m-4 rounded-[1.8rem] md:rounded-[2.2rem]">
@@ -146,11 +158,11 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 <div className="flex flex-col mb-4">
                                     <h3 className="text-2xl font-serif font-light text-foreground mb-1">{item.name}</h3>
                                     <span className="text-sm font-black text-primary tracking-widest">
-                                        Rp {Number(item.price).toLocaleString('id-ID')}
+                                        {formatCurrency(Number(item.price))}
                                     </span>
                                 </div>
                                 <p className="mb-10 line-clamp-3 text-sm font-medium leading-relaxed text-muted-foreground/80">
-                                    {item.description || 'Petualangan rasa yang dikurasi dengan presisi for menciptakan kenangan kuliner yang tak terlupakan.'}
+                                    {item.description || __('A precision-curated taste adventure designed to create unforgettable culinary memories.')}
                                 </p>
                                 <div className="mt-auto">
                                     {item.is_available ? (
@@ -159,13 +171,13 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                             className="block"
                                         >
                                             <Button className="w-full h-16 rounded-[1.5rem] bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em] shadow-xl transition-all hover:scale-105 active:scale-95 group relative z-10 border border-transparent">
-                                                Order Experience
+                                                {__('Order Experience')}
                                                 <ShoppingCart size={14} className="ml-3 transition-transform group-hover:translate-x-1" />
                                             </Button>
                                         </Link>
                                     ) : (
                                         <Button disabled className="w-full h-16 rounded-[1.5rem] bg-foreground/5 text-foreground/40 text-[10px] font-black uppercase tracking-[0.3em] opacity-80 border border-foreground/10 cursor-not-allowed">
-                                            Sedang Habis
+                                            {__('Currently Unavailable')}
                                         </Button>
                                     )}
                                 </div>
@@ -184,7 +196,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                             variant="outline"
                             className="h-20 px-16 rounded-full border-primary/20 bg-transparent text-xs font-black uppercase tracking-[0.4em] text-foreground transition-all hover:bg-primary hover:text-primary-foreground hover:scale-105 active:scale-95 group shadow-2xl"
                         >
-                            Jelajahi Menu Lengkap
+                            {__('Explore Full Menu')}
                             <ArrowRight className="ml-4 h-5 w-5 transition-transform group-hover:translate-x-2" />
                         </Button>
                     </Link>
@@ -193,5 +205,6 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
         </section>
     );
 }
+
 
 

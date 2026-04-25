@@ -1,41 +1,43 @@
 import { motion } from 'framer-motion';
 import { Trophy, Sprout, Wine, Users, ChefHat, Sparkles } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function BentoFeatures() {
+    const { __ } = useTranslations();
 
     const features = [
         {
-            title: "Simbol Keunggulan",
-            subtitle: "MICHELIN Star Experience",
-            description: "Pengakuan internasional atas komitmen kami terhadap kesempurnaan rasa dan layanan presisi.",
+            title: __("Catch of the Day"),
+            subtitle: __("Ocean's Best Selection"),
+            description: __("The best seafood selection caught directly by local fishermen every day."),
             icon: Trophy,
-            className: "md:col-span-2 md:row-span-2 bg-primary/5 border-primary/20",
-            iconClass: "bg-primary text-primary-foreground",
-            image: "https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=2574&auto=format&fit=crop"
+            className: "md:col-span-2 md:row-span-2 bg-sky-500/5 border-sky-500/20",
+            iconClass: "bg-sky-600 text-white",
+            image: "https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?q=80&w=2670&auto=format&fit=crop"
         },
         {
-            title: "Segar & Alami",
-            subtitle: "Farm-to-Table",
-            description: "Bahan organik langsung dari petani lokal untuk menjaga keaslian rasa setiap gigitan.",
+            title: __("Beachfront"),
+            subtitle: __("Beachfront Dining"),
+            description: __("Enjoy dishes with a stunning sunset view by the sea."),
             icon: Sprout,
-            className: "md:col-span-1 md:row-span-1 bg-green-500/5 border-green-500/20",
-            iconClass: "bg-green-500 text-white",
+            className: "md:col-span-1 md:row-span-1 bg-cyan-500/5 border-cyan-500/20",
+            iconClass: "bg-cyan-500 text-white",
         },
         {
-            title: "Koleksi Langka",
-            subtitle: "Exclusive Wine Cellar",
-            description: "Kurasi wine dunia yang dipilih khusus oleh sommelier kami.",
+            title: __("Fresh Drinks"),
+            subtitle: __("Tropical Refreshments"),
+            description: __("A curation of refreshing tropical drinks to complement your seafood dishes."),
             icon: Wine,
-            className: "md:col-span-1 md:row-span-1 bg-purple-500/5 border-purple-500/20",
-            iconClass: "bg-purple-500 text-white",
+            className: "md:col-span-1 md:row-span-1 bg-teal-500/5 border-teal-500/20",
+            iconClass: "bg-teal-500 text-white",
         },
         {
-            title: "Kisah Sang Maestro",
-            subtitle: "The Chef's Narrative",
-            description: "Dibalik setiap hidangan ada filosofi mendalam dan teknik yang diasah selama puluhan tahun oleh Chef kami.",
+            title: __("Chef's Touch"),
+            subtitle: __("Master of Seafood"),
+            description: __("Behind every dish is a deep philosophy and perfect seafood processing techniques."),
             icon: ChefHat,
-            className: "md:col-span-2 md:row-span-1 bg-orange-500/5 border-orange-500/20",
-            iconClass: "bg-orange-500 text-white",
+            className: "md:col-span-2 md:row-span-1 bg-blue-500/5 border-blue-500/20",
+            iconClass: "bg-blue-500 text-white",
         }
     ];
 
@@ -49,14 +51,14 @@ export default function BentoFeatures() {
                         whileInView={{ opacity: 1 }}
                         className="text-[10px] font-black tracking-[0.6em] text-primary uppercase block mb-4"
                     >
-                        Our Distinction
+                        {__('Our Distinction')}
                     </motion.span>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         className="font-serif text-4xl md:text-6xl font-light text-foreground text-wrap-balance"
                     >
-                        Detail yang <span className="italic">Mendefinisikan</span> Kami
+                        {__('Details That Define Us')}
                     </motion.h2>
                 </div>
 

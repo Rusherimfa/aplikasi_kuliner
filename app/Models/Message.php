@@ -12,14 +12,29 @@ class Message extends Model
 
     protected $fillable = [
         'reservation_id',
+        'order_id',
         'sender_id',
         'content',
         'is_chatbot',
+        'read_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_chatbot' => 'boolean',
+            'read_at' => 'datetime',
+        ];
+    }
 
     public function reservation(): BelongsTo
     {
         return $this->belongsTo(Reservation::class);
+    }
+
+    public function order(): BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 
     public function sender(): BelongsTo

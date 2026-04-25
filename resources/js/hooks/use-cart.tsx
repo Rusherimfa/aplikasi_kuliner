@@ -24,7 +24,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<CartItem[]>(() => {
         if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem('restoweb_cart');
+            const saved = localStorage.getItem("Ocean's Resto_cart");
             return saved ? JSON.parse(saved) : [];
         }
         return [];
@@ -33,7 +33,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [isCartOpen, setCartOpen] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('restoweb_cart', JSON.stringify(items));
+        localStorage.setItem("Ocean's Resto_cart", JSON.stringify(items));
     }, [items]);
 
     const addItem = (item: Omit<CartItem, 'quantity'>) => {
@@ -92,3 +92,4 @@ export function useCart() {
     }
     return context;
 }
+

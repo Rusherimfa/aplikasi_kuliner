@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+﻿import { Head, Link, usePage } from '@inertiajs/react';
 import { ChefHat, Sparkles, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';
@@ -55,9 +55,9 @@ export default function Experience() {
 
     return (
         <div ref={containerRef}>
-            <Head title="Strategic Gastronomi - RestoWeb Premium" />
+            <Head title="Strategic Gastronomi - Ocean's Resto Premium" />
 
-            <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-slate-900 dark:text-neutral-400 selection:bg-orange-500 selection:text-black transition-colors duration-500 overflow-hidden">
+            <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-slate-900 dark:text-neutral-400 selection:bg-sky-500 selection:text-black transition-colors duration-500 overflow-hidden">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -86,7 +86,7 @@ export default function Experience() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.5 }}
-                                className="inline-flex items-center gap-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-orange-500 uppercase glow-primary"
+                                className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-500 uppercase glow-primary"
                             >
                                 <Sparkles size={12} />
                                 <span>The Philosophy</span>
@@ -113,8 +113,8 @@ export default function Experience() {
                         </div>
 
                         {/* Ambient Orbs */}
-                        <div className="absolute top-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-orange-500/5 blur-[120px]" />
-                        <div className="absolute bottom-[-10%] left-[-10%] h-[400px] w-[400px] rounded-full bg-orange-600/5 blur-[100px]" />
+                        <div className="absolute top-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-sky-500/5 blur-[120px]" />
+                        <div className="absolute bottom-[-10%] left-[-10%] h-[400px] w-[400px] rounded-full bg-sky-600/5 blur-[100px]" />
                     </section>
 
                     {/* Masterclass Section */}
@@ -127,7 +127,7 @@ export default function Experience() {
                                 transition={{ duration: 0.8 }}
                                 className="relative group"
                             >
-                                <div className="absolute inset-0 bg-orange-500/20 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                                <div className="absolute inset-0 bg-sky-500/20 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                                 <div ref={masterclassFrameRef} className="relative overflow-hidden rounded-[3rem] aspect-[4/5] bg-slate-100 dark:bg-white/5 border border-border dark:border-white/5">
                                     <img
                                         ref={masterclassImageRef}
@@ -140,12 +140,12 @@ export default function Experience() {
                                     
                                     <div className="absolute bottom-10 left-10 right-10">
                                         <div className="glass-card flex items-center gap-5 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 p-8 shadow-3xl">
-                                            <ChefHat size={48} className="text-orange-500" />
+                                            <ChefHat size={48} className="text-sky-500" />
                                             <div>
                                                 <p className="font-['Playfair_Display',serif] text-2xl font-black text-white tracking-tight">
                                                     Executive Chef Antonio
                                                 </p>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">
+                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500">
                                                     Tri-Michelin Pedigree
                                                 </p>
                                             </div>
@@ -164,7 +164,7 @@ export default function Experience() {
                                 <div className="space-y-6">
                                     <h2 className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
                                         Visi Sang <br />
-                                        <span className="italic font-serif opacity-30 text-orange-500">Maestro Strategis</span>
+                                        <span className="italic font-serif opacity-30 text-sky-500">Maestro Strategis</span>
                                     </h2>
                                     <p className="text-lg font-medium leading-relaxed text-slate-500 dark:text-neutral-500">
                                         Chef Antonio mengintegrasikan tradisi kontinental dengan eksplorasi botanik lokal. Setiap inovasi berakar pada fondasi rasa yang autentik, dieksekusi dengan presisi laboratoris.
@@ -172,7 +172,7 @@ export default function Experience() {
                                 </div>
 
                                 <blockquote className="relative p-10 rounded-[2rem] bg-slate-50 dark:bg-white/[0.02] border border-border dark:border-white/5">
-                                    <span className="absolute top-4 left-6 text-6xl font-serif text-orange-500/20 italic">"</span>
+                                    <span className="absolute top-4 left-6 text-6xl font-serif text-sky-500/20 italic">"</span>
                                     <p className="relative z-10 text-2xl font-['Playfair_Display',serif] italic leading-relaxed text-slate-800 dark:text-neutral-300">
                                         Masakan adalah bahasa universal. Melalui tekstur and temperatur, kami menceritakan kisah tentang tanah, musim, and dedikasi manusia.
                                     </p>
@@ -180,11 +180,11 @@ export default function Experience() {
 
                                 <div className="grid grid-cols-2 gap-6">
                                     <div className="glass-card flex items-center gap-4 rounded-2xl bg-white dark:bg-white/5 p-6 border border-border dark:border-white/5">
-                                        <Award className="text-orange-500" size={24} />
+                                        <Award className="text-sky-500" size={24} />
                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Global Laureate</span>
                                     </div>
                                     <div className="glass-card flex items-center gap-4 rounded-2xl bg-white dark:bg-white/5 p-6 border border-border dark:border-white/5">
-                                        <Sparkles className="text-orange-500" size={24} />
+                                        <Sparkles className="text-sky-500" size={24} />
                                         <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Culinary Innovator</span>
                                     </div>
                                 </div>
@@ -195,7 +195,7 @@ export default function Experience() {
                     {/* Final Invitation */}
                     <section className="relative mx-8 overflow-hidden rounded-[3rem] bg-slate-900 p-24 text-center shadow-3xl">
                         <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-                        <div className="absolute top-1/2 left-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/5 opacity-50 blur-[120px]" />
+                        <div className="absolute top-1/2 left-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/5 opacity-50 blur-[120px]" />
                         
                         <div className="relative z-10 max-w-3xl mx-auto space-y-10">
                             <motion.h2 
@@ -213,7 +213,7 @@ export default function Experience() {
                             <div ref={reserveButtonRef as any} className="inline-block">
                                 <Link href="/reservations/create">
                                     <Button
-                                        className="group h-20 rounded-[1.5rem] bg-orange-500 px-16 text-[12px] font-black uppercase tracking-[0.3em] text-black shadow-2xl transition-all hover:scale-105 hover:bg-white active:scale-95"
+                                        className="group h-20 rounded-[1.5rem] bg-sky-500 px-16 text-[12px] font-black uppercase tracking-[0.3em] text-black shadow-2xl transition-all hover:scale-105 hover:bg-white active:scale-95"
                                     >
                                         Reserver Now
                                     </Button>
@@ -229,5 +229,6 @@ export default function Experience() {
         </div>
     );
 }
+
 
 

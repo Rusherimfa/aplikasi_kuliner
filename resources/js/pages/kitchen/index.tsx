@@ -1,22 +1,22 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle, MessageCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import kitchen from '@/routes/kitchen';
+import BoutiqueChat from '@/components/app/boutique-chat';
 
-export default function KitchenIndex({ online_active = [], online_completed = [], online_cancelled = [], couriers = [] }: any) {
-    const { auth } = usePage().props as any;
+export default function KitchenIndex({ auth, online_active = [], online_completed = [], online_cancelled = [], couriers = [] }: any) {
     const [loadingId, setLoadingId] = useState<string | number | null>(null);
     const [selectedCourier, setSelectedCourier] = useState<Record<number, string>>({});
+    const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
     // Use Wayfinder action/route functions instead of Ziggy's route()
     const updateItemStatus = (pivotId: number, status: string, itemName: string) => {
         setLoadingId(pivotId);
         router.patch(kitchen.item.update.url(pivotId), { status }, {
-            preserveScroll: true,
             onFinish: () => setLoadingId(null),
         });
     };
@@ -24,7 +24,6 @@ export default function KitchenIndex({ online_active = [], online_completed = []
     const handleAcceptOrder = (orderId: number) => {
         setLoadingId(`accept-${orderId}`);
         router.post(kitchen.orders.accept.url(orderId), {}, {
-            preserveScroll: true,
             onFinish: () => setLoadingId(null),
         });
     };
@@ -33,7 +32,6 @@ export default function KitchenIndex({ online_active = [], online_completed = []
         if (!confirm('Tolak pesanan ini?')) return;
         setLoadingId(`reject-${orderId}`);
         router.post(kitchen.orders.reject.url(orderId), {}, {
-            preserveScroll: true,
             onFinish: () => setLoadingId(null),
         });
     };
@@ -46,7 +44,6 @@ export default function KitchenIndex({ online_active = [], online_completed = []
         }
 
         router.patch(kitchen.orders.update_status.url(orderId), data, {
-            preserveScroll: true,
             onFinish: () => setLoadingId(null),
         });
     };
@@ -54,13 +51,13 @@ export default function KitchenIndex({ online_active = [], online_completed = []
     useEffect(() => {
         const kitchenChannel = window.Echo.channel('kitchen')
             .listen('.DishStatusUpdated', (e: any) => {
-                router.reload({ preserveScroll: true });
+                router.reload();
                 toast.info(`Dish Update: ${e.itemName} is ${e.status.toUpperCase()}`);
             });
 
         const reservationChannel = window.Echo.channel('reservations')
             .listen('.ReservationStatusUpdated', (e: any) => {
-                router.reload({ preserveScroll: true });
+                router.reload();
                 toast.warning('New Reservation/Order Updated!');
             });
 
@@ -71,20 +68,29 @@ export default function KitchenIndex({ online_active = [], online_completed = []
     }, []);
 
     const OrderCard = ({ order, statusType = 'active' }: { order: any, statusType?: 'active' | 'history' | 'cancelled' }) => (
-        <div key={order.id} className={`group relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden shadow-2xl transition-all ${statusType === 'active' ? 'hover:border-orange-500/20' : 'opacity-70 scanline'}`}>
+        <div key={order.id} className={`group relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden shadow-2xl transition-all ${statusType === 'active' ? 'hover:border-sky-500/20' : 'opacity-70 scanline'}`}>
             {/* Order Type Ribbon */}
-            <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl text-[8px] font-black uppercase tracking-widest ${order.order_type === 'delivery' ? 'bg-orange-500 text-black' : 'bg-blue-500 text-white'}`}>
+            <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl text-[8px] font-black uppercase tracking-widest ${order.order_type === 'delivery' ? 'bg-sky-500 text-black' : 'bg-blue-500 text-white'}`}>
                 {order.order_type === 'pickup' ? 'Takeaway' : 'Delivery'}
             </div>
 
             <div className="p-6 border-b border-white/5 bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-2">
                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{order.order_number}</p>
-                    <div className="flex items-center gap-1.5 text-orange-500/60 font-bold text-[10px]">
+                    <div className="flex items-center gap-1.5 text-sky-500/60 font-bold text-[10px]">
                         <Clock size={10} /> {order.time}
                     </div>
                 </div>
-                <h3 className="text-xl font-black text-white tracking-tight leading-none">{order.customer_name}</h3>
+                <div className="flex justify-between items-start">
+                    <h3 className="text-xl font-black text-white tracking-tight leading-none">{order.customer_name}</h3>
+                    <button 
+                        onClick={() => setActiveChatId(activeChatId === order.id ? null : order.id)}
+                        className={`p-1.5 rounded-xl border transition-all ${activeChatId === order.id ? 'bg-sky-500 text-black border-sky-500' : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white border-white/5'}`}
+                        title="Buka Chat"
+                    >
+                        <MessageCircle size={16} />
+                    </button>
+                </div>
                 
                 <div className="mt-4 flex items-center justify-between">
                     <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-500' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/40')}`}>
@@ -101,7 +107,7 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                     {order.items.map((item: any) => (
                         <li key={item.id} className="flex justify-between items-center text-sm font-medium">
                             <span className="text-white/60">
-                                <span className={`${statusType === 'active' ? 'text-orange-500' : 'text-white/20'} font-black mr-2`}>{item.quantity}x</span>
+                                <span className={`${statusType === 'active' ? 'text-sky-500' : 'text-white/20'} font-black mr-2`}>{item.quantity}x</span>
                                 {item.name}
                             </span>
                         </li>
@@ -134,8 +140,8 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                         )}
 
                         {order.order_status === 'waiting_for_payment' && (
-                            <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-center">
-                                <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Waiting for Customer Payment</p>
+                            <div className="p-3 rounded-xl bg-sky-500/10 border border-sky-500/20 text-center">
+                                <p className="text-[9px] font-black text-sky-500 uppercase tracking-widest">Waiting for Customer Payment</p>
                             </div>
                         )}
 
@@ -146,7 +152,7 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                                         <div className="flex flex-col gap-2">
                                             <label className="text-[8px] font-black text-white/20 uppercase tracking-widest ml-1">Assign Courier</label>
                                             <select 
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white/60 focus:outline-none focus:ring-1 focus:ring-orange-500/50"
+                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white/60 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
                                                 value={selectedCourier[order.id] || ''}
                                                 onChange={(e) => setSelectedCourier({...selectedCourier, [order.id]: e.target.value})}
                                             >
@@ -156,7 +162,7 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                                         </div>
                                         <Button 
                                             onClick={() => updateOrderStatus(order.id, 'delivering')}
-                                            className="w-full bg-orange-500 text-black font-black uppercase tracking-widest text-[9px] rounded-xl h-10 shadow-lg shadow-orange-500/10"
+                                            className="w-full bg-sky-500 text-black font-black uppercase tracking-widest text-[9px] rounded-xl h-10 shadow-lg shadow-sky-500/10"
                                             disabled={loadingId === `status-${order.id}`}
                                         >
                                             Send for Delivery
@@ -177,7 +183,7 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                         {order.order_status === 'delivering' && (
                             <Button 
                                 onClick={() => updateOrderStatus(order.id, 'delivered')}
-                                className="w-full bg-orange-500 text-black font-black uppercase tracking-widest text-[9px] rounded-xl h-10"
+                                className="w-full bg-sky-500 text-black font-black uppercase tracking-widest text-[9px] rounded-xl h-10"
                                 disabled={loadingId === `status-${order.id}`}
                             >
                                 Confirm Delivered
@@ -201,13 +207,13 @@ export default function KitchenIndex({ online_active = [], online_completed = []
 
     return (
         <>
-            <Head title="Kitchen Display System - RestoWeb" />
+            <Head title="Kitchen Display System - Ocean's Resto" />
 
             <div className="mx-auto max-w-7xl font-sans text-white pb-12">
                 <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-8">
                     <div>
                         <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-white/95 flex items-center gap-3">
-                            <ChefHat className="text-orange-500" size={36} />
+                            <ChefHat className="text-sky-500" size={36} />
                             Kitchen Display System
                         </h1>
                         <p className="mt-2 text-sm text-white/40 max-w-md uppercase tracking-widest font-black text-[9px]">
@@ -220,10 +226,10 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                 <div className="mb-16">
                     <div className="mb-8 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="h-1.5 w-8 rounded-full bg-orange-500"></div>
-                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-orange-500">Active Orders Queue</h2>
+                            <div className="h-1.5 w-8 rounded-full bg-sky-500"></div>
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500">Active Orders Queue</h2>
                         </div>
-                        <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20">{online_active.length} ACTIVE</Badge>
+                        <Badge className="bg-sky-500/10 text-sky-500 border-sky-500/20">{online_active.length} ACTIVE</Badge>
                     </div>
 
                     {online_active.length > 0 ? (
@@ -292,8 +298,13 @@ export default function KitchenIndex({ online_active = [], online_completed = []
                     </div>
                 </div>
             </div>
+
+            {activeChatId && (
+                <BoutiqueChat orderId={activeChatId} currentUser={auth.user} />
+            )}
         </>
     );
 }
 
 KitchenIndex.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;
+

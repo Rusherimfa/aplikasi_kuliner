@@ -16,7 +16,7 @@ class CourierLocationUpdated implements ShouldBroadcast
      * Create a new event instance.
      */
     public function __construct(
-        public int $reservationId,
+        public int $orderId,
         public float $latitude,
         public float $longitude
     ) {
@@ -31,7 +31,7 @@ class CourierLocationUpdated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('reservations.'.$this->reservationId),
+            new Channel('orders.'.$this->orderId),
         ];
     }
 
@@ -40,6 +40,6 @@ class CourierLocationUpdated implements ShouldBroadcast
      */
     public function broadcastAs(): string
     {
-        return 'courier.location.updated';
+        return 'CourierLocationUpdated';
     }
 }

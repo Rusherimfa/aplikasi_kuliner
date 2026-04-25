@@ -20,6 +20,8 @@ class Order extends Model
         'payment_status',
         'order_status',
         'total_price',
+        'customer_lat',
+        'customer_lng',
     ];
 
     public function items()

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -23,17 +24,21 @@ class OrderController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
             'cart_total' => 'required|numeric|min:0',
+            'customer_lat' => 'nullable|numeric',
+            'customer_lng' => 'nullable|numeric',
         ]);
 
         $order = DB::transaction(function () use ($validated) {
             $totalPrice = $validated['cart_total'];
 
             $order = Order::create([
-                'user_id' => auth()->id(),
+                'user_id' => Auth::id(),
                 'order_number' => 'ORD-'.date('YmdHis').'-'.rand(1000, 9999),
                 'customer_name' => $validated['customer_name'],
                 'customer_email' => $validated['customer_email'],
                 'customer_phone' => $validated['customer_phone'] ?? null,
+                'customer_lat' => $validated['customer_lat'] ?? null,
+                'customer_lng' => $validated['customer_lng'] ?? null,
                 'order_type' => $validated['order_type'],
                 'payment_status' => 'unpaid',
                 'order_status' => 'pending',
@@ -58,7 +63,7 @@ class OrderController extends Controller
 
     public function history(Request $request)
     {
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('user_id', Auth::id())
             ->with(['items.menu'])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -70,7 +75,7 @@ class OrderController extends Controller
 
     public function payment(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -87,7 +92,7 @@ class OrderController extends Controller
 
     public function processPayment(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -101,7 +106,7 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -116,7 +121,7 @@ class OrderController extends Controller
 
     public function cancel(Order $order)
     {
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -134,7 +139,7 @@ class OrderController extends Controller
 
     public function updateDeliveryStatus(Request $request, Order $order)
     {
-        if ($order->courier_id !== auth()->id()) {
+        if ($order->courier_id !== Auth::id()) {
             abort(403);
         }
 
@@ -149,15 +154,37 @@ class OrderController extends Controller
         return back()->with('success', 'Status pengiriman berhasil diupdate.');
     }
 
-    public function simulateTracking(Order $order)
+    public function simulateTracking(Request $request, Order $order)
     {
-        $startLat = -6.2088;
-        $startLng = 106.8456;
-        $endLat = -6.2188;
-        $endLng = 106.8556;
+        $lat = $request->input('latitude');
+        $lng = $request->input('longitude');
 
-        broadcast(new CourierLocationUpdated($order->id, $startLat, $startLng));
+        if ($lat && $lng) {
+            $order->update([
+                'courier_lat' => $lat,
+                'courier_lng' => $lng,
+            ]);
+        }
 
-        return response()->json(['message' => 'Simulation started']);
+        \Illuminate\Support\Facades\Log::info('Broadcasting Courier Location', ['order' => $order->id, 'lat' => $lat, 'lng' => $lng]);
+
+        broadcast(new CourierLocationUpdated($order->id, $lat, $lng));
+
+        return response()->json(['message' => 'Location updated and broadcasted', 'lat' => $lat, 'lng' => $lng]);
+    }
+
+    public function track(Order $order)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        if ($order->user_id !== $user->id && !$user->isStaff()) {
+            abort(403);
+        }
+
+        $order->load(['items.menu', 'courier']);
+
+        return Inertia::render('orders/track', [
+            'order' => $order,
+        ]);
     }
 }

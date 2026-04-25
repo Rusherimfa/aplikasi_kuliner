@@ -7,10 +7,12 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useMagnetic } from '@/hooks/use-magnetic';
+import { useTranslations } from '@/hooks/use-translations';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Hero() {
+    const { __ } = useTranslations();
     const containerRef = useRef(null);
     const bgRef = useRef(null);
     const magneticBadgeRef = useMagnetic();
@@ -56,13 +58,13 @@ export default function Hero() {
             {/* Cinematic Background */}
             <div ref={bgRef} className="absolute inset-0 z-0 origin-top">
                 <img
-                    src="https://images.unsplash.com/photo-1550966841-3ee5ad40bf3c?q=80&w=2670&auto=format&fit=crop"
-                    alt="Fine dining table setup"
-                    className="h-full w-full object-cover opacity-[0.4] dark:opacity-[0.12] transition-transform duration-1000"
+                    src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2670&auto=format&fit=crop"
+                    alt="Ocean view"
+                    className="h-full w-full object-cover opacity-[0.8] dark:opacity-[0.4] transition-transform duration-1000"
                 />
                 
-                {/* Animated Mesh Gradients */}
-                <div className="absolute inset-x-0 top-0 h-[80vh] bg-gradient-to-b from-primary/10 via-background/80 to-background" />
+                {/* Animated Mesh Gradients - made more transparent so bg is visible */}
+                <div className="absolute inset-0 bg-gradient-to-b from-sky-900/40 via-background/60 to-background/90" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,var(--color-primary)/0.05_0%,transparent_50%)]" />
                 
                 {/* Textures */}
@@ -76,7 +78,7 @@ export default function Hero() {
             />
             <div 
                 ref={(el) => { if (el) orbsRef.current[1] = el; }}
-                className="pointer-events-none absolute bottom-1/4 -left-48 h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" 
+                className="pointer-events-none absolute bottom-1/4 -left-48 h-[600px] w-[600px] rounded-full bg-sky-600/5 blur-[120px]" 
             />
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-24 pb-16 lg:px-8">
@@ -88,10 +90,10 @@ export default function Hero() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8 }}
-                            className="mb-12 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-6 py-2.5 text-[10px] font-black tracking-[0.4em] text-primary uppercase shadow-[0_0_40px_rgba(var(--color-primary),0.1)] glow-primary"
+                            className="mb-12 inline-flex items-center gap-3 rounded-full border border-sky-500/30 bg-sky-500/10 px-6 py-2.5 text-[10px] font-black tracking-[0.4em] text-sky-600 dark:text-sky-400 uppercase shadow-[0_0_40px_rgba(14,165,233,0.15)]"
                         >
-                            <Trophy size={14} className="text-primary" />
-                            <span>Distingsi Michelin 2024</span>
+                            <span className="text-sky-500">🌊</span>
+                            <span>{__('Fresh Seafood Daily')}</span>
                         </motion.div>
 
                         {/* Headline */}
@@ -102,25 +104,25 @@ export default function Hero() {
                                 initial={{ y: 40, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-                                className="block"
+                                className="block text-sky-900 dark:text-sky-50"
                             >
-                                Simfoni
+                                Ocean's
                             </motion.span>
                             <motion.span 
                                 initial={{ y: 40, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
-                                className="block italic"
+                                className="block italic text-sky-700 dark:text-sky-200"
                             >
-                                Gastronomi
+                                Resto
                             </motion.span>
                             <motion.span 
-                                initial={{ y: 40, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1, ease: "easeOut", delay: 0.9 }}
-                                className="block text-primary font-medium tracking-[-0.05em]"
+                                 initial={{ y: 40, opacity: 0 }}
+                                 animate={{ y: 0, opacity: 1 }}
+                                 transition={{ duration: 1, ease: "easeOut", delay: 0.9 }}
+                                 className="block text-sky-500 font-medium tracking-[-0.05em] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-2"
                             >
-                                Luar Biasa.
+                                {__('The Fish Connection.')}
                             </motion.span>
                         </h1>
 
@@ -129,9 +131,9 @@ export default function Hero() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 1.4, duration: 1 }}
-                            className="mb-14 max-w-lg text-sm leading-relaxed font-medium text-slate-600 dark:text-neutral-400 sm:text-lg"
+                            className="mb-14 max-w-lg text-sm leading-relaxed font-medium text-slate-600 dark:text-sky-100/70 sm:text-lg"
                         >
-                            Sebuah narasi rasa yang dikurasi melampaui batas ekspektasi. Selamat datang di pusat keunggulan kuliner modern.
+                            {__('Experience the sensation of fresh seafood with a stunning beach panorama. A culinary destination where flavor meets the waves.')}
                         </motion.p>
 
                         {/* CTA buttons */}
@@ -142,9 +144,9 @@ export default function Hero() {
                             >
                                 <Button
                                     size="lg"
-                                    className="group h-16 w-full rounded-full bg-primary px-10 text-[11px] font-black uppercase tracking-widest text-primary-foreground shadow-2xl transition-all hover:scale-[1.02] active:scale-95 sm:h-18 sm:px-12 sm:text-sm"
+                                    className="group h-16 w-full rounded-full bg-sky-600 hover:bg-sky-700 text-white px-10 text-[11px] font-black uppercase tracking-widest shadow-2xl shadow-sky-900/20 transition-all hover:scale-[1.02] active:scale-95 sm:h-18 sm:px-12 sm:text-sm border-none"
                                 >
-                                    Pesan Meja
+                                    {__('Reserve a Table')}
                                     <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
                                 </Button>
                             </Link>
@@ -157,13 +159,13 @@ export default function Hero() {
                                     variant="outline"
                                     className="h-16 w-full rounded-full border-border bg-transparent px-10 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-sm transition-all hover:bg-white/5 hover:scale-[1.02] active:scale-95 sm:h-18 sm:px-12 sm:text-sm"
                                 >
-                                    Eksplorasi Menu
+                                    {__('Explore Menu')}
                                 </Button>
                             </Link>
                         </div>
                     </div>
 
-                    {/* Right column — Visual Card */}
+                    {/* Right column â€” Visual Card */}
                     <div className="relative hidden lg:block">
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.95, x: 30 }}
@@ -172,19 +174,19 @@ export default function Hero() {
                             className="relative"
                         >
                             {/* Main frame with glass-highlight */}
-                            <div className="glass-highlight relative aspect-[4/5] overflow-hidden rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.6)] ring-1 ring-white/10">
+                            <div className="glass-highlight relative aspect-[4/5] overflow-hidden rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(14,165,233,0.3)] ring-1 ring-white/20">
                                 <img
-                                    src="https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2670&auto=format&fit=crop"
-                                    alt="Culinary art preparation"
+                                    src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2574&auto=format&fit=crop"
+                                    alt="Fresh seafood plate"
                                     className="h-full w-full scale-105 object-cover transition-transform duration-1000 hover:scale-100"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent opacity-80" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-sky-900/30 to-transparent opacity-90 mix-blend-multiply" />
                                 
                                 {/* Inner Overlay Label */}
                                 <div className="absolute bottom-12 left-12 z-20">
-                                    <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-4 block font-sans">Filosofi Kami</span>
+                                    <span className="text-[10px] font-bold tracking-[0.2em] text-sky-300 uppercase mb-4 block font-sans">{__('Our Specialization')}</span>
                                     <h3 className="font-serif text-5xl font-light text-white leading-tight italic">
-                                        Sensory <br /> Perfection.
+                                        Ocean <br /> Fresh.
                                     </h3>
                                 </div>
                             </div>
@@ -206,11 +208,11 @@ export default function Hero() {
                                 </div>
                                 <div className="flex flex-col">
                                     <div className="flex items-center gap-2">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse-orange" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-white/40 uppercase font-sans">Ketersediaan</span>
+                                        <div className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
+                                        <span className="text-[10px] font-bold tracking-[0.2em] text-white/60 uppercase font-sans">{__('Outdoor Area')}</span>
                                     </div>
                                     <p className="font-serif text-xl text-white tracking-tight leading-none mt-1 italic">
-                                        Tersedia Malam Ini
+                                        {__('Sunset View')}
                                     </p>
                                 </div>
                             </motion.div>
@@ -226,9 +228,10 @@ export default function Hero() {
                     className="absolute bottom-12 left-1/2 flex -translate-x-1/2 flex-col items-center gap-5"
                 >
                     <div className="h-16 w-[1px] bg-gradient-to-b from-primary/50 to-transparent" />
-                    <span className="text-[10px] font-black tracking-[0.6em] text-neutral-500 uppercase">Telusuri</span>
+                    <span className="text-[10px] font-black tracking-[0.6em] text-neutral-500 uppercase">{__('Scroll Down')}</span>
                 </motion.div>
             </div>
         </main>
     );
 }
+

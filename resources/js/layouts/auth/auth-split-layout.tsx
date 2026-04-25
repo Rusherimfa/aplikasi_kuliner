@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { ChefHat } from 'lucide-react';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function AuthSplitLayout({
     children,
@@ -9,14 +10,15 @@ export default function AuthSplitLayout({
     description,
 }: AuthLayoutProps) {
     const { name } = usePage().props;
+    const { __ } = useTranslations();
 
     return (
-        <div className="relative min-h-dvh w-full flex items-center justify-center selection:bg-orange-500/30 selection:text-orange-200 bg-background transition-colors duration-500">
+        <div className="relative min-h-dvh w-full flex items-center justify-center selection:bg-sky-500/30 selection:text-sky-200 bg-background transition-colors duration-500">
             {/* Full Screen Background Image */}
             <div className="fixed inset-0 z-0">
                 <img
                     src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2070&auto=format&fit=crop"
-                    alt="Premium Restaurant Atmosphere"
+                    alt={__('Premium Restaurant Atmosphere')}
                     className="h-full w-full object-cover grayscale-[0.2] opacity-60"
                 />
                 {/* Gradient Overlays for readability - Theme Aware */}
@@ -32,11 +34,11 @@ export default function AuthSplitLayout({
                         href={home()}
                         className="group flex flex-col items-center gap-4 transition-transform hover:scale-105"
                     >
-                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-orange-500 to-orange-700 shadow-xl shadow-orange-900/30 ring-1 ring-white/20 transition-all group-hover:shadow-orange-500/30">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-sky-500 to-sky-700 shadow-xl shadow-sky-900/30 ring-1 ring-white/20 transition-all group-hover:shadow-sky-500/30">
                             <ChefHat size={32} className="text-white drop-shadow-md" />
                         </div>
                         <h2 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-widest text-foreground drop-shadow-lg">
-                            {name || 'RESTOWEB'}
+                            {name || "Ocean's Resto"}
                         </h2>
                     </Link>
                 </div>
@@ -51,10 +53,10 @@ export default function AuthSplitLayout({
                     {/* Header */}
                     <div className="mb-8 text-center space-y-2">
                         <h1 className="font-['Playfair_Display',serif] text-2xl font-semibold text-foreground tracking-wide">
-                            {title}
+                            {title ? __(title) : ''}
                         </h1>
                         <p className="text-sm font-light tracking-wide text-muted-foreground">
-                            {description}
+                            {description ? __(description) : ''}
                         </p>
                     </div>
 
@@ -67,10 +69,11 @@ export default function AuthSplitLayout({
                 {/* Footer Note */}
                 <div className="mt-8 text-center">
                     <p className="font-['Playfair_Display',serif] text-sm italic text-muted-foreground/60 drop-shadow-md">
-                        "Holistic dining experience for the senses."
+                        "{__('Holistic dining experience for the senses.')}"
                     </p>
                 </div>
             </div>
         </div>
     );
 }
+

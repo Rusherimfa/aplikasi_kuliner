@@ -8,6 +8,7 @@ use App\Models\RestoTable;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -33,7 +34,7 @@ class DatabaseSeeder extends Seeder
             'is_verified' => true,
         ]);
 
-        \DB::table('team_members')->updateOrInsert(
+        DB::table('team_members')->updateOrInsert(
             ['team_id' => $team->id, 'user_id' => $admin->id],
             ['role' => 'owner', 'created_at' => now(), 'updated_at' => now()]
         );

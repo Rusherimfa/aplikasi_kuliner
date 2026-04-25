@@ -4,7 +4,7 @@ import Pusher from 'pusher-js';
 declare global {
     interface Window {
         Pusher: typeof Pusher;
-        Echo: Echo;
+        Echo: Echo<any>;
     }
 }
 
@@ -19,5 +19,16 @@ if (typeof window !== 'undefined') {
         wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
         forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
         enabledTransports: ['ws', 'wss'],
+        auth: {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'Accept': 'application/json',
+            }
+        }
+    });
+
+    console.log('Echo initialized with Reverb', {
+        host: import.meta.env.VITE_REVERB_HOST,
+        port: import.meta.env.VITE_REVERB_PORT
     });
 }

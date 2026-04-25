@@ -1,40 +1,43 @@
 import { Eye, Camera } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-const GALLERY_IMAGES = [
-    {
-        src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2670&auto=format&fit=crop',
-        alt: 'Fine dining presentation',
-        label: 'Makan Malam Mewah',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=2574&auto=format&fit=crop',
-        alt: 'Chef at work',
-        label: 'Dapur Kami',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?q=80&w=2574&auto=format&fit=crop',
-        alt: 'Restaurant interior',
-        label: 'Suasana',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2670&auto=format&fit=crop',
-        alt: 'Signature dish',
-        label: 'Hidangan Khas',
-    },
-    {
-        src: 'https://images.unsplash.com/photo-1551218808-94e220e084d2?q=80&w=2574&auto=format&fit=crop',
-        alt: 'Cocktails',
-        label: 'Minuman Khas',
-    },
-     {
-        src: 'https://images.unsplash.com/photo-1470333738027-5654490f4e8c?q=80&w=2574&auto=format&fit=crop',
-        alt: 'Bar atmosphere',
-        label: 'Signature Bar',
-    },
-];
+import { useTranslations } from '@/hooks/use-translations';
 
 export default function PhotoGallery() {
+    const { __ } = useTranslations();
+
+    const GALLERY_IMAGES = [
+        {
+            src: 'https://images.unsplash.com/photo-1544148103-0773bf10d330?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Fresh seafood dining',
+            label: __('Seafood Sensation'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1534604973900-c430904a43fc?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Ocean view sunset',
+            label: __('Sunset View'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?q=80&w=2574&auto=format&fit=crop',
+            alt: 'Signature dish',
+            label: __('Special Catch'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Lobster platter',
+            label: __('Premium Lobster'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Tropical drinks',
+            label: __('Tropical Drinks'),
+        },
+         {
+            src: 'https://images.unsplash.com/photo-1498654896293-37aacf113fd9?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Beachfront atmosphere',
+            label: __('Coastal Atmosphere'),
+        },
+    ];
+
     return (
         <section className="bg-[#FAFAFA] dark:bg-[#0A0A0B] py-32 transition-colors duration-500 font-['Inter',sans-serif]">
             <div className="mx-auto max-w-7xl px-8">
@@ -44,10 +47,10 @@ export default function PhotoGallery() {
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-orange-600 dark:text-orange-500 uppercase glow-primary"
+                        className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
                     >
                         <Camera size={12} />
-                        <span>Visual Journey</span>
+                        <span>{__('Visual Journey')}</span>
                     </motion.div>
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
@@ -56,10 +59,10 @@ export default function PhotoGallery() {
                         transition={{ delay: 0.1 }}
                         className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter"
                     >
-                        Pesta <span className="italic font-serif opacity-30">Visual</span>
+                        {__('Visual Feast')}
                     </motion.h2>
                     <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg font-medium">
-                        Eksplorasi estetika gastronomi and atmosfer yang kami bangun dengan penuh dedikasi.
+                        {__('Explore the freshness of seafood and the coastal atmosphere we\'ve built for you.')}
                     </p>
                 </div>
 
@@ -87,12 +90,12 @@ export default function PhotoGallery() {
                             <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-0 transition-all duration-700 group-hover:opacity-100">
                                 <motion.div 
                                     whileHover={{ scale: 1.1 }}
-                                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-orange-500 text-black shadow-2xl"
+                                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky-500 text-white shadow-2xl"
                                 >
                                     <Eye size={24} />
                                 </motion.div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                                    View Details
+                                    {__('View Details')}
                                 </span>
                             </div>
 

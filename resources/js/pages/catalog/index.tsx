@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+﻿import { Head, Link, usePage } from '@inertiajs/react';
 import { UtensilsCrossed, Search, ShoppingBag, Flame, SlidersHorizontal, ArrowLeft, Info, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -68,11 +68,11 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
 
     return (
         <div className="relative min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-foreground transition-colors duration-500 overflow-hidden">
-            <Head title="Katalog Menu — Seleksi Gastronomi Premium" />
+            <Head title="Katalog Menu â€” Seleksi Gastronomi Premium" />
             
             {/* Premium Decorative Ambient */}
-            <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-orange-500/5 blur-[140px]" />
-            <div className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-orange-600/5 blur-[120px]" />
+            <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-sky-500/5 blur-[140px]" />
+            <div className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-sky-600/5 blur-[120px]" />
 
             <Navbar
                 auth={auth}
@@ -88,7 +88,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                         <motion.div 
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="inline-flex items-center gap-3 rounded-2xl border border-orange-500/20 bg-orange-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-orange-600 dark:text-orange-500 uppercase glow-primary"
+                            className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
                         >
                             Exquisite Menu
                         </motion.div>
@@ -98,7 +98,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             transition={{ delay: 0.1 }}
                             className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white md:text-7xl tracking-tighter"
                         >
-                            Seleksi <span className="italic font-serif opacity-40 text-orange-500">Gastronomi</span>
+                            Seleksi <span className="italic font-serif opacity-40 text-sky-500">Gastronomi</span>
                         </motion.h1>
                         <motion.p 
                             initial={{ opacity: 0, y: 20 }}
@@ -122,7 +122,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             <Input
                                 type="search"
                                 placeholder="Cari hidangan istimewa..."
-                                className="h-14 rounded-3xl border-none bg-slate-50 dark:bg-white/5 pl-14 text-base font-medium placeholder:text-slate-400 focus:ring-orange-500/30 transition-all font-sans"
+                                className="h-14 rounded-3xl border-none bg-slate-50 dark:bg-white/5 pl-14 text-base font-medium placeholder:text-slate-400 focus:ring-sky-500/30 transition-all font-sans"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -141,7 +141,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
                                             exit={{ scale: 0 }}
-                                            className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-[11px] font-black text-black border-2 border-white dark:border-[#0A0A0B] shadow-lg"
+                                            className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-sky-500 text-[11px] font-black text-black border-2 border-white dark:border-[#0A0A0B] shadow-lg"
                                         >
                                             {cartCount}
                                         </motion.span>
@@ -162,8 +162,8 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                 onClick={() => setActiveCategory(category)}
                                 className={`whitespace-nowrap rounded-2xl px-8 py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-300 active:scale-95 ${
                                     activeCategory === category
-                                        ? 'bg-orange-500 text-black shadow-xl shadow-orange-500/20'
-                                        : 'bg-white dark:bg-white/5 border border-border dark:border-white/5 text-slate-500 dark:text-neutral-500 hover:border-orange-500/30'
+                                        ? 'bg-sky-500 text-black shadow-xl shadow-sky-500/20'
+                                        : 'bg-white dark:bg-white/5 border border-border dark:border-white/5 text-slate-500 dark:text-neutral-500 hover:border-sky-500/30'
                                 }`}
                             >
                                 {category}
@@ -190,7 +190,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                         transition={{ duration: 0.5, delay: index * 0.05 }}
                                         className="group h-full"
                                     >
-                                        <div className="glass-card relative flex h-full flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border-border dark:border-white/10 transition-all duration-700 md:hover:-translate-y-3 hover:border-orange-500/30 hover:shadow-2xl shadow-orange-500/5 active:scale-[0.98]">
+                                        <div className="glass-card relative flex h-full flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border-border dark:border-white/10 transition-all duration-700 md:hover:-translate-y-3 hover:border-sky-500/30 hover:shadow-2xl shadow-sky-500/5 active:scale-[0.98]">
                                             {/* Media Area */}
                                             <div className="relative aspect-[4/3] md:aspect-square overflow-hidden m-2 md:m-3 rounded-[1.5rem] md:rounded-[1.75rem] bg-slate-50 dark:bg-white/5">
                                                 <div className="absolute inset-0 flex items-center justify-center opacity-40 transition-transform duration-1000 group-hover:scale-125 group-hover:rotate-12">
@@ -200,7 +200,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                 {/* Labels */}
                                                 <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
                                                     {!!item.is_best_seller && (
-                                                        <div className="flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-1.5 text-[10px] font-black text-black uppercase tracking-widest shadow-xl">
+                                                        <div className="flex items-center gap-2 rounded-xl bg-sky-500 px-3 py-1.5 text-[10px] font-black text-black uppercase tracking-widest shadow-xl">
                                                             <Flame size={12} />
                                                             Best Seller
                                                         </div>
@@ -224,10 +224,10 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                             {/* Content */}
                                             <div className="flex flex-1 flex-col p-5 md:p-8 pt-2 md:pt-4">
                                                 <div className="mb-3 md:mb-4 flex flex-col items-start gap-0.5 md:gap-1">
-                                                    <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight group-hover:text-orange-500 transition-colors">
+                                                    <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white tracking-tight leading-tight group-hover:text-sky-500 transition-colors">
                                                         {item.name}
                                                     </h3>
-                                                    <span className="text-base md:text-lg font-black text-orange-500 italic">
+                                                    <span className="text-base md:text-lg font-black text-sky-500 italic">
                                                         {formatRupiah(item.price)}
                                                     </span>
                                                 </div>
@@ -238,7 +238,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                 {item.is_available ? (
                                                     <Button
                                                         onClick={() => addItem({ id: item.id, name: item.name, price: item.price })}
-                                                        className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-orange-500 hover:text-black dark:hover:bg-orange-500 dark:hover:text-black group active:scale-95 shadow-xl border border-transparent"
+                                                        className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-sky-500 hover:text-black dark:hover:bg-sky-500 dark:hover:text-black group active:scale-95 shadow-xl border border-transparent"
                                                     >
                                                         <ShoppingBag size={14} className="mr-3" />
                                                         Add to Order
@@ -276,7 +276,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                         setActiveCategory('Semua');
                                         setSearchTerm('');
                                     }}
-                                    className="h-14 rounded-2xl px-10 bg-orange-500 text-black font-black uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-orange-500/10"
+                                    className="h-14 rounded-2xl px-10 bg-sky-500 text-black font-black uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-sky-500/10"
                                 >
                                     <ArrowLeft size={16} className="mr-3" />
                                     Reset Filters
@@ -300,4 +300,5 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
         </div>
     );
 }
+
 

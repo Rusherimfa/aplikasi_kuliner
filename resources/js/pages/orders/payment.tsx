@@ -1,4 +1,4 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+﻿import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { ArrowLeft, CheckCircle2, ChevronRight, CreditCard, Lock, QrCode, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -26,16 +26,16 @@ export default function OrderPayment() {
 
     return (
         <>
-            <Head title={`Pembayaran #${order.order_number} - RestoWeb`} />
+            <Head title={`Pembayaran #${order.order_number} - Ocean's Resto`} />
 
-            <div className="flex min-h-screen flex-col bg-background font-['Inter',sans-serif] selection:bg-orange-100 selection:text-orange-900 transition-colors duration-500">
+            <div className="flex min-h-screen flex-col bg-background font-['Inter',sans-serif] selection:bg-sky-100 selection:text-sky-900 transition-colors duration-500">
                 <Navbar auth={auth} dashboardUrl="/dashboard" mobileMenuOpen={false} setMobileMenuOpen={() => {}} />
 
                 <main className="flex-1 px-4 py-32 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
                         
                         <div className="mb-8">
-                            <Link href="/orders/history" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-orange-600 transition-colors">
+                            <Link href="/orders/history" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-sky-600 transition-colors">
                                 <ArrowLeft className="mr-2 h-4 w-4" /> Batal dan Kembali
                             </Link>
                         </div>
@@ -44,11 +44,11 @@ export default function OrderPayment() {
                             {/* Left Side: Invoice Summary */}
                             <div className="bg-zinc-950 p-8 text-white sm:p-12 relative overflow-hidden">
                                 <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
-                                    <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-orange-500 to-rose-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
+                                    <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-sky-500 to-rose-500 opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]"></div>
                                 </div>
                                 
                                 <div className="relative z-10">
-                                    <ShieldCheck className="mb-6 h-12 w-12 text-orange-500" />
+                                    <ShieldCheck className="mb-6 h-12 w-12 text-sky-500" />
                                     <h2 className="mb-2 font-['Playfair_Display',serif] text-3xl font-bold">Ringkasan Tagihan</h2>
                                     <p className="text-sm font-medium text-zinc-400">Order ID: #{order.order_number}</p>
                                     
@@ -77,7 +77,7 @@ export default function OrderPayment() {
                                         <div className="pt-2">
                                             <div className="flex justify-between items-center bg-white/5 rounded-xl p-4 border border-white/10">
                                                 <span className="text-lg font-medium text-white">Total Pembayaran</span>
-                                                <span className="text-2xl font-bold tracking-tight text-orange-400">
+                                                <span className="text-2xl font-bold tracking-tight text-sky-400">
                                                     Rp {Number(order.total_price).toLocaleString('id-ID')}
                                                 </span>
                                             </div>
@@ -94,10 +94,10 @@ export default function OrderPayment() {
                                 <div className="space-y-4">
                                     <button 
                                         onClick={() => setPaymentMethod('ewallet')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-orange-500 bg-orange-500/10 shadow-md ring-1 ring-orange-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'ewallet' ? 'bg-orange-500/20 text-orange-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'ewallet' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
                                                 <CreditCard size={20} />
                                             </div>
                                             <div className="text-left">
@@ -105,17 +105,17 @@ export default function OrderPayment() {
                                                 <p className="text-xs text-muted-foreground">GoPay, OVO, Dana, ShopeePay</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'ewallet' ? 'border-orange-500 bg-orange-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
                                             {paymentMethod === 'ewallet' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
 
                                     <button 
                                         onClick={() => setPaymentMethod('qris')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'qris' ? 'border-orange-500 bg-orange-500/10 shadow-md ring-1 ring-orange-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'qris' ? 'bg-orange-500/20 text-orange-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'qris' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
                                                 <QrCode size={20} />
                                             </div>
                                             <div className="text-left">
@@ -123,17 +123,17 @@ export default function OrderPayment() {
                                                 <p className="text-xs text-muted-foreground">Scan QR Code Otomatis</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'qris' ? 'border-orange-500 bg-orange-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
                                             {paymentMethod === 'qris' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
 
                                     <button 
                                         onClick={() => setPaymentMethod('bank')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'bank' ? 'border-orange-500 bg-orange-500/10 shadow-md ring-1 ring-orange-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'bank' ? 'bg-orange-500/20 text-orange-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'bank' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
                                                 <CreditCard size={20} />
                                             </div>
                                             <div className="text-left">
@@ -141,7 +141,7 @@ export default function OrderPayment() {
                                                 <p className="text-xs text-muted-foreground">BCA, Mandiri, BNI, BRI</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'bank' ? 'border-orange-500 bg-orange-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
                                             {paymentMethod === 'bank' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
@@ -179,3 +179,4 @@ export default function OrderPayment() {
         </>
     );
 }
+

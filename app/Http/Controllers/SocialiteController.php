@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -25,9 +26,13 @@ class SocialiteController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->user();
+            $googleUser = Socialite::driver('google')->stateless()->user();
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Gagal login dari Google. Silakan coba lagi.');
+            Log::error('Google Login Error: '.$e->getMessage(), [
+                'exception' => $e,
+            ]);
+
+            return redirect('/login')->with('error', 'Gagal login dari Google: '.$e->getMessage());
         }
 
         // Cek apakah pengguna sudah pernah mendaftar (Cari via Google ID ATAU Email yang cocok)
@@ -48,7 +53,7 @@ class SocialiteController extends Controller
             // Assign to default team since standard registration does this
             $team = Team::first();
             if ($team) {
-                $team->users()->attach($user, ['role' => 'customer']);
+                $team->members()->attach($user, ['role' => 'member']);
                 $user->current_team_id = $team->id;
                 $user->save();
             }
