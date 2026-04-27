@@ -99,4 +99,3 @@ export default function VerifyOtp({ email, status }: { email: string; status?: s
         </AuthLayout>
     );
 }
-
