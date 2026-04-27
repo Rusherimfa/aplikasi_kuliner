@@ -16,6 +16,7 @@ class Message extends Model
         'sender_id',
         'content',
         'is_chatbot',
+        'chat_type',
         'read_at',
     ];
 

@@ -188,12 +188,12 @@ export default function NotificationDropdown() {
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white truncate group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">{notification.data.title}</h4>
+                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white truncate group-hover:text-sky-500 dark:group-hover:text-sky-400 transition-colors">{__(notification.data.title)}</h4>
                                                     <span className="text-[10px] font-medium text-slate-400 dark:text-white/30 whitespace-nowrap">
                                                         {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true, locale: dateLocale })}
                                                     </span>
                                                 </div>
-                                                <p className="text-xs text-slate-500 dark:text-white/50 mt-1 leading-relaxed line-clamp-2">{notification.data.message}</p>
+                                                <p className="text-xs text-slate-500 dark:text-white/50 mt-1 leading-relaxed line-clamp-2">{__(notification.data.message)}</p>
                                                 
                                                 <div className="flex items-center gap-4 mt-4">
                                                     {notification.data.url && (

@@ -1,11 +1,23 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { UtensilsCrossed, Instagram, Twitter, Facebook, MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
-import { login } from '@/routes';
+import { login, dashboard } from '@/routes';
 import { motion } from 'framer-motion';
 import { useTranslations } from '@/hooks/use-translations';
 
 export default function Footer() {
+    const { auth } = usePage().props as any;
     const { __ } = useTranslations();
+    const dashboardUrl = dashboard().url;
+
+    const links = [
+        { label: __('Our Selection'), href: '/catalog' },
+        { label: __('Private Booking'), href: '/reservations/create' },
+        { label: __('The Experience'), href: '/experience' },
+    ];
+
+    if (auth.user && auth.user.role !== 'customer') {
+        links.push({ label: __('Dashboard Panel'), href: dashboardUrl });
+    }
     return (
         <footer className="relative bg-[#FAFAFA] dark:bg-[#0A0A0B] text-slate-500 dark:text-neutral-500 border-t border-border dark:border-white/5 transition-colors duration-500 font-['Inter',sans-serif]">
             {/* Top decorative gradient line */}
@@ -56,12 +68,7 @@ export default function Footer() {
                                 {__('Exploration')}
                             </h4>
                             <ul className="space-y-4">
-                                {[
-                                    { label: __('Our Selection'), href: '/catalog' },
-                                    { label: __('Private Booking'), href: '/reservations/create' },
-                                    { label: __('The Experience'), href: '/experience' },
-                                    { label: __('Strategic Portal'), href: login().url },
-                                ].map((link) => (
+                                {links.map((link) => (
                                     <li key={link.label}>
                                         <Link
                                             href={link.href}
@@ -90,20 +97,20 @@ export default function Footer() {
                                         <MapPin size={18} />
                                     </div>
                                     <span className="text-sm font-medium leading-relaxed">
-                                        {__('Melawai Beach Area Balikpapan')}
+                                        {__('Kompleks Ruko Bandar Blok N1, Jl. Jenderal Sudirman No.26, Balikpapan')}
                                     </span>
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <Mail size={18} />
                                     </div>
-                                    <span className="text-sm font-medium">hello@oceansresto.com</span>
+                                    <span className="text-sm font-medium">info@oceans-balikpapan.id</span>
                                 </li>
                                 <li className="flex items-center gap-4">
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <Clock size={18} />
                                     </div>
-                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Setiap Hari 08:00 — 23:00')}</span>
+                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Open Daily 10:00 AM — 11:00 PM')}</span>
                                 </li>
                             </ul>
                         </div>
@@ -116,14 +123,17 @@ export default function Footer() {
                         © {new Date().getFullYear()} Ocean's Resto The Fish Connection.
                     </p>
                     <div className="flex gap-8">
-                        {[__('Privacy Protocol'), __('Terms of Engagement')].map((label) => (
-                            <a
-                                key={label}
-                                href="#"
+                        {[
+                            { label: __('Privacy Protocol'), href: '/privacy' },
+                            { label: __('Terms of Engagement'), href: '/terms' }
+                        ].map((link) => (
+                            <Link
+                                key={link.label}
+                                href={link.href}
                                 className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-sky-500"
                             >
-                                {label}
-                            </a>
+                                {link.label}
+                            </Link>
                         ))}
                     </div>
                 </div>

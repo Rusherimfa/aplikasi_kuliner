@@ -17,6 +17,7 @@ import { threads as chatThreads } from '@/routes/chat';
 type ChatThread = {
     id: string;
     type: 'reservations' | 'orders' | 'guest';
+    chat_type?: 'support' | 'delivery';
     record_id: number;
     title: string;
     subtitle: string;
@@ -292,6 +293,7 @@ export default function HomeLiveChat({ currentUser }: { currentUser: any }) {
                             ? activeThread.record_id
                             : undefined
                     }
+                    chatType={activeThread.chat_type}
                     defaultOpen
                     hideToggle
                     placement="left"

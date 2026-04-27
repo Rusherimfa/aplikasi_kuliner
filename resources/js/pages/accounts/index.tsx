@@ -1,4 +1,4 @@
-﻿import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { Users, Plus, Edit2, Trash2, X, ChefHat, Bike, User as UserIcon } from 'lucide-react';
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { useTranslations } from '@/hooks/use-translations';
 import {
     Table,
     TableBody,
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/table';
 
 export default function AccountManagement({ staffs, kurirs, customers }: any) {
+    const { __ } = useTranslations();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingAccount, setEditingAccount] = useState<any>(null);
 
@@ -70,7 +72,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Yakin ingin menghapus akun ini secara permanen?')) {
+        if (confirm(__('Yakin ingin menghapus akun ini secara permanen?'))) {
             destroy(`/accounts/${id}`);
         }
     };
@@ -86,10 +88,10 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                         <Table>
                             <TableHeader className="border-b border-border bg-muted/20">
                                 <TableRow className="hover:bg-transparent border-border">
-                                    <TableHead className="font-semibold text-foreground/70">Tipe</TableHead>
-                                    <TableHead className="font-semibold text-foreground/70">Nama</TableHead>
-                                    <TableHead className="font-semibold text-foreground/70">Email & Kontak</TableHead>
-                                    <TableHead className="text-right font-semibold text-foreground/70">Aksi</TableHead>
+                                    <TableHead className="font-semibold text-foreground/70">{__('Tipe')}</TableHead>
+                                    <TableHead className="font-semibold text-foreground/70">{__('Nama')}</TableHead>
+                                    <TableHead className="font-semibold text-foreground/70">{__('Email & Kontak')}</TableHead>
+                                    <TableHead className="text-right font-semibold text-foreground/70">{__('Aksi')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -136,7 +138,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                     </div>
                 ) : (
                     <div className="p-8 text-center text-muted-foreground text-sm">
-                        Belum ada data untuk kategori ini.
+                        {__('Belum ada data untuk kategori ini.')}
                     </div>
                 )}
             </div>
@@ -145,16 +147,16 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
 
     return (
         <>
-            <Head title="Manajemen Akun - Ocean's Resto Admin" />
+            <Head title={`${__('Manajemen Akun')} - Ocean's Resto Admin`} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-foreground font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-foreground/90">
-                            Manajemen Akun
+                            {__('Manajemen Akun')}
                         </h1>
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Atur pengguna sistem, kru internal, jajaran kemitraan, dan direktori pelanggan.
+                            {__('Atur pengguna sistem, kru internal, jajaran kemitraan, dan direktori pelanggan.')}
                         </p>
                     </div>
                     <div className="flex w-full sm:w-auto items-center gap-3">
@@ -163,14 +165,14 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                             className="shrink-0 bg-sky-500 hover:bg-sky-600 text-[#0A0A0B] font-semibold"
                         >
                             <Plus className="mr-2 h-4 w-4" />
-                            Tambah Personil Baru
+                            {__('Tambah Personil Baru')}
                         </Button>
                     </div>
                 </div>
 
-                {renderAccountTable('Manajemen Staff & Kru Dapur', staffs, <ChefHat size={18} />, 'text-emerald-400')}
-                {renderAccountTable('Mitra Armada Logistik (Kurir)', kurirs, <Bike size={18} />, 'text-cyan-400')}
-                {renderAccountTable('Direktori Pelanggan', customers, <UserIcon size={18} />, 'text-violet-400')}
+                {renderAccountTable(__('Manajemen Staff & Kru Dapur'), staffs, <ChefHat size={18} />, 'text-emerald-400')}
+                {renderAccountTable(__('Mitra Armada Logistik (Kurir)'), kurirs, <Bike size={18} />, 'text-cyan-400')}
+                {renderAccountTable(__('Direktori Pelanggan'), customers, <UserIcon size={18} />, 'text-violet-400')}
             </div>
 
             {/* Modal Form */}
@@ -183,7 +185,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                         
                         <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
                             <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
-                                {editingAccount ? 'Ubah Profil Akun' : 'Pendaftaran Akun Baru'}
+                                {editingAccount ? __('Ubah Profil Akun') : __('Pendaftaran Akun Baru')}
                             </h2>
                             <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
                                 <X size={18} />
@@ -192,23 +194,23 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
 
                         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="off">
                             <div>
-                                <Label htmlFor="role" className="text-foreground/70">Wewenang / Role</Label>
+                                <Label htmlFor="role" className="text-foreground/70">{__('Wewenang / Role')}</Label>
                                 <select 
                                     id="role" 
                                     value={data.role} 
                                     onChange={e => setData('role', e.target.value)}
                                     className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500"
                                 >
-                                    <option value="staff" className="bg-card">Staff / Kru</option>
-                                    <option value="kurir" className="bg-card">Kurir Truk</option>
-                                    <option value="customer" className="bg-card">Customer Registrasi</option>
+                                    <option value="staff" className="bg-card">{__('Staff / Kru')}</option>
+                                    <option value="kurir" className="bg-card">{__('Kurir Truk')}</option>
+                                    <option value="customer" className="bg-card">{__('Customer Registrasi')}</option>
                                 </select>
                                 {errors.role && <p className="mt-1 text-xs text-destructive">{errors.role}</p>}
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="name" className="text-foreground/70">Nama Lengkap</Label>
+                                    <Label htmlFor="name" className="text-foreground/70">{__('Nama Lengkap')}</Label>
                                     <Input 
                                         id="name" 
                                         value={data.name} 
@@ -218,7 +220,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                                     {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="phone" className="text-foreground/70">Telp (Opsional)</Label>
+                                    <Label htmlFor="phone" className="text-foreground/70">{__('Telp (Opsional)')}</Label>
                                     <Input 
                                         id="phone" 
                                         value={data.phone} 
@@ -230,7 +232,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                             </div>
                             
                             <div>
-                                <Label htmlFor="email" className="text-foreground/70">Email Aktivasi</Label>
+                                <Label htmlFor="email" className="text-foreground/70">{__('Email Aktivasi')}</Label>
                                 <Input 
                                     id="email" 
                                     type="email"
@@ -244,7 +246,7 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                             
                             <div>
                                 <Label htmlFor="password" className="text-foreground/70">
-                                    Password {editingAccount && <span className="text-xs text-muted-foreground">(Kosongkan jika tidak diubah)</span>}
+                                    {__('Password')} {editingAccount && <span className="text-xs text-muted-foreground">({__('Kosongkan jika tidak diubah')})</span>}
                                 </Label>
                                 <Input 
                                     id="password" 
@@ -259,10 +261,10 @@ export default function AccountManagement({ staffs, kurirs, customers }: any) {
                             
                              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-border">
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-muted">
-                                    Batal
+                                    {__('Batal')}
                                 </Button>
                                 <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600 text-zinc-950 font-bold">
-                                    {processing ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+                                    {processing ? __('Menyimpan...') : __('Simpan Konfigurasi')}
                                 </Button>
                             </div>
                         </form>

@@ -72,7 +72,7 @@ export function UserMenuContent({ user }: Props) {
                     data-test="logout-button"
                 >
                     <LogOut className="mr-2" />
-                    {__('Exit Sanctuary')}
+                    {__('End Session')}
                 </Link>
             </DropdownMenuItem>
         </>

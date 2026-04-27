@@ -71,6 +71,7 @@ class OrderController extends Controller
         // Notify Staff about new order
         $staff = User::whereIn('role', ['admin', 'staff'])->get();
         foreach ($staff as $s) {
+            /** @var User $s */
             $s->notify(new AppNotification(
                 __('Pesanan Baru'),
                 __('Ada pesanan masuk #:order dari :name.', ['order' => $order->order_number, 'name' => $order->customer_name]),
@@ -133,6 +134,7 @@ class OrderController extends Controller
         // Notify Staff
         $staff = User::whereIn('role', ['admin', 'staff'])->get();
         foreach ($staff as $s) {
+            /** @var User $s */
             $s->notify(new AppNotification(
                 __('Pesanan Dibayar'),
                 __('Pelanggan :name telah membayar pesanan #:order.', ['name' => $order->customer_name, 'order' => $order->order_number]),
@@ -146,17 +148,21 @@ class OrderController extends Controller
 
     public function destroy(Order $order)
     {
-        if ($order->user_id !== Auth::id()) {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($order->user_id !== $user->id && ! $user->isStaff()) {
             abort(403);
         }
 
-        if ($order->order_status !== 'cancelled') {
-            return back()->withError('Hanya pesanan yang dibatalkan yang dapat dihapus.');
+        // For customers, only allow deleting cancelled orders
+        if (! $user->isStaff() && $order->order_status !== 'cancelled') {
+            return back()->with('error', 'Hanya pesanan yang dibatalkan yang dapat dihapus.');
         }
 
         $order->delete();
 
-        return redirect()->route('orders.history');
+        return back()->with('success', 'Riwayat pesanan berhasil dihapus.');
     }
 
     public function cancel(Order $order)

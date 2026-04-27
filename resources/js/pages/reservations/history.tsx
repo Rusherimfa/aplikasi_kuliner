@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import Navbar from '@/pages/welcome/sections/navbar';
 import Footer from '@/pages/welcome/sections/footer';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ import {
     Utensils,
     ChefHat,
     History as HistoryIcon,
-    Sparkles
+    Sparkles,
+    Trash2
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -65,6 +66,14 @@ export default function ReservationHistory({ auth, reservations }: any) {
             });
         });
         setCartOpen(true);
+    };
+
+    const deleteReservation = (id: number) => {
+        if (confirm(__('Batalkan reservasi ini?'))) {
+            router.delete(`/reservations/${id}`, {
+                preserveScroll: true,
+            });
+        }
     };
 
     const generateCalendarLink = (r: any) => {
@@ -171,7 +180,7 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                                     </h3>
                                                     <div className="flex flex-wrap gap-6 text-sm font-bold text-slate-500 dark:text-neutral-400">
                                                         <span className="flex items-center gap-2.5"><CalendarRange size={16} className="text-sky-500" /> {new Date(r.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
-                                                        <span className="flex items-center gap-2.5"><Clock size={16} className="text-sky-500" /> {r.time} WIB</span>
+                                                        <span className="flex items-center gap-2.5"><Clock size={16} className="text-sky-500" /> {r.time} WITA</span>
                                                         <span className="flex items-center gap-2.5"><ChefHat size={16} className="text-sky-500" /> {r.customer_name}</span>
                                                     </div>
                                                 </div>
@@ -237,6 +246,15 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                                         >
                                                             <MessageCircle size={16} className="mr-2" /> {__('Chat with Staff')}
                                                         </Button>
+                                                        {r.status === 'pending' && (
+                                                            <Button 
+                                                                onClick={() => deleteReservation(r.id)}
+                                                                variant="outline"
+                                                                className="w-full h-14 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all mt-2 border-rose-500/20 hover:bg-rose-500/10 text-rose-500"
+                                                            >
+                                                                <Trash2 size={16} className="mr-2" /> {__('Batalkan Reservasi')}
+                                                            </Button>
+                                                        )}
                                                     </>
                                                 )}
                                             </div>

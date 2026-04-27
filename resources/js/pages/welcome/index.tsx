@@ -1,14 +1,9 @@
-<<<<<<< HEAD
 import { Head, usePage } from '@inertiajs/react';
 import { useState, useRef } from 'react';
-=======
-﻿import { Head, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { dashboard } from '@/routes';
 import AIChatbot from '@/components/app/ai-chatbot';
 import GuestSupportChat from '@/components/app/guest-support-chat';
 import HomeLiveChat from '@/components/app/home-live-chat';
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
-import { dashboard } from '@/routes';
 
 // Sections
 import BentoFeatures from './sections/bento-features';
@@ -65,11 +60,7 @@ export default function Welcome({
                 />
             </Head>
 
-<<<<<<< HEAD
             <div className="min-h-screen bg-transparent font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-500 relative">
-=======
-            <div className="min-h-screen bg-[#FAFAFA] font-['Inter',sans-serif] text-slate-800 transition-colors duration-500 selection:bg-sky-100 selection:text-sky-900 dark:bg-neutral-950 dark:text-neutral-200 dark:selection:bg-sky-500/30 dark:selection:text-sky-200">
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -88,6 +79,8 @@ export default function Welcome({
                         <SignatureDishes bestSellers={bestSellers} auth={auth} />
                     </div>
 
+                    <HowItWorks />
+
                     <div className="mx-auto max-w-7xl px-6 lg:px-8">
                         <PhotoGallery />
                     </div>
@@ -96,24 +89,8 @@ export default function Welcome({
                     
                     <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
 
-<<<<<<< HEAD
                     <CTASection />
                 </main>
-=======
-                <PhotoGallery />
-
-                <HowItWorks />
-
-                <LocationHours />
-
-                <Testimonials
-                    testimonials={testimonials}
-                    reviews={reviews}
-                    auth={auth}
-                />
-
-                <CTASection />
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
 
                 <Footer />
 

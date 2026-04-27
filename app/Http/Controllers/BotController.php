@@ -52,7 +52,7 @@ class BotController extends Controller
                 return response()->json(['reply' => 'Maaf, data menu kami belom tersedia.']);
             }
 
-            $reply = "Ini dia daftar lengkap menu RestoWeb 📝:\n\n";
+            $reply = "Ini dia daftar lengkap menu Ocean's Resto 📝:\n\n";
             foreach ($menus as $m) {
                 $price = 'Rp'.number_format($m->price, 0, ',', '.');
                 $reply .= "✅ *{$m->name}*: {$price}\n";
@@ -93,12 +93,12 @@ class BotController extends Controller
 
         // Match: Operating Hours
         if (str_contains($message, 'jam') || str_contains($message, 'buka') || str_contains($message, 'tutup') || str_contains($message, 'operasional')) {
-            return response()->json(['reply' => "RestoWeb buka setiap hari untuk menemani hari Anda:\n\n🕒 *Makan Siang (Lunch):* 11.00 - 15.00 WIB\n🕒 *Makan Malam (Dinner):* 17.00 - 22.00 WIB\n\nPesanan Takeaway/Delivery terakhir kami terima 30 menit sebelum jam tutup tutup."]);
+            return response()->json(['reply' => "Ocean's Resto buka setiap hari untuk menemani hari Anda:\n\n🕒 *Senin — Jumat:* 08.00 - 22.00 WITA\n🕒 *Sabtu — Minggu:* 09.00 - 23.00 WITA\n\nPesanan Takeaway/Delivery terakhir kami terima 30 menit sebelum jam tutup."]);
         }
 
         // Match: Location / Admin
         if (str_contains($message, 'alamat') || str_contains($message, 'lokasi') || str_contains($message, 'dimana')) {
-            return response()->json(['reply' => "Restoran elit kami bertempat di jantung perkantoran:\n\n📍 *Gedung Menara Indah Lt. 12*\nJl. MH. Thamrin No. 90, Jakarta Pusat\n\nCocok untuk dinner mewah bersama keluarga atau rekan kerja Anda!"]);
+            return response()->json(['reply' => "Ocean's Resto bertempat di lokasi yang strategis dengan pemandangan laut:\n\n📍 *Kompleks Ruko Bandar*\nJl. Jenderal Sudirman No.26 Blok N1, Balikpapan\n\nNikmati hidangan laut segar dengan suasana 'Ocean Breeze' yang menenangkan!"]);
         }
 
         // Fallback Response

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\Role;
 use App\Events\DishStatusUpdated;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Reservation;
 use App\Models\User;
 use App\Notifications\AppNotification;
 use App\Services\WhatsAppService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -36,22 +38,58 @@ class KitchenController extends Controller
                     'total_price' => $order->total_price,
                     'courier' => $order->courier ? $order->courier->name : null,
                     'time' => $order->created_at->format('H:i'),
+                    'elapsed_minutes' => now()->diffInMinutes($order->created_at),
                     'items' => $order->items->map(function ($item) {
                         return [
                             'id' => $item->id,
-                            'name' => $item->menu->name,
+                            'name' => $item->menu ? $item->menu->name : 'Menu Tidak Tersedia',
                             'quantity' => $item->quantity,
                             'status' => $item->status ?? 'pending',
+                            'type' => 'order',
                         ];
                     }),
                 ];
             });
 
+        // 2. Fetch Dine-in Reservations
+        $reservations = Reservation::with(['menus', 'restoTable'])
+            ->latest()
+            ->get()
+            ->map(function ($res) {
+                return [
+                    'id' => $res->id,
+                    'type' => 'reservation',
+                    'order_number' => 'RES-'.$res->id,
+                    'customer_name' => $res->customer_name,
+                    'order_type' => 'dine-in',
+                    'table_number' => $res->restoTable ? $res->restoTable->name : null,
+                    'payment_status' => $res->status == 'completed' ? 'paid' : 'pending',
+                    'order_status' => $res->status, // pending, confirmed, active, completed, cancelled
+                    'total_price' => $res->menus->sum(fn ($m) => $m->price * $m->pivot->quantity),
+                    'courier' => null,
+                    'time' => $res->reservation_time ? Carbon::parse($res->reservation_time)->format('H:i') : $res->created_at->format('H:i'),
+                    'elapsed_minutes' => now()->diffInMinutes($res->created_at),
+                    'items' => $res->menus->map(function ($item) {
+                        return [
+                            'id' => $item->pivot->id,
+                            'name' => $item->name,
+                            'quantity' => $item->pivot->quantity,
+                            'status' => $item->pivot->status ?? 'pending',
+                            'notes' => $item->pivot->notes,
+                            'type' => 'reservation',
+                        ];
+                    }),
+                    'special_requests' => $res->special_requests,
+                ];
+            });
+
+        $allOrders = $allOrders->concat($reservations)->sortByDesc('time')->values();
+
         $couriers = User::where('role', Role::KURIR->value)->get(['id', 'name']);
 
         return Inertia::render('kitchen/index', [
-            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered']))->values(),
-            'online_completed' => $allOrders->filter(fn ($o) => $o['order_status'] === 'complete')->values(),
+            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered', 'active']))->values(),
+            'online_completed' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['complete', 'completed', 'served']))->values(),
             'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected']))->values(),
             'couriers' => $couriers,
         ]);
@@ -106,6 +144,33 @@ class KitchenController extends Controller
         return back()->with('success', 'Item status updated.');
     }
 
+    public function updateOrderItemStatus(Request $request, $itemId)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:pending,preparing,ready,served',
+        ]);
+
+        $item = OrderItem::with(['menu', 'order.user'])->find($itemId);
+        if (! $item) {
+            return back();
+        }
+
+        $item->update(['status' => $validated['status']]);
+
+        event(new DishStatusUpdated($item->order_id, $itemId, $validated['status'], $item->menu ? $item->menu->name : 'Item'));
+
+        if ($validated['status'] === 'ready' && $item->order && $item->order->user) {
+            $item->order->user->notify(new AppNotification(
+                __('Hidangan Siap'),
+                __('Hidangan ":name" Anda sudah siap dan akan segera dikemas/disajikan.', ['name' => $item->menu ? $item->menu->name : 'Menu']),
+                'success',
+                route('orders.track', [$item->order_id], false)
+            ));
+        }
+
+        return back()->with('success', 'Order Item status updated.');
+    }
+
     /**
      * Manage Online Order workflow.
      */
@@ -123,6 +188,13 @@ class KitchenController extends Controller
 
         $order->update($updateData);
 
+        // OTOMATISASI: Jika status pesanan berubah, update semua item di dalamnya
+        if ($validated['status'] === 'preparing') {
+            $order->items()->update(['status' => 'preparing']);
+        } elseif (in_array($validated['status'], ['complete', 'delivering', 'delivered'])) {
+            $order->items()->update(['status' => 'ready']);
+        }
+
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pesanan'),
@@ -136,17 +208,21 @@ class KitchenController extends Controller
 
     public function acceptOrder(Order $order)
     {
-        $order->update(['order_status' => 'waiting_for_payment']);
+        // Langsung masuk ke tahap memasak tanpa menunggu pembayaran
+        $order->update(['order_status' => 'preparing']);
+
+        // Otomatis tandai semua item sebagai sedang dimasak
+        $order->items()->update(['status' => 'preparing']);
 
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Pesanan Diterima'),
-            __('Pesanan #:order Anda telah diterima. Silakan lakukan pembayaran agar kami dapat mulai memasak.', ['order' => $order->order_number]),
-            'info',
-            route('orders.payment', [$order->id], false)
+            __('Kabar baik! Pesanan #:order Anda telah diterima dan koki kami mulai memasak sekarang.', ['order' => $order->order_number]),
+            'success',
+            route('orders.track', [$order->id], false)
         ));
 
-        return back()->with('success', "Pesanan #{$order->order_number} diterima.");
+        return back()->with('success', "Pesanan #{$order->order_number} diterima dan mulai dimasak.");
     }
 
     public function rejectOrder(Order $order)

@@ -8,6 +8,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useMagnetic } from '@/hooks/use-magnetic';
+import { useTranslations } from '@/hooks/use-translations';
 
 // Layout Shared Components
 import Navbar from '../welcome/sections/navbar';
@@ -18,6 +19,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Experience() {
     const { auth } = usePage().props as any;
+    const { __ } = useTranslations();
     const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
@@ -27,60 +29,60 @@ export default function Experience() {
     
     const chapters = {
         ocean: {
-            title: "The Source",
-            subtitle: "The Deep Blue Connection",
+            title: __("The Source"),
+            subtitle: __("The Deep Blue Connection"),
             color: "from-blue-600/20 to-cyan-500/20",
             icon: Sparkles,
             slides: [
                 {
-                    title: "Kejujuran Laut",
-                    text: "Kami menjalin koneksi langsung dengan nelayan lokal. Setiap ikan yang kami sajikan ditangkap secara berkelanjutan di perairan Nusantara.",
+                    title: __("Kejujuran Laut"),
+                    text: __("Kami menjalin koneksi langsung dengan nelayan lokal. Setiap ikan yang kami sajikan ditangkap secara berkelanjutan di perairan Nusantara."),
                     image: "https://images.unsplash.com/photo-1551244072-5d12893278ab?q=80&w=2670&auto=format&fit=crop"
                 },
                 {
-                    title: "Kesegaran Mutlak",
-                    text: "Dari jaring nelayan ke meja Anda dalam hitungan jam. Kami percaya bahwa rasa terbaik berasal dari kesegaran yang tidak berkompromi.",
+                    title: __("Kesegaran Mutlak"),
+                    text: __("Dari jaring nelayan ke meja Anda dalam hitungan jam. Kami percaya bahwa rasa terbaik berasal dari kesegaran yang tidak berkompromi."),
                     image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2670&auto=format&fit=crop"
                 },
                 {
-                    title: "Ekosistem Lestari",
-                    text: "Mendukung metode penangkapan ikan tradisional yang menjaga kelestarian terumbu karang and populasi biota laut.",
+                    title: __("Ekosistem Lestari"),
+                    text: __("Mendukung metode penangkapan ikan tradisional yang menjaga kelestarian terumbu karang and populasi biota laut."),
                     image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=2574&auto=format&fit=crop"
                 }
             ]
         },
         culinary: {
-            title: "The Craft",
-            subtitle: "The Art of Seafood",
+            title: __("The Craft"),
+            subtitle: __("The Art of Seafood"),
             color: "from-sky-500/20 to-indigo-500/20",
             icon: Utensils,
             slides: [
                 {
-                    title: "Presisi Fillet",
-                    text: "Setiap jenis ikan memerlukan teknik pemotongan yang berbeda untuk menjaga tekstur and karakter rasa uniknya.",
+                    title: __("Presisi Fillet"),
+                    text: __("Setiap jenis ikan memerlukan teknik pemotongan yang berbeda untuk menjaga tekstur and karakter rasa uniknya."),
                     image: "https://images.unsplash.com/photo-1534604973900-c41ab4c5d4b0?q=80&w=2574&auto=format&fit=crop"
                 },
                 {
-                    title: "Rempah Pesisir",
-                    text: "Bumbu rahasia kami diracik dari rempah-rempah pesisir yang telah digunakan secara turun-temurun oleh komunitas nelayan.",
+                    title: __("Rempah Pesisir"),
+                    text: __("Bumbu rahasia kami diracik dari rempah-rempah pesisir yang telah digunakan secara turun-temurun oleh komunitas nelayan."),
                     image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=2574&auto=format&fit=crop"
                 }
             ]
         },
         vibe: {
-            title: "The Depth",
-            subtitle: "Immersive Sanctuary",
+            title: __("The Depth"),
+            subtitle: __("Immersive Sanctuary"),
             color: "from-blue-900/20 to-slate-900/20",
             icon: GlassWater,
             slides: [
                 {
-                    title: "Interior Akuatik",
-                    text: "Desain interior yang terinspirasi dari ketenangan bawah laut, memberikan pengalaman bersantap yang meditatif.",
+                    title: __("Interior Akuatik"),
+                    text: __("Desain interior yang terinspirasi dari ketenangan bawah laut, memberikan pengalaman bersantap yang meditatif."),
                     image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2670&auto=format&fit=crop"
                 },
                 {
-                    title: "Simfoni Ombak",
-                    text: "Sistem audio kami mereplikasi frekuensi suara laut yang menenangkan, melengkapi cita rasa hidangan kami.",
+                    title: __("Simfoni Ombak"),
+                    text: __("Sistem audio kami mereplikasi frekuensi suara laut yang menenangkan, melengkapi cita rasa hidangan kami."),
                     image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2670&auto=format&fit=crop"
                 }
             ]
@@ -97,7 +99,7 @@ export default function Experience() {
 
     return (
         <div ref={containerRef}>
-            <Head title="Strategic Gastronomi - Ocean's Resto Premium" />
+            <Head title={`${__("Strategic Gastronomi")} - Ocean's Resto Premium`} />
 
             <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-slate-900 dark:text-neutral-400 selection:bg-sky-500 selection:text-black transition-colors duration-500 overflow-hidden">
                 <Navbar
@@ -172,7 +174,7 @@ export default function Experience() {
                                     >
                                         {activeData.slides[currentSlide].text}
                                     </motion.p>
-
+ 
                                     {/* Pagination Controls */}
                                     <div className="flex items-center gap-8 pt-8">
                                         <div className="flex gap-2">
@@ -204,7 +206,7 @@ export default function Experience() {
                                         </div>
                                     </div>
                                 </div>
-
+ 
                                 {/* Image Content */}
                                 <div className="order-1 lg:order-2">
                                     <motion.div
@@ -219,7 +221,7 @@ export default function Experience() {
                                             <img
                                                 src={activeData.slides[currentSlide].image}
                                                 className="h-full w-full object-cover grayscale-0 group-hover:grayscale transition-all duration-1000"
-                                                alt="Story Slide"
+                                                alt={__("Story Slide")}
                                             />
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                                         </div>
@@ -227,15 +229,15 @@ export default function Experience() {
                                 </div>
                             </div>
                         </div>
-
+ 
                         {/* Slide Indicator (Physical Magazine Vibe) */}
                         <div className="absolute bottom-12 right-12">
                             <span className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">
-                                Page {currentSlide + 1} / {activeData.slides.length}
+                                {__("Page")} {currentSlide + 1} / {activeData.slides.length}
                             </span>
                         </div>
                     </div>
-
+ 
                     {/* Final Invitation - Physical Card Vibe */}
                     <section className="relative mx-8 overflow-hidden rounded-[4rem] bg-slate-50 dark:bg-white/[0.01] border border-border dark:border-white/5 p-24 text-center shadow-2xl">
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500/50 to-transparent" />
@@ -245,25 +247,25 @@ export default function Experience() {
                                 whileInView={{ opacity: 1 }}
                                 className="inline-flex px-6 py-2 rounded-full bg-sky-500/10 text-sky-500 text-[10px] font-black uppercase tracking-[0.4em] mb-4"
                             >
-                                Your Presence is Requested
+                                {__("Your Presence is Requested")}
                             </motion.div>
                             <h2 className="text-6xl sm:text-8xl font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter uppercase italic">
-                                Initiate <br />
-                                <span className="text-sky-500 opacity-20">Encounter</span>
+                                {__("Initiate")} <br />
+                                <span className="text-sky-500 opacity-20">{__("Encounter")}</span>
                             </h2>
                             <div ref={reserveButtonRef as any} className="inline-block mt-8">
                                 <Link href="/reservations/create">
                                     <Button
                                         className="h-24 px-20 rounded-[2rem] bg-black dark:bg-sky-500 text-white dark:text-black text-[12px] font-black uppercase tracking-[0.4em] shadow-4xl hover:scale-105 transition-all duration-500"
                                     >
-                                        Reserve My Passage
+                                        {__("Reserve My Passage")}
                                     </Button>
                                 </Link>
                             </div>
                         </div>
                     </section>
                 </main>
-
+ 
                 <Footer />
                 <AIChatbot />
             </div>

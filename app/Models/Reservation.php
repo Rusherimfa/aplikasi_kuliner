@@ -71,7 +71,7 @@ class Reservation extends Model
     public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class)
-            ->withPivot('quantity', 'notes')
+            ->withPivot('id', 'quantity', 'notes', 'status')
             ->withTimestamps();
     }
 

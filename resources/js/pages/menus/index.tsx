@@ -18,6 +18,7 @@ import {
 
 export default function MenuManagement({ menus, filters }: any) {
     const { auth } = usePage().props as any;
+    const { __ } = useTranslations();
     const isStaff = auth.user.role === 'staff';
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,7 +91,7 @@ export default function MenuManagement({ menus, filters }: any) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Yakin ingin menghapus menu ini?')) {
+        if (confirm(__('Yakin ingin menghapus menu ini?'))) {
             destroy(`/menus/${id}`);
         }
     };
@@ -101,16 +102,16 @@ export default function MenuManagement({ menus, filters }: any) {
 
     return (
         <>
-            <Head title="Manajemen Menu - Ocean's Resto Admin" />
+            <Head title={`${__('Manajemen Menu')} - Ocean's Resto Admin`} />
 
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-slate-900 dark:text-foreground font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
                         <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-slate-900 dark:text-foreground/90">
-                            Katalog Menu
+                            {__('Katalog Menu')}
                         </h1>
                         <p className="mt-1 text-sm text-slate-500 dark:text-muted-foreground">
-                            Tambah, kurangi, atau ubah detail makanan yang ditawarkan.
+                            {__('Tambah, kurangi, atau ubah detail makanan yang ditawarkan.')}
                         </p>
                     </div>
                     <div className="flex w-full sm:w-auto items-center gap-3">
@@ -130,7 +131,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                 className="shrink-0 bg-sky-500 hover:bg-sky-600 text-white dark:text-[#0A0A0B] font-semibold"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                Tambah Menu
+                                {__('Tambah Menu')}
                             </Button>
                         )}
                     </div>
@@ -142,12 +143,12 @@ export default function MenuManagement({ menus, filters }: any) {
                             <Table>
                                 <TableHeader className="border-b border-slate-100 dark:border-border bg-slate-50 dark:bg-muted/20">
                                     <TableRow className="hover:bg-transparent border-slate-100 dark:border-border">
-                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Menu Item</TableHead>
-                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Kategori</TableHead>
-                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Harga</TableHead>
-                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Wujud</TableHead>
-                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70 text-center">Terjual</TableHead>
-                                        <TableHead className="text-right font-semibold text-slate-500 dark:text-foreground/70">Aksi</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">{__('Menu Item')}</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">{__('Kategori')}</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">{__('Harga')}</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">{__('Wujud')}</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70 text-center">{__('Terjual')}</TableHead>
+                                        <TableHead className="text-right font-semibold text-slate-500 dark:text-foreground/70">{__('Aksi')}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -164,13 +165,13 @@ export default function MenuManagement({ menus, filters }: any) {
                                                     </div>
                                                     <div>
                                                         <p className="font-semibold text-slate-900 dark:text-foreground/90 flex items-center gap-2">{menu.name} {menu.is_best_seller && <Flame size={14} className="text-rose-500" />}</p>
-                                                        <p className="text-xs text-slate-500 dark:text-muted-foreground mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
+                                                        <p className="text-xs text-slate-500 dark:text-muted-foreground mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || __('Tidak ada deskripsi')}</p>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant="outline" className="border-slate-200 dark:border-border text-slate-600 dark:text-foreground/70 bg-transparent">
-                                                    {menu.category}
+                                                    {__(menu.category)}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
@@ -179,16 +180,16 @@ export default function MenuManagement({ menus, filters }: any) {
                                             <TableCell>
                                                 {menu.is_available ? (
                                                     <span className="inline-flex items-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                                                        <Check size={14} className="mr-1" /> Tersedia
+                                                        <Check size={14} className="mr-1" /> {__('Tersedia')}
                                                     </span>
                                                 ) : (
                                                     <span className="inline-flex items-center text-xs font-medium text-rose-400 opacity-70">
-                                                        <EyeOff size={14} className="mr-1" /> Habis (Hidden)
+                                                        <EyeOff size={14} className="mr-1" /> {__('Habis (Hidden)')}
                                                     </span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-center font-black text-sky-600 dark:text-sky-500 bg-sky-500/5 sm:bg-transparent sm:border-l sm:border-r border-slate-100 dark:border-border min-w-[100px]">
-                                                {menu.total_sold || 0} porsi
+                                                {menu.total_sold || 0} {__('porsi')}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 {isStaff ? (
@@ -197,7 +198,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                             onClick={() => toggleStatus(menu, 'is_available')}
                                                             className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${menu.is_available ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20' : 'bg-rose-500/10 border-rose-500/30 text-rose-500 hover:bg-rose-500/20'}`}
                                                         >
-                                                            {menu.is_available ? 'Set Habis' : 'Set Tersedia'}
+                                                            {menu.is_available ? __('Set Habis') : __('Set Tersedia')}
                                                         </button>
                                                         <button 
                                                             onClick={() => toggleStatus(menu, 'is_best_seller')}
@@ -237,10 +238,10 @@ export default function MenuManagement({ menus, filters }: any) {
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground/20">
                                 <BookOpen size={28} />
                             </div>
-                            <h3 className="mb-1 text-lg font-semibold text-slate-900 dark:text-foreground/90">Katalog Kosong</h3>
-                            <p className="text-sm text-slate-500 dark:text-muted-foreground mb-6 max-w-sm">Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.</p>
+                            <h3 className="mb-1 text-lg font-semibold text-slate-900 dark:text-foreground/90">{__('Katalog Kosong')}</h3>
+                            <p className="text-sm text-slate-500 dark:text-muted-foreground mb-6 max-w-sm">{__('Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.')}</p>
                             <Button onClick={openCreateModal} className="bg-sky-500 hover:bg-sky-600 text-white dark:text-[#0A0A0B] font-semibold">
-                                Mulai Tambah Menu
+                                {__('Mulai Tambah Menu')}
                             </Button>
                         </div>
                     )}
@@ -257,7 +258,7 @@ export default function MenuManagement({ menus, filters }: any) {
                         
                         <div className="flex items-center justify-between border-b border-slate-100 dark:border-border pb-4 mb-5">
                             <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-foreground">
-                                {editingMenu ? 'Edit Menu' : 'Menu Makanan Baru'}
+                                {editingMenu ? __('Edit Menu') : __('Menu Makanan Baru')}
                             </h2>
                             <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-slate-400 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-muted hover:text-slate-900 dark:hover:text-foreground transition-colors">
                                 <X size={18} />
@@ -266,32 +267,32 @@ export default function MenuManagement({ menus, filters }: any) {
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <Label htmlFor="name" className="text-slate-600 dark:text-foreground/70">Nama Hidangan</Label>
+                                <Label htmlFor="name" className="text-slate-600 dark:text-foreground/70">{__('Nama Hidangan')}</Label>
                                 <Input 
                                     id="name" 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)}
                                     className="mt-1.5 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-900 dark:text-foreground focus-visible:ring-sky-500"
-                                    placeholder="Cth: Wagyu A5 Ribeye"
+                                    placeholder={__('Cth: Wagyu A5 Ribeye')}
                                 />
                                 {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="category" className="text-slate-600 dark:text-foreground/70">Kategori</Label>
+                                    <Label htmlFor="category" className="text-slate-600 dark:text-foreground/70">{__('Kategori')}</Label>
                                     <select 
                                         id="category" 
                                         value={data.category} 
                                         onChange={e => setData('category', e.target.value)}
                                         className="mt-1.5 flex h-10 w-full rounded-md border border-slate-200 dark:border-border bg-slate-50 dark:bg-muted px-3 py-2 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500"
                                     >
-                                        <option value="" className="bg-white dark:bg-card text-slate-400 dark:text-muted-foreground">Pilih...</option>
+                                        <option value="" className="bg-white dark:bg-card text-slate-400 dark:text-muted-foreground">{__('Pilih...')}</option>
                                         {categories.map(c => <option key={c} value={c} className="bg-white dark:bg-card">{c}</option>)}
                                     </select>
                                     {errors.category && <p className="mt-1 text-xs text-destructive">{errors.category}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="price" className="text-slate-600 dark:text-foreground/70">Harga (Rp)</Label>
+                                    <Label htmlFor="price" className="text-slate-600 dark:text-foreground/70">{__('Harga (Rp)')}</Label>
                                     <Input 
                                         id="price" 
                                         type="number"
@@ -304,15 +305,14 @@ export default function MenuManagement({ menus, filters }: any) {
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="description" className="text-slate-600 dark:text-foreground/70">Deskripsi Singkat</Label>
+                                <Label htmlFor="description" className="text-slate-600 dark:text-foreground/70">{__('Deskripsi Singkat')}</Label>
                                 <Textarea 
                                     id="description" 
                                     value={data.description} 
                                     onChange={e => setData('description', e.target.value)}
                                     className="mt-1.5 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-900 dark:text-foreground focus-visible:ring-sky-500 resize-none h-20"
-                                    placeholder="Sajian istimewa dari dapur kami..."
+                                    placeholder={__('Sajian istimewa dari dapur kami...')}
                                 />
-                                {errors.description && <p className="mt-1 text-xs text-destructive">{errors.description}</p>}
                             </div>
 
                             <div>
@@ -343,8 +343,8 @@ export default function MenuManagement({ menus, filters }: any) {
                                         </label>
                                     </div>
                                     <div className="flex-1 text-[10px] text-slate-500 dark:text-muted-foreground leading-relaxed">
-                                        <p className="font-bold uppercase tracking-widest text-sky-600 dark:text-sky-500 mb-1">Upload Visual</p>
-                                        <p>Gunakan gambar rasio 1:1 atau 4:5 untuk hasil terbaik. Maksimal 2MB.</p>
+                                        <p className="font-bold uppercase tracking-widest text-sky-600 dark:text-sky-500 mb-1">{__('Upload Visual')}</p>
+                                        <p>{__('Gunakan gambar rasio 1:1 atau 4:5 untuk hasil terbaik. Maksimal 2MB.')}</p>
                                     </div>
                                 </div>
                                 {errors.image && <p className="mt-1 text-xs text-destructive">{errors.image}</p>}
@@ -359,7 +359,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                         onChange={e => setData('is_available', e.target.checked)}
                                         className="h-4 w-4 rounded border-slate-300 dark:border-border bg-slate-50 dark:bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
-                                    <Label htmlFor="is_available" className="text-slate-700 dark:text-foreground cursor-pointer font-medium">Tersedia untuk dipesan</Label>
+                                    <Label htmlFor="is_available" className="text-slate-700 dark:text-foreground cursor-pointer font-medium">{__('Tersedia untuk dipesan')}</Label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input 
@@ -369,16 +369,16 @@ export default function MenuManagement({ menus, filters }: any) {
                                         onChange={e => setData('is_best_seller', e.target.checked)}
                                         className="h-4 w-4 rounded border-slate-300 dark:border-border bg-slate-50 dark:bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
-                                    <Label htmlFor="is_best_seller" className="text-slate-700 dark:text-foreground cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> Tandai sebagai hidangan "Sangat Laris"</Label>
+                                    <Label htmlFor="is_best_seller" className="text-slate-700 dark:text-foreground cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> {__('Tandai sebagai hidangan "Sangat Laris"')}</Label>
                                 </div>
                             </div>
 
                               <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted">
-                                    Batal
+                                    {__('Batal')}
                                 </Button>
                                 <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600 text-white dark:text-zinc-950 font-bold">
-                                    {processing ? 'Menyimpan...' : 'Simpan Menu'}
+                                    {processing ? __('Menyimpan...') : __('Simpan Menu')}
                                 </Button>
                             </div>
                         </form>

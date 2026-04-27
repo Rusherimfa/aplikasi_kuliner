@@ -81,7 +81,7 @@ export default function AdminDashboard({ auth, stats, recent_activity, revenue_c
                             <span className="text-[10px] font-black tracking-[0.3em] text-sky-500/80 uppercase">{__('Owner Suite')}</span>
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
-                            Executive <span className="text-slate-300 dark:text-white/40 italic font-serif">Overview</span>
+                            {__('Executive')} <span className="text-slate-300 dark:text-white/40 italic font-serif">{__('Overview')}</span>
                         </h1>
                         <p className="mt-4 text-slate-500 dark:text-white/40 max-w-lg leading-relaxed font-medium">
                             {__('Pantau performa bisnis, tren pendapatan, dan efektivitas menu dalam satu dashboard eksklusif.')}

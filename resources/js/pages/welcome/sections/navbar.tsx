@@ -73,10 +73,10 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
         if (auth.user) {
             const channel = (window as any).Echo.private(`user.${auth.user.id}`)
                 .listen('.message.sent', (e: any) => {
-                    toast.info(`Pesan baru dari ${e.message.sender.name}`, {
+                    toast.info(`${__('New message from')} ${e.message.sender.name}`, {
                         description: e.message.content,
                         action: {
-                            label: 'Buka Chat',
+                            label: __('Open Chat'),
                             onClick: () => {
                                 if (e.message.reservation_id) {
                                     router.visit(`/reservations/${e.message.reservation_id}`);
@@ -254,7 +254,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                         href={login().url}
                                         className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors bg-black/5 dark:bg-white/5 px-4 py-2 rounded-full"
                                     >
-                                        Login
+                                        {__('Login')}
                                     </Link>
                                 )}
                             </div>
@@ -301,7 +301,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                         className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
                                     >
                                         <ShoppingBag size={18} />
-                                        {cartCount > 0 && (
+                                        {mounted && cartCount > 0 && (
                                             <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-primary shadow-sm">
                                                 {cartCount}
                                             </span>
@@ -345,7 +345,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             ) : (
                                 <button key={i} onClick={item.onClick} className="relative p-3 text-foreground/60 active:scale-90 transition-transform">
                                     <item.icon size={22} className="stroke-[1.5px]" />
-                                    {item.count ? (
+                                    {mounted && item.count ? (
                                         <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] font-black text-primary-foreground border-2 border-background shadow-sm">
                                             {item.count}
                                         </span>

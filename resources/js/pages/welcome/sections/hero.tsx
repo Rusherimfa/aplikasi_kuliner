@@ -109,7 +109,7 @@ export default function Hero() {
                                 transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
                                 className="block text-sky-900 dark:text-sky-50"
                             >
-                                Ocean's
+                                {__("Ocean's")}
                             </motion.span>
                             <motion.span 
                                 initial={{ y: 40, opacity: 0 }}
@@ -117,7 +117,7 @@ export default function Hero() {
                                 transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
                                 className="block italic text-sky-700 dark:text-sky-200"
                             >
-                                Resto
+                                {__('Resto')}
                             </motion.span>
                             <motion.span 
                                  initial={{ y: 40, opacity: 0 }}
@@ -189,7 +189,7 @@ export default function Hero() {
                                 <div className="absolute bottom-12 left-12 z-20">
                                     <span className="text-[10px] font-bold tracking-[0.2em] text-sky-300 uppercase mb-4 block font-sans">{__('Our Specialization')}</span>
                                     <h3 className="font-serif text-5xl font-light text-white leading-tight italic">
-                                        Ocean <br /> Fresh.
+                                        {__('Ocean')} <br /> {__('Fresh.')}
                                     </h3>
                                 </div>
                             </div>

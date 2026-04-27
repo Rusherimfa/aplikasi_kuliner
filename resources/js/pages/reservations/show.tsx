@@ -325,7 +325,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                                 </div>
                                                 <div className="space-y-2">
                                                     <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[.2em]"><Clock size={14} className="text-sky-500" /> {__('Time')}</span>
-                                                    <span className="text-xl font-bold text-slate-900 dark:text-white block">{reservation.time} <span className="text-sm opacity-30">WIB</span></span>
+                                                    <span className="text-xl font-bold text-slate-900 dark:text-white block">{reservation.time} <span className="text-sm opacity-30">WITA</span></span>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[.2em]"><Users size={14} className="text-sky-500" /> {__('Seats')}</span>

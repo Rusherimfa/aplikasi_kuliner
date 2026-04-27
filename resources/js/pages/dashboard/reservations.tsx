@@ -1,5 +1,5 @@
 import { Head, router, usePage, useHttp, Link } from '@inertiajs/react';
-import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck, CheckCircle2, DollarSign } from 'lucide-react';
+import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck, CheckCircle2, DollarSign, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -119,6 +119,15 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
         });
     };
 
+    const deleteReservation = (id: number) => {
+        if (confirm(__('Apakah Anda yakin ingin menghapus riwayat reservasi ini?'))) {
+            router.delete(`/reservations/${id}`, {
+                preserveScroll: true,
+                onSuccess: () => toast.success(__('Reservasi berhasil dihapus'))
+            });
+        }
+    };
+
     const assignCourier = (reservationId: number, courierId: number) => {
         router.patch(
             `/reservations/${reservationId}/assign-courier`,
@@ -155,7 +164,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                 variant="outline"
                 className={`${variants[status]} px-2.5 py-0.5 font-medium`}
             >
-                {labels[status] || status}
+                {__(labels[status] || status)}
             </Badge>
         );
     };
@@ -174,17 +183,17 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                 const request = e.serviceRequest;
                 
                 // If it's a new or updated request
-                setActiveRequests(prev => {
-                    const exists = prev.find(r => r.id === request.id);
+                setActiveRequests((prev: ServiceRequest[]) => {
+                    const exists = prev.find((r: ServiceRequest) => r.id === request.id);
                     if (exists) {
-                        return prev.map(r => r.id === request.id ? request : r).filter(r => r.status !== 'resolved');
+                        return prev.map((r: ServiceRequest) => r.id === request.id ? request : r).filter((r: ServiceRequest) => r.status !== 'resolved');
                     }
                     return [request, ...prev];
                 });
 
                 if (request.status === 'pending') {
                     toast.info(`${__('Concierge Alert')}: #RES-${request.reservation_id}`, {
-                        description: `${__('Tamu di Meja')} ${request.reservation?.resto_table?.name || '?'} ${__('butuh')} ${request.type.toUpperCase()}`
+                        description: `${__('Tamu di Meja')} ${request.reservation?.resto_table?.name || '?'} ${__('butuh')} ${__(request.type).toUpperCase()}`
                     });
                 }
             });
@@ -196,7 +205,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
         http.setData({ status });
         http.patch(`/service-requests/${id}`, {
             onSuccess: () => {
-                setActiveRequests(prev => prev.map(r => r.id === id ? { ...r, status: status as any } : r).filter(r => status !== 'resolved' ? true : r.id !== id));
+                setActiveRequests((prev: ServiceRequest[]) => prev.map((r: ServiceRequest) => r.id === id ? { ...r, status: status as any } : r).filter((r: ServiceRequest) => status !== 'resolved' ? true : r.id !== id));
                 toast.success(`${__('Permintaan')} #${id} ${__('diperbarui menjadi')} ${status.toUpperCase()}`);
             },
             onError: () => {
@@ -232,6 +241,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                             <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Pelanggan')}</TableHead>
                                             <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Tanggal & Waktu')}</TableHead>
                                             <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Meja & Tamu')}</TableHead>
+                                            <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Menu')}</TableHead>
                                             <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Status')}</TableHead>
                                             <TableHead className="text-right font-black tracking-widest uppercase text-[10px] text-slate-400 dark:text-white/50 w-[150px]">
                                                 {__('Aksi')}
@@ -269,15 +279,40 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                         {reservation.time.substring(0, 5)}
                                                     </div>
                                                 </TableCell>
-                                                <TableCell>
+                                                 <TableCell>
                                                     <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center text-sm font-semibold text-slate-900 dark:text-white/90">
+                                                        <div className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-white/90">
                                                             <Badge variant="outline" className="bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60">
                                                                 {__('Meja')} {reservation.table_id || '?'}
                                                             </Badge>
+                                                            <span className="text-xs text-slate-400 dark:text-white/40">{reservation.guest_count} {__('Orang')}</span>
                                                         </div>
-                                                        <span className="text-xs text-slate-400 dark:text-white/40 ml-1">{reservation.guest_count} {__('Orang')}</span>
                                                     </div>
+                                                </TableCell>
+                                                <TableCell>
+                                                    {reservation.menus && reservation.menus.length > 0 ? (
+                                                        <div className="flex flex-col gap-1">
+                                                            <Badge variant="outline" className="w-fit bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 text-[10px] font-bold">
+                                                                {__('Pesan Menu')} ({reservation.menus.length})
+                                                            </Badge>
+                                                            <div className="flex flex-col gap-0.5">
+                                                                {reservation.menus.slice(0, 1).map((m: any) => (
+                                                                    <div key={m.id} className="text-[10px] text-slate-500 dark:text-white/50 truncate max-w-[120px]">
+                                                                        {m.pivot.quantity}x {m.name}
+                                                                    </div>
+                                                                ))}
+                                                                {reservation.menus.length > 1 && (
+                                                                    <span className="text-[9px] text-slate-400 dark:text-white/30 italic">
+                                                                        + {reservation.menus.length - 1} {__('lainnya')}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <Badge variant="outline" className="bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/40 text-[10px]">
+                                                            {__('Meja Saja')}
+                                                        </Badge>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell>
                                                     <StatusBadge status={reservation.status} />
@@ -342,7 +377,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                                         <DollarSign className="h-4 w-4" />
                                                                     </Button>
                                                                 )}
-                                                                {reservation.status === 'confirmed' && (
+                                                                 {reservation.status === 'confirmed' && (
                                                                     <Button
                                                                         size="icon"
                                                                         variant="outline"
@@ -353,6 +388,15 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                                         <CheckCircle2 className="h-4 w-4" />
                                                                     </Button>
                                                                 )}
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
+                                                                    onClick={() => deleteReservation(reservation.id)}
+                                                                    title={__('Hapus Riwayat')}
+                                                                >
+                                                                    <Trash2 className="h-4 w-4" />
+                                                                </Button>
                                                             </>
                                                         )}
                                                     </div>
@@ -398,7 +442,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-0 ${
                                             request.status === 'pending' ? 'bg-sky-500 text-black' : 'bg-blue-500 text-white'
                                         }`}>
-                                            {request.status}
+                                            {__(request.status)}
                                         </Badge>
                                         <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">
                                             #{request.reservation_id}
@@ -414,7 +458,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </div>
                                         <div>
                                             <p className="text-sm font-black text-white uppercase tracking-tight">{__('Meja')} {request.reservation?.resto_table?.name || '?'}</p>
-                                            <p className="text-[10px] font-bold text-sky-400 uppercase">{request.type}</p>
+                                            <p className="text-[10px] font-bold text-sky-400 uppercase">{__(request.type)}</p>
                                         </div>
                                     </div>
 
@@ -483,7 +527,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </div>
                                         <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Jadwal')}</p>
-                                            <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US')} - {selectedReservation.time.substring(0,5)} WIB</p>
+                                            <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US')} - {selectedReservation.time.substring(0,5)} WITA</p>
                                         </div>
                                         <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
@@ -553,7 +597,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </div>
                                         {selectedReservation.status !== 'rejected' && selectedReservation.status !== 'cancelled' && (
                                             <Badge variant={selectedReservation.payment_status === 'paid' ? 'default' : 'destructive'} className={selectedReservation.payment_status === 'paid' ? 'bg-emerald-500/20 text-emerald-500 border-0' : 'bg-rose-500/20 text-rose-500 border-0'}>
-                                                {selectedReservation.payment_status?.toUpperCase()}
+                                                {__(selectedReservation.payment_status || '').toUpperCase()}
                                             </Badge>
                                         )}
                                     </div>

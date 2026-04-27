@@ -13,17 +13,17 @@ export default function InfoBar() {
         {
             icon: MapPin,
             label: __('Location'),
-            value: __('Melawai Beach, Balikpapan'),
+            value: __('Ruko Bandar, Balikpapan'),
         },
         {
             icon: CalendarDays,
             label: __('Reservation'),
-            value: __('Online or call (021) 555-0123'),
+            value: __('Online or Call (0542) 739439'),
         },
         {
             icon: ChefHat,
-            label: __('Executive Chef'),
-            value: __('Chef Ahmad Reza, 15 yrs exp'),
+            label: __('Signature Cuisine'),
+            value: __('Fresh Sea-to-Table Experience'),
         },
     ];
 

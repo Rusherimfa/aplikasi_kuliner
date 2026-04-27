@@ -21,11 +21,18 @@ use App\Http\Controllers\TestErrorController;
 use App\Http\Controllers\TestimonialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
 Route::get('/catalog', [PublicCatalogController::class, 'catalog'])->name('catalog');
 Route::get('/experience', [PublicCatalogController::class, 'experience'])->name('experience');
 Route::get('/testimonials', [TestimonialController::class, 'index'])->name('testimonials.index');
+Route::get('/privacy', function () {
+    return Inertia::render('legal/privacy');
+})->name('privacy');
+Route::get('/terms', function () {
+    return Inertia::render('legal/terms');
+})->name('terms');
 
 // Public reservations (no login required)
 Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
@@ -133,6 +140,7 @@ Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
         Route::middleware('role:admin,staff')->group(function () {
             Route::get('kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
             Route::patch('kitchen/item/{pivotId}', [KitchenController::class, 'updateItemStatus'])->name('kitchen.item.update');
+            Route::patch('kitchen/order-item/{itemId}', [KitchenController::class, 'updateOrderItemStatus'])->name('kitchen.order_item.update');
             Route::post('kitchen/orders/{order}/accept', [KitchenController::class, 'acceptOrder'])->name('kitchen.orders.accept');
             Route::post('kitchen/orders/{order}/reject', [KitchenController::class, 'rejectOrder'])->name('kitchen.orders.reject');
             Route::patch('kitchen/orders/{order}/status', [KitchenController::class, 'updateOrderStatus'])->name('kitchen.orders.update_status');

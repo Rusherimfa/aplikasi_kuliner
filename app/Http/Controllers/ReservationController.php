@@ -253,6 +253,7 @@ class ReservationController extends Controller
         // Notify Admin/Staff about new reservation
         $staff = User::whereIn('role', ['admin', 'staff'])->get();
         foreach ($staff as $s) {
+            /** @var User $s */
             $s->notify(new AppNotification(
                 __('Reservasi Baru'),
                 __('Ada reservasi baru dari :name untuk tanggal :date.', ['name' => $reservation->customer_name, 'date' => $reservation->date]),
@@ -336,6 +337,7 @@ class ReservationController extends Controller
         // Notify Staff about payment
         $staff = User::whereIn('role', ['admin', 'staff'])->get();
         foreach ($staff as $s) {
+            /** @var User $s */
             $s->notify(new AppNotification(
                 __('DP Reservasi Dibayar'),
                 __('Pelanggan :name telah membayar DP untuk reservasi #:id.', ['name' => $reservation->customer_name, 'id' => $reservation->id]),
@@ -380,6 +382,14 @@ class ReservationController extends Controller
         ]);
 
         $reservation->update(['status' => $validated['status']]);
+
+        // OTOMATISASI: Update status menu jika status reservasi berubah
+        if ($validated['status'] === 'completed') {
+            $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'ready']);
+        } elseif ($validated['status'] === 'confirmed') {
+            // Jika dikonfirmasi (aktif), bisa dianggap mulai dimasak
+            $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'preparing']);
+        }
 
         // Broadcast real-time update
         event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable'])));
@@ -491,17 +501,21 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        if ($reservation->user_id !== Auth::id()) {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($reservation->user_id !== $user->id && ! $user->isStaff()) {
             abort(403);
         }
 
-        if ($reservation->status !== 'pending') {
+        // For customers, only allow deleting pending
+        if (! $user->isStaff() && $reservation->status !== 'pending') {
             return back()->with('error', 'Hanya pesanan berstatus pending yang dapat dibatalkan.');
         }
 
         $reservation->delete();
 
-        return redirect()->route('reservations.history')->with('success', 'Reservasi berhasil dibatalkan.');
+        return back()->with('success', 'Reservasi berhasil dihapus.');
     }
 
     /**

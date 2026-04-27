@@ -116,7 +116,7 @@ export default function GuestSupportChat({
         setIsLoading(true);
 
         const url = isStaffMode
-            ? staffMessages.url(conversationId)
+            ? staffMessages.url(conversationId!)
             : guestMessages.url({
                   query: currentConversationId
                       ? { conversation_id: currentConversationId }
@@ -189,7 +189,7 @@ export default function GuestSupportChat({
         setNewMessage('');
 
         const url = isStaffMode
-            ? staffStore.url(conversationId)
+            ? staffStore.url(conversationId!)
             : guestStore.url();
         const payload = isStaffMode
             ? { content }
@@ -279,7 +279,7 @@ export default function GuestSupportChat({
                                         {title || __('Chat with Staff')}
                                     </h3>
                                     <p className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-                                        {subtitle || __('Staff restoran')}
+                                        {subtitle || __('Restaurant staff')}
                                     </p>
                                 </div>
                             </div>
@@ -319,9 +319,7 @@ export default function GuestSupportChat({
                                     <p className="max-w-56 text-xs leading-relaxed font-bold tracking-widest text-muted-foreground uppercase">
                                         {isLoading
                                             ? __('Loading conversation')
-                                            : __(
-                                                  'Kirim pesan, staff akan membalas dari panel restoran.',
-                                              )}
+                                            : __('Send a message, staff will reply from the restaurant panel.')}
                                     </p>
                                 </div>
                             ) : (

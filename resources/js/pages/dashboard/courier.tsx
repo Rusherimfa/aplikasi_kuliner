@@ -7,29 +7,31 @@ import { toast } from 'sonner';
 import BoutiqueChat from '@/components/app/boutique-chat';
 import { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
+import { useTranslations } from '@/hooks/use-translations';
 import { usePage } from '@inertiajs/react';
 
 export default function CourierDashboard({ stats, deliveries }: any) {
+    const { __ } = useTranslations();
     const http = useHttp();
     const { auth } = usePage().props as any;
     const [activeChatId, setActiveChatId] = useState<number | null>(null);
 
     return (
         <>
-            <Head title="Courier Station - Dashboard" />
+            <Head title={`${__('Courier Station - Dashboard')} - Ocean's Resto`} />
 
             <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-20">
                 <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <span className="h-1 w-8 rounded-full bg-blue-500" />
-                            <span className="text-[10px] font-black tracking-[0.3em] text-blue-500/80 uppercase">Delivery Fleet</span>
+                            <span className="text-[10px] font-black tracking-[0.3em] text-blue-500/80 uppercase">{__('Delivery Fleet')}</span>
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
-                            Courier <span className="text-slate-400 dark:text-white/40 italic font-serif">Dashboard</span>
+                            {__('Courier')} <span className="text-slate-400 dark:text-white/40 italic font-serif">{__('Dashboard')}</span>
                         </h1>
                         <p className="mt-4 text-slate-400 dark:text-white/40 max-w-lg leading-relaxed font-medium">
-                            Pantau pengiriman aktif Anda, koordinasikan dengan dapur, dan pastikan pesanan sampai tepat waktu.
+                            {__('Pantau pengiriman aktif Anda, koordinasikan dengan dapur, dan pastikan pesanan sampai tepat waktu.')}
                         </p>
                     </div>
                 </div>
@@ -37,9 +39,9 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                 {/* Courier Stat Cards */}
                 <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
                     {[
-                        { title: 'Pengiriman Aktif', val: stats.pending_deliveries, icon: Bike, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                        { title: 'Selesai Hari Ini', val: stats.completed_today, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
-                        { title: 'Pesanan Selesai', val: stats.total_completed, icon: Package, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                        { title: __('Pengiriman Aktif'), val: stats.pending_deliveries, icon: Bike, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                        { title: __('Selesai Hari Ini'), val: stats.completed_today, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+                        { title: __('Pesanan Selesai'), val: stats.total_completed, icon: Package, color: 'text-purple-400', bg: 'bg-purple-400/10' },
                     ].map((card, idx) => (
                         <div 
                             key={idx} 
@@ -59,8 +61,8 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                 <div className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-slate-100 dark:ring-white/5">
                     <div className="p-10 border-b border-slate-100 dark:border-white/5 flex justify-between items-center text-left">
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">Tugas Pengiriman</h2>
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-1">Pesanan yang perlu diantar</p>
+                            <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Tugas Pengiriman')}</h2>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-1">{__('Pesanan yang perlu diantar')}</p>
                         </div>
                     </div>
                     
@@ -95,7 +97,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                 </div>
                                                 <div className="mt-4">
                                                     <Badge variant="outline" className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/40 text-[9px] font-black uppercase tracking-widest px-3 py-1">
-                                                        {delivery.status.replace('_', ' ')}
+                                                        {__(delivery.status)}
                                                     </Badge>
                                                 </div>
                                             </div>
@@ -115,18 +117,18 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                             {delivery.status === 'preparing' && (
                                                 <div className="flex flex-col gap-2 w-full md:w-auto">
                                                     <Button 
-                                                        onClick={() => toast.success('Berhasil mengirim status: Menunggu di Restoran')}
+                                                        onClick={() => toast.success(__('Berhasil mengirim status: Menunggu di Restoran'))}
                                                         variant="outline"
                                                         className="border-blue-500/50 text-blue-500 hover:bg-blue-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
                                                     >
-                                                        <MapPin className="mr-2 h-4 w-4" /> Saya di Resto
+                                                        <MapPin className="mr-2 h-4 w-4" /> {__('Saya di Resto')}
                                                     </Button>
                                                     
                                                     <Button 
                                                         onClick={() => router.patch(`/orders/${delivery.id}/delivery-status`, { delivery_status: 'delivering' })}
                                                         className="bg-blue-500 text-white hover:bg-blue-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
                                                     >
-                                                        <Bike className="mr-2 h-4 w-4" /> Ambil & Kirim
+                                                        <Bike className="mr-2 h-4 w-4" /> {__('Ambil & Kirim')}
                                                     </Button>
                                                 </div>
                                             )}
@@ -136,7 +138,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                     <Button 
                                                         onClick={() => {
                                                             if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-                                                                toast.error('GPS Asli memerlukan koneksi HTTPS (SSL) untuk berfungsi.');
+                                                                toast.error(__('GPS Asli memerlukan koneksi HTTPS (SSL) untuk berfungsi.'));
                                                                 return;
                                                             }
 
@@ -148,12 +150,12 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                             if ((window as any).watchId) {
                                                                 navigator.geolocation.clearWatch((window as any).watchId);
                                                                 (window as any).watchId = null;
-                                                                toast.error('GPS Pelacakan Dimatikan');
+                                                                toast.error(__('GPS Pelacakan Dimatikan'));
                                                                 return;
                                                             }
 
                                                             if (!navigator.geolocation) {
-                                                                toast.error('Browser Anda tidak mendukung GPS');
+                                                                toast.error(__('Browser Anda tidak mendukung GPS'));
                                                                 return;
                                                             }
 
@@ -162,7 +164,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                                     const { latitude, longitude, accuracy } = position.coords;
                                                                     
                                                                     // Visual feedback that data is being sent
-                                                                    toast.loading(`Mengirim Sinyal GPS (Akurasi: ${accuracy.toFixed(0)}m)...`, { id: 'gps-sync' });
+                                                                    toast.loading(`${__('Mengirim Sinyal GPS')} (Akurasi: ${accuracy.toFixed(0)}m)...`, { id: 'gps-sync' });
 
                                                                     fetch(`/orders/${delivery.id}/simulate-tracking`, {
                                                                         method: 'POST',
@@ -172,7 +174,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                                         },
                                                                         body: JSON.stringify({ latitude, longitude })
                                                                     }).then(() => {
-                                                                        toast.success(`Lokasi Terkirim! (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`, { 
+                                                                        toast.success(`${__('Lokasi Terkirim')}! (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`, { 
                                                                             id: 'gps-sync',
                                                                             duration: 2000
                                                                         });
@@ -185,12 +187,12 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                             );
 
                                                             (window as any).watchId = watchId;
-                                                            toast.success('GPS Asli Aktif! Melacak posisi real-time Anda.');
+                                                            toast.success(__('GPS Asli Aktif! Melacak posisi real-time Anda.'));
                                                         }}
                                                         variant="outline"
                                                         className={`border-emerald-500/50 text-emerald-500 hover:bg-emerald-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${ (window as any).watchId ? 'bg-emerald-500 text-white' : ''}`}
                                                     >
-                                                        <MapPin className="mr-2 h-4 w-4" /> {(window as any).watchId ? 'Stop Pelacakan GPS' : 'Aktifkan GPS Asli'}
+                                                        <MapPin className="mr-2 h-4 w-4" /> {(window as any).watchId ? __('Stop Pelacakan GPS') : __('Aktifkan GPS Asli')}
                                                     </Button>
 
                                                     <Button 
@@ -203,11 +205,11 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                             if ((window as any).simInterval) {
                                                                 clearInterval((window as any).simInterval);
                                                                 (window as any).simInterval = null;
-                                                                toast.error('Simulasi Dimatikan');
+                                                                toast.error(__('Simulasi Dimatikan'));
                                                                 return;
                                                             }
 
-                                                            toast.info('Memulai Simulasi Perjalanan...');
+                                                            toast.info(__('Memulai Simulasi Perjalanan...'));
                                                             let i = 0;
                                                             const interval = setInterval(() => {
                                                                 if(i > 40) {
@@ -236,7 +238,7 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                         variant="outline"
                                                         className={`border-sky-500/50 text-sky-500 hover:bg-sky-500/10 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all ${ (window as any).simInterval ? 'bg-sky-500 text-white' : ''}`}
                                                     >
-                                                        <Bike className="mr-2 h-4 w-4" /> {(window as any).simInterval ? 'Stop Simulasi' : 'Jalankan Simulasi'}
+                                                        <Bike className="mr-2 h-4 w-4" /> {(window as any).simInterval ? __('Stop Simulasi') : __('Jalankan Simulasi')}
                                                     </Button>
 
                                                     <Button 
@@ -247,14 +249,14 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                                                         }}
                                                         className="bg-emerald-500 text-white hover:bg-emerald-600 rounded-xl px-6 py-2 text-[10px] font-black uppercase tracking-widest transition-all"
                                                     >
-                                                        <CheckCircle2 className="mr-2 h-4 w-4" /> Selesaikan Pengiriman
+                                                        <CheckCircle2 className="mr-2 h-4 w-4" /> {__('Selesaikan Pengiriman')}
                                                     </Button>
                                                 </div>
                                             )}
 
                                             {['delivered', 'complete'].includes(delivery.status) && (
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 flex items-center gap-2">
-                                                    <CheckCircle2 size={14} /> Berhasil Terkirim
+                                                    <CheckCircle2 size={14} /> {__('Berhasil Terkirim')}
                                                 </p>
                                             )}
                                         </div>
@@ -264,8 +266,8 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                         ) : (
                             <div className="p-20 text-center text-slate-200 dark:text-white/10 flex flex-col items-center gap-4">
                                 <Package size={48} strokeWidth={1} />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">Belum ada tugas pengiriman</span>
-                                <p className="text-[9px] text-slate-300 dark:text-white/20 max-w-xs mx-auto">Tunggu Admin memberikan tugas kepada Anda.</p>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40">{__('Belum ada tugas pengiriman')}</span>
+                                <p className="text-[9px] text-slate-300 dark:text-white/20 max-w-xs mx-auto">{__('Tunggu Admin memberikan tugas kepada Anda.')}</p>
                             </div>
                         )}
                     </div>

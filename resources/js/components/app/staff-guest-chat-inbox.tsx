@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import GuestSupportChat from '@/components/app/guest-support-chat';
 import { Button } from '@/components/ui/button';
 import { threads as chatThreads } from '@/routes/chat';
+import { useTranslations } from '@/hooks/use-translations';
 
 type GuestThread = {
     id: string;
@@ -26,6 +27,7 @@ export default function StaffGuestChatInbox({
 }: {
     currentUser: any;
 }) {
+    const { __ } = useTranslations();
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [threads, setThreads] = useState<GuestThread[]>([]);
@@ -113,7 +115,7 @@ export default function StaffGuestChatInbox({
                         className="transition-transform group-hover:-rotate-6"
                     />
                     <span className="text-[10px] font-black tracking-[0.16em] uppercase">
-                        Guest Chat
+                        {__('Chat Tamu')}
                     </span>
                     {unreadTotal > 0 && (
                         <span className="flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-white bg-rose-500 px-1 text-[10px] font-black text-white">
@@ -138,10 +140,10 @@ export default function StaffGuestChatInbox({
                                 </div>
                                 <div>
                                     <h3 className="text-sm font-black tracking-tight text-white uppercase">
-                                        Guest Chat
+                                        {__('Chat Tamu')}
                                     </h3>
                                     <p className="text-[10px] font-bold tracking-widest text-white/30 uppercase">
-                                        Home visitor messages
+                                        {__('Pesan pengunjung beranda')}
                                     </p>
                                 </div>
                             </div>
@@ -180,7 +182,7 @@ export default function StaffGuestChatInbox({
                                         <Inbox size={20} />
                                     </div>
                                     <p className="text-xs font-bold tracking-widest text-white/30 uppercase">
-                                        Belum ada chat tamu
+                                        {__('Belum ada chat tamu')}
                                     </p>
                                 </div>
                             ) : (
@@ -247,7 +249,7 @@ export default function StaffGuestChatInbox({
                     hideToggle
                     placement="right"
                     title={activeThread.title}
-                    subtitle="Guest & Staff"
+                    subtitle={__('Tamu & Staf')}
                     onClose={() => {
                         setActiveThread(null);
                         fetchThreads();

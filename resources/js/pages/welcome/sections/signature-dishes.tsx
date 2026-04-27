@@ -142,7 +142,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                             <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden m-4 rounded-[1.8rem] md:rounded-[2.2rem]">
                                 {item.image_path ? (
                                     <img 
-                                        src={`/storage/${item.image_path}`} 
+                                        src={item.image_path.startsWith('http') ? item.image_path : `/storage/${item.image_path}`} 
                                         alt={item.name}
                                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                     />
@@ -170,7 +170,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 {!!item.is_best_seller && (
                                     <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 w-max text-[10px] font-black text-primary uppercase tracking-widest">
                                         <Flame size={12} />
-                                        Signature
+                                        {__('Signature')}
                                     </div>
                                 )}
                                 <div className="flex flex-col mb-4">
@@ -185,7 +185,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 <div className="mt-auto">
                                     {item.is_available ? (
                                         <Link 
-                                            href={auth.user ? '/dashboard' : login().url}
+                                            href="/reservations/create"
                                             className="block"
                                         >
                                             <Button className="w-full h-16 rounded-[1.5rem] bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-[0.3em] shadow-xl transition-all hover:scale-105 active:scale-95 group relative z-10 border border-transparent">

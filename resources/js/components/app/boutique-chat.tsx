@@ -16,6 +16,7 @@ interface Message {
         role: string;
     };
     is_chatbot: boolean;
+    chat_type: string;
     read_at?: string | null;
     created_at: string;
 }
@@ -29,6 +30,7 @@ type BoutiqueChatProps = {
     placement?: 'left' | 'right';
     title?: string;
     subtitle?: string;
+    chatType?: 'support' | 'delivery';
     onClose?: () => void;
 };
 
@@ -41,6 +43,7 @@ export default function BoutiqueChat({
     placement = 'right',
     title,
     subtitle,
+    chatType = 'support',
     onClose,
 }: BoutiqueChatProps) {
     const { __ } = useTranslations();
@@ -69,7 +72,7 @@ export default function BoutiqueChat({
             return;
         }
 
-        fetch(`/${type}/${id}/messages`, {
+        fetch(`/${type}/${id}/messages?chat_type=${chatType}`, {
             headers: { Accept: 'application/json' },
         })
             .then((res) => res.json())
@@ -100,7 +103,7 @@ export default function BoutiqueChat({
                     )?.content || '',
                 Accept: 'application/json',
             },
-            body: JSON.stringify({ type }),
+            body: JSON.stringify({ type, chat_type: chatType }),
         })
             .then((res) => res.json())
             .then(() => {
@@ -125,10 +128,12 @@ export default function BoutiqueChat({
         const channel = (window as any).Echo.private(`${type}.${id}`).listen(
             '.message.sent',
             (data: { message: Message }) => {
-                setMessages((prev) => [...prev, data.message]);
+                if (data.message.chat_type === chatType) {
+                    setMessages((prev) => [...prev, data.message]);
 
-                if (!isOpen && data.message.sender.id !== currentUserId) {
-                    setUnreadCount((prev) => prev + 1);
+                    if (!isOpen && data.message.sender.id !== currentUserId) {
+                        setUnreadCount((prev) => prev + 1);
+                    }
                 }
             },
         );
@@ -172,7 +177,7 @@ export default function BoutiqueChat({
                     )?.content || '',
                 Accept: 'application/json',
             },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ content, chat_type: chatType }),
         })
             .then((response) => {
                 if (!response.ok) {
@@ -217,15 +222,8 @@ export default function BoutiqueChat({
                         className="transition-transform group-hover:rotate-12"
                     />
                     {unreadCount > 0 && (
-<<<<<<< HEAD
                         <div className="absolute -top-1 -right-1 h-6 w-6 bg-rose-500 border-2 border-white dark:border-black rounded-full flex items-center justify-center shadow-lg">
                             <span className="text-[10px] font-black text-white">{unreadCount}</span>
-=======
-                        <div className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border-2 border-black bg-rose-500 shadow-lg">
-                            <span className="text-[10px] font-black text-white">
-                                {unreadCount}
-                            </span>
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
                         </div>
                     )}
                 </motion.button>
@@ -257,16 +255,12 @@ export default function BoutiqueChat({
                                     </div>
                                 </div>
                             </div>
-<<<<<<< HEAD
-                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
-=======
                             <Button
                                 variant="ghost"
                                 size="icon"
                                 onClick={closeChat}
-                                className="rounded-full transition-colors hover:bg-white/10"
+                                className="rounded-full transition-colors hover:bg-slate-200 dark:hover:bg-white/10"
                             >
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
                                 <X size={20} />
                             </Button>
                         </div>
@@ -354,15 +348,10 @@ export default function BoutiqueChat({
                                         'Ask for concierge assistance...',
                                     )}
                                     value={newMessage}
-<<<<<<< HEAD
-                                    onChange={e => setNewMessage(e.target.value)}
-                                    className="h-14 pl-6 pr-14 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-sky-500/20 font-medium"
-=======
                                     onChange={(e) =>
                                         setNewMessage(e.target.value)
                                     }
-                                    className="h-14 rounded-2xl border-slate-200 pr-14 pl-6 font-medium focus:ring-sky-500/20 dark:border-white/10 dark:bg-black/40"
->>>>>>> 854faaa89de91e541e11f652cb2fc3d468ba2b2c
+                                    className="h-14 pl-6 pr-14 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-sky-500/20 font-medium"
                                 />
                                 <button
                                     type="submit"

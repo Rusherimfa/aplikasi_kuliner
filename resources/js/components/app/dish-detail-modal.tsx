@@ -31,11 +31,16 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-4xl p-0 overflow-hidden bg-[#0A0A0B] border-white/10 rounded-[2.5rem] shadow-3xl ring-1 ring-white/5">
+                <DialogTitle className="sr-only">{dish.name}</DialogTitle>
                 <div className="flex flex-col md:flex-row h-full">
                     {/* Media Side */}
                     <div className="relative w-full md:w-[45%] aspect-square md:aspect-auto bg-slate-900 group">
                         {dish.image_path ? (
-                            <img src={`/storage/${dish.image_path}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-[2000ms] group-hover:scale-110" alt={dish.name} />
+                            <img 
+                                src={dish.image_path.startsWith('http') ? dish.image_path : `/storage/${dish.image_path}`} 
+                                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[2000ms] group-hover:scale-110" 
+                                alt={dish.name} 
+                            />
                         ) : (
                             <div className="absolute inset-0 flex items-center justify-center opacity-20">
                                 <UtensilsCrossed size={120} strokeWidth={0.5} className="text-white" />
@@ -46,7 +51,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                         <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">
                             {dish.is_best_seller && (
                                 <Badge className="bg-sky-500 text-black border-none px-4 py-2 font-black text-[10px] uppercase tracking-widest shadow-2xl">
-                                    <Flame size={12} className="mr-2" /> Signature
+                                    <Flame size={12} className="mr-2" /> {__('Signature')}
                                 </Badge>
                             )}
                             <Badge className="bg-white/10 backdrop-blur-md text-white border-white/10 px-4 py-2 font-black text-[10px] uppercase tracking-widest">
@@ -80,7 +85,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                             <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/5">
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Preparation Time')}</p>
-                                    <p className="text-white font-bold tracking-tight uppercase">15 - 20 {__('Minutes')}</p>
+                                    <p className="text-white font-bold tracking-tight uppercase">15 - 20 {__('Min.')}</p>
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Complexity Level')}</p>
@@ -92,11 +97,11 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                             <div className="flex gap-6">
                                 <div className="flex items-center gap-2 text-white/40">
                                     <Leaf size={16} className="text-emerald-500" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Vegan Friendly</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{__('Vegan Friendly')}</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-white/40">
                                     <Wheat size={16} className="text-sky-300" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">Non-Gluten</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{__('Non-Gluten')}</span>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +115,7 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                                 className="flex-1 h-16 rounded-2xl bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs transition-all hover:bg-white hover:scale-[1.02] active:scale-95 shadow-2xl shadow-sky-500/20"
                             >
                                 <ShoppingBag size={18} className="mr-3" />
-                                Add to Experience
+                                {__('Add to Experience')}
                             </Button>
                         </div>
                     </div>

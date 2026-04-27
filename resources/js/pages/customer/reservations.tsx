@@ -12,7 +12,7 @@ export default function CustomerReservations({ reservations }: any) {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Dashboard',
+            title: __('Dashboard'),
             href: '/dashboard',
         },
         {
@@ -83,11 +83,11 @@ export default function CustomerReservations({ reservations }: any) {
                                             <div className="mt-6 flex flex-wrap gap-4 text-sm text-muted-foreground">
                                                 <div className="flex items-center gap-1.5 bg-background/40 px-3 py-1.5 rounded-lg border border-border">
                                                     <Clock size={16} className="text-sky-500" />
-                                                    <span>{reservation.time.substring(0, 5)} WIB</span>
+                                                    <span>{reservation.time.substring(0, 5)} {__('WITA')}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5 bg-background/40 px-3 py-1.5 rounded-lg border border-border">
                                                     <Calendar size={16} className="text-sky-500" />
-                                                    <span>{reservation.guest_count} Pax</span>
+                                                    <span>{reservation.guest_count} {__('Pax')}</span>
                                                 </div>
                                             </div>
                                         </div>

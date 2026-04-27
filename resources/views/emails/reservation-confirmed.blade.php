@@ -14,7 +14,7 @@
             </tr>
             <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">Waktu</td>
-                <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; color: #FFFFFF;">{{ $reservation->time }} WIB</td>
+                <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: right; color: #FFFFFF;">{{ $reservation->time }} WITA</td>
             </tr>
             <tr>
                 <td style="padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">Jumlah Tamu</td>

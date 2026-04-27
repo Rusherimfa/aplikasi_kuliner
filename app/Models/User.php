@@ -11,10 +11,20 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
 #[Fillable(['name', 'email', 'phone', 'password', 'current_team_id', 'role', 'google_id', 'avatar', 'email_verified_at', 'points', 'otp_code', 'otp_expires_at', 'is_verified', 'is_available', 'latitude', 'longitude'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'otp_code'])]
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string|null $avatar
+ * @property string|null $google_id
+ * @property Role $role
+ * @property Carbon|null $email_verified_at
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

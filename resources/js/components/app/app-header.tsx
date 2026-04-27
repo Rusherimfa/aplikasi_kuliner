@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search, Languages } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import AppLogo from '@/components/app/app-logo';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 import { Breadcrumbs } from '@/components/app/breadcrumbs';
@@ -237,7 +238,10 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <LanguageSwitcher />
+                        <div className="flex items-center gap-1">
+                            <ThemeSwitcher />
+                            <LanguageSwitcher />
+                        </div>
 
                         <TeamSwitcher inHeader />
                     </div>

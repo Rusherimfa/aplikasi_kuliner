@@ -370,17 +370,17 @@ export default function Profile({
                             <ShieldCheck size={40} strokeWidth={1.5} />
                         </div>
                         <DialogTitle className="text-center text-2xl font-black uppercase tracking-tight italic text-slate-900 dark:text-white">
-                            {__('Konfirmasi Perubahan')}
+                            {__('Confirm Changes')}
                         </DialogTitle>
                         <DialogDescription className="text-center text-slate-500 dark:text-muted-foreground/60 font-medium leading-relaxed">
-                            {__('Untuk keamanan, silakan masukkan kata sandi Anda untuk mengonfirmasi perubahan profil ini.')}
+                            {__('For security, please enter your password to confirm these profile changes.')}
                         </DialogDescription>
                     </DialogHeader>
                     
                     <div className="mt-6 space-y-4">
                         <div className="grid gap-3">
                             <Label htmlFor="confirm_password" title={__('Password Konfirmasi')} className="ml-2 text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/70">
-                                {__('Konfirmasi Sandi')}
+                                {__('Confirm Password')}
                             </Label>
                             <div className="group relative">
                                 <ShieldCheck size={20} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 dark:text-muted-foreground/30 group-focus-within:text-sky-600 dark:group-focus-within:text-sky-500 transition-all duration-500" />
@@ -406,14 +406,14 @@ export default function Profile({
                             }}
                             className="flex-1 h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-muted dark:hover:bg-white/5"
                         >
-                            {__('Batal')}
+                            {__('Cancel')}
                         </Button>
                         <Button
                             onClick={confirmUpdate}
                             disabled={form.processing || !form.data.current_password}
                             className="flex-1 h-14 rounded-2xl bg-sky-600 dark:bg-sky-500 text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
                         >
-                            {form.processing ? __('Memproses...') : __('Ya, Perbarui')}
+                            {form.processing ? __('Processing...') : __('Yes, Update')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

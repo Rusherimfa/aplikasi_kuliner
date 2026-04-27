@@ -2,8 +2,9 @@ import { Head, Link, router } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Clock, CalendarCheck, CheckCircle2, UserCheck, ArrowRight, Table as TableIcon, Users, UserPlus, TrendingUp, HandPlatter, Wallet, ShoppingBag, Info } from 'lucide-react';
+import { Clock, CalendarCheck, CheckCircle2, UserCheck, ArrowRight, Table as TableIcon, Users, UserPlus, TrendingUp, HandPlatter, Wallet, ShoppingBag, Info, ChefHat, Plus, X, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
     AreaChart, 
     Area, 
@@ -76,6 +77,26 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
         return <Badge className={`${config.color} hover:bg-transparent px-3 py-1 font-bold text-[10px] uppercase tracking-wider border transition-all`}>{config.label}</Badge>;
     };
 
+    const updateStatus = (id: number, status: string) => {
+        router.put(`/reservations/${id}`, { status }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Success feedback automatically handled by flash messages
+            }
+        });
+    };
+
+    const deleteReservation = (id: number) => {
+        if (confirm(__('Apakah Anda yakin ingin menghapus riwayat reservasi ini?'))) {
+            router.delete(`/reservations/${id}`, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    // Success feedback automatically handled by flash messages
+                }
+            });
+        }
+    };
+
     return (
         <>
             <Head title={__('Staff Hub - Dashboard')} />
@@ -88,33 +109,50 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                             <span className="text-[10px] font-black tracking-[0.3em] text-emerald-500/80 uppercase">{__('Staff Station')}</span>
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
-                            Operational <span className="text-slate-300 dark:text-white/40 italic font-serif">Hub</span>
+                            {__('Operational')} <span className="text-slate-300 dark:text-white/40 italic font-serif">{__('Hub')}</span>
                         </h1>
                         <p className="mt-4 text-slate-500 dark:text-white/40 max-w-lg leading-relaxed font-medium">
                             {__('Kelola alur tamu, pantau reservasi hari ini, dan pastikan setiap pengalaman kuliner berjalan sempurna.')}
                         </p>
                     </div>
 
-                    <div className="flex bg-slate-100 dark:bg-white/5 rounded-2xl p-1 border border-slate-200 dark:border-white/5 relative z-20">
-                        {[
-                            { id: 'day', label: __('Daily') },
-                            { id: 'week', label: __('Weekly') },
-                            { id: 'month', label: __('Monthly') },
-                            { id: 'year', label: __('Yearly') }
-                        ].map((p) => (
-                            <button
-                                key={p.id}
-                                onClick={() => router.get(dashboard.url({ query: { period: p.id } }), {}, { preserveState: true, preserveScroll: true })}
-                                className={cn(
-                                    "px-6 py-2.5 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-500",
-                                    (filters?.period ?? 'week') === p.id 
-                                        ? "bg-emerald-500 text-white dark:text-black shadow-xl scale-105" 
-                                        : "text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white/70"
-                                )}
-                            >
-                                {p.label}
-                            </button>
-                        ))}
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                        <div className="flex bg-slate-100 dark:bg-white/5 rounded-2xl p-1 border border-slate-200 dark:border-white/5 relative z-20">
+                            {[
+                                { id: 'day', label: __('Daily') },
+                                { id: 'week', label: __('Weekly') },
+                                { id: 'month', label: __('Monthly') },
+                                { id: 'year', label: __('Yearly') }
+                            ].map((p) => (
+                                <button
+                                    key={p.id}
+                                    onClick={() => router.get(dashboard.url({ query: { period: p.id } }), {}, { preserveState: true, preserveScroll: true })}
+                                    className={cn(
+                                        "px-6 py-2.5 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-500",
+                                        (filters?.period ?? 'week') === p.id 
+                                            ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xl ring-1 ring-black/5 dark:ring-white/10" 
+                                            : "text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/60"
+                                    )}
+                                >
+                                    {p.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                             <Button asChild variant="outline" className="rounded-2xl border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 h-11 px-6 text-[10px] font-black uppercase tracking-widest">
+                                <Link href="/reservations/create">
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    {__('Reservasi Baru')}
+                                </Link>
+                            </Button>
+                            <Button asChild variant="outline" className="rounded-2xl border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-500 hover:bg-sky-500/20 h-11 px-6 text-[10px] font-black uppercase tracking-widest">
+                                <Link href="/kitchen">
+                                    <ChefHat className="mr-2 h-4 w-4" />
+                                    {__('Kitchen View')}
+                                </Link>
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
@@ -360,6 +398,46 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                                         >
                                                             <Info size={14} />
                                                         </button>
+                                                        
+                                                        {res.status === 'pending' && (
+                                                            <>
+                                                                <button 
+                                                                    onClick={() => updateStatus(res.id, 'awaiting_payment')}
+                                                                    className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors border border-emerald-500/20"
+                                                                    title={__('Terima & Menunggu Pembayaran')}
+                                                                >
+                                                                    <CheckCircle2 size={14} />
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => updateStatus(res.id, 'rejected')}
+                                                                    className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-colors border border-rose-500/20"
+                                                                    title={__('Tolak Reservasi')}
+                                                                >
+                                                                    <X size={14} />
+                                                                </button>
+                                                            </>
+                                                        )}
+
+                                                        {res.status === 'awaiting_payment' && (
+                                                            <button 
+                                                                onClick={() => updateStatus(res.id, 'confirmed')}
+                                                                className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 transition-colors border border-sky-500/20"
+                                                                title={__('Tandai Sudah Bayar (Confirmed)')}
+                                                            >
+                                                                <Wallet size={14} />
+                                                            </button>
+                                                        )}
+
+                                                        {res.status === 'confirmed' && (
+                                                            <button 
+                                                                onClick={() => updateStatus(res.id, 'completed')}
+                                                                className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 transition-colors border border-emerald-500/20"
+                                                                title={__('Tandai Selesai')}
+                                                            >
+                                                                <CheckCircle2 size={14} />
+                                                            </button>
+                                                        )}
+
                                                         <button 
                                                             onClick={() => setActiveChatId(activeChatId === res.id ? null : res.id)}
                                                             className={`p-1.5 rounded-lg border transition-colors ${
@@ -368,6 +446,14 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                                             title={__('Buka Chat')}
                                                         >
                                                             <MessageCircle size={14} />
+                                                        </button>
+
+                                                        <button 
+                                                            onClick={() => deleteReservation(res.id)}
+                                                            className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20"
+                                                            title={__('Hapus Riwayat')}
+                                                        >
+                                                            <Trash2 size={14} />
                                                         </button>
                                                     </div>
                                                 </td>
@@ -417,7 +503,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                         </div>
                                         <div className="bg-slate-100 dark:bg-white/5 rounded-xl p-3 border border-slate-200 dark:border-white/5">
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Jadwal')}</p>
-                                            <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US')} - {selectedReservation.time.substring(0,5)} WIB</p>
+                                            <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US')} - {selectedReservation.time.substring(0,5)} {__('WITA')}</p>
                                         </div>
                                         <div className="bg-slate-100 dark:bg-white/5 rounded-xl p-3 border border-slate-200 dark:border-white/5">
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
@@ -434,7 +520,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
 
                                 {/* Pre-order Menu */}
                                 <div className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">Pre-order Menu</h4>
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">{__('Pre-order Menu')}</h4>
                                     <div className="bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden">
                                         {selectedReservation.menus && selectedReservation.menus.length > 0 ? (
                                             <div className="divide-y divide-white/5">
@@ -487,7 +573,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                         </div>
                                         {selectedReservation.status !== 'rejected' && selectedReservation.status !== 'cancelled' && (
                                             <Badge variant={selectedReservation.payment_status === 'paid' ? 'default' : 'destructive'} className={selectedReservation.payment_status === 'paid' ? 'bg-emerald-500/20 text-emerald-500 border-0' : 'bg-rose-500/20 text-rose-500 border-0'}>
-                                                {selectedReservation.payment_status?.toUpperCase()}
+                                                {__(selectedReservation.payment_status || '').toUpperCase()}
                                             </Badge>
                                         )}
                                     </div>

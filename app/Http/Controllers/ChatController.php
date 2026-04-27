@@ -27,6 +27,7 @@ class ChatController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Reservation> $reservations */
         $reservations = Reservation::query()
             ->select(['id', 'user_id', 'customer_name', 'status', 'date', 'time', 'courier_id', 'created_at'])
             ->with(['courier:id,name,role'])
@@ -36,6 +37,7 @@ class ChatController extends Controller
             ->limit(12)
             ->get();
 
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Order> $orders */
         $orders = Order::query()
             ->select(['id', 'user_id', 'courier_id', 'order_number', 'customer_name', 'order_type', 'order_status', 'created_at'])
             ->with(['courier:id,name,role'])
@@ -45,13 +47,85 @@ class ChatController extends Controller
             ->limit(12)
             ->get();
 
-        $reservationLastMessages = $this->lastMessagesFor('reservation_id', $reservations->pluck('id')->all());
-        $orderLastMessages = $this->lastMessagesFor('order_id', $orders->pluck('id')->all());
-        $reservationUnreadCounts = $this->unreadCountsFor('reservation_id', $reservations->pluck('id')->all(), $user);
-        $orderUnreadCounts = $this->unreadCountsFor('order_id', $orders->pluck('id')->all(), $user);
-        $guestThreads = collect();
+        $resIds = $reservations->pluck('id')->all();
+        $orderIds = $orders->pluck('id')->all();
 
-        if ($user->role === Role::STAFF) {
+        // Support Messages
+        $resLastSupport = $this->lastMessagesFor('reservation_id', $resIds, 'support');
+        $orderLastSupport = $this->lastMessagesFor('order_id', $orderIds, 'support');
+        $resUnreadSupport = $this->unreadCountsFor('reservation_id', $resIds, $user, 'support');
+        $orderUnreadSupport = $this->unreadCountsFor('order_id', $orderIds, $user, 'support');
+
+        // Delivery Messages
+        $resLastDelivery = $this->lastMessagesFor('reservation_id', $resIds, 'delivery');
+        $orderLastDelivery = $this->lastMessagesFor('order_id', $orderIds, 'delivery');
+        $resUnreadDelivery = $this->unreadCountsFor('reservation_id', $resIds, $user, 'delivery');
+        $orderUnreadDelivery = $this->unreadCountsFor('order_id', $orderIds, $user, 'delivery');
+
+        $allThreads = collect();
+
+        // Format Reservation Threads
+        foreach ($reservations as $res) {
+            /** @var Reservation $res */
+            // Add Support Thread (Customer & Staff)
+            if (! $user->isCourier()) {
+                $allThreads->push($this->formatReservationThread(
+                    reservation: $res,
+                    user: $user,
+                    type: 'support',
+                    lastMessage: $resLastSupport->get($res->id),
+                    unreadCount: (int) ($resUnreadSupport->get($res->id) ?? 0)
+                ));
+            }
+
+            // Add Delivery Thread (Customer & Courier)
+            if ($res->courier_id) {
+                if ($user->isCourier() && $user->id !== $res->courier_id) {
+                    continue;
+                }
+
+                $allThreads->push($this->formatReservationThread(
+                    reservation: $res,
+                    user: $user,
+                    type: 'delivery',
+                    lastMessage: $resLastDelivery->get($res->id),
+                    unreadCount: (int) ($resUnreadDelivery->get($res->id) ?? 0)
+                ));
+            }
+        }
+
+        // Format Order Threads
+        foreach ($orders as $order) {
+            /** @var Order $order */
+            // Add Support Thread
+            if (! $user->isCourier()) {
+                $allThreads->push($this->formatOrderThread(
+                    order: $order,
+                    user: $user,
+                    type: 'support',
+                    lastMessage: $orderLastSupport->get($order->id),
+                    unreadCount: (int) ($orderUnreadSupport->get($order->id) ?? 0)
+                ));
+            }
+
+            // Add Delivery Thread
+            if ($order->courier_id) {
+                if ($user->isCourier() && $user->id !== $order->courier_id) {
+                    continue;
+                }
+
+                $allThreads->push($this->formatOrderThread(
+                    order: $order,
+                    user: $user,
+                    type: 'delivery',
+                    lastMessage: $orderLastDelivery->get($order->id),
+                    unreadCount: (int) ($orderUnreadDelivery->get($order->id) ?? 0)
+                ));
+            }
+        }
+
+        // Guest Threads for Staff
+        if ($user->role === Role::STAFF || $user->role === Role::ADMIN) {
             $guestConversations = GuestConversation::query()
                 ->select(['id', 'guest_name', 'status', 'created_at'])
                 ->where('status', 'open')
@@ -62,32 +136,16 @@ class ChatController extends Controller
             $guestLastMessages = $this->guestLastMessagesFor($guestIds);
             $guestUnreadCounts = $this->guestUnreadCountsFor($guestIds);
 
-            $guestThreads = $guestConversations->map(fn (GuestConversation $conversation) => $this->formatGuestThread(
-                conversation: $conversation,
-                lastMessage: $guestLastMessages->get($conversation->id),
-                unreadCount: (int) ($guestUnreadCounts->get($conversation->id) ?? 0),
-            ));
+            foreach ($guestConversations as $conv) {
+                $allThreads->push($this->formatGuestThread(
+                    conversation: $conv,
+                    lastMessage: $guestLastMessages->get($conv->id),
+                    unreadCount: (int) ($guestUnreadCounts->get($conv->id) ?? 0),
+                ));
+            }
         }
 
-        $reservationThreads = $reservations
-            ->map(fn (Reservation $reservation) => $this->formatReservationThread(
-                reservation: $reservation,
-                lastMessage: $reservationLastMessages->get($reservation->id),
-                unreadCount: (int) ($reservationUnreadCounts->get($reservation->id) ?? 0),
-                user: $user,
-            ));
-
-        $orderThreads = $orders
-            ->map(fn (Order $order) => $this->formatOrderThread(
-                order: $order,
-                lastMessage: $orderLastMessages->get($order->id),
-                unreadCount: (int) ($orderUnreadCounts->get($order->id) ?? 0),
-                user: $user,
-            ));
-
-        $threads = collect($reservationThreads->all())
-            ->merge($orderThreads->all())
-            ->merge($guestThreads)
+        $threads = $allThreads
             ->sortByDesc(fn (array $thread) => $thread['last_message']['created_at'] ?? $thread['created_at'])
             ->values();
 
@@ -99,7 +157,7 @@ class ChatController extends Controller
     /**
      * Get messages for a specific reservation.
      */
-    public function index(Reservation $reservation): JsonResponse
+    public function index(Request $request, Reservation $reservation): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -108,8 +166,11 @@ class ChatController extends Controller
             abort(403);
         }
 
+        $type = $request->input('chat_type', 'support');
+
         return response()->json(Message::with('sender:id,name,role')
             ->where('reservation_id', $reservation->id)
+            ->where('chat_type', $type)
             ->oldest()
             ->get());
     }
@@ -117,7 +178,7 @@ class ChatController extends Controller
     /**
      * Get messages for a specific order.
      */
-    public function indexOrder(Order $order): JsonResponse
+    public function indexOrder(Request $request, Order $order): JsonResponse
     {
         /** @var User $user */
         $user = Auth::user();
@@ -126,8 +187,11 @@ class ChatController extends Controller
             abort(403);
         }
 
+        $type = $request->input('chat_type', 'support');
+
         return response()->json(Message::with('sender:id,name,role')
             ->where('order_id', $order->id)
+            ->where('chat_type', $type)
             ->oldest()
             ->get());
     }
@@ -146,17 +210,19 @@ class ChatController extends Controller
 
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
+            'chat_type' => 'nullable|string|in:support,delivery',
         ]);
+
+        $type = $validated['chat_type'] ?? 'support';
 
         try {
             $message = Message::create([
                 'reservation_id' => $reservation->id,
                 'sender_id' => $user->id,
                 'content' => $validated['content'],
+                'chat_type' => $type,
                 'is_chatbot' => false,
             ]);
-
-            Log::info('Broadcasting Reservation Message', ['id' => $message->id, 'res_id' => $reservation->id]);
 
             try {
                 broadcast(new MessageSent($message->load(['sender:id,name,role', 'reservation', 'order'])))->toOthers();
@@ -164,7 +230,7 @@ class ChatController extends Controller
                 Log::error('Broadcast failed: '.$e->getMessage());
             }
 
-            if ($user->id === $reservation->user_id) {
+            if ($user->id === $reservation->user_id && $type === 'support') {
                 try {
                     $this->handleChatbot($reservation, null, $validated['content']);
                 } catch (Throwable $e) {
@@ -194,17 +260,19 @@ class ChatController extends Controller
 
         $validated = $request->validate([
             'content' => 'required|string|max:1000',
+            'chat_type' => 'nullable|string|in:support,delivery',
         ]);
+
+        $type = $validated['chat_type'] ?? 'support';
 
         try {
             $message = Message::create([
                 'order_id' => $order->id,
                 'sender_id' => $user->id,
                 'content' => $validated['content'],
+                'chat_type' => $type,
                 'is_chatbot' => false,
             ]);
-
-            Log::info('Broadcasting Order Message', ['id' => $message->id, 'order_id' => $order->id]);
 
             try {
                 broadcast(new MessageSent($message->load(['sender:id,name,role', 'reservation', 'order'])))->toOthers();
@@ -212,7 +280,7 @@ class ChatController extends Controller
                 Log::error('Broadcast failed: '.$e->getMessage());
             }
 
-            if ($user->id === $order->user_id) {
+            if ($user->id === $order->user_id && $type === 'support') {
                 try {
                     $this->handleChatbot(null, $order, $validated['content']);
                 } catch (Throwable $e) {
@@ -237,7 +305,7 @@ class ChatController extends Controller
         $reply = null;
 
         if (str_contains($input, 'halo')) {
-            $reply = 'Halo! Saya adalah Boutique Assistant. Ada yang bisa saya bantu?';
+            $reply = 'Halo! Saya adalah Ocean\'s Concierge. Ada yang bisa saya bantu terkait reservasi atau pesanan Anda?';
         } elseif (str_contains($input, 'status')) {
             if ($reservation) {
                 $reply = 'Status reservasi Anda saat ini adalah: '.strtoupper($reservation->status).'.';
@@ -280,9 +348,13 @@ class ChatController extends Controller
 
         $validated = $request->validate([
             'type' => 'required|in:reservations,orders',
+            'chat_type' => 'nullable|string|in:support,delivery',
         ]);
 
+        $chatType = $validated['chat_type'] ?? 'support';
+
         $query = Message::where('read_at', null)
+            ->where('chat_type', $chatType)
             ->where('sender_id', '!=', $user->id);
 
         if ($validated['type'] === 'reservations') {
@@ -330,7 +402,7 @@ class ChatController extends Controller
     /**
      * @return Collection<int, Message>
      */
-    private function lastMessagesFor(string $column, array $ids): Collection
+    private function lastMessagesFor(string $column, array $ids, string $type): Collection
     {
         if ($ids === []) {
             return collect();
@@ -338,6 +410,7 @@ class ChatController extends Controller
 
         return Message::with('sender:id,name,role')
             ->whereIn($column, $ids)
+            ->where('chat_type', $type)
             ->latest()
             ->get()
             ->unique($column)
@@ -347,7 +420,7 @@ class ChatController extends Controller
     /**
      * @return Collection<int, int>
      */
-    private function unreadCountsFor(string $column, array $ids, User $user): Collection
+    private function unreadCountsFor(string $column, array $ids, User $user, string $type): Collection
     {
         if ($ids === []) {
             return collect();
@@ -355,6 +428,7 @@ class ChatController extends Controller
 
         return Message::query()
             ->whereIn($column, $ids)
+            ->where('chat_type', $type)
             ->whereNull('read_at')
             ->where('sender_id', '!=', $user->id)
             ->selectRaw($column.', count(*) as aggregate')
@@ -362,15 +436,20 @@ class ChatController extends Controller
             ->pluck('aggregate', $column);
     }
 
-    private function formatReservationThread(Reservation $reservation, ?Message $lastMessage, int $unreadCount, User $user): array
+    private function formatReservationThread(Reservation $reservation, User $user, string $type, ?Message $lastMessage = null, int $unreadCount = 0): array
     {
+        $isDelivery = $type === 'delivery';
+
         return [
-            'id' => 'reservation-'.$reservation->id,
+            'id' => 'reservation-'.$reservation->id.'-'.$type,
             'type' => 'reservations',
+            'chat_type' => $type,
             'record_id' => $reservation->id,
-            'title' => 'Reservasi #'.$reservation->id,
-            'subtitle' => $this->threadSubtitle($reservation->customer_name, $reservation->courier?->name, $user),
-            'badge' => $reservation->courier_id ? 'Customer, Staff & Kurir' : 'Customer & Staff',
+            'title' => ($isDelivery ? '📦 ' : '🍷 ').'Reservasi #'.$reservation->id,
+            'subtitle' => $isDelivery
+                ? $this->deliverySubtitle($reservation->customer_name, $reservation->courier?->name, $user)
+                : $this->supportSubtitle($reservation->customer_name, $user),
+            'badge' => $isDelivery ? 'Delivery (Kurir)' : 'Resto Support',
             'status' => $reservation->status,
             'created_at' => $reservation->created_at?->toISOString(),
             'unread_count' => $unreadCount,
@@ -378,15 +457,20 @@ class ChatController extends Controller
         ];
     }
 
-    private function formatOrderThread(Order $order, ?Message $lastMessage, int $unreadCount, User $user): array
+    private function formatOrderThread(Order $order, User $user, string $type, ?Message $lastMessage = null, int $unreadCount = 0): array
     {
+        $isDelivery = $type === 'delivery';
+
         return [
-            'id' => 'order-'.$order->id,
+            'id' => 'order-'.$order->id.'-'.$type,
             'type' => 'orders',
+            'chat_type' => $type,
             'record_id' => $order->id,
-            'title' => $order->order_number,
-            'subtitle' => $this->orderThreadSubtitle($order, $user),
-            'badge' => $this->orderThreadBadge($order),
+            'title' => ($isDelivery ? '🚚 ' : '🛍️ ').$order->order_number,
+            'subtitle' => $isDelivery
+                ? $this->deliverySubtitle($order->customer_name, $order->courier?->name, $user)
+                : $this->supportSubtitle($order->customer_name, $user),
+            'badge' => $isDelivery ? 'Delivery (Kurir)' : 'Resto Support',
             'status' => $order->order_status,
             'created_at' => $order->created_at?->toISOString(),
             'unread_count' => $unreadCount,
@@ -410,43 +494,22 @@ class ChatController extends Controller
         ];
     }
 
-    private function threadSubtitle(string $customerName, ?string $courierName, User $user): string
+    private function supportSubtitle(string $customerName, User $user): string
+    {
+        return $user->isCustomer() ? 'Bantuan Tim Restoran' : 'Customer: '.$customerName;
+    }
+
+    private function deliverySubtitle(string $customerName, ?string $courierName, User $user): string
     {
         if ($user->isCustomer()) {
-            return $courierName ? 'Staff dan kurir '.$courierName : 'Staff restoran';
+            return $courierName ? 'Kurir: '.$courierName : 'Menunggu Kurir...';
         }
 
         if ($user->isCourier()) {
-            return 'Customer '.$customerName;
+            return 'Customer: '.$customerName;
         }
 
-        return $courierName ? $customerName.' - kurir '.$courierName : $customerName;
-    }
-
-    private function orderThreadSubtitle(Order $order, User $user): string
-    {
-        if ($user->isCustomer() && $order->order_type === 'delivery') {
-            return $order->courier?->name
-                ? 'Staff dan kurir '.$order->courier->name
-                : 'Staff restoran, kurir akan bergabung';
-        }
-
-        return $this->threadSubtitle(
-            $order->customer_name,
-            $order->courier?->name,
-            $user,
-        );
-    }
-
-    private function orderThreadBadge(Order $order): string
-    {
-        if ($order->order_type === 'delivery') {
-            return $order->courier_id
-                ? 'Customer, Staff & Kurir'
-                : 'Customer & Staff, Kurir Menyusul';
-        }
-
-        return 'Customer & Staff';
+        return 'K: '.($courierName ?? '-').' | C: '.$customerName;
     }
 
     private function formatLastMessage(?Message $message): ?array

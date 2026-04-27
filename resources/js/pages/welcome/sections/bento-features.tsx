@@ -17,8 +17,8 @@ export default function BentoFeatures() {
     const features = [
         {
             title: __("Catch of the Day"),
-            subtitle: __("Pilihan Terbaik Ocean"),
-            description: __("Hasil laut terbaik yang ditangkap langsung oleh nelayan lokal setiap harinya, menjamin kesegaran maksimal di setiap hidangan."),
+            subtitle: __("Ocean's Best Selection"),
+            description: __("The best seafood selection caught directly by local fishermen every day, ensuring maximum freshness in every dish."),
             icon: Trophy,
             className: "md:col-span-2 md:row-span-2",
             iconClass: resolvedAppearance === 'dark' ? "bg-sky-500/20 text-sky-400 border border-sky-400/30" : "bg-sky-500 text-white shadow-lg shadow-sky-500/30",
@@ -26,8 +26,8 @@ export default function BentoFeatures() {
         },
         {
             title: __("Beachfront"),
-            subtitle: __("Makan di Tepi Pantai"),
-            description: __("Nikmati hidangan dengan pemandangan matahari terbenam yang memukau tepat di bibir pantai."),
+            subtitle: __("Beachfront Dining"),
+            description: __("Enjoy dishes with a stunning sunset view right on the shoreline."),
             icon: Sprout,
             className: "md:col-span-1 md:row-span-1",
             iconClass: resolvedAppearance === 'dark' ? "bg-cyan-500/20 text-cyan-400 border border-cyan-400/30" : "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30",
@@ -35,8 +35,8 @@ export default function BentoFeatures() {
         },
         {
             title: __("Fresh Drinks"),
-            subtitle: __("Kesegaran Tropis"),
-            description: __("Kurasi minuman tropis menyegarkan untuk menyempurnakan santapan seafood Anda."),
+            subtitle: __("Tropical Refreshments"),
+            description: __("A curation of refreshing tropical drinks to complement your seafood dining."),
             icon: Wine,
             className: "md:col-span-1 md:row-span-1",
             iconClass: resolvedAppearance === 'dark' ? "bg-teal-500/20 text-teal-400 border border-teal-400/30" : "bg-teal-500 text-white shadow-lg shadow-teal-500/30",
@@ -44,8 +44,8 @@ export default function BentoFeatures() {
         },
         {
             title: __("Chef's Touch"),
-            subtitle: __("Ahli Seafood"),
-            description: __("Di balik setiap hidangan terdapat filosofi mendalam dan teknik pengolahan seafood yang sempurna."),
+            subtitle: __("Master of Seafood"),
+            description: __("Behind every dish is a deep philosophy and perfect seafood processing techniques."),
             icon: ChefHat,
             className: "md:col-span-1 md:row-span-1",
             iconClass: resolvedAppearance === 'dark' ? "bg-blue-500/20 text-blue-400 border border-blue-400/30" : "bg-blue-500 text-white shadow-lg shadow-blue-500/30",
@@ -53,8 +53,8 @@ export default function BentoFeatures() {
         },
         {
             title: __("Mastery"),
-            subtitle: __("Filosofi Rasa"),
-            description: __("Setiap sajian adalah perpaduan antara kearifan lokal dan teknik kuliner tingkat tinggi."),
+            subtitle: __("Taste Philosophy"),
+            description: __("Every serving is a blend of local wisdom and high-level culinary techniques."),
             icon: Sparkles,
             className: "md:col-span-2 md:row-span-1",
             iconClass: resolvedAppearance === 'dark' ? "bg-indigo-500/20 text-indigo-400 border border-indigo-400/30" : "bg-indigo-500 text-white shadow-lg shadow-indigo-500/30",
@@ -86,7 +86,7 @@ export default function BentoFeatures() {
                             whileInView={{ opacity: 1, x: 0 }}
                             className="text-[10px] font-black tracking-[0.6em] text-sky-500 uppercase block mb-4"
                         >
-                            {__('Keunggulan Kami')}
+                            {__('Our Distinction')}
                         </motion.span>
                         <motion.h2 
                             initial={{ opacity: 0, y: 20 }}
@@ -96,7 +96,7 @@ export default function BentoFeatures() {
                                 resolvedAppearance === 'dark' ? "text-white" : "text-slate-900"
                             )}
                         >
-                            {__('Detail yang Mendefinisikan Kami')}
+                            {__('Details That Define Us')}
                         </motion.h2>
                     </div>
                     <motion.p 
@@ -107,7 +107,7 @@ export default function BentoFeatures() {
                             resolvedAppearance === 'dark' ? "text-slate-400" : "text-slate-600"
                         )}
                     >
-                        {__('Lebih dari sekadar rasa, kami menghadirkan simfoni antara alam, seni kuliner, dan keramahan yang tulus.')}
+                        {__('More than just taste, we bring a symphony between nature, culinary art, and sincere hospitality.')}
                     </motion.p>
                 </div>
 

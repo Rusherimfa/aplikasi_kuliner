@@ -15,21 +15,21 @@ export default function LocationHours() {
     useEffect(() => {
         const checkStatus = () => {
             const now = new Date();
-            const day = now.getDay();
+            const day = now.getDay(); // 0 is Sunday, 1-6 is Mon-Sat
             const hour = now.getHours();
+            const minute = now.getMinutes();
+            const currentTime = hour + (minute / 60);
             
-            // Typical hours: 8 AM - 10 PM (Mon-Fri), 9 AM - 11 PM (Sat-Sun)
-            if (day >= 1 && day <= 5) {
-                setIsOpen(hour >= 8 && hour < 22);
-            } else {
-                setIsOpen(hour >= 9 && hour < 23);
-            }
+            // Open Daily: 10:00 AM – 11:00 PM
+            setIsOpen(currentTime >= 10 && currentTime < 23);
         };
 
         checkStatus();
         const interval = setInterval(checkStatus, 60000);
         return () => clearInterval(interval);
     }, []);
+
+    // ... (Map Initialization logic remains the same)
 
     // Leaflet Map Initialization
     useEffect(() => {
@@ -64,7 +64,7 @@ export default function LocationHours() {
                                 <img src="/logo.png" class="h-7 w-7 object-contain" alt="Ocean's Resto" />
                             </div>
                             <div class="absolute -bottom-12 bg-white dark:bg-slate-900 px-4 py-1.5 rounded-lg shadow-2xl border border-sky-500/20 whitespace-nowrap">
-                                <span class="text-[11px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">Ocean's Resto</span>
+                                <span class="text-[11px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">${__("Ocean's Resto")}</span>
                             </div>
                         </div>
                     `,
@@ -130,39 +130,33 @@ export default function LocationHours() {
                         className="bg-white dark:bg-neutral-900/40 backdrop-blur-md rounded-[2.5rem] md:rounded-[3rem] p-8 md:p-10 lg:p-12 shadow-[0_30px_60px_-15px_rgba(180,140,100,0.1)] border border-white/40 dark:border-white/5 flex flex-col justify-between"
                     >
                         <div>
-                            <div className="flex items-center gap-4 mb-10">
-                                <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                                     <Clock size={24} strokeWidth={1.5} />
+                            <div className="flex items-center gap-6 mb-12">
+                                <div className="h-14 w-14 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center">
+                                     <Clock size={28} strokeWidth={1.5} />
                                  </div>
-                                 <h2 className="font-serif text-3xl md:text-4xl text-slate-900 dark:text-white">{__('Operational Hours')}</h2>
+                                 <h2 className="font-serif text-4xl md:text-5xl text-slate-900 dark:text-white tracking-tight">{__('Operational Hours')}</h2>
                             </div>
 
-                            <div className="space-y-10">
+                            <div className="space-y-12">
                                 <div className="group">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">{__('Monday — Friday')}</p>
-                                    <p className="font-serif text-2xl md:text-3xl text-slate-800 dark:text-neutral-200 group-hover:text-primary transition-colors duration-500">08:00 AM — 10:00 PM</p>
-                                </div>
-                                
-                                <div className="group">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-primary/60 mb-3 font-sans">{__('Saturday — Sunday')}</p>
-                                    <p className="font-serif text-2xl md:text-3xl text-slate-800 dark:text-neutral-200 group-hover:text-primary transition-colors duration-500">09:00 AM — 11:00 PM</p>
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-sky-500/80 mb-5 font-sans">{__('Opening Daily')}</p>
+                                    <p className="font-serif text-4xl md:text-5xl text-slate-800 dark:text-neutral-100 leading-none">{__('10:00 AM — 11:00 PM')}</p>
                                 </div>
                             </div>
                         </div>
 
                         <div className="mt-16">
                             <motion.div 
-                                initial={{ scale: 0.95 }}
-                                animate={{ scale: [0.95, 1, 0.95] }}
-                                transition={{ duration: 4, repeat: Infinity }}
-                                className={`inline-flex items-center gap-3 px-6 py-3 rounded-full ${
+                                initial={{ opacity: 0, y: 10 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                className={`inline-flex items-center gap-3 px-6 py-3 rounded-2xl ${
                                     isOpen 
-                                    ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20' 
-                                    : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
+                                    ? 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/10' 
+                                    : 'bg-rose-500/10 text-rose-700 border border-rose-500/10'
                                 }`}
                             >
-                                <div className={`h-2 w-2 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'} `} />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">
+                                <div className={`h-2.5 w-2.5 rounded-full ${isOpen ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'} `} />
+                                <span className="text-[11px] font-bold uppercase tracking-[0.15em]">
                                     {isOpen ? __('We Are Open Now') : __('We Are Closed Now')}
                                 </span>
                             </motion.div>
@@ -184,7 +178,7 @@ export default function LocationHours() {
                         </div>
 
                         <p className="font-serif text-lg md:text-xl text-slate-600 dark:text-neutral-400 leading-relaxed mb-12 italic">
-                            Kompleks Ruko Bandar, Jl. Jenderal Sudirman No.26 Blok N1, RT.01, Klandasan Ulu, Kec. Balikpapan Kota, Kota Balikpapan, Kalimantan Timur 76112
+                            {__('Kompleks Ruko Bandar, Jl. Jenderal Sudirman No.26 Blok N1, Klandasan Ulu, Balikpapan')}
                         </p>
 
                         <div className="relative flex-1 min-h-[350px] rounded-[2.5rem] overflow-hidden group ring-1 ring-slate-200 dark:ring-white/10 bg-slate-100 dark:bg-neutral-900 shadow-inner">

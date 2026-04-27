@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { dashboard } from '@/routes';
 import { useCart } from '@/hooks/use-cart';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslations } from '@/hooks/use-translations';
 
 // Layout Shared Components
 import Navbar from '../welcome/sections/navbar';
@@ -34,24 +35,25 @@ interface PageProps {
 
 export default function CatalogIndex({ menus, filters }: PageProps) {
     const { auth } = usePage().props as any;
+    const { __ } = useTranslations();
     const dashboardUrl = dashboard().url;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const { addItem, setCartOpen, cartCount } = useCart();
 
     const [activeCategory, setActiveCategory] = useState(
-        filters.category || 'Semua',
+        filters.category || __('All'),
     );
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedDish, setSelectedDish] = useState<any>(null);
 
     const rawCategories = Array.from(new Set(menus.map((item) => item.category)));
-    const categories = ['Semua', 'Best Seller', ...rawCategories];
+    const categories = [__('All'), __('Best Seller'), ...rawCategories];
 
     const filteredMenus = menus.filter((item) => {
         let matchesCategory = false;
-        if (activeCategory === 'Semua') {
+        if (activeCategory === __('All')) {
             matchesCategory = true;
-        } else if (activeCategory === 'Best Seller') {
+        } else if (activeCategory === __('Best Seller')) {
             matchesCategory = !!item.is_best_seller;
         } else {
             matchesCategory = item.category === activeCategory;
@@ -70,7 +72,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
 
     return (
         <div className="relative min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-foreground transition-colors duration-500 overflow-hidden">
-            <Head title="Katalog Menu â€” Seleksi Gastronomi Premium" />
+            <Head title={`${__('Menu Catalog')} — ${__('Premium Gastronomy Selection')}`} />
             
             {/* Premium Decorative Ambient */}
             <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-sky-500/5 blur-[140px]" />
@@ -92,7 +94,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             animate={{ opacity: 1, scale: 1 }}
                             className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
                         >
-                            Exquisite Menu
+                            {__('Exquisite Menu')}
                         </motion.div>
                         <motion.h1 
                             initial={{ opacity: 0, y: 20 }}
@@ -100,7 +102,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             transition={{ delay: 0.1 }}
                             className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white md:text-7xl tracking-tighter"
                         >
-                            Seleksi <span className="italic font-serif opacity-40 text-sky-500">Gastronomi</span>
+                            {__('Gastronomy')} <span className="italic font-serif opacity-40 text-sky-500">{__('Selection')}</span>
                         </motion.h1>
                         <motion.p 
                             initial={{ opacity: 0, y: 20 }}
@@ -108,7 +110,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             transition={{ delay: 0.2 }}
                             className="text-lg font-medium text-slate-500 dark:text-neutral-400"
                         >
-                            Jelajahi petualangan rasa kami yang dikurasi dengan presisi. Dari kreasi klasik hingga inovasi kontemporer.
+                            {__('Explore our curated taste adventures. From classic creations to contemporary innovations.')}
                         </motion.p>
                     </div>
 
@@ -123,7 +125,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                             <Search className="absolute top-4 left-5 h-5 w-5 text-slate-400" />
                             <Input
                                 type="search"
-                                placeholder="Cari hidangan istimewa..."
+                                placeholder={__('Search for exquisite dishes...')}
                                 className="h-14 rounded-3xl border-none bg-slate-50 dark:bg-white/5 pl-14 text-base font-medium placeholder:text-slate-400 focus:ring-sky-500/30 transition-all font-sans"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,7 +138,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                 className="h-14 rounded-[1.25rem] bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-[10px] px-8 shadow-2xl transition-all hover:scale-105 active:scale-95 relative"
                             >
                                 <ShoppingBag size={18} className="mr-3" />
-                                Cart
+                                {__('Cart')}
                                 <AnimatePresence>
                                     {cartCount > 0 && (
                                         <motion.span 
@@ -168,7 +170,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                         : 'bg-white dark:bg-white/5 border border-border dark:border-white/5 text-slate-500 dark:text-neutral-500 hover:border-sky-500/30'
                                 }`}
                             >
-                                {category}
+                                {__(category)}
                             </motion.button>
                         ))}
                     </div>
@@ -197,7 +199,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                             <div className="relative aspect-[4/3] md:aspect-square overflow-hidden m-2 md:m-3 rounded-[1.5rem] md:rounded-[1.75rem] bg-slate-50 dark:bg-white/5">
                                                 {item.image_path ? (
                                                     <img 
-                                                        src={`/storage/${item.image_path}`} 
+                                                        src={item.image_path.startsWith('http') ? item.image_path : `/storage/${item.image_path}`} 
                                                         className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                                                         alt={item.name} 
                                                     />
@@ -212,11 +214,11 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                     {!!item.is_best_seller && (
                                                         <div className="flex items-center gap-2 rounded-xl bg-sky-500 px-3 py-1.5 text-[10px] font-black text-black uppercase tracking-widest shadow-xl">
                                                             <Flame size={12} />
-                                                            Best Seller
+                                                            {__('Best Seller')}
                                                         </div>
                                                     )}
                                                     <div className="rounded-xl bg-white/10 backdrop-blur-md border border-white/10 px-3 py-1.5 text-[10px] font-black text-white/60 uppercase tracking-widest">
-                                                        {item.category}
+                                                        {__(item.category)}
                                                     </div>
                                                 </div>
 
@@ -226,7 +228,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                         onClick={() => setSelectedDish(item)}
                                                         className="bg-white text-black font-black uppercase tracking-widest text-[10px] rounded-2xl h-12 px-6 shadow-2xl transition-all hover:scale-110"
                                                     >
-                                                        <Eye size={14} className="mr-2" /> Detail Rasa
+                                                        <Eye size={14} className="mr-2" /> {__('Taste Details')}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -242,7 +244,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                     </span>
                                                 </div>
                                                 <p className="mb-6 md:mb-8 line-clamp-2 flex-1 text-xs md:text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-500">
-                                                    {item.description || 'Simfoni rasa yang dirancang oleh chef untuk memanjakan indera Anda.'}
+                                                    {item.description || __('A symphony of flavors crafted by the chef to indulge your senses.')}
                                                 </p>
 
                                                 {item.is_available ? (
@@ -251,14 +253,14 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                                         className="w-full h-14 rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:bg-sky-500 hover:text-black dark:hover:bg-sky-500 dark:hover:text-black group active:scale-95 shadow-xl border border-transparent"
                                                     >
                                                         <ShoppingBag size={14} className="mr-3" />
-                                                        Add to Order
+                                                        {__('Add to Order')}
                                                     </Button>
                                                 ) : (
                                                     <Button
                                                         disabled
                                                         className="w-full h-14 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/30 text-[10px] font-black uppercase tracking-[0.2em] border border-slate-200 dark:border-white/10 opacity-80 cursor-not-allowed"
                                                     >
-                                                        Tidak Tersedia
+                                                        {__('Not Available')}
                                                     </Button>
                                                 )}
                                             </div>
@@ -276,20 +278,20 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                     <SlidersHorizontal size={32} className="text-slate-300 dark:text-neutral-700" />
                                 </div>
                                 <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-3">
-                                    No Delicacies Found
+                                    {__('No Delicacies Found')}
                                 </h3>
                                 <p className="text-slate-500 dark:text-neutral-500 font-medium mb-10 max-w-sm text-center">
-                                    Tidak dapat menemukan hidangan yang sesuai. Coba ubah pencarian atau filter Anda.
+                                    {__('Could not find matching dishes. Try changing your search or filters.')}
                                 </p>
                                 <Button
                                     onClick={() => {
-                                        setActiveCategory('Semua');
+                                        setActiveCategory(__('All'));
                                         setSearchTerm('');
                                     }}
                                     className="h-14 rounded-2xl px-10 bg-sky-500 text-black font-black uppercase tracking-widest hover:bg-white transition-all shadow-xl shadow-sky-500/10"
                                 >
                                     <ArrowLeft size={16} className="mr-3" />
-                                    Reset Filters
+                                    {__('Reset Filters')}
                                 </Button>
                             </motion.div>
                         )}

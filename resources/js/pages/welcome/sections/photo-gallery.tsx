@@ -18,17 +18,17 @@ export default function PhotoGallery() {
         {
             src: 'https://images.pexels.com/photos/699953/pexels-photo-699953.jpeg?auto=compress&cs=tinysrgb&w=800',
             alt: 'Seafood Sensation',
-            label: __('Sensasi Seafood'),
+            label: __('Seafood Sensation'),
         },
         {
             src: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80',
             alt: 'Ocean view sunset',
-            label: __('Pemandangan Matahari Terbenam'),
+            label: __('Sunset View'),
         },
         {
             src: 'https://images.pexels.com/photos/924824/pexels-photo-924824.jpeg?auto=compress&cs=tinysrgb&w=800',
             alt: 'Fresh catch',
-            label: __('Tangkapan Spesial'),
+            label: __('Special Catch'),
         },
         {
             src: 'https://images.unsplash.com/photo-1599084993091-1cb5c0721cc6?q=80&w=2670&auto=format&fit=crop',
@@ -38,12 +38,12 @@ export default function PhotoGallery() {
         {
             src: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?q=80&w=2670&auto=format&fit=crop',
             alt: 'Tropical drinks',
-            label: __('Minuman Tropis'),
+            label: __('Tropical Drinks'),
         },
          {
             src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2670&auto=format&fit=crop',
             alt: 'Beachfront dining',
-            label: __('Suasana Pesisir'),
+            label: __('Coastal Atmosphere'),
         },
     ];
 
@@ -82,10 +82,10 @@ export default function PhotoGallery() {
                         transition={{ delay: 0.1 }}
                         className="font-serif text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter"
                     >
-                        {__('Pesta Visual')}
+                        {__('Visual Feast')}
                     </motion.h2>
                     <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg font-medium">
-                        {__('Eksplorasi kesegaran hasil laut dan atmosfer pantai yang kami bangun untuk Anda.')}
+                        {__('Explore the freshness of seafood and the coastal atmosphere we\'ve built for you.')}
                     </p>
                 </div>
 
@@ -119,7 +119,7 @@ export default function PhotoGallery() {
                                     <Eye size={24} />
                                 </motion.div>
                                 <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                                    {__('Lihat Detail')}
+                                    {__('View Details')}
                                 </span>
                             </div>
 
@@ -157,7 +157,7 @@ export default function PhotoGallery() {
                                         />
                                         <div className="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black/90 to-transparent">
                                             <h3 className="text-2xl font-serif text-white mb-2">{selectedImage.label}</h3>
-                                            <p className="text-white/60 text-sm">{__('Abadikan momen terbaik Anda bersama Ocean\'s Resto.')}</p>
+                                            <p className="text-white/60 text-sm">{__('Capture your best moments with Ocean\'s Resto.')}</p>
                                         </div>
                                         <DialogClose className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/10 hover:bg-black/60 transition-colors">
                                             <X size={20} />
