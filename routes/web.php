@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\OTPController;
 use App\Http\Controllers\BotController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuestChatController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\NotificationController;
@@ -34,6 +35,8 @@ Route::post('/reservations', [ReservationController::class, 'store'])->name('res
 
 // Chatbot API (Public)
 Route::post('/chatbot/ask', [BotController::class, 'ask'])->name('chatbot.ask');
+Route::get('/guest-chat/messages', [GuestChatController::class, 'messages'])->name('guest-chat.messages');
+Route::post('/guest-chat/messages', [GuestChatController::class, 'store'])->middleware('throttle:20,1')->name('guest-chat.store');
 
 // Google Socialite Login
 Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
@@ -69,6 +72,7 @@ Route::middleware(['auth', 'verified'])
         Route::post('/reservations/{reservation}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
         // Chat Routes
+        Route::get('/chat/threads', [ChatController::class, 'threads'])->name('chat.threads');
         Route::get('/reservations/{reservation}/messages', [ChatController::class, 'index'])->name('chat.index');
         Route::post('/reservations/{reservation}/messages', [ChatController::class, 'store'])->name('chat.store');
         Route::get('/orders/{order}/messages', [ChatController::class, 'indexOrder'])->name('chat.order.index');
@@ -92,6 +96,11 @@ Route::middleware(['auth', 'verified'])
         Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
+
+Route::middleware(['auth', 'verified', 'role:staff'])->group(function () {
+    Route::get('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffMessages'])->name('guest-chat.staff.messages');
+    Route::post('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffStore'])->name('guest-chat.staff.store');
+});
 
 Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
     ->group(function () {
