@@ -1,5 +1,5 @@
-﻿import { Head, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, usePage } from '@inertiajs/react';
+import { useState, useRef } from 'react';
 import { dashboard } from '@/routes';
 
 // Sections
@@ -27,11 +27,25 @@ export default function Welcome({
 }) {
     const { auth } = usePage().props as any;
     const dashboardUrl = dashboard().url;
+    const mainRef = useRef<HTMLDivElement>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!mainRef.current) return;
+        const { clientX, clientY } = e;
+        const x = (clientX / window.innerWidth) * 100;
+        const y = (clientY / window.innerHeight) * 100;
+        mainRef.current.style.setProperty('--mouse-x', `${x}%`);
+        mainRef.current.style.setProperty('--mouse-y', `${y}%`);
+    };
+
     return (
-        <>
-            <Head title="Ocean's Resto â€” Taste the Extraordinary">
+        <div 
+            ref={mainRef}
+            className="group/main relative"
+            onMouseMove={handleMouseMove}
+        >
+            <Head title="Ocean's Resto — Taste the Extraordinary">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link
@@ -40,7 +54,7 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="min-h-screen bg-[#FAFAFA] dark:bg-neutral-950 font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-500">
+            <div className="min-h-screen bg-transparent font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-500 relative">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
@@ -48,29 +62,33 @@ export default function Welcome({
                     setMobileMenuOpen={setMobileMenuOpen}
                 />
 
-                <Hero />
+                <main className="relative z-10 space-y-32">
+                    <Hero />
+                    
+                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <BentoFeatures />
+                    </div>
 
-                <InfoBar />
+                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <SignatureDishes bestSellers={bestSellers} auth={auth} />
+                    </div>
 
-                <BentoFeatures />
+                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <PhotoGallery />
+                    </div>
 
-                <SignatureDishes bestSellers={bestSellers} auth={auth} />
+                    <LocationHours />
+                    
+                    <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
 
-                <PhotoGallery />
-
-                <HowItWorks />
-
-                <LocationHours />
-
-                <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
-
-                <CTASection />
+                    <CTASection />
+                </main>
 
                 <Footer />
                 
                 <AIChatbot />
             </div>
-        </>
+        </div>
     );
 }
 

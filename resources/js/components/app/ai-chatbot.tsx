@@ -10,15 +10,20 @@ interface ChatMessage {
 
 export default function AIChatbot() {
     const { __ } = useTranslations();
+    const [mounted, setMounted] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     // Initialize greeting after translations are ready
     useEffect(() => {
-        if (messages.length === 0) {
+        if (mounted && messages.length === 0) {
             setMessages([
                 {
                     id: '1',
@@ -27,7 +32,7 @@ export default function AIChatbot() {
                 },
             ]);
         }
-    }, [__]);
+    }, [__, mounted]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -100,6 +105,8 @@ export default function AIChatbot() {
             );
         });
     };
+
+    if (!mounted) return null;
 
     return (
         <div className="fixed bottom-32 right-6 md:bottom-6 md:right-6 z-50 flex flex-col items-end font-['Inter',sans-serif]">

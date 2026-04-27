@@ -41,4 +41,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', 'http://restoweb.test/auth/google/callback'),
     ],
 
+    'whatsapp' => [
+        'key' => env('WHATSAPP_KEY'),
+    ],
+
 ];

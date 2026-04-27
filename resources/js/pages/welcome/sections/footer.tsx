@@ -103,7 +103,7 @@ export default function Footer() {
                                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
                                         <Clock size={18} />
                                     </div>
-                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Open Daily 08:00 — 23:00')}</span>
+                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Setiap Hari 08:00 — 23:00')}</span>
                                 </li>
                             </ul>
                         </div>

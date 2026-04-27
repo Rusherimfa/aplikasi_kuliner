@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\AbstractProvider;
 
 class SocialiteController extends Controller
 {
@@ -26,7 +27,10 @@ class SocialiteController extends Controller
     public function callback()
     {
         try {
-            $googleUser = Socialite::driver('google')->stateless()->user();
+            /** @var AbstractProvider $driver */
+            $driver = Socialite::driver('google');
+
+            $googleUser = $driver->stateless()->user();
         } catch (\Exception $e) {
             Log::error('Google Login Error: '.$e->getMessage(), [
                 'exception' => $e,

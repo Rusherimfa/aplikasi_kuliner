@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\Testimonial;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
@@ -36,9 +37,9 @@ class TestimonialController extends Controller
             'rating' => 'required|integer|min:1|max:5',
         ]);
 
-        $validated['name'] = auth()->user()->name;
-        $validated['email'] = auth()->user()->email;
-        $validated['user_id'] = auth()->id();
+        $validated['name'] = Auth::user()->name;
+        $validated['email'] = Auth::user()->email;
+        $validated['user_id'] = Auth::id();
         $validated['is_approved'] = true; // Auto-approve as requested
 
         Testimonial::create($validated);

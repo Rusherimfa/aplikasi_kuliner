@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Events\CourierLocationUpdated;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\User;
+use App\Notifications\AppNotification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class OrderController extends Controller
@@ -26,10 +29,14 @@ class OrderController extends Controller
             'cart_total' => 'required|numeric|min:0',
             'customer_lat' => 'nullable|numeric',
             'customer_lng' => 'nullable|numeric',
+            'delivery_method' => 'nullable|string|in:resto,gojek,grab',
+            'delivery_service' => 'nullable|string',
+            'delivery_fee' => 'nullable|numeric',
         ]);
 
         $order = DB::transaction(function () use ($validated) {
-            $totalPrice = $validated['cart_total'];
+            $deliveryFee = $validated['delivery_fee'] ?? 0;
+            $totalPrice = $validated['cart_total'] + $deliveryFee;
 
             $order = Order::create([
                 'user_id' => Auth::id(),
@@ -40,6 +47,9 @@ class OrderController extends Controller
                 'customer_lat' => $validated['customer_lat'] ?? null,
                 'customer_lng' => $validated['customer_lng'] ?? null,
                 'order_type' => $validated['order_type'],
+                'delivery_method' => $validated['delivery_method'] ?? null,
+                'delivery_service' => $validated['delivery_service'] ?? null,
+                'delivery_fee' => $deliveryFee,
                 'payment_status' => 'unpaid',
                 'order_status' => 'pending',
                 'total_price' => $totalPrice,
@@ -57,6 +67,17 @@ class OrderController extends Controller
 
             return $order;
         });
+
+        // Notify Staff about new order
+        $staff = User::whereIn('role', ['admin', 'staff'])->get();
+        foreach ($staff as $s) {
+            $s->notify(new AppNotification(
+                __('Pesanan Baru'),
+                __('Ada pesanan masuk #:order dari :name.', ['order' => $order->order_number, 'name' => $order->customer_name]),
+                'info',
+                route('kitchen.index', [], false)
+            ));
+        }
 
         return redirect()->route('orders.history')->with('success', 'Pesanan Anda telah berhasil dibuat!');
     }
@@ -100,6 +121,25 @@ class OrderController extends Controller
             'payment_status' => 'paid',
             'order_status' => 'preparing',
         ]);
+
+        // Notify Customer about payment
+        $order->user?->notify(new AppNotification(
+            __('Pembayaran Pesanan Berhasil'),
+            __('Terima kasih! Pembayaran untuk pesanan #:order telah kami terima.', ['order' => $order->order_number]),
+            'success',
+            route('orders.track', [$order->id], false)
+        ));
+
+        // Notify Staff
+        $staff = User::whereIn('role', ['admin', 'staff'])->get();
+        foreach ($staff as $s) {
+            $s->notify(new AppNotification(
+                __('Pesanan Dibayar'),
+                __('Pelanggan :name telah membayar pesanan #:order.', ['name' => $order->customer_name, 'order' => $order->order_number]),
+                'success',
+                route('kitchen.index', [], false)
+            ));
+        }
 
         return redirect()->route('orders.history')->with('success', 'Pembayaran berhasil! Pesanan Anda sedang diproses.');
     }
@@ -151,6 +191,14 @@ class OrderController extends Controller
             'order_status' => $request->delivery_status,
         ]);
 
+        // Notify Customer
+        $order->user?->notify(new AppNotification(
+            __('Update Status Pengiriman'),
+            __('Pesanan #:order Anda sekarang berstatus: :status', ['order' => $order->order_number, 'status' => ucfirst($request->delivery_status)]),
+            'info',
+            route('orders.track', [$order->id], false)
+        ));
+
         return back()->with('success', 'Status pengiriman berhasil diupdate.');
     }
 
@@ -166,7 +214,7 @@ class OrderController extends Controller
             ]);
         }
 
-        \Illuminate\Support\Facades\Log::info('Broadcasting Courier Location', ['order' => $order->id, 'lat' => $lat, 'lng' => $lng]);
+        Log::info('Broadcasting Courier Location', ['order' => $order->id, 'lat' => $lat, 'lng' => $lng]);
 
         broadcast(new CourierLocationUpdated($order->id, $lat, $lng));
 
@@ -175,9 +223,9 @@ class OrderController extends Controller
 
     public function track(Order $order)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
-        if ($order->user_id !== $user->id && !$user->isStaff()) {
+        if ($order->user_id !== $user->id && ! $user->isStaff()) {
             abort(403);
         }
 

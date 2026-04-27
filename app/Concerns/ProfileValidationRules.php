@@ -14,12 +14,25 @@ trait ProfileValidationRules
      */
     protected function profileRules(?int $userId = null): array
     {
-        return [
+        $request = request();
+
+        $rules = [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
             'phone' => ['nullable', 'string', 'max:20'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ];
+
+        // Only require password if name or email is being changed
+        $user = auth()->user();
+        if ($request->filled('name') && $request->name !== $user->name ||
+            $request->filled('email') && $request->email !== $user->email) {
+            $rules['current_password'] = ['required', 'string', 'current_password'];
+        } else {
+            $rules['current_password'] = ['nullable', 'string', 'current_password'];
+        }
+
+        return $rules;
     }
 
     /**
@@ -29,7 +42,7 @@ trait ProfileValidationRules
      */
     protected function nameRules(): array
     {
-        return ['required', 'string', 'max:255'];
+        return ['sometimes', 'required', 'string', 'max:255'];
     }
 
     /**
@@ -40,6 +53,7 @@ trait ProfileValidationRules
     protected function emailRules(?int $userId = null): array
     {
         return [
+            'sometimes',
             'required',
             'string',
             'email',

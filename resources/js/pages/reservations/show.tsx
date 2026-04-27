@@ -75,18 +75,16 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
         const resChannel = window.Echo.channel(`reservations.${reservation.id}`)
             .listen('.ReservationStatusUpdated', (e: any) => {
                 router.reload({ 
-                    preserveScroll: true,
                     onSuccess: () => toast.success(__('Status reservasi Anda telah diperbarui!'))
                 });
             })
             .listen('.DishStatusUpdated', (e: any) => {
                 router.reload({ 
-                    preserveScroll: true,
                     onSuccess: () => toast.success(`${__('Piring')} "${e.itemName}" ${__('kini')} ${e.status.toUpperCase()}`)
                 });
             })
             .listen('.service.request.created', (e: any) => {
-                router.reload({ preserveScroll: true });
+                router.reload();
             });
 
         return () => {
@@ -158,22 +156,22 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
 
                         <div className="flex gap-4">
                             {isConfirmed && reservation.status !== 'completed' && !isEditing && (
-                                <Button onClick={() => router.put(`/reservations/${reservation.id}`, { status: 'completed' })} className="h-11 px-6 rounded-2xl bg-emerald-500 text-black font-black uppercase tracking-widest hover:bg-white transition-all">
+                                <Button onClick={() => router.put(`/reservations/${reservation.id}`, { status: 'completed' })} className="h-11 px-6 rounded-2xl bg-emerald-500 text-white dark:text-black font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
                                     <CheckCircle2 size={14} className="mr-2" /> {__('Selesaikan Kedatangan')}
                                 </Button>
                             )}
                             {isPending && !isEditing && (
                                 <div className="flex gap-3">
-                                    <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-white/10 bg-white/5 text-[10px] font-black uppercase tracking-widest hover:text-sky-500 transition-all">
+                                    <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:text-sky-500 transition-all shadow-sm">
                                         <PencilLine size={14} className="mr-2" /> {__('Ubah Reservasi')}
                                     </Button>
-                                    <Button onClick={handleDelete} variant="destructive" className="h-11 px-6 rounded-2xl bg-rose-500/10 text-rose-500 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all">
+                                    <Button onClick={handleDelete} variant="destructive" className="h-11 px-6 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                                         <Trash2 size={14} className="mr-2" /> {__('Batalkan')}
                                     </Button>
                                 </div>
                             )}
                             {isEditing && (
-                                <Button onClick={() => { setIsEditing(false); setData('menus', reservation.menus) }} className="h-11 px-6 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                                <Button onClick={() => { setIsEditing(false); setData('menus', reservation.menus) }} className="h-11 px-6 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all">
                                     {__('Batal Ubah')}
                                 </Button>
                             )}
@@ -208,21 +206,20 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             ].map((service) => (
                                                 <button
                                                     key={service.type}
-                                                    onClick={() => {
-                                                        http.post('/service-requests', {
-                                                            reservation_id: reservation.id,
-                                                            type: service.type,
-                                                        }, {
-                                                            onSuccess: () => {
-                                                                toast.success(__('Permintaan Terkirim'), {
-                                                                    description: __('Staff kami akan segera menuju meja Anda.')
-                                                                });
-                                                            },
-                                                            onError: () => {
-                                                                toast.error(__('Gagal mengirim permintaan.'));
-                                                            }
-                                                        });
-                                                    }}
+                                                        onClick={() => {
+                                                            http.setData({
+                                                                reservation_id: reservation.id,
+                                                                type: service.type,
+                                                            });
+                                                            http.post('/service-requests', {
+                                                                onSuccess: () => {
+                                                                    toast.success(`${__('Permintaan')} ${service.label} ${__('telah dikirim')}`);
+                                                                },
+                                                                onError: () => {
+                                                                    toast.error(__('Gagal mengirim permintaan. Silakan hubungi staf.'));
+                                                                },
+                                                            });
+                                                        }}
                                                     className="bg-black/10 hover:bg-black/20 border border-black/5 rounded-2xl p-4 flex flex-col items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 group"
                                                 >
                                                     <service.icon size={18} className="group-hover:animate-bounce" />
@@ -247,22 +244,22 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                         <div className="space-y-2">
                                             <div className="flex items-center gap-2 mb-4">
                                                 <Sparkles size={14} className="text-sky-500" />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 dark:text-white/20">{__('Official Dining Pass')}</span>
+                                                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 dark:text-white/20">{__('Official Dining Pass')}</span>
                                             </div>
                                             <h1 className="font-['Playfair_Display',serif] text-5xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter leading-none">
                                                 Boutique <span className="italic font-serif opacity-40 text-sky-500">Pass</span>
                                             </h1>
-                                            <p className="font-mono text-sm font-bold text-sky-500/60 uppercase tracking-widest mt-2 px-3 py-1 bg-sky-500/5 inline-block rounded-lg">#RES-{reservation.id.toString().padStart(4, '0')}</p>
+                                            <p className="font-mono text-sm font-bold text-sky-600 dark:text-sky-500/60 uppercase tracking-widest mt-2 px-3 py-1 bg-sky-500/5 inline-block rounded-lg">#RES-{reservation.id.toString().padStart(4, '0')}</p>
                                         </div>
                                         
                                         <div className="flex flex-col items-end gap-3 text-right">
                                              <span className={`inline-flex items-center gap-2 rounded-2xl border px-4 py-2 text-[10px] font-black uppercase tracking-widest shadow-2xl
-                                                ${isConfirmed ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : ''}
-                                                ${reservation.status === 'rejected' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : ''}
-                                                ${reservation.status === 'pending' ? 'bg-sky-500/10 text-sky-400 border-sky-500/20' : ''}
-                                                ${isAwaitingPayment ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : ''}
+                                                ${isConfirmed ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' : ''}
+                                                ${reservation.status === 'rejected' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-500 border-rose-500/20' : ''}
+                                                ${reservation.status === 'pending' ? 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20' : ''}
+                                                ${isAwaitingPayment ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : ''}
                                             `}>
-                                                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${isConfirmed ? 'bg-emerald-400' : (reservation.status === 'rejected' ? 'bg-rose-500' : 'bg-sky-400')}`} />
+                                                <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${isConfirmed ? 'bg-emerald-500 dark:bg-emerald-400' : (reservation.status === 'rejected' ? 'bg-rose-600 dark:bg-rose-500' : 'bg-sky-500 dark:bg-sky-400')}`} />
                                                 {isConfirmed && __('Experience Confirmed')}
                                                 {reservation.status === 'completed' && __('Completed')}
                                                 {reservation.status === 'rejected' && __('Cancelled')}
@@ -298,21 +295,21 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             >
                                                 <div className="grid gap-8 md:grid-cols-2">
                                                     <div className="space-y-3">
-                                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">{__('Reservation Date')}</Label>
-                                                        <Input type="date" value={data.date} onChange={e => setData('date', e.target.value)} required className="h-16 rounded-2xl bg-white/5 border-white/10 text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
+                                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 ml-2">{__('Reservation Date')}</Label>
+                                                        <Input type="date" value={data.date} onChange={e => setData('date', e.target.value)} required className="h-16 rounded-2xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
                                                     </div>
                                                     <div className="space-y-3">
-                                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">{__('Time Slot')}</Label>
-                                                        <Input type="time" value={data.time} onChange={e => setData('time', e.target.value)} required className="h-16 rounded-2xl bg-white/5 border-white/10 text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
+                                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 ml-2">{__('Time Slot')}</Label>
+                                                        <Input type="time" value={data.time} onChange={e => setData('time', e.target.value)} required className="h-16 rounded-2xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
                                                     </div>
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">{__('Guest Capacity')}</Label>
-                                                    <Input type="number" min="1" max="20" value={data.guest_count} onChange={e => setData('guest_count', e.target.value)} required className="h-16 rounded-2xl bg-white/5 border-white/10 text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 ml-2">{__('Guest Capacity')}</Label>
+                                                    <Input type="number" min="1" max="20" value={data.guest_count} onChange={e => setData('guest_count', e.target.value)} required className="h-16 rounded-2xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-lg font-bold px-6 focus:ring-sky-500/20 transition-all font-sans" />
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 ml-2">{__('Special Requests & Celebrations')}</Label>
-                                                    <Textarea placeholder={__('Birthday, Anniversary, or special dietary needs...')} value={data.special_requests} onChange={e => setData('special_requests', e.target.value)} rows={4} className="rounded-3xl bg-white/5 border-white/10 text-lg font-medium p-6 focus:ring-sky-500/20 transition-all font-sans" />
+                                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/30 ml-2">{__('Special Requests & Celebrations')}</Label>
+                                                    <Textarea placeholder={__('Birthday, Anniversary, or special dietary needs...')} value={data.special_requests} onChange={e => setData('special_requests', e.target.value)} rows={4} className="rounded-3xl bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white text-lg font-medium p-6 focus:ring-sky-500/20 transition-all font-sans" />
                                                 </div>
                                             </motion.form>
                                         ) : (
@@ -323,16 +320,16 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                                 className="grid gap-10 md:grid-cols-3 border-y border-slate-200 dark:border-white/5 py-12"
                                             >
                                                 <div className="space-y-2">
-                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-300 dark:text-white/20 uppercase tracking-[.2em]"><CalendarRange size={14} className="text-sky-500" /> {__('Date')}</span>
-                                                    <span className="text-xl font-bold dark:text-white block">{new Date(reservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[.2em]"><CalendarRange size={14} className="text-sky-500" /> {__('Date')}</span>
+                                                    <span className="text-xl font-bold text-slate-900 dark:text-white block">{new Date(reservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-300 dark:text-white/20 uppercase tracking-[.2em]"><Clock size={14} className="text-sky-500" /> {__('Time')}</span>
-                                                    <span className="text-xl font-bold dark:text-white block">{reservation.time} <span className="text-sm opacity-30">WIB</span></span>
+                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[.2em]"><Clock size={14} className="text-sky-500" /> {__('Time')}</span>
+                                                    <span className="text-xl font-bold text-slate-900 dark:text-white block">{reservation.time} <span className="text-sm opacity-30">WIB</span></span>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-300 dark:text-white/20 uppercase tracking-[.2em]"><Users size={14} className="text-sky-500" /> {__('Seats')}</span>
-                                                    <span className="text-xl font-bold dark:text-white block">{reservation.guest_count} {__('People')}</span>
+                                                    <span className="flex items-center gap-2.5 text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[.2em]"><Users size={14} className="text-sky-500" /> {__('Seats')}</span>
+                                                    <span className="text-xl font-bold text-slate-900 dark:text-white block">{reservation.guest_count} {__('People')}</span>
                                                 </div>
                                             </motion.div>
                                         )}
@@ -350,10 +347,10 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                                 { label: __('Enjoy'), icon: Utensils, active: reservation.status === 'completed' || reservation.menus.every((m: any) => m.pivot?.status === 'ready' || m.pivot?.status === 'served') }
                                             ].map((step, idx) => (
                                                 <div key={idx} className="relative z-10 flex flex-col items-center">
-                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all duration-700 ${step.active ? 'bg-sky-500 border-sky-500 text-[#0A0A0B]' : 'bg-slate-50 dark:bg-[#0A0A0B] border-slate-200 dark:border-white/10 text-slate-300 dark:text-white/20'}`}>
+                                                    <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all duration-700 ${step.active ? 'bg-sky-500 border-sky-500 text-white dark:text-[#0A0A0B]' : 'bg-slate-50 dark:bg-[#0A0A0B] border-slate-200 dark:border-white/10 text-slate-300 dark:text-white/20'}`}>
                                                         <step.icon size={18} />
                                                     </div>
-                                                    <span className={`text-[9px] font-black uppercase tracking-widest mt-2 ${step.active ? 'text-sky-500' : 'text-slate-300 dark:text-white/10'}`}>{step.label}</span>
+                                                    <span className={`text-[9px] font-black uppercase tracking-widest mt-2 ${step.active ? 'text-sky-600 dark:text-sky-500' : 'text-slate-300 dark:text-white/10'}`}>{step.label}</span>
                                                 </div>
                                             ))}
                                         </div>
@@ -374,8 +371,8 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             <MapPin size={28} />
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Reserved Table')}</p>
-                                            <p className="text-xl font-black text-white">{reservation.resto_table ? `${__('Table Section')} ${reservation.resto_table.name}` : __('Priority Waiting List')}</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">{__('Reserved Table')}</p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white">{reservation.resto_table ? `${__('Table Section')} ${reservation.resto_table.name}` : __('Priority Waiting List')}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">
@@ -383,8 +380,8 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             <CreditCard size={28} />
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Entry Fee Status')}</p>
-                                            <p className="text-xl font-black text-white">{reservation.payment_status === 'paid' ? __('Paid & Secured') : __('Awaiting Payment')}</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">{__('Entry Fee Status')}</p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white">{reservation.payment_status === 'paid' ? __('Paid & Secured') : __('Awaiting Payment')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -395,30 +392,30 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                 <motion.div 
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-3xl"
+                                    className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-10 shadow-3xl ring-1 ring-slate-100 dark:ring-transparent"
                                 >
-                                    <h3 className="text-2xl font-black text-white font-['Playfair_Display',serif] tracking-tight mb-8">{__('Customize Your Courses')}</h3>
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-8">{__('Customize Your Courses')}</h3>
                                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-h-[600px] overflow-y-auto pr-4 custom-scrollbar">
                                         {availableMenus.map((menu: any) => {
                                             const inCart = data.menus.find((m: any) => m.id === menu.id);
                                             return (
-                                            <div key={menu.id} className="glass-card p-6 rounded-[2rem] border border-white/5 flex flex-col h-full bg-white/[0.01] hover:bg-white/5 hover:border-sky-500/20 transition-all group/card">
+                                            <div key={menu.id} className="glass-card p-6 rounded-[2rem] border border-slate-200 dark:border-white/5 flex flex-col h-full bg-white dark:bg-white/[0.01] hover:bg-slate-50 dark:hover:bg-white/5 hover:border-sky-500/20 transition-all group/card shadow-sm">
                                                 <div className="flex-1 mb-6">
-                                                    <p className="text-sm font-black text-white uppercase group-hover/card:text-sky-500 transition-colors">{menu.name}</p>
-                                                    <p className="text-xs text-sky-500 italic mt-1 font-black">{formatRupiah(menu.price)}</p>
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase group-hover/card:text-sky-600 dark:group-hover/card:text-sky-500 transition-colors">{menu.name}</p>
+                                                    <p className="text-xs text-sky-600 dark:text-sky-500 italic mt-1 font-black">{formatRupiah(menu.price)}</p>
                                                 </div>
                                                 {inCart ? (
                                                     <div className="flex items-center justify-between bg-black/40 p-2 rounded-2xl border border-white/5">
-                                                        <button type="button" onClick={() => updateMenuQuantity(menu.id, -1)} className="h-10 w-10 flex items-center justify-center bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all">
+                                                        <button type="button" onClick={() => updateMenuQuantity(menu.id, -1)} className="h-10 w-10 flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-sky-500 hover:text-white dark:hover:text-black transition-all">
                                                             <Minus size={14} />
                                                         </button>
-                                                        <span className="font-black text-sm w-6 text-center text-white">{inCart.quantity || inCart.pivot?.quantity || 1}</span>
-                                                        <button type="button" onClick={() => updateMenuQuantity(menu.id, 1)} className="h-10 w-10 flex items-center justify-center bg-white/5 rounded-xl hover:bg-sky-500 hover:text-black transition-all">
+                                                        <span className="font-black text-sm w-6 text-center text-slate-900 dark:text-white">{inCart.quantity || inCart.pivot?.quantity || 1}</span>
+                                                        <button type="button" onClick={() => updateMenuQuantity(menu.id, 1)} className="h-10 w-10 flex items-center justify-center bg-slate-100 dark:bg-white/5 rounded-xl hover:bg-sky-500 hover:text-white dark:hover:text-black transition-all">
                                                             <Plus size={14} />
                                                         </button>
                                                     </div>
                                                 ) : (
-                                                    <Button type="button" onClick={() => addMenu(menu)} className="w-full h-12 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black">
+                                                    <Button type="button" onClick={() => addMenu(menu)} className="w-full h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:bg-sky-500 hover:text-white dark:hover:text-black transition-all">
                                                         {__('Add to Pass')}
                                                     </Button>
                                                 )}
@@ -442,8 +439,8 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                     <div className="h-16 w-16 rounded-full bg-sky-500 mx-auto mb-6 flex items-center justify-center text-black">
                                         <Star size={32} fill="currentColor" />
                                     </div>
-                                    <h3 className="text-2xl font-black text-white font-['Playfair_Display',serif] mb-2">{__('Terima Kasih!')}</h3>
-                                    <p className="text-sm text-sky-500/60 font-medium">{__('Ulasan Anda telah kami terima untuk meningkatkan pelayanan kami.')}</p>
+                                    <h3 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] mb-2">{__('Terima Kasih!')}</h3>
+                                    <p className="text-sm text-sky-600 dark:text-sky-500/60 font-medium">{__('Ulasan Anda telah kami terima untuk meningkatkan pelayanan kami.')}</p>
                                 </motion.div>
                             )}
                         </div>
@@ -499,40 +496,40 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 }}
-                                className="rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-3xl flex flex-col h-full ring-1 ring-white/5"
+                                className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-10 shadow-3xl flex flex-col h-full ring-1 ring-slate-100 dark:ring-transparent"
                             >
-                                <h2 className="mb-10 flex items-center gap-4 font-['Playfair_Display',serif] text-2xl font-black text-white">
+                                <h2 className="mb-10 flex items-center gap-4 font-['Playfair_Display',serif] text-2xl font-black text-slate-900 dark:text-white">
                                     <Utensils size={24} className="text-sky-500" /> {__('Ocean\'s Selection')}
                                 </h2>
                                 
                                 <div className="flex-1">
                                     {displayMenus.length === 0 ? (
-                                        <div className="py-12 text-center rounded-[2rem] border border-dashed border-white/5 bg-white/[0.01]">
-                                            <ChefHat size={32} className="mx-auto text-white/10 mb-4" />
-                                            <p className="text-sm text-white/20 italic font-medium">{__('Belum ada pilihan menu.')}</p>
+                                        <div className="py-12 text-center rounded-[2rem] border border-dashed border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.01]">
+                                            <ChefHat size={32} className="mx-auto text-slate-300 dark:text-white/10 mb-4" />
+                                            <p className="text-sm text-slate-400 dark:text-white/20 italic font-medium">{__('Belum ada pilihan menu.')}</p>
                                         </div>
                                     ) : (
                                         <ul className="space-y-6 mb-10">
                                             {displayMenus.map((item: any, idx: number) => {
                                                 const qty = item.quantity || item.pivot?.quantity || 1;
                                                 return (
-                                                <li key={idx} className="flex justify-between items-start gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-all group/item">
+                                                <li key={idx} className="flex justify-between items-start gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/5 hover:bg-slate-100 dark:hover:bg-white/[0.04] transition-all group/item shadow-sm dark:shadow-none">
                                                     <div className="space-y-1 flex-1">
                                                         <div className="flex items-center gap-2">
-                                                            <p className="text-sm font-black text-white uppercase tracking-tight group-hover:text-sky-500 transition-colors leading-tight">{item.name}</p>
+                                                            <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight group-hover:text-sky-600 dark:group-hover:text-sky-500 transition-colors leading-tight">{item.name}</p>
                                                             {item.pivot?.status && (
                                                                 <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-1.5 py-0 border-0 ${
-                                                                    item.pivot.status === 'ready' ? 'text-emerald-400' : 
-                                                                    item.pivot.status === 'cooking' ? 'text-sky-400 animate-pulse' : 
-                                                                    item.pivot.status === 'preparing' ? 'text-blue-400' : 'text-white/20'
+                                                                    item.pivot.status === 'ready' ? 'text-emerald-500 dark:text-emerald-400' : 
+                                                                    item.pivot.status === 'cooking' ? 'text-sky-600 dark:text-sky-400 animate-pulse' : 
+                                                                    item.pivot.status === 'preparing' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-300 dark:text-white/20'
                                                                 }`}>
                                                                     {__(item.pivot.status)}
                                                                 </Badge>
                                                             )}
                                                         </div>
-                                                        <p className="text-[10px] font-bold text-white/20 uppercase tracking-[.2em]">{formatRupiah(item.price)} <span className="text-sky-500/40 italic">x {qty}</span></p>
+                                                        <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[.2em]">{formatRupiah(item.price)} <span className="text-sky-500/40 italic">x {qty}</span></p>
                                                     </div>
-                                                    <p className="text-sm font-black text-white italic whitespace-nowrap">
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white italic whitespace-nowrap">
                                                         {formatRupiah(item.price * qty)}
                                                     </p>
                                                 </li>
@@ -541,23 +538,23 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                     )}
                                 </div>
 
-                                <div className="mt-8 pt-10 border-t border-white/5">
+                                <div className="mt-8 pt-10 border-t border-slate-200 dark:border-white/5">
                                     <div className="flex justify-between items-end mb-6">
                                         <div className="space-y-1 text-left">
-                                            <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Estimated Total')}</p>
-                                            <p className="text-sky-500 font-serif italic text-sm">{__('Fine Dining Selection')}</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">{__('Estimated Total')}</p>
+                                            <p className="text-sky-600 dark:text-sky-500 font-serif italic text-sm">{__('Fine Dining Selection')}</p>
                                         </div>
-                                        <p className="text-4xl font-black text-white tracking-tighter">{formatRupiah(currentTotal)}</p>
+                                        <p className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{formatRupiah(currentTotal)}</p>
                                     </div>
                                     
                                     {isEditing ? (
-                                        <Button type="submit" form="edit-form" disabled={processing} className="w-full h-16 rounded-2xl bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all">
+                                        <Button type="submit" form="edit-form" disabled={processing} className="w-full h-16 rounded-2xl bg-sky-600 dark:bg-sky-500 text-white dark:text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-sky-700 dark:hover:bg-white hover:scale-[1.02] transition-all">
                                             {processing ? __('Crafting Pass...') : __('Finalize Reservation')}
                                         </Button>
                                     ) : (
                                         isAwaitingPayment && (
                                             <Link href={`/reservations/payment/${reservation.id}`}>
-                                                <Button className="w-full h-16 rounded-2xl bg-blue-500 text-white font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-blue-500/20 hover:bg-white hover:text-black hover:scale-[1.02] transition-all">
+                                                <Button className="w-full h-16 rounded-2xl bg-blue-600 dark:bg-blue-500 text-white dark:text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-blue-500/20 hover:bg-blue-700 dark:hover:bg-white hover:scale-[1.02] transition-all">
                                                     {__('Complete Secure Payment')}
                                                 </Button>
                                             </Link>
@@ -602,8 +599,8 @@ function ReviewForm({ reservationId }: { reservationId: number }) {
                 <Sparkles size={120} className="text-sky-500" />
             </div>
             
-            <h3 className="text-3xl font-black text-white font-['Playfair_Display',serif] tracking-tight mb-2">{__('How was your stay?')}</h3>
-            <p className="text-slate-400 text-sm mb-10 font-medium tracking-wide">{__('Help us perfect the boutique experience.')}</p>
+            <h3 className="text-3xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-2">{__('How was your stay?')}</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mb-10 font-medium tracking-wide">{__('Help us perfect the boutique experience.')}</p>
             
             <form onSubmit={submit} className="space-y-8 relative z-10">
                 <div className="space-y-4">
@@ -614,7 +611,7 @@ function ReviewForm({ reservationId }: { reservationId: number }) {
                                 key={star}
                                 type="button"
                                 onClick={() => setData('rating', star)}
-                                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${data.rating >= star ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20 scale-110' : 'bg-white/5 text-white/20 hover:bg-white/10'}`}
+                                className={`h-12 w-12 rounded-xl flex items-center justify-center transition-all ${data.rating >= star ? 'bg-sky-500 text-white dark:text-black shadow-lg shadow-sky-500/20 scale-110' : 'bg-slate-100 dark:bg-white/5 text-slate-300 dark:text-white/20 hover:bg-slate-200 dark:hover:bg-white/10'}`}
                             >
                                 <Star size={20} fill={data.rating >= star ? "currentColor" : "none"} />
                             </button>
@@ -623,16 +620,16 @@ function ReviewForm({ reservationId }: { reservationId: number }) {
                 </div>
 
                 <div className="space-y-4">
-                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500/60">{__('Share Your Experience')}</Label>
+                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/60">{__('Share Your Experience')}</Label>
                     <Textarea 
                         placeholder={__('What did you love about your gastronomy journey?')}
                         value={data.message}
                         onChange={e => setData('message', e.target.value)}
-                        className="rounded-[2rem] bg-black/40 border-white/5 focus:border-sky-500/50 min-h-[140px] p-6 text-white"
+                        className="rounded-[2rem] bg-slate-50 dark:bg-black/40 border-slate-200 dark:border-white/5 focus:border-sky-500/50 min-h-[140px] p-6 text-slate-900 dark:text-white"
                     />
                 </div>
 
-                <Button disabled={processing} className="w-full h-16 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-[0.2em] hover:bg-white transition-all shadow-xl shadow-sky-500/20">
+                <Button disabled={processing} className="w-full h-16 rounded-[2rem] bg-sky-600 dark:bg-sky-500 text-white dark:text-black font-black uppercase tracking-[0.2em] hover:bg-sky-700 dark:hover:bg-white transition-all shadow-xl shadow-sky-500/20">
                     {processing ? __('Sharing Experience...') : __('Post Testimonial')}
                 </Button>
             </form>

@@ -2,11 +2,15 @@ import { motion } from 'framer-motion';
 import { Clock, MapPin, ExternalLink, Navigation } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
 import { useTranslations } from '@/hooks/use-translations';
+import { useAppearance } from '@/hooks/use-appearance';
 
 export default function LocationHours() {
     const { __ } = useTranslations();
+    const { resolvedAppearance } = useAppearance();
     const [isOpen, setIsOpen] = useState(false);
-    const containerRef = useRef(null);
+    const containerRef = useRef<HTMLElement>(null);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapRef = useRef<any>(null);
 
     useEffect(() => {
         const checkStatus = () => {
@@ -27,12 +31,91 @@ export default function LocationHours() {
         return () => clearInterval(interval);
     }, []);
 
+    // Leaflet Map Initialization
+    useEffect(() => {
+        // We use a small timeout to ensure the container has its final dimensions
+        const timer = setTimeout(() => {
+            if (!mapContainerRef.current) return;
+
+            const L = (window as any).L;
+            if (!L) return;
+
+            const lat = -1.2721869;
+            const lng = 116.8091722;
+
+            if (!mapRef.current) {
+                // Initialize map if not already done
+                mapRef.current = L.map(mapContainerRef.current, {
+                    center: [lat, lng],
+                    zoom: 16,
+                    zoomControl: false,
+                    attributionControl: false,
+                    scrollWheelZoom: false
+                });
+
+                // Resto Icon
+                const restoIcon = L.divIcon({
+                    className: 'resto-marker-container',
+                    html: `
+                        <div class="relative flex items-center justify-center">
+                            <div class="absolute h-16 w-16 bg-sky-500/20 rounded-full animate-ping"></div>
+                            <div class="absolute h-12 w-12 bg-sky-500/40 rounded-full animate-pulse"></div>
+                            <div class="relative h-12 w-12 flex items-center justify-center bg-sky-600 rounded-full shadow-[0_0_25px_rgba(14,165,233,0.7)] border-2 border-white ring-4 ring-sky-500/20">
+                                <img src="/logo.png" class="h-7 w-7 object-contain" alt="Ocean's Resto" />
+                            </div>
+                            <div class="absolute -bottom-12 bg-white dark:bg-slate-900 px-4 py-1.5 rounded-lg shadow-2xl border border-sky-500/20 whitespace-nowrap">
+                                <span class="text-[11px] font-black uppercase tracking-widest text-sky-600 dark:text-sky-400">Ocean's Resto</span>
+                            </div>
+                        </div>
+                    `,
+                    iconSize: [48, 48],
+                    iconAnchor: [24, 24]
+                });
+
+                L.marker([lat, lng], { icon: restoIcon }).addTo(mapRef.current);
+            }
+
+            // Update Tiles based on appearance
+            const tiles = resolvedAppearance === 'dark' 
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+
+            // Remove old tile layers
+            mapRef.current.eachLayer((layer: any) => {
+                if (layer instanceof L.TileLayer) {
+                    mapRef.current.removeLayer(layer);
+                }
+            });
+
+            L.tileLayer(tiles, {
+                maxZoom: 20,
+            }).addTo(mapRef.current);
+
+            // Crucial: Fix map size issues common in flex/hidden containers
+            mapRef.current.invalidateSize();
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [resolvedAppearance]);
+
     return (
         <section 
             id="location-hours"
             ref={containerRef}
-            className="relative py-12 md:py-20 bg-[#FFF9F2] dark:bg-neutral-900/50 transition-colors duration-700 overflow-hidden"
+            className="relative py-12 md:py-20 bg-[#FFF9F2] dark:bg-background transition-colors duration-700 overflow-hidden"
         >
+            <style dangerouslySetInnerHTML={{ __html: `
+                .leaflet-container {
+                    background: transparent !important;
+                    height: 100%;
+                    width: 100%;
+                }
+                .resto-marker-container {
+                    background: transparent !important;
+                    border: none !important;
+                }
+            `}} />
+
             {/* Artistic background grain/textures */}
             <div className="absolute inset-0 premium-noise opacity-[0.03] pointer-events-none" />
             
@@ -104,20 +187,13 @@ export default function LocationHours() {
                             Kompleks Ruko Bandar, Jl. Jenderal Sudirman No.26 Blok N1, RT.01, Klandasan Ulu, Kec. Balikpapan Kota, Kota Balikpapan, Kalimantan Timur 76112
                         </p>
 
-                        <div className="relative flex-1 min-h-[300px] rounded-[2.5rem] overflow-hidden group ring-1 ring-slate-200 dark:ring-white/10">
-                            {/* Map Placeholder with high-end look */}
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.899665596486!2d116.8091722!3d-1.2721869!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2df147ac52b75a13%3A0x67fa50df185d9200!2sOcean&#39;s%20Resto%20Balikpapan!5e0!3m2!1sen!2sid!4v1713022500000!5m2!1sen!2sid" 
-                                width="100%" 
-                                height="100%" 
-                                style={{ border: 0, filter: 'grayscale(1) contrast(1.1) opacity(0.8)' }} 
-                                allowFullScreen 
-                                loading="lazy" 
-                                referrerPolicy="no-referrer-when-downgrade"
-                                className="transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+                        <div className="relative flex-1 min-h-[350px] rounded-[2.5rem] overflow-hidden group ring-1 ring-slate-200 dark:ring-white/10 bg-slate-100 dark:bg-neutral-900 shadow-inner">
+                            <div 
+                                ref={mapContainerRef} 
+                                className="absolute inset-0 z-0 h-full w-full"
                             />
                             
-                            <div className="absolute top-6 right-6">
+                            <div className="absolute top-6 right-6 z-10">
                                 <a 
                                     href="https://maps.app.goo.gl/g5LkqGHRnbGva1sV8" 
                                     target="_blank" 

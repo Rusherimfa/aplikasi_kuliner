@@ -14,12 +14,15 @@ import {
     Utensils,
     Clock,
     MapPin,
-    ShieldCheck
+    ShieldCheck,
+    Zap,
+    CircleDollarSign,
+    Trophy
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/hooks/use-cart';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Shared Components
@@ -34,20 +37,58 @@ interface CartItem {
     [key: string]: any;
 }
 
+const DELIVERY_PRICES = {
+    resto: {
+        standard: 10000
+    },
+    gojek: {
+        economy: 12000,
+        instant: 25000,
+        priority: 45000
+    },
+    grab: {
+        economy: 12500,
+        instant: 26000,
+        priority: 46000
+    }
+} as const;
+
 export default function CheckoutIndex() {
     const { items, cartTotal, clearCart } = useCart() as { items: CartItem[], cartTotal: number, clearCart: () => void };
     const { auth } = usePage().props as any;
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [orderType, setOrderType] = useState<'delivery' | 'pickup'>('delivery');
+    
     const [formData, setFormData] = useState({
         customer_name: auth?.user?.name || '',
         customer_email: auth?.user?.email || '',
         customer_phone: auth?.user?.phone || '',
         customer_lat: null as number | null,
         customer_lng: null as number | null,
+        delivery_method: 'resto' as 'resto' | 'gojek' | 'grab',
+        delivery_service: 'standard' as string,
     });
 
     const [locationStatus, setLocationStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+    // Auto-select standard service when method changes
+    useEffect(() => {
+        if (formData.delivery_method === 'resto') {
+            setFormData(prev => ({ ...prev, delivery_service: 'standard' }));
+        } else if (formData.delivery_service === 'standard') {
+            setFormData(prev => ({ ...prev, delivery_service: 'instant' }));
+        }
+    }, [formData.delivery_method]);
+
+    const deliveryFee = useMemo(() => {
+        if (orderType === 'pickup') return 0;
+        const method = formData.delivery_method as keyof typeof DELIVERY_PRICES;
+        const services = DELIVERY_PRICES[method] as any;
+        return services[formData.delivery_service] || 0;
+    }, [orderType, formData.delivery_method, formData.delivery_service]);
+
+    const taxAmount = cartTotal * 0.15;
+    const grandTotal = cartTotal + taxAmount + deliveryFee;
 
     const getMyLocation = () => {
         setLocationStatus('loading');
@@ -82,6 +123,7 @@ export default function CheckoutIndex() {
             order_type: orderType,
             items: items as any,
             cart_total: cartTotal,
+            delivery_fee: deliveryFee,
         }, {
             onSuccess: () => {
                 clearCart();
@@ -90,13 +132,10 @@ export default function CheckoutIndex() {
         });
     };
 
-
-
     return (
         <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-sans text-foreground transition-colors duration-500 overflow-hidden relative">
             <Head title="Checkout — Ocean's Resto" />
             
-            {/* Ambient Background Glows */}
             <div className="pointer-events-none fixed top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-sky-500/5 blur-[140px]" />
             <div className="pointer-events-none fixed bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-sky-600/5 blur-[120px]" />
 
@@ -104,31 +143,26 @@ export default function CheckoutIndex() {
 
             <main className="pt-32 pb-32 relative z-10">
                 <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                    {/* Breadcrumbs */}
                     <div className="mb-8 flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                         <Link href="/catalog" className="hover:text-sky-500 transition-colors">The Gallery</Link>
                         <ChevronRight size={14} className="opacity-20" />
-                        <span className="text-sky-500">Secure Order</span>
+                        <span className="text-sky-500">Secure Order Suite</span>
                     </div>
 
                     <div className="mb-16">
                         <div className="flex items-center gap-2 mb-4">
                             <span className="h-1 w-8 rounded-full bg-sky-500" />
-                            <span className="text-[10px] font-black tracking-[0.3em] text-sky-500 uppercase">Secure Transaction</span>
+                            <span className="text-[10px] font-black tracking-[0.3em] text-sky-500 uppercase">Premium Selection Checkout</span>
                         </div>
                         <h1 className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter">
-                            Order <span className="italic font-serif opacity-40 text-sky-500">Suite</span>
+                            Secure <span className="italic font-serif opacity-40 text-sky-500">Checkout</span>
                         </h1>
-                        <p className="mt-4 text-lg font-medium text-slate-500 dark:text-neutral-500 max-w-lg">
-                            Lengkapi detail di bawah ini untuk mengunci pesanan kuliner Anda malam ini.
-                        </p>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mt-8">
-                        {/* Checkout Form */}
                         <div className="lg:col-span-7 xl:col-span-8 space-y-12">
                             <form onSubmit={handleSubmit} className="space-y-12">
-                                {/* Identity */}
+                                {/* 01 IDENTITY */}
                                 <motion.div 
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -180,7 +214,7 @@ export default function CheckoutIndex() {
                                                 </Button>
                                                 {formData.customer_lat && (
                                                     <p className="mt-3 text-[9px] font-black text-emerald-500 uppercase tracking-widest ml-4 flex items-center gap-2">
-                                                        <CheckCircle2 size={12} /> Coordinates: {formData.customer_lat.toFixed(4)}, {formData.customer_lng?.toFixed(4)}
+                                                        <CheckCircle2 size={12} /> Coordinates Locked: {formData.customer_lat.toFixed(4)}, {formData.customer_lng?.toFixed(4)}
                                                     </p>
                                                 )}
                                             </div>
@@ -188,7 +222,7 @@ export default function CheckoutIndex() {
                                     </div>
                                 </motion.div>
 
-                                {/* Experience Mode */}
+                                {/* 02 EXPERIENCE MODE */}
                                 <motion.div 
                                     initial={{ opacity: 0, x: -20 }}
                                     animate={{ opacity: 1, x: 0 }}
@@ -204,7 +238,6 @@ export default function CheckoutIndex() {
                                             onClick={() => setOrderType('delivery')}
                                             className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'delivery' ? 'border-sky-500 bg-sky-500/5 shadow-2xl shadow-sky-500/10' : 'border-slate-200 dark:border-white/10 hover:border-sky-500/30'}`}
                                         >
-                                            <input type="radio" name="orderType" className="sr-only" defaultChecked />
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'delivery' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
                                                     <Truck size={24} />
@@ -219,7 +252,6 @@ export default function CheckoutIndex() {
                                             onClick={() => setOrderType('pickup')}
                                             className={`cursor-pointer relative rounded-[2.5rem] border-2 p-8 transition-all duration-500 ${orderType === 'pickup' ? 'border-sky-500 bg-sky-500/5 shadow-2xl shadow-sky-500/10' : 'border-slate-200 dark:border-white/10 hover:border-sky-500/30'}`}
                                         >
-                                            <input type="radio" name="orderType" className="sr-only" />
                                             <div className="flex items-center justify-between mb-4">
                                                 <div className={`h-12 w-12 rounded-2xl flex items-center justify-center ${orderType === 'pickup' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
                                                     <Store size={24} />
@@ -232,17 +264,145 @@ export default function CheckoutIndex() {
                                     </div>
                                 </motion.div>
 
+                                {/* 03 COURIER SELECTION */}
+                                <AnimatePresence>
+                                    {orderType === 'delivery' && (
+                                        <motion.div 
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            transition={{ delay: 0.2 }}
+                                            className="p-10 md:p-12 rounded-[3.5rem] bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 shadow-3xl backdrop-blur-3xl"
+                                        >
+                                            <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight mb-10 flex items-center gap-4">
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-500/10 text-sky-500 border border-sky-500/20 font-black text-sm">03</div>
+                                                Courier Selection
+                                            </h2>
+                                            
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                                                <label 
+                                                    onClick={() => setFormData({...formData, delivery_method: 'resto'})}
+                                                    className={`cursor-pointer relative rounded-[2rem] border-2 p-6 transition-all duration-500 flex flex-col items-center text-center ${formData.delivery_method === 'resto' ? 'border-sky-500 bg-sky-500/5 shadow-2xl shadow-sky-500/10' : 'border-slate-200 dark:border-white/10 hover:border-sky-500/30'}`}
+                                                >
+                                                    <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 ${formData.delivery_method === 'resto' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                        <UtensilsCrossed size={20} />
+                                                    </div>
+                                                    <div className={`font-black uppercase tracking-widest text-[10px] ${formData.delivery_method === 'resto' ? 'text-sky-500' : 'text-slate-400'}`}>Resto Courier</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-neutral-500 mt-2">Internal Service</div>
+                                                    {formData.delivery_method === 'resto' && <CheckCircle2 size={16} className="absolute top-4 right-4 text-sky-500" />}
+                                                </label>
 
+                                                <label 
+                                                    onClick={() => setFormData({...formData, delivery_method: 'gojek'})}
+                                                    className={`cursor-pointer relative rounded-[2rem] border-2 p-6 transition-all duration-500 flex flex-col items-center text-center ${formData.delivery_method === 'gojek' ? 'border-emerald-500 bg-emerald-500/5 shadow-2xl shadow-emerald-500/10' : 'border-slate-200 dark:border-white/10 hover:border-emerald-500/30'}`}
+                                                >
+                                                    <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 ${formData.delivery_method === 'gojek' ? 'bg-emerald-500 text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                        <div className="font-black text-sm">G</div>
+                                                    </div>
+                                                    <div className={`font-black uppercase tracking-widest text-[10px] ${formData.delivery_method === 'gojek' ? 'text-emerald-500' : 'text-slate-400'}`}>Gojek</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-neutral-500 mt-2">Rapid Fleet</div>
+                                                    {formData.delivery_method === 'gojek' && <CheckCircle2 size={16} className="absolute top-4 right-4 text-emerald-500" />}
+                                                </label>
 
-                                <div className="lg:hidden">
-                                    <Button disabled={isSubmitting || items.length === 0} type="submit" className="w-full h-18 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-widest shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all">
-                                        {isSubmitting ? 'Memproses...' : `Confirm Order Rp ${cartTotal.toLocaleString('id-ID')}`}
-                                    </Button>
-                                </div>
+                                                <label 
+                                                    onClick={() => setFormData({...formData, delivery_method: 'grab'})}
+                                                    className={`cursor-pointer relative rounded-[2rem] border-2 p-6 transition-all duration-500 flex flex-col items-center text-center ${formData.delivery_method === 'grab' ? 'border-green-500 bg-green-500/5 shadow-2xl shadow-green-500/10' : 'border-slate-200 dark:border-white/10 hover:border-green-500/30'}`}
+                                                >
+                                                    <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 ${formData.delivery_method === 'grab' ? 'bg-green-600 text-white' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                        <div className="font-black text-sm">GR</div>
+                                                    </div>
+                                                    <div className={`font-black uppercase tracking-widest text-[10px] ${formData.delivery_method === 'grab' ? 'text-green-500' : 'text-slate-400'}`}>Grab</div>
+                                                    <div className="text-[10px] font-medium text-slate-500 dark:text-neutral-500 mt-2">Active Network</div>
+                                                    {formData.delivery_method === 'grab' && <CheckCircle2 size={16} className="absolute top-4 right-4 text-green-500" />}
+                                                </label>
+                                            </div>
+
+                                            {/* Service Tier Selection */}
+                                            <div className="space-y-6">
+                                                <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Service Tier</p>
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    {(formData.delivery_method === 'resto') ? (
+                                                        <div className="flex items-center justify-between p-6 rounded-2xl bg-sky-500/5 border border-sky-500/20">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="h-10 w-10 rounded-xl bg-sky-500/20 text-sky-500 flex items-center justify-center">
+                                                                    <Sparkles size={20} />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-xs font-black uppercase tracking-widest text-sky-500">Ocean Standard</p>
+                                                                    <p className="text-[10px] text-slate-500">Layanan pengantaran khusus dari tim kami.</p>
+                                                                </div>
+                                                            </div>
+                                                            <p className="font-black text-sky-500 italic">Rp 10.000</p>
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            {/* ECONOMY */}
+                                                            <label 
+                                                                onClick={() => setFormData({...formData, delivery_service: 'economy'})}
+                                                                className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'economy' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
+                                                            >
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'economy' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                        <CircleDollarSign size={20} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className={`text-xs font-black uppercase tracking-widest ${formData.delivery_service === 'economy' ? 'text-sky-500' : 'text-slate-400'}`}>Hemat (Economy)</p>
+                                                                        <p className="text-[10px] text-slate-500">Pengiriman ekonomis dengan waktu santai.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <p className={`font-black italic ${formData.delivery_service === 'economy' ? 'text-sky-500' : 'text-slate-400'}`}>
+                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['economy'].toLocaleString('id-ID')}
+                                                                </p>
+                                                            </label>
+
+                                                            {/* INSTANT */}
+                                                            <label 
+                                                                onClick={() => setFormData({...formData, delivery_service: 'instant'})}
+                                                                className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'instant' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
+                                                            >
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'instant' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                        <Zap size={20} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className={`text-xs font-black uppercase tracking-widest ${formData.delivery_service === 'instant' ? 'text-sky-500' : 'text-slate-400'}`}>Instan (Instant)</p>
+                                                                        <p className="text-[10px] text-slate-500">Pengiriman cepat langsung ke titik tujuan.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <p className={`font-black italic ${formData.delivery_service === 'instant' ? 'text-sky-500' : 'text-slate-400'}`}>
+                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['instant'].toLocaleString('id-ID')}
+                                                                </p>
+                                                            </label>
+
+                                                            {/* PRIORITY */}
+                                                            <label 
+                                                                onClick={() => setFormData({...formData, delivery_service: 'priority'})}
+                                                                className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'priority' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
+                                                            >
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'priority' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                        <Trophy size={20} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className={`text-xs font-black uppercase tracking-widest ${formData.delivery_service === 'priority' ? 'text-sky-500' : 'text-slate-400'}`}>Prioritas (Priority)</p>
+                                                                        <p className="text-[10px] text-slate-500">Prioritas utama, paling cepat di kelasnya.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <p className={`font-black italic ${formData.delivery_service === 'priority' ? 'text-sky-500' : 'text-slate-400'}`}>
+                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['priority'].toLocaleString('id-ID')}
+                                                                </p>
+                                                            </label>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </form>
                         </div>
 
-                        {/* Order Summary Sidebar */}
+                        {/* ORDER SUMMARY SIDEBAR */}
                         <div className="lg:col-span-5 xl:col-span-4 sticky top-32">
                             <motion.div 
                                 initial={{ opacity: 0, y: 20 }}
@@ -259,14 +419,14 @@ export default function CheckoutIndex() {
                                 </div>
 
                                 {items.length > 0 ? (
-                                    <ul className="space-y-6 mb-10">
+                                    <ul className="space-y-6 mb-10 max-h-[250px] overflow-y-auto pr-4 scrollbar-thin scrollbar-thumb-sky-500/20">
                                         {items.map(item => (
                                             <li key={item.id} className="flex justify-between items-start group">
                                                 <div className="space-y-1">
-                                                    <p className="text-sm font-black text-white uppercase tracking-tight leading-tight group-hover:text-sky-500 transition-colors">{item.name}</p>
-                                                    <p className="text-[10px] font-bold text-white/20 uppercase tracking-[.2em] italic">Quantity: {item.quantity}</p>
+                                                    <p className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight leading-tight group-hover:text-sky-500 transition-colors">{item.name}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[.2em] italic">Quantity: {item.quantity}</p>
                                                 </div>
-                                                <span className="font-black text-white italic text-sm whitespace-nowrap">
+                                                <span className="font-black text-slate-700 dark:text-white italic text-sm whitespace-nowrap">
                                                     {(Number(item.price) * Number(item.quantity)).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })}
                                                 </span>
                                             </li>
@@ -282,22 +442,27 @@ export default function CheckoutIndex() {
                                     </div>
                                 )}
                                 
-                                <div className="space-y-4 pt-10 border-t border-white/5">
-                                    <div className="flex justify-between text-[11px] font-bold text-white/40 uppercase tracking-widest">
+                                <div className="space-y-4 pt-10 border-t border-slate-100 dark:border-white/5">
+                                    <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest">
                                         <span>Subtotal</span>
-                                        <span className="text-white/60">Rp {cartTotal.toLocaleString('id-ID')}</span>
+                                        <span className="text-slate-800 dark:text-white/60">Rp {cartTotal.toLocaleString('id-ID')}</span>
                                     </div>
-                                    <div className="flex justify-between text-[11px] font-bold text-white/40 uppercase tracking-widest">
+                                    <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest">
                                         <span>Tax & Service (15%)</span>
-                                        <span className="text-white/60">Rp {(cartTotal * 0.15).toLocaleString('id-ID')}</span>
+                                        <span className="text-slate-800 dark:text-white/60">Rp {taxAmount.toLocaleString('id-ID')}</span>
                                     </div>
-                                    <div className="flex justify-between items-end pt-8 mt-4 border-t border-white/10">
+                                    <div className="flex justify-between text-[11px] font-bold text-emerald-500 uppercase tracking-widest">
+                                        <span>Delivery Fee ({formData.delivery_method.toUpperCase()})</span>
+                                        <span className="font-black">Rp {deliveryFee.toLocaleString('id-ID')}</span>
+                                    </div>
+                                    
+                                    <div className="flex justify-between items-end pt-8 mt-4 border-t border-slate-200 dark:border-white/10">
                                         <div className="text-left space-y-1">
-                                            <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">Total Experience</span>
+                                            <span className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em]">Total Experience</span>
                                             <p className="text-sky-500 font-serif italic text-sm">Fine Dining Value</p>
                                         </div>
-                                        <span className="text-4xl font-black text-white tracking-tighter">
-                                            Rp {(cartTotal * 1.15).toLocaleString('id-ID', { minimumFractionDigits: 0, useGrouping: true }).split(',')[0]}
+                                        <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">
+                                            Rp {grandTotal.toLocaleString('id-ID', { minimumFractionDigits: 0, useGrouping: true }).split(',')[0]}
                                         </span>
                                     </div>
                                 </div>
@@ -305,7 +470,7 @@ export default function CheckoutIndex() {
                                 <Button 
                                     onClick={handleSubmit} 
                                     disabled={isSubmitting || items.length === 0} 
-                                    className="hidden lg:flex w-full mt-12 h-18 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-20 flex items-center justify-center gap-3 py-4"
+                                    className="w-full mt-12 h-18 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-20 flex items-center justify-center gap-3 py-8"
                                 >
                                     {isSubmitting ? (
                                         <>
@@ -329,4 +494,3 @@ export default function CheckoutIndex() {
         </div>
     );
 }
-

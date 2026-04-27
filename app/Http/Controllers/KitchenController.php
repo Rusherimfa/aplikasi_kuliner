@@ -7,6 +7,7 @@ use App\Events\DishStatusUpdated;
 use App\Models\Order;
 use App\Models\Reservation;
 use App\Models\User;
+use App\Notifications\AppNotification;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,14 @@ class KitchenController extends Controller
                         "Chef Insight: Piring '{$item->name}' Anda sudah siap saji! Pelayan kami akan segera mengantarkannya ke meja Anda."
                     );
                 }
+
+                // Notify Customer via Website
+                $reservation?->user?->notify(new AppNotification(
+                    __('Hidangan Siap'),
+                    __('Hidangan ":name" Anda sudah siap dan akan segera disajikan.', ['name' => $item->name]),
+                    'success',
+                    route('reservations.show', [$item->reservation_id], false)
+                ));
             }
         }
 
@@ -114,6 +123,14 @@ class KitchenController extends Controller
 
         $order->update($updateData);
 
+        // Notify Customer
+        $order->user?->notify(new AppNotification(
+            __('Update Status Pesanan'),
+            __('Pesanan #:order Anda sekarang berstatus: :status', ['order' => $order->order_number, 'status' => ucfirst($validated['status'])]),
+            'info',
+            route('orders.track', [$order->id], false)
+        ));
+
         return back()->with('success', "Pesanan #{$order->order_number} diperbarui ke ".ucfirst($validated['status']));
     }
 
@@ -121,12 +138,28 @@ class KitchenController extends Controller
     {
         $order->update(['order_status' => 'waiting_for_payment']);
 
+        // Notify Customer
+        $order->user?->notify(new AppNotification(
+            __('Pesanan Diterima'),
+            __('Pesanan #:order Anda telah diterima. Silakan lakukan pembayaran agar kami dapat mulai memasak.', ['order' => $order->order_number]),
+            'info',
+            route('orders.payment', [$order->id], false)
+        ));
+
         return back()->with('success', "Pesanan #{$order->order_number} diterima.");
     }
 
     public function rejectOrder(Order $order)
     {
         $order->update(['order_status' => 'rejected']);
+
+        // Notify Customer
+        $order->user?->notify(new AppNotification(
+            __('Pesanan Ditolak'),
+            __('Maaf, pesanan #:order Anda ditolak karena alasan operasional.', ['order' => $order->order_number]),
+            'error',
+            route('orders.history', [], false)
+        ));
 
         return back()->with('success', "Pesanan #{$order->order_number} ditolak.");
     }

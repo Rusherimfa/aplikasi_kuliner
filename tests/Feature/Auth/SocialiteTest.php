@@ -2,25 +2,28 @@
 
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
+use Tests\TestCase;
+
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\assertAuthenticatedAs;
+use function Pest\Laravel\get;
+
+uses(TestCase::class);
 
 test('users can redirect to google', function () {
-    $response = $this->get('/auth/google');
+    $response = get('/auth/google');
 
     // Fortify or Socialite will send a 302 redirect to google
     $response->assertStatus(302);
-    $this->assertStringContainsString('accounts.google.com', $response->headers->get('Location'));
+    expect($response->headers->get('Location'))->toContain('accounts.google.com');
 });
 
 test('new users can register via google', function () {
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')
-        ->andReturn('1234567890')
-        ->shouldReceive('getName')
-        ->andReturn('Google User')
-        ->shouldReceive('getEmail')
-        ->andReturn('googleuser@test.com')
-        ->shouldReceive('getAvatar')
-        ->andReturn('https://google.com/avatar.jpg');
+    $abstractUser->shouldReceive('getId')->andReturn('1234567890');
+    $abstractUser->shouldReceive('getName')->andReturn('Google User');
+    $abstractUser->shouldReceive('getEmail')->andReturn('googleuser@test.com');
+    $abstractUser->shouldReceive('getAvatar')->andReturn('https://google.com/avatar.jpg');
 
     // Expose properties dynamically used by SocialiteController
     $abstractUser->id = '1234567890';
@@ -33,11 +36,11 @@ test('new users can register via google', function () {
 
     Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
 
-    $response = $this->get('/auth/google/callback');
+    $response = get('/auth/google/callback');
 
     $response->assertRedirect(route('home'));
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 
     $user = User::where('email', 'googleuser@test.com')->first();
     expect($user)->not->toBeNull();
@@ -51,14 +54,10 @@ test('existing admin users can login via google and redirect to dashboard', func
     ]);
 
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')
-        ->andReturn('0987654321')
-        ->shouldReceive('getName')
-        ->andReturn('Admin Google')
-        ->shouldReceive('getEmail')
-        ->andReturn('admin@test.com')
-        ->shouldReceive('getAvatar')
-        ->andReturn('https://google.com/avatar_admin.jpg');
+    $abstractUser->shouldReceive('getId')->andReturn('0987654321');
+    $abstractUser->shouldReceive('getName')->andReturn('Admin Google');
+    $abstractUser->shouldReceive('getEmail')->andReturn('admin@test.com');
+    $abstractUser->shouldReceive('getAvatar')->andReturn('https://google.com/avatar_admin.jpg');
 
     $abstractUser->id = '0987654321';
     $abstractUser->name = 'Admin Google';
@@ -70,11 +69,11 @@ test('existing admin users can login via google and redirect to dashboard', func
 
     Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
 
-    $response = $this->get('/auth/google/callback');
+    $response = get('/auth/google/callback');
 
     $response->assertRedirect(route('dashboard'));
 
-    $this->assertAuthenticatedAs($admin);
+    assertAuthenticatedAs($admin);
 
     $admin->refresh();
     expect($admin->google_id)->toBe('0987654321');

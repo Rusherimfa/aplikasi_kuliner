@@ -34,9 +34,13 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                 <div className="flex flex-col md:flex-row h-full">
                     {/* Media Side */}
                     <div className="relative w-full md:w-[45%] aspect-square md:aspect-auto bg-slate-900 group">
-                        <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                            <UtensilsCrossed size={120} strokeWidth={0.5} className="text-white" />
-                        </div>
+                        {dish.image_path ? (
+                            <img src={`/storage/${dish.image_path}`} className="absolute inset-0 h-full w-full object-cover transition-transform duration-[2000ms] group-hover:scale-110" alt={dish.name} />
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                                <UtensilsCrossed size={120} strokeWidth={0.5} className="text-white" />
+                            </div>
+                        )}
                         
                         {/* Tags over image */}
                         <div className="absolute top-6 left-6 flex flex-col gap-2 z-10">

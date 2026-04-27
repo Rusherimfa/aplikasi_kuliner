@@ -20,6 +20,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useTranslations } from '@/hooks/use-translations';
+import NotificationDropdown from '@/components/app/notification-dropdown';
 
 interface NavbarProps {
     auth: any;
@@ -35,6 +36,11 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
     const { locale } = props as any;
     const { __ } = useTranslations();
     const [scrolled, setScrolled] = useState(false);
+    const [mounted, setMounted] = useState(false);
+    
+    useEffect(() => {
+        setMounted(true);
+    }, []);
     
     // Magnetic Refs
     const magneticLogoRef = useMagnetic();
@@ -67,12 +73,6 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
         if (auth.user) {
             const channel = (window as any).Echo.private(`user.${auth.user.id}`)
                 .listen('.message.sent', (e: any) => {
-                    // Only show notification if the message is from staff/courier
-                    // and we are not already on the page where that specific chat is active
-                    // But since BoutiqueChat handles its own visibility, we can just show a global toast
-                    // unless the user is specifically viewing that chat.
-                    // For now, a simple toast is good.
-                    
                     toast.info(`Pesan baru dari ${e.message.sender.name}`, {
                         description: e.message.content,
                         action: {
@@ -105,10 +105,12 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                     layout
                     initial={false}
                     animate={{
-                        backgroundColor: resolvedAppearance === 'dark' 
-                            ? (scrolled ? 'rgba(2, 6, 23, 0.9)' : 'rgba(2, 6, 23, 0.4)')
-                            : (scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.6)'),
-                        backdropFilter: scrolled ? 'blur(24px)' : 'blur(16px)',
+                        backgroundColor: !mounted 
+                            ? 'rgba(255, 255, 255, 0.6)' 
+                            : resolvedAppearance === 'dark' 
+                                ? (scrolled ? 'rgba(2, 6, 23, 0.9)' : 'rgba(2, 6, 23, 0.4)')
+                                : (scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.6)'),
+                        backdropFilter: !mounted || scrolled ? 'blur(24px)' : 'blur(16px)',
                         borderRadius: scrolled ? '2.5rem' : '9999px',
                         paddingLeft: scrolled ? '1.5rem' : '2.5rem',
                         paddingRight: scrolled ? '1.5rem' : '2.5rem',
@@ -122,8 +124,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         mass: 1,
                     }}
                     className={cn(
-                        "mx-auto flex h-20 items-center justify-between pointer-events-auto relative shadow-2xl overflow-hidden group border transition-colors duration-500",
-                        resolvedAppearance === 'dark' ? "border-white/10" : "border-black/5"
+                        "mx-auto flex h-20 items-center justify-between pointer-events-auto relative shadow-2xl overflow-hidden group border border-black/5 dark:border-white/10 transition-colors duration-500",
                     )}
                 >
                     {/* SVG Ocean Wave - Enhanced Visibility */}
@@ -131,15 +132,15 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-[150%] h-14 sm:h-20 block relative -left-[25%]">
                             <path 
                                 d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z"
-                                className={cn("transition-colors duration-500", resolvedAppearance === 'dark' ? "fill-sky-400/10" : "fill-sky-500/15")}
+                                className="transition-colors duration-500 fill-sky-500/15 dark:fill-sky-400/10"
                             />
                             <path 
                                 d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-23.64V0Z"
-                                className={cn("transition-colors duration-500", resolvedAppearance === 'dark' ? "fill-sky-500/15" : "fill-sky-600/20")}
+                                className="transition-colors duration-500 fill-sky-600/20 dark:fill-sky-500/15"
                             />
                             <path 
                                 d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z"
-                                className={cn("transition-colors duration-500", resolvedAppearance === 'dark' ? "fill-sky-700/20" : "fill-sky-800/25")}
+                                className="transition-colors duration-500 fill-sky-800/25 dark:fill-sky-700/20"
                             />
                         </svg>
                     </div>
@@ -152,8 +153,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 className="group flex items-center gap-4 outline-none" 
                             >
                                 <div className={cn(
-                                    "flex h-10 w-10 items-center justify-center transition-all duration-500 group-hover:scale-105 rounded-full overflow-hidden p-0.5 shadow-inner",
-                                    resolvedAppearance === 'dark' ? "bg-white/10" : "bg-black/5"
+                                    "flex h-10 w-10 items-center justify-center transition-all duration-500 group-hover:scale-105 rounded-full overflow-hidden p-0.5 shadow-inner bg-black/5 dark:bg-white/10",
                                 )}>
                                     <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-full" />
                                 </div>
@@ -170,12 +170,12 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                         href={link.href}
                                         className={cn(
                                             "rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-[0.25em] transition-all duration-300",
-                                            resolvedAppearance === 'dark' 
-                                                ? (active ? 'text-white bg-white/5 shadow-inner ring-1 ring-white/10' : 'text-white/60 hover:text-white hover:bg-white/10')
-                                                : (active ? 'text-sky-600 bg-sky-50 shadow-sm ring-1 ring-sky-100' : 'text-slate-600 hover:text-sky-600 hover:bg-sky-50')
+                                            active 
+                                                ? "text-sky-600 bg-sky-50 shadow-sm ring-1 ring-sky-100 dark:text-white dark:bg-white/5 dark:ring-white/10" 
+                                                : "text-slate-600 hover:text-sky-600 hover:bg-sky-50 dark:text-white/60 dark:hover:text-white dark:hover:bg-white/10"
                                         )}
                                     >
-                                        {link.label}
+                                        {link.label || '...'}
                                     </Link>
                                 );
                             })}
@@ -183,18 +183,13 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
 
                         {/* Actions */}
                         <div className="flex items-center gap-4">
-                            <div className={cn(
-                                "hidden md:flex items-center gap-4 border-r pr-6 mr-2 transition-colors",
-                                resolvedAppearance === 'dark' ? "border-white/10" : "border-black/5"
-                            )}>
+                            <div className="hidden md:flex items-center gap-3 border-r border-black/5 dark:border-white/10 pr-6 mr-2 transition-colors">
+                                {auth.user && <NotificationDropdown />}
                                 {auth.user ? (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className={cn(
-                                                "flex h-10 w-10 items-center justify-center rounded-full transition-colors overflow-hidden outline-none cursor-pointer border",
-                                                resolvedAppearance === 'dark' 
-                                                    ? "bg-white/5 border-white/10 hover:border-sky-500/50" 
-                                                    : "bg-black/5 border-black/5 hover:border-sky-500/50"
+                                                "flex h-10 w-10 items-center justify-center rounded-full transition-colors overflow-hidden outline-none cursor-pointer border bg-black/5 border-black/5 hover:border-sky-500/50 dark:bg-white/5 dark:border-white/10 dark:hover:border-sky-500/50",
                                             )}>
                                                 {auth.user.avatar ? (
                                                     <img src={auth.user.avatar} className="h-full w-full object-cover" alt="" />
@@ -257,7 +252,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 ) : (
                                     <Link 
                                         href={login().url}
-                                        className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                                        className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors bg-black/5 dark:bg-white/5 px-4 py-2 rounded-full"
                                     >
                                         Login
                                     </Link>
@@ -267,10 +262,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             <div className="flex items-center gap-2">
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <button className={cn(
-                                            "flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                                            resolvedAppearance === 'dark' ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"
-                                        )}>
+                                        <button className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10">
                                             <span className="text-[10px] font-black uppercase">{locale}</span>
                                         </button>
                                     </DropdownMenuTrigger>
@@ -293,12 +285,13 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 <div ref={magneticThemeRef as any}>
                                     <button
                                         onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
-                                        className={cn(
-                                            "flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                                            resolvedAppearance === 'dark' ? "bg-white/5 hover:bg-white/10" : "bg-black/5 hover:bg-black/10"
-                                        )}
+                                        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
                                     >
-                                        {resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                                        {mounted ? (
+                                            resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />
+                                        ) : (
+                                            <Moon size={18} />
+                                        )}
                                     </button>
                                 </div>
                                 
@@ -309,23 +302,23 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                     >
                                         <ShoppingBag size={18} />
                                         {cartCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-white text-[9px] font-black text-primary shadow-sm">
+                                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[9px] font-black text-primary shadow-sm">
                                                 {cartCount}
                                             </span>
                                         )}
                                     </button>
                                 </div>
 
-                                {/* Mobile Hamburger */}
-                                <button
-                                    className={cn(
-                                        "md:hidden flex h-10 w-10 items-center justify-center rounded-full transition-colors",
-                                        resolvedAppearance === 'dark' ? "bg-white/5" : "bg-black/5"
-                                    )}
-                                    onClick={() => setMobileMenuOpen(true)}
-                                >
-                                    <MenuIcon size={20} />
-                                </button>
+                                {/* Mobile Actions */}
+                                <div className="md:hidden flex items-center gap-2">
+                                    {auth.user && <NotificationDropdown />}
+                                    <button
+                                        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 dark:bg-white/5 active:scale-95"
+                                        onClick={() => setMobileMenuOpen(true)}
+                                    >
+                                        <MenuIcon size={20} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -477,4 +470,3 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
         </>
     );
 }
-

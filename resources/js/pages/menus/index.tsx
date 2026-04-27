@@ -1,7 +1,7 @@
-﻿import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame } from 'lucide-react';
+import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame, Image as ImageIcon, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,11 @@ export default function MenuManagement({ menus, filters }: any) {
         price: '',
         is_available: true,
         is_best_seller: false,
+        image: null as File | null,
+        _method: 'post' as string,
     });
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const categories = ['Main Course', 'Appetizer', 'Beverage', 'Dessert', 'Snack'];
 
@@ -43,7 +47,8 @@ export default function MenuManagement({ menus, filters }: any) {
         clearErrors();
         setEditingMenu(null);
         reset();
-        setData((prev) => ({ ...prev, is_available: true, is_best_seller: false }));
+        setImagePreview(null);
+        setData((prev) => ({ ...prev, is_available: true, is_best_seller: false, _method: 'post' }));
         setIsModalOpen(true);
     };
 
@@ -57,14 +62,17 @@ export default function MenuManagement({ menus, filters }: any) {
             price: menu.price,
             is_available: menu.is_available,
             is_best_seller: menu.is_best_seller || false,
+            image: null,
+            _method: 'put',
         });
+        setImagePreview(menu.image_path ? `/storage/${menu.image_path}` : null);
         setIsModalOpen(true);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (editingMenu) {
-            put(`/menus/${editingMenu.id}`, {
+            post(`/menus/${editingMenu.id}`, {
                 onSuccess: () => setIsModalOpen(false),
             });
         } else {
@@ -95,13 +103,13 @@ export default function MenuManagement({ menus, filters }: any) {
         <>
             <Head title="Manajemen Menu - Ocean's Resto Admin" />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-foreground font-['Inter',sans-serif]">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-slate-900 dark:text-foreground font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-foreground/90">
+                        <h1 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-tight text-slate-900 dark:text-foreground/90">
                             Katalog Menu
                         </h1>
-                        <p className="mt-1 text-sm text-muted-foreground">
+                        <p className="mt-1 text-sm text-slate-500 dark:text-muted-foreground">
                             Tambah, kurangi, atau ubah detail makanan yang ditawarkan.
                         </p>
                     </div>
@@ -113,13 +121,13 @@ export default function MenuManagement({ menus, filters }: any) {
                                 placeholder="Cari sajian..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-9 bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/40 focus-visible:ring-sky-500"
+                                className="pl-9 bg-slate-50 dark:bg-muted/50 border-slate-200 dark:border-border text-slate-900 dark:text-foreground placeholder:text-slate-400 dark:text-muted-foreground/40 focus-visible:ring-sky-500"
                             />
                         </form>
                         {!isStaff && (
                             <Button 
                                 onClick={openCreateModal}
-                                className="shrink-0 bg-sky-500 hover:bg-sky-600 text-[#0A0A0B] font-semibold"
+                                className="shrink-0 bg-sky-500 hover:bg-sky-600 text-white dark:text-[#0A0A0B] font-semibold"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
                                 Tambah Menu
@@ -128,45 +136,49 @@ export default function MenuManagement({ menus, filters }: any) {
                     </div>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-border bg-card/10 backdrop-blur-md shadow-xl">
+                <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-border bg-white dark:bg-card/10 backdrop-blur-md shadow-xl">
                     {menus.length > 0 ? (
                         <div className="overflow-x-auto">
                             <Table>
-                                <TableHeader className="border-b border-border bg-muted/20">
-                                    <TableRow className="hover:bg-transparent border-border">
-                                        <TableHead className="font-semibold text-foreground/70">Menu Item</TableHead>
-                                        <TableHead className="font-semibold text-foreground/70">Kategori</TableHead>
-                                        <TableHead className="font-semibold text-foreground/70">Harga</TableHead>
-                                        <TableHead className="font-semibold text-foreground/70">Wujud</TableHead>
-                                        <TableHead className="font-semibold text-foreground/70 text-center">Terjual</TableHead>
-                                        <TableHead className="text-right font-semibold text-foreground/70">Aksi</TableHead>
+                                <TableHeader className="border-b border-slate-100 dark:border-border bg-slate-50 dark:bg-muted/20">
+                                    <TableRow className="hover:bg-transparent border-slate-100 dark:border-border">
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Menu Item</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Kategori</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Harga</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70">Wujud</TableHead>
+                                        <TableHead className="font-semibold text-slate-500 dark:text-foreground/70 text-center">Terjual</TableHead>
+                                        <TableHead className="text-right font-semibold text-slate-500 dark:text-foreground/70">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {menus.map((menu: any) => (
-                                        <TableRow key={menu.id} className="hover:bg-muted/30 border-border/50">
+                                        <TableRow key={menu.id} className="hover:bg-slate-50 dark:hover:bg-muted/30 border-slate-100 dark:border-border/50">
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground border border-border">
-                                                        <BookOpen size={18} />
+                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-muted overflow-hidden border border-slate-200 dark:border-border">
+                                                        {menu.image_path ? (
+                                                            <img src={`/storage/${menu.image_path}`} className="h-full w-full object-cover" alt={menu.name} />
+                                                        ) : (
+                                                            <BookOpen size={18} className="text-slate-400 dark:text-muted-foreground" />
+                                                        )}
                                                     </div>
                                                     <div>
-                                                        <p className="font-semibold text-foreground/90 flex items-center gap-2">{menu.name} {menu.is_best_seller && <Flame size={14} className="text-rose-500" title="Sangat Laris" />}</p>
-                                                        <p className="text-xs text-muted-foreground mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
+                                                        <p className="font-semibold text-slate-900 dark:text-foreground/90 flex items-center gap-2">{menu.name} {menu.is_best_seller && <Flame size={14} className="text-rose-500" />}</p>
+                                                        <p className="text-xs text-slate-500 dark:text-muted-foreground mt-0.5 truncate max-w-[200px]" title={menu.description}>{menu.description || "Tidak ada deksripsi"}</p>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant="outline" className="border-border text-foreground/70 bg-transparent">
+                                                <Badge variant="outline" className="border-slate-200 dark:border-border text-slate-600 dark:text-foreground/70 bg-transparent">
                                                     {menu.category}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <span className="font-medium text-sky-500">{formatRupiah(menu.price)}</span>
+                                                <span className="font-medium text-sky-600 dark:text-sky-500">{formatRupiah(menu.price)}</span>
                                             </TableCell>
                                             <TableCell>
                                                 {menu.is_available ? (
-                                                    <span className="inline-flex items-center text-xs font-medium text-emerald-400">
+                                                    <span className="inline-flex items-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
                                                         <Check size={14} className="mr-1" /> Tersedia
                                                     </span>
                                                 ) : (
@@ -175,7 +187,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-center font-black text-sky-500 bg-sky-500/5 sm:bg-transparent sm:border-l sm:border-r border-border min-w-[100px]">
+                                            <TableCell className="text-center font-black text-sky-600 dark:text-sky-500 bg-sky-500/5 sm:bg-transparent sm:border-l sm:border-r border-slate-100 dark:border-border min-w-[100px]">
                                                 {menu.total_sold || 0} porsi
                                             </TableCell>
                                             <TableCell className="text-right">
@@ -189,7 +201,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                         </button>
                                                         <button 
                                                             onClick={() => toggleStatus(menu, 'is_best_seller')}
-                                                            className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${menu.is_best_seller ? 'bg-sky-500/10 border-sky-500/30 text-sky-500 hover:bg-sky-500/20' : 'bg-white/5 border-white/10 text-white/40 hover:bg-white/10 hover:text-white/60'}`}
+                                                            className={`text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border transition-colors ${menu.is_best_seller ? 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-500 hover:bg-sky-500/20' : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-600 dark:hover:text-white/60'}`}
                                                         >
                                                             {menu.is_best_seller ? '- Best Seller' : '+ Best Seller'}
                                                         </button>
@@ -200,7 +212,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                             size="icon" 
                                                             variant="ghost" 
                                                             onClick={() => openEditModal(menu)}
-                                                            className="h-8 w-8 text-foreground/60 hover:text-foreground hover:bg-muted"
+                                                            className="h-8 w-8 text-slate-400 dark:text-foreground/60 hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted"
                                                         >
                                                             <Edit2 size={16} />
                                                         </Button>
@@ -225,9 +237,9 @@ export default function MenuManagement({ menus, filters }: any) {
                             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted text-muted-foreground/20">
                                 <BookOpen size={28} />
                             </div>
-                            <h3 className="mb-1 text-lg font-semibold text-foreground/90">Katalog Kosong</h3>
-                            <p className="text-sm text-muted-foreground mb-6 max-w-sm">Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.</p>
-                            <Button onClick={openCreateModal} className="bg-sky-500 hover:bg-sky-600 text-[#0A0A0B] font-semibold">
+                            <h3 className="mb-1 text-lg font-semibold text-slate-900 dark:text-foreground/90">Katalog Kosong</h3>
+                            <p className="text-sm text-slate-500 dark:text-muted-foreground mb-6 max-w-sm">Belum ada hidangan yang didaftarkan atau tidak ada kecocokan dari pencarianmu.</p>
+                            <Button onClick={openCreateModal} className="bg-sky-500 hover:bg-sky-600 text-white dark:text-[#0A0A0B] font-semibold">
                                 Mulai Tambah Menu
                             </Button>
                         </div>
@@ -238,69 +250,104 @@ export default function MenuManagement({ menus, filters }: any) {
             {/* Premium Modal Form */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
-                    <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="absolute inset-0 bg-slate-900/60 dark:bg-black/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)}></div>
+                    <div className="relative w-full max-w-lg rounded-2xl border border-slate-200 dark:border-border bg-white dark:bg-card p-6 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
                         
                         <div className="pointer-events-none absolute left-0 top-0 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/20 blur-3xl"></div>
                         
-                        <div className="flex items-center justify-between border-b border-border pb-4 mb-5">
-                            <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-foreground">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-border pb-4 mb-5">
+                            <h2 className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-foreground">
                                 {editingMenu ? 'Edit Menu' : 'Menu Makanan Baru'}
                             </h2>
-                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="rounded-full p-2 text-slate-400 dark:text-muted-foreground hover:bg-slate-100 dark:hover:bg-muted hover:text-slate-900 dark:hover:text-foreground transition-colors">
                                 <X size={18} />
                             </button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <Label htmlFor="name" className="text-foreground/70">Nama Hidangan</Label>
+                                <Label htmlFor="name" className="text-slate-600 dark:text-foreground/70">Nama Hidangan</Label>
                                 <Input 
                                     id="name" 
                                     value={data.name} 
                                     onChange={e => setData('name', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
+                                    className="mt-1.5 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-900 dark:text-foreground focus-visible:ring-sky-500"
                                     placeholder="Cth: Wagyu A5 Ribeye"
                                 />
                                 {errors.name && <p className="mt-1 text-xs text-destructive">{errors.name}</p>}
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="category" className="text-foreground/70">Kategori</Label>
+                                    <Label htmlFor="category" className="text-slate-600 dark:text-foreground/70">Kategori</Label>
                                     <select 
                                         id="category" 
                                         value={data.category} 
                                         onChange={e => setData('category', e.target.value)}
-                                        className="mt-1.5 flex h-10 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500"
+                                        className="mt-1.5 flex h-10 w-full rounded-md border border-slate-200 dark:border-border bg-slate-50 dark:bg-muted px-3 py-2 text-sm text-slate-900 dark:text-foreground focus:outline-none focus:ring-2 focus:ring-sky-500"
                                     >
-                                        <option value="" className="bg-card text-muted-foreground">Pilih...</option>
-                                        {categories.map(c => <option key={c} value={c} className="bg-card">{c}</option>)}
+                                        <option value="" className="bg-white dark:bg-card text-slate-400 dark:text-muted-foreground">Pilih...</option>
+                                        {categories.map(c => <option key={c} value={c} className="bg-white dark:bg-card">{c}</option>)}
                                     </select>
                                     {errors.category && <p className="mt-1 text-xs text-destructive">{errors.category}</p>}
                                 </div>
                                 <div>
-                                    <Label htmlFor="price" className="text-foreground/70">Harga (Rp)</Label>
+                                    <Label htmlFor="price" className="text-slate-600 dark:text-foreground/70">Harga (Rp)</Label>
                                     <Input 
                                         id="price" 
                                         type="number"
                                         value={data.price} 
                                         onChange={e => setData('price', e.target.value)}
-                                        className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500"
+                                        className="mt-1.5 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-900 dark:text-foreground focus-visible:ring-sky-500"
                                         placeholder="75000"
                                     />
                                     {errors.price && <p className="mt-1 text-xs text-destructive">{errors.price}</p>}
                                 </div>
                             </div>
                             <div>
-                                <Label htmlFor="description" className="text-foreground/70">Deskripsi Singkat</Label>
+                                <Label htmlFor="description" className="text-slate-600 dark:text-foreground/70">Deskripsi Singkat</Label>
                                 <Textarea 
                                     id="description" 
                                     value={data.description} 
                                     onChange={e => setData('description', e.target.value)}
-                                    className="mt-1.5 bg-muted border-border text-foreground focus-visible:ring-sky-500 resize-none h-20"
+                                    className="mt-1.5 bg-slate-50 dark:bg-muted border-slate-200 dark:border-border text-slate-900 dark:text-foreground focus-visible:ring-sky-500 resize-none h-20"
                                     placeholder="Sajian istimewa dari dapur kami..."
                                 />
                                 {errors.description && <p className="mt-1 text-xs text-destructive">{errors.description}</p>}
+                            </div>
+
+                            <div>
+                                <Label className="text-slate-600 dark:text-foreground/70 mb-2 block">Foto Sajian</Label>
+                                <div className="flex items-center gap-4">
+                                    <div className="relative h-20 w-20 rounded-xl bg-slate-50 dark:bg-muted border border-slate-200 dark:border-border overflow-hidden flex items-center justify-center">
+                                        {imagePreview ? (
+                                            <img src={imagePreview} className="h-full w-full object-cover" alt="Preview" />
+                                        ) : (
+                                            <ImageIcon className="text-muted-foreground/20" size={24} />
+                                        )}
+                                        <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity cursor-pointer">
+                                            <Camera className="text-white" size={20} />
+                                            <input 
+                                                type="file" 
+                                                className="hidden" 
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        setData('image', file);
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => setImagePreview(reader.result as string);
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                    </div>
+                                    <div className="flex-1 text-[10px] text-slate-500 dark:text-muted-foreground leading-relaxed">
+                                        <p className="font-bold uppercase tracking-widest text-sky-600 dark:text-sky-500 mb-1">Upload Visual</p>
+                                        <p>Gunakan gambar rasio 1:1 atau 4:5 untuk hasil terbaik. Maksimal 2MB.</p>
+                                    </div>
+                                </div>
+                                {errors.image && <p className="mt-1 text-xs text-destructive">{errors.image}</p>}
                             </div>
                             
                             <div className="flex flex-col gap-3 pt-2">
@@ -310,9 +357,9 @@ export default function MenuManagement({ menus, filters }: any) {
                                         id="is_available" 
                                         checked={data.is_available} 
                                         onChange={e => setData('is_available', e.target.checked)}
-                                        className="h-4 w-4 rounded border-border bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                        className="h-4 w-4 rounded border-slate-300 dark:border-border bg-slate-50 dark:bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
-                                    <Label htmlFor="is_available" className="text-foreground cursor-pointer font-medium">Tersedia untuk dipesan</Label>
+                                    <Label htmlFor="is_available" className="text-slate-700 dark:text-foreground cursor-pointer font-medium">Tersedia untuk dipesan</Label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <input 
@@ -320,17 +367,17 @@ export default function MenuManagement({ menus, filters }: any) {
                                         id="is_best_seller" 
                                         checked={data.is_best_seller} 
                                         onChange={e => setData('is_best_seller', e.target.checked)}
-                                        className="h-4 w-4 rounded border-border bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
+                                        className="h-4 w-4 rounded border-slate-300 dark:border-border bg-slate-50 dark:bg-muted text-sky-500 focus:ring-sky-500 focus:ring-offset-0 focus:ring-offset-transparent"
                                     />
-                                    <Label htmlFor="is_best_seller" className="text-foreground cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> Tandai sebagai hidangan "Sangat Laris"</Label>
+                                    <Label htmlFor="is_best_seller" className="text-slate-700 dark:text-foreground cursor-pointer font-medium flex items-center gap-1.5"><Flame size={14} className="text-rose-500"/> Tandai sebagai hidangan "Sangat Laris"</Label>
                                 </div>
                             </div>
 
-                             <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-border">
-                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground hover:bg-muted">
+                              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted">
                                     Batal
                                 </Button>
-                                <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600 text-zinc-950 font-bold">
+                                <Button type="submit" disabled={processing} className="bg-sky-500 hover:bg-sky-600 text-white dark:text-zinc-950 font-bold">
                                     {processing ? 'Menyimpan...' : 'Simpan Menu'}
                                 </Button>
                             </div>

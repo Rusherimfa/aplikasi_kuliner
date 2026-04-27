@@ -7,17 +7,19 @@ import { Button } from '@/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useInitials } from '@/hooks/use-initials';
 import { edit, index } from '@/routes/teams';
-import type { Team } from '@/types';
+import type { Team, TeamMember } from '@/types';
 
 type Props = {
-    teams: Team[];
+    teams: (Team & { members: TeamMember[] })[];
 };
 
 export default function TeamsIndex({ teams }: Props) {
+    const getInitials = useInitials();
     return (
         <>
             <Head title="Teams" />
@@ -64,51 +66,50 @@ export default function TeamsIndex({ teams }: Props) {
                                 </div>
                             </div>
 
-                            <TooltipProvider>
-                                <div className="flex items-center gap-2">
-                                    {team.role === 'member' ? (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    data-test="team-view-button"
-                                                    asChild
+                            <div className="flex items-center gap-2">
+                                {team.role === 'member' ? (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                data-test="team-view-button"
+                                                asChild
+                                            >
+                                                <Link
+                                                    href={edit(team.slug)}
                                                 >
-                                                    <Link
-                                                        href={edit(team.slug)}
-                                                    >
-                                                        <Eye className="h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>View team</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    ) : (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    data-test="team-edit-button"
-                                                    asChild
-                                                >
-                                                    <Link
-                                                        href={edit(team.slug)}
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Link>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>Edit team</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )}
-                                </div>
-                            </TooltipProvider>
+                                                    <Eye className="h-4 w-4" />
+                                                </Link>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>View team</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <div className="flex -space-x-2">
+                                        {team.members.map((user: TeamMember) => (
+                                            <Tooltip key={user.id}>
+                                                <TooltipTrigger asChild>
+                                                    <Avatar className="size-8 border-2 border-white dark:border-neutral-900">
+                                                        <AvatarImage
+                                                            src={user.avatar ?? undefined}
+                                                            alt={user.name}
+                                                        />
+                                                        <AvatarFallback className="text-xs">
+                                                            {getInitials(user.name)}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{user.name}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))}
 

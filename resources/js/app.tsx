@@ -49,7 +49,7 @@ createInertiaApp({
                     <SmoothScroll>
                         {app}
                     </SmoothScroll>
-                    <Toaster position="bottom-right" theme="dark" closeButton richColors />
+                    <Toaster position="bottom-right" theme="system" closeButton richColors />
                 </TooltipProvider>
             </CartProvider>
         );

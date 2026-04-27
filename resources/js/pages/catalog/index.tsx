@@ -1,4 +1,4 @@
-﻿import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { UtensilsCrossed, Search, ShoppingBag, Flame, SlidersHorizontal, ArrowLeft, Info, Eye } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,8 @@ interface Menu {
     category: string;
     price: string;
     is_best_seller: boolean;
+    is_available: boolean;
+    image_path: string | null;
 }
 
 interface PageProps {
@@ -193,9 +195,17 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                         <div className="glass-card relative flex h-full flex-col overflow-hidden rounded-[2.5rem] bg-white dark:bg-white/5 border-border dark:border-white/10 transition-all duration-700 md:hover:-translate-y-3 hover:border-sky-500/30 hover:shadow-2xl shadow-sky-500/5 active:scale-[0.98]">
                                             {/* Media Area */}
                                             <div className="relative aspect-[4/3] md:aspect-square overflow-hidden m-2 md:m-3 rounded-[1.5rem] md:rounded-[1.75rem] bg-slate-50 dark:bg-white/5">
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-40 transition-transform duration-1000 group-hover:scale-125 group-hover:rotate-12">
-                                                    <UtensilsCrossed size={48} md:size={64} strokeWidth={1} />
-                                                </div>
+                                                {item.image_path ? (
+                                                    <img 
+                                                        src={`/storage/${item.image_path}`} 
+                                                        className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" 
+                                                        alt={item.name} 
+                                                    />
+                                                ) : (
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-40 transition-transform duration-1000 group-hover:scale-125 group-hover:rotate-12">
+                                                        <UtensilsCrossed className="w-12 h-12 md:w-16 md:h-16" strokeWidth={1} />
+                                                    </div>
+                                                )}
                                                 
                                                 {/* Labels */}
                                                 <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">

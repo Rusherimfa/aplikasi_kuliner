@@ -43,6 +43,9 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $user,
+                'notifications' => [
+                    'unreadCount' => $user ? $user->unreadNotifications()->count() : 0,
+                ],
             ],
             'locale' => $locale,
             'translations' => $this->getTranslations($locale),

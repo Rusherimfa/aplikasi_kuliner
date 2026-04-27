@@ -42,7 +42,7 @@ export default function SimulatePayment() {
                             </Link>
                         </div>
 
-                        <div className="overflow-hidden rounded-3xl bg-card shadow-2xl ring-1 ring-border/5 sm:grid sm:grid-cols-2">
+                        <div className="overflow-hidden rounded-3xl bg-white dark:bg-card shadow-2xl ring-1 ring-slate-200 dark:ring-border/5 sm:grid sm:grid-cols-2">
                             {/* Left Side: Invoice Summary */}
                             <div className="bg-zinc-950 p-8 text-white sm:p-12 relative overflow-hidden">
                                 <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
@@ -97,71 +97,71 @@ export default function SimulatePayment() {
                                 <h3 className="mb-6 text-xl font-bold text-foreground">{__('Pilih Metode Pembayaran')}</h3>
                                 
                                 <div className="space-y-4">
-                                    <button 
+                                     <button 
                                         onClick={() => setPaymentMethod('ewallet')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-slate-200 dark:border-border bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'ewallet' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'ewallet' ? 'bg-sky-500/20 text-sky-500' : 'bg-slate-100 dark:bg-muted text-slate-400 dark:text-muted-foreground'}`}>
                                                 <CreditCard size={20} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="font-semibold text-foreground">{__('E-Wallet')}</p>
-                                                <p className="text-xs text-muted-foreground">GoPay, OVO, Dana, ShopeePay</p>
+                                                <p className="font-semibold text-slate-900 dark:text-foreground">{__('E-Wallet')}</p>
+                                                <p className="text-xs text-slate-500 dark:text-muted-foreground">GoPay, OVO, Dana, ShopeePay</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500' : 'border-slate-300 dark:border-border'}`}>
                                             {paymentMethod === 'ewallet' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
 
-                                    <button 
+                                     <button 
                                         onClick={() => setPaymentMethod('qris')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-slate-200 dark:border-border bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'qris' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'qris' ? 'bg-sky-500/20 text-sky-500' : 'bg-slate-100 dark:bg-muted text-slate-400 dark:text-muted-foreground'}`}>
                                                 <QrCode size={20} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="font-semibold text-foreground">{__('QRIS PanduPay')}</p>
-                                                <p className="text-xs text-muted-foreground">{__('Scan QR Code Otomatis')}</p>
+                                                <p className="font-semibold text-slate-900 dark:text-foreground">{__('QRIS PanduPay')}</p>
+                                                <p className="text-xs text-slate-500 dark:text-muted-foreground">{__('Scan QR Code Otomatis')}</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'qris' ? 'border-sky-500 bg-sky-500' : 'border-slate-300 dark:border-border'}`}>
                                             {paymentMethod === 'qris' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
 
-                                    <button 
+                                     <button 
                                         onClick={() => setPaymentMethod('bank')}
-                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-border bg-card hover:bg-accent/10'}`}
+                                        className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-slate-200 dark:border-border bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'bank' ? 'bg-sky-500/20 text-sky-500' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${paymentMethod === 'bank' ? 'bg-sky-500/20 text-sky-500' : 'bg-slate-100 dark:bg-muted text-slate-400 dark:text-muted-foreground'}`}>
                                                 <CreditCard size={20} />
                                             </div>
                                             <div className="text-left">
-                                                <p className="font-semibold text-foreground">{__('Transfer Bank Virtual Account')}</p>
-                                                <p className="text-xs text-muted-foreground">BCA, Mandiri, BNI, BRI</p>
+                                                <p className="font-semibold text-slate-900 dark:text-foreground">{__('Transfer Bank Virtual Account')}</p>
+                                                <p className="text-xs text-slate-500 dark:text-muted-foreground">BCA, Mandiri, BNI, BRI</p>
                                             </div>
                                         </div>
-                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500' : 'border-border'}`}>
+                                        <div className={`h-5 w-5 rounded-full border flex items-center justify-center ${paymentMethod === 'bank' ? 'border-sky-500 bg-sky-500' : 'border-slate-300 dark:border-border'}`}>
                                             {paymentMethod === 'bank' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
                                 </div>
 
-                                <div className="my-8 rounded-2xl bg-muted p-6 text-center border border-border">
-                                    <Lock className="mx-auto mb-2 h-6 w-6 text-muted-foreground/60" />
-                                    <p className="text-sm font-medium text-foreground">{__('Ini adalah Simulasi Payment Gateway.')}</p>
-                                    <p className="text-xs text-muted-foreground mt-1">{__('Uang Anda aman. Tidak ada saldo asli yang dipotong.')}</p>
+                                <div className="my-8 rounded-2xl bg-slate-50 dark:bg-muted p-6 text-center border border-slate-100 dark:border-border">
+                                    <Lock className="mx-auto mb-2 h-6 w-6 text-slate-400 dark:text-muted-foreground/60" />
+                                    <p className="text-sm font-medium text-slate-900 dark:text-foreground">{__('Ini adalah Simulasi Payment Gateway.')}</p>
+                                    <p className="text-xs text-slate-500 dark:text-muted-foreground mt-1">{__('Uang Anda aman. Tidak ada saldo asli yang dipotong.')}</p>
                                 </div>
 
                                 <Button
                                     onClick={handleSimulatePayment}
                                     disabled={isSimulating}
-                                    className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-foreground text-base font-semibold text-background shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 hover:bg-foreground/90 disabled:opacity-70 disabled:hover:scale-100"
+                                    className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-slate-900 dark:bg-foreground text-base font-semibold text-white dark:text-background shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 hover:bg-black dark:hover:bg-foreground/90 disabled:opacity-70 disabled:hover:scale-100"
                                 >
                                     {isSimulating ? (
                                         <div className="flex items-center gap-3">

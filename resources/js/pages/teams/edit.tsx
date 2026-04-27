@@ -22,7 +22,6 @@ import { Label } from '@/components/ui/label';
 import {
     Tooltip,
     TooltipContent,
-    TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useInitials } from '@/hooks/use-initials';
@@ -251,27 +250,25 @@ export default function TeamEdit({
 
                                     {member.role !== 'owner' &&
                                     permissions.canRemoveMember ? (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        data-test="member-remove-button"
-                                                        onClick={() =>
-                                                            confirmRemoveMember(
-                                                                member,
-                                                            )
-                                                        }
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Remove member</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    data-test="member-remove-button"
+                                                    onClick={() =>
+                                                        confirmRemoveMember(
+                                                            member,
+                                                        )
+                                                    }
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Remove member</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     ) : null}
                                 </div>
                             </div>
@@ -309,27 +306,25 @@ export default function TeamEdit({
                                     </div>
 
                                     {permissions.canCancelInvitation ? (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        data-test="invitation-cancel-button"
-                                                        onClick={() =>
-                                                            confirmCancelInvitation(
-                                                                invitation,
-                                                            )
-                                                        }
-                                                    >
-                                                        <X className="h-4 w-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Cancel invitation</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    data-test="invitation-cancel-button"
+                                                    onClick={() =>
+                                                        confirmCancelInvitation(
+                                                            invitation,
+                                                        )
+                                                    }
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Cancel invitation</p>
+                                            </TooltipContent>
+                                        </Tooltip>
                                     ) : null}
                                 </div>
                             ))}

@@ -64,7 +64,8 @@ export default function ServiceRequestsIndex({ serviceRequests }: PageProps) {
 
     const updateRequestStatus = (id: number, status: string) => {
         setLoadingId(id);
-        http.patch(`/service-requests/${id}`, { status }, {
+        http.setData({ status });
+        http.patch(`/service-requests/${id}`, {
             onSuccess: () => {
                 setActiveRequests(prev => 
                     prev.map(r => r.id === id ? { ...r, status: status as any } : r)

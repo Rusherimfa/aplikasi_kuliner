@@ -8,7 +8,7 @@ export default function InfoBar() {
         {
             icon: Clock,
             label: __('Opening Hours'),
-            value: __('Mon – Sun: 11:00 – 23:00'),
+            value: __('Sen – Jum: 08:00 – 22:00'),
         },
         {
             icon: MapPin,

@@ -1,8 +1,8 @@
-﻿import { Head, Link, usePage } from '@inertiajs/react';
-import { ChefHat, Sparkles, Award } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { ChefHat, Sparkles, Award, Utensils, GlassWater, Truck, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -22,36 +22,78 @@ export default function Experience() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     
     const containerRef = useRef(null);
-    const heroImageRef = useRef(null);
-    const masterclassImageRef = useRef(null);
-    const masterclassFrameRef = useRef(null);
+    const [activeChapter, setActiveChapter] = useState('ocean');
+    const [currentSlide, setCurrentSlide] = useState(0);
+    
+    const chapters = {
+        ocean: {
+            title: "The Source",
+            subtitle: "The Deep Blue Connection",
+            color: "from-blue-600/20 to-cyan-500/20",
+            icon: Sparkles,
+            slides: [
+                {
+                    title: "Kejujuran Laut",
+                    text: "Kami menjalin koneksi langsung dengan nelayan lokal. Setiap ikan yang kami sajikan ditangkap secara berkelanjutan di perairan Nusantara.",
+                    image: "https://images.unsplash.com/photo-1551244072-5d12893278ab?q=80&w=2670&auto=format&fit=crop"
+                },
+                {
+                    title: "Kesegaran Mutlak",
+                    text: "Dari jaring nelayan ke meja Anda dalam hitungan jam. Kami percaya bahwa rasa terbaik berasal dari kesegaran yang tidak berkompromi.",
+                    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2670&auto=format&fit=crop"
+                },
+                {
+                    title: "Ekosistem Lestari",
+                    text: "Mendukung metode penangkapan ikan tradisional yang menjaga kelestarian terumbu karang and populasi biota laut.",
+                    image: "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=2574&auto=format&fit=crop"
+                }
+            ]
+        },
+        culinary: {
+            title: "The Craft",
+            subtitle: "The Art of Seafood",
+            color: "from-sky-500/20 to-indigo-500/20",
+            icon: Utensils,
+            slides: [
+                {
+                    title: "Presisi Fillet",
+                    text: "Setiap jenis ikan memerlukan teknik pemotongan yang berbeda untuk menjaga tekstur and karakter rasa uniknya.",
+                    image: "https://images.unsplash.com/photo-1534604973900-c41ab4c5d4b0?q=80&w=2574&auto=format&fit=crop"
+                },
+                {
+                    title: "Rempah Pesisir",
+                    text: "Bumbu rahasia kami diracik dari rempah-rempah pesisir yang telah digunakan secara turun-temurun oleh komunitas nelayan.",
+                    image: "https://images.unsplash.com/photo-1516684732162-798a0062be99?q=80&w=2574&auto=format&fit=crop"
+                }
+            ]
+        },
+        vibe: {
+            title: "The Depth",
+            subtitle: "Immersive Sanctuary",
+            color: "from-blue-900/20 to-slate-900/20",
+            icon: GlassWater,
+            slides: [
+                {
+                    title: "Interior Akuatik",
+                    text: "Desain interior yang terinspirasi dari ketenangan bawah laut, memberikan pengalaman bersantap yang meditatif.",
+                    image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2670&auto=format&fit=crop"
+                },
+                {
+                    title: "Simfoni Ombak",
+                    text: "Sistem audio kami mereplikasi frekuensi suara laut yang menenangkan, melengkapi cita rasa hidangan kami.",
+                    image: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2670&auto=format&fit=crop"
+                }
+            ]
+        }
+    };
+
+    const chapterKeys = Object.keys(chapters);
+    const activeData = (chapters as any)[activeChapter];
     const reserveButtonRef = useMagnetic();
 
-    useGSAP(() => {
-        // Hero Image Parallax
-        gsap.to(heroImageRef.current, {
-            yPercent: 30,
-            ease: "none",
-            scrollTrigger: {
-                trigger: "section",
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-
-        // Masterclass Image Parallax
-        gsap.to(masterclassImageRef.current, {
-            yPercent: 15,
-            ease: "none",
-            scrollTrigger: {
-                trigger: masterclassFrameRef.current,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-    }, { scope: containerRef });
+    useEffect(() => {
+        setCurrentSlide(0);
+    }, [activeChapter]);
 
     return (
         <div ref={containerRef}>
@@ -66,156 +108,155 @@ export default function Experience() {
                 />
 
                 <main className="pt-32 pb-24">
-                    {/* Hero Section - Executive Reveal */}
-                    <section className="relative mx-8 mb-32 overflow-hidden rounded-[3rem] bg-slate-900 dark:bg-white/[0.02] border border-white/5 h-[75vh] flex items-center shadow-3xl">
-                        <div className="absolute inset-0 overflow-hidden">
-                            <motion.img
-                                ref={heroImageRef}
-                                initial={{ scale: 1.1, opacity: 0 }}
-                                animate={{ scale: 1.2, opacity: 0.2 }}
-                                transition={{ duration: 1.5 }}
-                                src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=2670&auto=format&fit=crop"
-                                alt="Culinary Sanctum"
-                                className="h-full w-full object-cover grayscale"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0B] via-transparent to-transparent" />
+                    {/* Chapter Navigation */}
+                    <div className="flex justify-center mb-12">
+                        <div className="inline-flex p-2 bg-white/5 dark:bg-white/[0.02] backdrop-blur-3xl rounded-[2.5rem] border border-white/10 shadow-2xl">
+                            {chapterKeys.map((key) => {
+                                const chapter = (chapters as any)[key];
+                                const isActive = activeChapter === key;
+                                return (
+                                    <button
+                                        key={key}
+                                        onClick={() => setActiveChapter(key)}
+                                        className={`flex items-center gap-3 px-8 py-4 rounded-[2rem] transition-all duration-500 ${
+                                            isActive 
+                                                ? 'bg-sky-500 text-black shadow-[0_10px_30px_rgba(14,165,233,0.4)]' 
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
+                                        }`}
+                                    >
+                                        <chapter.icon size={18} />
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{chapter.title}</span>
+                                    </button>
+                                );
+                            })}
                         </div>
+                    </div>
+
+                    {/* Story Content Wrapper */}
+                    <div className="relative mx-8 mb-32 overflow-hidden rounded-[4rem] bg-slate-900 dark:bg-white/[0.01] border border-white/5 min-h-[85vh] flex items-center shadow-4xl">
+                        {/* Dynamic Background */}
+                        <div className={`absolute inset-0 bg-gradient-to-br ${activeData.color} transition-all duration-1000`} />
+                        <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.03] mix-blend-overlay" />
                         
-                        <div className="relative z-10 mx-auto max-w-5xl px-12 space-y-8">
-                            <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-500 uppercase glow-primary"
-                            >
-                                <Sparkles size={12} />
-                                <span>The Philosophy</span>
-                            </motion.div>
-                            
-                            <motion.h1 
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
-                                className="font-['Playfair_Display',serif] text-6xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter"
-                            >
-                                Seni Presisi <br />
-                                <span className="italic font-serif opacity-30">Gastronomi</span>
-                            </motion.h1>
-                            
-                            <motion.p 
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.9 }}
-                                className="max-w-2xl text-xl font-medium text-slate-400"
-                            >
-                                Setiap piring adalah manifesto kejujuran bahan and dedikasi tanpa kompromi terhadap kualitas.
-                            </motion.p>
-                        </div>
+                        {/* Slide Content */}
+                        <div className="relative z-10 w-full px-12 sm:px-24">
+                            <div className="grid lg:grid-cols-2 gap-24 items-center">
+                                {/* Text Content */}
+                                <div className="space-y-10 order-2 lg:order-1">
+                                    <div className="space-y-4">
+                                        <motion.div
+                                            key={`sub-${activeChapter}-${currentSlide}`}
+                                            initial={{ opacity: 0, x: -20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            className="inline-flex items-center gap-3 text-sky-500"
+                                        >
+                                            <Sparkles size={14} className="animate-pulse" />
+                                            <span className="text-[10px] font-black uppercase tracking-[0.4em]">{activeData.subtitle}</span>
+                                        </motion.div>
+                                        <motion.h2
+                                            key={`title-${activeChapter}-${currentSlide}`}
+                                            initial={{ opacity: 0, y: 30 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ duration: 0.8, delay: 0.1 }}
+                                            className="text-6xl sm:text-8xl font-black text-white leading-[0.9] tracking-tighter uppercase"
+                                        >
+                                            {activeData.slides[currentSlide].title}
+                                        </motion.h2>
+                                    </div>
+                                    <motion.p
+                                        key={`text-${activeChapter}-${currentSlide}`}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.8, delay: 0.2 }}
+                                        className="text-xl sm:text-2xl font-medium text-slate-400 leading-relaxed max-w-xl"
+                                    >
+                                        {activeData.slides[currentSlide].text}
+                                    </motion.p>
 
-                        {/* Ambient Orbs */}
-                        <div className="absolute top-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-sky-500/5 blur-[120px]" />
-                        <div className="absolute bottom-[-10%] left-[-10%] h-[400px] w-[400px] rounded-full bg-sky-600/5 blur-[100px]" />
-                    </section>
-
-                    {/* Masterclass Section */}
-                    <section className="relative mx-auto max-w-7xl px-8 mb-32">
-                        <div className="grid items-center gap-24 lg:grid-cols-2">
-                            <motion.div 
-                                initial={{ opacity: 0, x: -50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
-                                className="relative group"
-                            >
-                                <div className="absolute inset-0 bg-sky-500/20 blur-[100px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                                <div ref={masterclassFrameRef} className="relative overflow-hidden rounded-[3rem] aspect-[4/5] bg-slate-100 dark:bg-white/5 border border-border dark:border-white/5">
-                                    <img
-                                        ref={masterclassImageRef}
-                                        src="https://images.unsplash.com/photo-1583394838336-acd977736f90?q=80&w=2568&auto=format&fit=crop"
-                                        alt="Strategic Architect"
-                                        className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    />
-                                    
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                    
-                                    <div className="absolute bottom-10 left-10 right-10">
-                                        <div className="glass-card flex items-center gap-5 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/10 p-8 shadow-3xl">
-                                            <ChefHat size={48} className="text-sky-500" />
-                                            <div>
-                                                <p className="font-['Playfair_Display',serif] text-2xl font-black text-white tracking-tight">
-                                                    Executive Chef Antonio
-                                                </p>
-                                                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-500">
-                                                    Tri-Michelin Pedigree
-                                                </p>
-                                            </div>
+                                    {/* Pagination Controls */}
+                                    <div className="flex items-center gap-8 pt-8">
+                                        <div className="flex gap-2">
+                                            {activeData.slides.map((_: any, idx: number) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => setCurrentSlide(idx)}
+                                                    className={`h-2 transition-all duration-500 rounded-full ${
+                                                        currentSlide === idx ? 'w-12 bg-sky-500' : 'w-2 bg-white/10 hover:bg-white/20'
+                                                    }`}
+                                                />
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-4">
+                                            <button 
+                                                onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
+                                                disabled={currentSlide === 0}
+                                                className="p-4 rounded-full border border-white/10 text-white hover:bg-white/5 disabled:opacity-20 transition-all"
+                                            >
+                                                <ChevronLeft size={24} />
+                                            </button>
+                                            <button 
+                                                onClick={() => setCurrentSlide(prev => Math.min(activeData.slides.length - 1, prev + 1))}
+                                                disabled={currentSlide === activeData.slides.length - 1}
+                                                className="p-4 rounded-full border border-white/10 text-white hover:bg-white/5 disabled:opacity-20 transition-all"
+                                            >
+                                                <ChevronRight size={24} />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </motion.div>
 
-                            <motion.div 
-                                initial={{ opacity: 0, x: 50 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.8 }}
-                                className="space-y-10"
-                            >
-                                <div className="space-y-6">
-                                    <h2 className="font-['Playfair_Display',serif] text-5xl font-black text-slate-900 dark:text-white leading-tight tracking-tight">
-                                        Visi Sang <br />
-                                        <span className="italic font-serif opacity-30 text-sky-500">Maestro Strategis</span>
-                                    </h2>
-                                    <p className="text-lg font-medium leading-relaxed text-slate-500 dark:text-neutral-500">
-                                        Chef Antonio mengintegrasikan tradisi kontinental dengan eksplorasi botanik lokal. Setiap inovasi berakar pada fondasi rasa yang autentik, dieksekusi dengan presisi laboratoris.
-                                    </p>
+                                {/* Image Content */}
+                                <div className="order-1 lg:order-2">
+                                    <motion.div
+                                        key={`img-${activeChapter}-${currentSlide}`}
+                                        initial={{ opacity: 0, scale: 0.9, rotate: 2 }}
+                                        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                                        transition={{ duration: 1, ease: "easeOut" }}
+                                        className="relative"
+                                    >
+                                        <div className="absolute inset-0 bg-sky-500/20 blur-[120px] rounded-full" />
+                                        <div className="relative aspect-[4/5] rounded-[3.5rem] overflow-hidden border border-white/10 shadow-4xl ring-1 ring-white/5">
+                                            <img
+                                                src={activeData.slides[currentSlide].image}
+                                                className="h-full w-full object-cover grayscale-0 group-hover:grayscale transition-all duration-1000"
+                                                alt="Story Slide"
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                        </div>
+                                    </motion.div>
                                 </div>
-
-                                <blockquote className="relative p-10 rounded-[2rem] bg-slate-50 dark:bg-white/[0.02] border border-border dark:border-white/5">
-                                    <span className="absolute top-4 left-6 text-6xl font-serif text-sky-500/20 italic">"</span>
-                                    <p className="relative z-10 text-2xl font-['Playfair_Display',serif] italic leading-relaxed text-slate-800 dark:text-neutral-300">
-                                        Masakan adalah bahasa universal. Melalui tekstur and temperatur, kami menceritakan kisah tentang tanah, musim, and dedikasi manusia.
-                                    </p>
-                                </blockquote>
-
-                                <div className="grid grid-cols-2 gap-6">
-                                    <div className="glass-card flex items-center gap-4 rounded-2xl bg-white dark:bg-white/5 p-6 border border-border dark:border-white/5">
-                                        <Award className="text-sky-500" size={24} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Global Laureate</span>
-                                    </div>
-                                    <div className="glass-card flex items-center gap-4 rounded-2xl bg-white dark:bg-white/5 p-6 border border-border dark:border-white/5">
-                                        <Sparkles className="text-sky-500" size={24} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">Culinary Innovator</span>
-                                    </div>
-                                </div>
-                            </motion.div>
+                            </div>
                         </div>
-                    </section>
 
-                    {/* Final Invitation */}
-                    <section className="relative mx-8 overflow-hidden rounded-[3rem] bg-slate-900 p-24 text-center shadow-3xl">
-                        <div className="pointer-events-none absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-                        <div className="absolute top-1/2 left-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-sky-500/5 opacity-50 blur-[120px]" />
-                        
-                        <div className="relative z-10 max-w-3xl mx-auto space-y-10">
-                            <motion.h2 
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                className="font-['Playfair_Display',serif] text-5xl md:text-7xl font-black text-white tracking-tighter"
+                        {/* Slide Indicator (Physical Magazine Vibe) */}
+                        <div className="absolute bottom-12 right-12">
+                            <span className="text-[10px] font-black tracking-[0.5em] text-white/20 uppercase italic">
+                                Page {currentSlide + 1} / {activeData.slides.length}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Final Invitation - Physical Card Vibe */}
+                    <section className="relative mx-8 overflow-hidden rounded-[4rem] bg-slate-50 dark:bg-white/[0.01] border border-border dark:border-white/5 p-24 text-center shadow-2xl">
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-sky-500/50 to-transparent" />
+                        <div className="relative z-10 max-w-3xl mx-auto space-y-12">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                className="inline-flex px-6 py-2 rounded-full bg-sky-500/10 text-sky-500 text-[10px] font-black uppercase tracking-[0.4em] mb-4"
                             >
-                                Initiate Your <br />
-                                <span className="italic font-serif opacity-30">Private Encounter</span>
-                            </motion.h2>
-                            <p className="text-xl font-medium text-slate-400">
-                                Kami mengundang Anda untuk mengamankan momen gastronomi eksklusif malam ini.
-                            </p>
-                            <div ref={reserveButtonRef as any} className="inline-block">
+                                Your Presence is Requested
+                            </motion.div>
+                            <h2 className="text-6xl sm:text-8xl font-black text-slate-900 dark:text-white leading-[0.9] tracking-tighter uppercase italic">
+                                Initiate <br />
+                                <span className="text-sky-500 opacity-20">Encounter</span>
+                            </h2>
+                            <div ref={reserveButtonRef as any} className="inline-block mt-8">
                                 <Link href="/reservations/create">
                                     <Button
-                                        className="group h-20 rounded-[1.5rem] bg-sky-500 px-16 text-[12px] font-black uppercase tracking-[0.3em] text-black shadow-2xl transition-all hover:scale-105 hover:bg-white active:scale-95"
+                                        className="h-24 px-20 rounded-[2rem] bg-black dark:bg-sky-500 text-white dark:text-black text-[12px] font-black uppercase tracking-[0.4em] shadow-4xl hover:scale-105 transition-all duration-500"
                                     >
-                                        Reserver Now
+                                        Reserve My Passage
                                     </Button>
                                 </Link>
                             </div>

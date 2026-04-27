@@ -68,24 +68,24 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
     }, []);
 
     const OrderCard = ({ order, statusType = 'active' }: { order: any, statusType?: 'active' | 'history' | 'cancelled' }) => (
-        <div key={order.id} className={`group relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden shadow-2xl transition-all ${statusType === 'active' ? 'hover:border-sky-500/20' : 'opacity-70 scanline'}`}>
+        <div key={order.id} className={`group relative rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 backdrop-blur-xl overflow-hidden shadow-xl dark:shadow-2xl transition-all ${statusType === 'active' ? 'hover:border-sky-500/20' : 'opacity-70 scanline'}`}>
             {/* Order Type Ribbon */}
             <div className={`absolute top-0 right-0 px-4 py-1.5 rounded-bl-2xl text-[8px] font-black uppercase tracking-widest ${order.order_type === 'delivery' ? 'bg-sky-500 text-black' : 'bg-blue-500 text-white'}`}>
                 {order.order_type === 'pickup' ? 'Takeaway' : 'Delivery'}
             </div>
 
-            <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+            <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
                 <div className="flex justify-between items-start mb-2">
-                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{order.order_number}</p>
+                    <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">{order.order_number}</p>
                     <div className="flex items-center gap-1.5 text-sky-500/60 font-bold text-[10px]">
                         <Clock size={10} /> {order.time}
                     </div>
                 </div>
                 <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-black text-white tracking-tight leading-none">{order.customer_name}</h3>
+                    <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight leading-none">{order.customer_name}</h3>
                     <button 
                         onClick={() => setActiveChatId(activeChatId === order.id ? null : order.id)}
-                        className={`p-1.5 rounded-xl border transition-all ${activeChatId === order.id ? 'bg-sky-500 text-black border-sky-500' : 'bg-white/5 text-white/40 hover:bg-white/10 hover:text-white border-white/5'}`}
+                        className={`p-1.5 rounded-xl border transition-all ${activeChatId === order.id ? 'bg-sky-500 text-white dark:text-black border-sky-500' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-white/5'}`}
                         title="Buka Chat"
                     >
                         <MessageCircle size={16} />
@@ -93,11 +93,11 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                 </div>
                 
                 <div className="mt-4 flex items-center justify-between">
-                    <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-500' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/5 text-white/40')}`}>
+                    <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-500' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40')}`}>
                         {order.order_status.replace(/_/g, ' ')}
                     </Badge>
-                    <div className="text-[10px] font-black text-white/60">
-                        Rp {Number(order.total_price).toLocaleString('id-ID')}
+                    <div className="text-[10px] font-black text-slate-500 dark:text-white/60">
+                        Rp {Number(order.total_price).toLocaleString(usePage().props.locale === 'id' ? 'id-ID' : 'en-US')}
                     </div>
                 </div>
             </div>
@@ -106,8 +106,8 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                 <ul className="space-y-3">
                     {order.items.map((item: any) => (
                         <li key={item.id} className="flex justify-between items-center text-sm font-medium">
-                            <span className="text-white/60">
-                                <span className={`${statusType === 'active' ? 'text-sky-500' : 'text-white/20'} font-black mr-2`}>{item.quantity}x</span>
+                            <span className="text-slate-600 dark:text-white/60">
+                                <span className={`${statusType === 'active' ? 'text-sky-600 dark:text-sky-500' : 'text-slate-400 dark:text-white/20'} font-black mr-2`}>{item.quantity}x</span>
                                 {item.name}
                             </span>
                         </li>
@@ -117,7 +117,7 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
 
             {/* Workflow Actions (Only for Active and not admin) */}
             {statusType === 'active' && auth?.user?.role !== 'admin' && (
-                <div className="p-6 pt-0 mt-auto border-t border-white/5 bg-white/[0.01]">
+                <div className="p-6 pt-0 mt-auto border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/[0.01]">
                     <div className="pt-6">
                         {order.order_status === 'pending' && (
                             <div className="grid grid-cols-2 gap-3">
@@ -131,7 +131,7 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                 <Button 
                                     onClick={() => handleRejectOrder(order.id)}
                                     variant="outline"
-                                    className="border-white/10 text-rose-500 font-black uppercase tracking-widest text-[9px] rounded-xl h-10 hover:bg-rose-500/10"
+                                    className="border-slate-200 dark:border-white/10 text-rose-600 dark:text-rose-500 font-black uppercase tracking-widest text-[9px] rounded-xl h-10 hover:bg-rose-500/10"
                                     disabled={loadingId === `reject-${order.id}`}
                                 >
                                     {loadingId === `reject-${order.id}` ? <Loader2 className="animate-spin" size={14}/> : 'Reject'}
@@ -150,9 +150,9 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                 {order.order_type === 'delivery' ? (
                                     <div className="space-y-3">
                                         <div className="flex flex-col gap-2">
-                                            <label className="text-[8px] font-black text-white/20 uppercase tracking-widest ml-1">Assign Courier</label>
+                                            <label className="text-[8px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest ml-1">Assign Courier</label>
                                             <select 
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white/60 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+                                                className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white/60 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
                                                 value={selectedCourier[order.id] || ''}
                                                 onChange={(e) => setSelectedCourier({...selectedCourier, [order.id]: e.target.value})}
                                             >
@@ -209,14 +209,14 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
         <>
             <Head title="Kitchen Display System - Ocean's Resto" />
 
-            <div className="mx-auto max-w-7xl font-sans text-white pb-12">
-                <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-8">
+            <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-12">
+                <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-white/5 pb-8">
                     <div>
-                        <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-white/95 flex items-center gap-3">
+                        <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-slate-900 dark:text-white/95 flex items-center gap-3">
                             <ChefHat className="text-sky-500" size={36} />
                             Kitchen Display System
                         </h1>
-                        <p className="mt-2 text-sm text-white/40 max-w-md uppercase tracking-widest font-black text-[9px]">
+                        <p className="mt-2 text-sm text-slate-400 dark:text-white/40 max-w-md uppercase tracking-widest font-black text-[9px]">
                             Real-time Kitchen & Online Order Management
                         </p>
                     </div>
@@ -239,16 +239,16 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                             ))}
                         </div>
                     ) : (
-                        <div className="py-12 border border-dashed border-white/5 rounded-3xl bg-white/[0.01] text-center">
-                            <p className="text-xs font-black uppercase tracking-widest text-white/10 italic">No Active Online Orders</p>
+                        <div className="py-12 border border-dashed border-slate-200 dark:border-white/5 rounded-3xl bg-slate-50 dark:bg-white/[0.01] text-center">
+                            <p className="text-xs font-black uppercase tracking-widest text-slate-300 dark:text-white/10 italic">No Active Online Orders</p>
                         </div>
                     )}
                 </div>
 
                 {/* MULTIPLE HISTORY SECTIONS */}
                 <div className="space-y-12">
-                    <div className="border-b border-white/5 pb-6">
-                        <h2 className="font-['Playfair_Display',serif] text-2xl font-bold tracking-tight text-white/95">
+                    <div className="border-b border-slate-100 dark:border-white/5 pb-6">
+                        <h2 className="font-['Playfair_Display',serif] text-2xl font-bold tracking-tight text-slate-900 dark:text-white/95">
                             Order History
                         </h2>
                     </div>
@@ -269,8 +269,8 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                 ))}
                             </div>
                         ) : (
-                            <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
-                                <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">History is Empty</p>
+                            <div className="p-8 border border-slate-100 dark:border-white/5 rounded-2xl bg-slate-50 dark:bg-white/[0.01] text-center">
+                                <p className="text-[8px] font-black text-slate-300 dark:text-white/10 uppercase tracking-widest">History is Empty</p>
                             </div>
                         )}
                     </div>
@@ -291,8 +291,8 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                 ))}
                             </div>
                         ) : (
-                            <div className="p-8 border border-white/5 rounded-2xl bg-white/[0.01] text-center">
-                                <p className="text-[8px] font-black text-white/10 uppercase tracking-widest">No Cancelled Orders</p>
+                            <div className="p-8 border border-slate-100 dark:border-white/5 rounded-2xl bg-slate-50 dark:bg-white/[0.01] text-center">
+                                <p className="text-[8px] font-black text-slate-300 dark:text-white/10 uppercase tracking-widest">No Cancelled Orders</p>
                             </div>
                         )}
                     </div>

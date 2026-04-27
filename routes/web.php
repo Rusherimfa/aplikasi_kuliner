@@ -8,6 +8,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KitchenController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PublicCatalogController;
 use App\Http\Controllers\ReservationController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\Teams\TeamInvitationController;
+use App\Http\Controllers\TestErrorController;
 use App\Http\Controllers\TestimonialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -75,7 +77,7 @@ Route::middleware(['auth', 'verified'])
 
         // Simulation Route for Mapping Tracking
         Route::post('/reservations/{reservation}/simulate-tracking', [ReservationController::class, 'simulateTracking'])->name('reservations.simulate_tracking');
-        Route::post('/orders/{order}/simulate-tracking', [OrderController::class, 'simulateTracking'])->name('orders.simulate_tracking');
+        Route::post('/orders/{order}/simulate-tracking', [OrderController::class, 'simulateTracking'])->name('orders.simulate-tracking');
 
         Route::get('/verify-otp', [OTPController::class, 'show'])->name('otp.verify');
         Route::post('/verify-otp', [OTPController::class, 'verify']);
@@ -83,6 +85,12 @@ Route::middleware(['auth', 'verified'])
 
         // Service Hub Routes (Customer)
         Route::post('/service-requests', [ServiceRequestController::class, 'store'])->name('service-requests.store');
+
+        // Notification Routes
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+        Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
 Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
@@ -141,9 +149,14 @@ Route::post('locale', function (Request $request) {
         'locale' => 'required|string|in:en,id',
     ]);
 
-    session()->put('locale', $request->locale);
+    session()->put('locale', $request->input('locale'));
 
     return back();
 })->name('locale.update');
+
+// Error Page Previews (Local Only)
+if (app()->environment('local')) {
+    Route::get('/errors/{status}', [TestErrorController::class, 'preview'])->name('errors.preview');
+}
 
 require __DIR__.'/settings.php';

@@ -36,7 +36,7 @@ interface Reservation {
     date: string;
     time: string;
     guest_count: number;
-    status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment';
+    status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment' | 'cancelled';
     payment_status?: string;
     booking_fee?: string | number;
     total_after_discount?: string | number;
@@ -135,11 +135,11 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
 
     const StatusBadge = ({ status }: { status: string }) => {
         const variants: Record<string, string> = {
-            awaiting_payment: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-            pending: 'bg-sky-500/10 text-sky-500 border-sky-500/20',
-            confirmed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-            rejected: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
-            completed: 'bg-white/10 text-white/60 border-white/20',
+            awaiting_payment: 'bg-blue-500/10 text-blue-600 dark:text-blue-500 border-blue-500/20',
+            pending: 'bg-sky-500/10 text-sky-600 dark:text-sky-500 border-sky-500/20',
+            confirmed: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+            rejected: 'bg-rose-500/10 text-rose-600 dark:text-rose-500 border-rose-500/20',
+            completed: 'bg-slate-100 dark:bg-white/10 text-slate-400 dark:text-white/60 border-slate-200 dark:border-white/20',
         };
 
         const labels: Record<string, string> = {
@@ -193,7 +193,8 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     }, []);
 
     const updateRequestStatus = (id: number, status: string) => {
-        http.patch(`/service-requests/${id}`, { status }, {
+        http.setData({ status });
+        http.patch(`/service-requests/${id}`, {
             onSuccess: () => {
                 setActiveRequests(prev => prev.map(r => r.id === id ? { ...r, status: status as any } : r).filter(r => status !== 'resolved' ? true : r.id !== id));
                 toast.success(`${__('Permintaan')} #${id} ${__('diperbarui menjadi')} ${status.toUpperCase()}`);
@@ -208,13 +209,13 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
         <>
             <Head title={`${__('Manajemen Reservasi')} - Ocean's Resto`} />
 
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-white font-['Inter',sans-serif]">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-slate-900 dark:text-white font-['Inter',sans-serif]">
                 <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
                     <div>
-                        <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-white/95">
+                        <h1 className="font-['Playfair_Display',serif] text-4xl font-bold tracking-tight text-slate-900 dark:text-white/95">
                             {__('Reservasi & Layout')}
                         </h1>
-                        <p className="mt-1 text-sm text-white/40">
+                        <p className="mt-1 text-sm text-slate-400 dark:text-white/40">
                             {__('Kelola pemesanan masuk dan atur tata letak meja restoran secara visual.')}
                         </p>
                     </div>
@@ -222,36 +223,36 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
 
                 <div className="w-full">
                     {/* List Section */}
-                    <div className="overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] backdrop-blur-md shadow-2xl transition-all">
+                    <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] backdrop-blur-md shadow-xl dark:shadow-2xl transition-all">
                         {reservations.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <Table>
-                                    <TableHeader className="border-b border-white/5 bg-white/5">
+                                    <TableHeader className="border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5">
                                         <TableRow className="hover:bg-transparent border-white/5">
-                                            <TableHead className="font-semibold text-white/70">{__('Pelanggan')}</TableHead>
-                                            <TableHead className="font-semibold text-white/70">{__('Tanggal & Waktu')}</TableHead>
-                                            <TableHead className="font-semibold text-white/70">{__('Meja & Tamu')}</TableHead>
-                                            <TableHead className="font-semibold text-white/70">{__('Status')}</TableHead>
-                                            <TableHead className="text-right font-black tracking-widest uppercase text-[10px] text-white/50 w-[150px]">
+                                            <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Pelanggan')}</TableHead>
+                                            <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Tanggal & Waktu')}</TableHead>
+                                            <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Meja & Tamu')}</TableHead>
+                                            <TableHead className="font-semibold text-slate-500 dark:text-white/70">{__('Status')}</TableHead>
+                                            <TableHead className="text-right font-black tracking-widest uppercase text-[10px] text-slate-400 dark:text-white/50 w-[150px]">
                                                 {__('Aksi')}
                                             </TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {reservations.map((reservation) => (
-                                            <TableRow key={reservation.id} className="hover:bg-white/5 border-white/5 transition-colors group">
+                                            <TableRow key={reservation.id} className="hover:bg-slate-50 dark:hover:bg-white/5 border-slate-100 dark:border-white/5 transition-colors group">
                                                 <TableCell>
                                                     <div className="flex items-center gap-4">
                                                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500 ring-1 ring-sky-500/20">
                                                             <Users size={18} />
                                                         </div>
                                                         <div className="min-w-0">
-                                                            <h3 className="truncate font-bold text-white/95 text-base">{reservation.customer_name}</h3>
-                                                            <div className="text-xs text-white/40 flex flex-col gap-0.5 mt-0.5">
+                                                            <h3 className="truncate font-bold text-slate-900 dark:text-white/95 text-base">{reservation.customer_name}</h3>
+                                                            <div className="text-xs text-slate-400 dark:text-white/40 flex flex-col gap-0.5 mt-0.5">
                                                                 <a 
                                                                     href={`https://wa.me/${reservation.customer_phone?.replace(/\D/g, '')}?text=Halo%20${encodeURIComponent(reservation.customer_name)},%0A%0AMengenai%20reservasi%20di%20Ocean's Resto...`}
                                                                     target="_blank" rel="noopener noreferrer"
-                                                                    className="inline-flex items-center gap-1 text-emerald-500/80 hover:text-emerald-400 transition-colors"
+                                                                    className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-500/80 hover:text-emerald-500 transition-colors"
                                                                 >
                                                                     <MessageCircle size={12} /> {reservation.customer_phone}
                                                                 </a>
@@ -260,22 +261,22 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <div className="mb-1 flex items-center text-sm font-medium text-white/80">
+                                                    <div className="mb-1 flex items-center text-sm font-medium text-slate-600 dark:text-white/80">
                                                         {new Date(reservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </div>
-                                                    <div className="flex items-center text-xs text-white/40">
-                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-sky-500/70" />
+                                                    <div className="flex items-center text-xs text-slate-400 dark:text-white/40">
+                                                        <Clock className="mr-1.5 h-3.5 w-3.5 text-sky-600 dark:text-sky-500/70" />
                                                         {reservation.time.substring(0, 5)}
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <div className="flex flex-col gap-1.5">
-                                                        <div className="flex items-center text-sm font-semibold text-white/90">
-                                                            <Badge variant="outline" className="bg-white/5 border-white/10 text-white/60">
+                                                        <div className="flex items-center text-sm font-semibold text-slate-900 dark:text-white/90">
+                                                            <Badge variant="outline" className="bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-white/60">
                                                                 {__('Meja')} {reservation.table_id || '?'}
                                                             </Badge>
                                                         </div>
-                                                        <span className="text-xs text-white/40 ml-1">{reservation.guest_count} {__('Orang')}</span>
+                                                        <span className="text-xs text-slate-400 dark:text-white/40 ml-1">{reservation.guest_count} {__('Orang')}</span>
                                                     </div>
                                                 </TableCell>
                                                 <TableCell>
@@ -291,7 +292,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                         <Button
                                                             size="icon"
                                                             variant="outline"
-                                                            className="h-8 w-8 border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
+                                                            className="h-8 w-8 border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/70 hover:bg-slate-200 dark:hover:bg-white/10"
                                                             onClick={() => setSelectedReservation(reservation)}
                                                             title={__('Lihat Detail')}
                                                         >
@@ -300,7 +301,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                         <Button
                                                             size="icon"
                                                             variant="outline"
-                                                            className={`h-8 w-8 border-sky-500/20 bg-sky-500/10 text-sky-500 hover:bg-sky-500/20 ${activeChatId === reservation.id ? 'ring-2 ring-sky-500 ring-offset-2 ring-offset-black' : ''}`}
+                                                            className={`h-8 w-8 border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-500 hover:bg-sky-500/20 ${activeChatId === reservation.id ? 'ring-2 ring-sky-500 ring-offset-2 ring-offset-white dark:ring-offset-black' : ''}`}
                                                             onClick={() => setActiveChatId(activeChatId === reservation.id ? null : reservation.id)}
                                                             title={__('Buka Chat')}
                                                         >
@@ -363,11 +364,11 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                             </div>
                         ) : (
                             <div className="p-20 text-center flex flex-col items-center">
-                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5">
-                                    <Calendar size={32} className="text-sky-500/40" />
+                                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/5">
+                                    <Calendar size={32} className="text-sky-600/40 dark:text-sky-500/40" />
                                 </div>
-                                <h3 className="text-lg font-bold text-white/90 italic font-['Playfair_Display',serif]">{__('Hening di Sini...')}</h3>
-                                <p className="mt-2 text-sm text-white/40 max-w-xs">{__('Saat ini tidak ada permintaan reservasi yang masuk dalam antrean Anda.')}</p>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white/90 italic font-['Playfair_Display',serif]">{__('Hening di Sini...')}</h3>
+                                <p className="mt-2 text-sm text-slate-400 dark:text-white/40 max-w-xs">{__('Saat ini tidak ada permintaan reservasi yang masuk dalam antrean Anda.')}</p>
                             </div>
                         )}
                     </div>
@@ -405,7 +406,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                     </div>
 
                                     <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-500 border border-sky-500/20">
+                                        <div className="h-10 w-10 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-500 border border-sky-500/20">
                                             {request.type === 'waiter' && <Bell size={18} />}
                                             {request.type === 'bill' && <Receipt size={18} />}
                                             {request.type === 'refill' && <Droplets size={18} />}
@@ -413,7 +414,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </div>
                                         <div>
                                             <p className="text-sm font-black text-white uppercase tracking-tight">{__('Meja')} {request.reservation?.resto_table?.name || '?'}</p>
-                                            <p className="text-[10px] font-bold text-sky-500/60 uppercase">{request.type}</p>
+                                            <p className="text-[10px] font-bold text-sky-400 uppercase">{request.type}</p>
                                         </div>
                                     </div>
 
@@ -454,13 +455,13 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
 
                 {/* Detail Dialog */}
                 <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && setSelectedReservation(null)}>
-                    <DialogContent className="sm:max-w-xl bg-[#0A0A0B] border-white/5 text-white p-0 overflow-hidden flex flex-col max-h-[90vh]">
-                        <div className="p-6 border-b border-white/5 bg-white/[0.02]">
+                    <DialogContent className="sm:max-w-xl bg-white dark:bg-[#0A0A0B] border-slate-200 dark:border-white/5 text-slate-900 dark:text-white p-0 overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
                             <DialogHeader>
                                 <DialogTitle className="font-['Playfair_Display',serif] text-2xl font-bold">
                                     {__('Detail Reservasi')} #{selectedReservation?.id.toString().padStart(4, '0')}
                                 </DialogTitle>
-                                <DialogDescription className="text-white/40">
+                                <DialogDescription className="text-slate-400 dark:text-white/40">
                                     {__('Info lengkap tamu, pesanan pre-order, dan tagihan.')}
                                 </DialogDescription>
                             </DialogHeader>
@@ -472,49 +473,49 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                 <div className="space-y-3">
                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-sky-500">{__('Informasi Tamu')}</h4>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{__('Nama')}</p>
+                                        <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+                                            <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Nama')}</p>
                                             <p className="text-sm font-semibold">{selectedReservation.customer_name}</p>
                                         </div>
-                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{__('Kontak')}</p>
+                                        <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+                                            <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Kontak')}</p>
                                             <p className="text-sm font-semibold">{selectedReservation.customer_phone}</p>
                                         </div>
-                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{__('Jadwal')}</p>
+                                        <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+                                            <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Jadwal')}</p>
                                             <p className="text-sm font-semibold">{new Date(selectedReservation.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US')} - {selectedReservation.time.substring(0,5)} WIB</p>
                                         </div>
-                                        <div className="bg-white/5 rounded-xl p-3 border border-white/5">
-                                            <p className="text-[10px] text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
+                                        <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+                                            <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
                                             <p className="text-sm font-semibold">{__('Meja')} {selectedReservation.table_id || '?'} ({selectedReservation.guest_count} {__('Tamu')})</p>
                                         </div>
                                     </div>
                                     {selectedReservation.special_requests && (
                                         <div className="bg-sky-500/5 rounded-xl p-3 border border-sky-500/10">
-                                            <p className="text-[10px] text-sky-400 uppercase font-bold tracking-wider mb-1">{__('Catatan Spesial')}</p>
-                                            <p className="text-sm font-medium text-white/80">{selectedReservation.special_requests}</p>
+                                            <p className="text-[10px] text-sky-600 dark:text-sky-400 uppercase font-bold tracking-wider mb-1">{__('Catatan Spesial')}</p>
+                                            <p className="text-sm font-medium text-slate-700 dark:text-white/80">{selectedReservation.special_requests}</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Pre-order Menu */}
                                 <div className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500">{__('Pre-order Menu')}</h4>
-                                    <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-500">{__('Pre-order Menu')}</h4>
+                                    <div className="bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 overflow-hidden">
                                         {selectedReservation.menus && selectedReservation.menus.length > 0 ? (
                                             <div className="divide-y divide-white/5">
                                                 {selectedReservation.menus.map((m: any) => (
                                                     <div key={m.id} className="p-4 flex items-center justify-between">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="h-10 w-10 rounded-lg bg-white/10 flex-shrink-0 overflow-hidden">
+                                                            <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-white/5">
                                                                 <img src={`/storage/${m.image_url}`} alt={m.name} className="h-full w-full object-cover" />
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-bold text-white/90">{m.name}</p>
-                                                                <p className="text-xs text-white/40">{m.pivot.quantity}x @ Rp {Number(m.price).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</p>
+                                                                <p className="text-sm font-bold text-slate-900 dark:text-white/90">{m.name}</p>
+                                                                <p className="text-xs text-slate-400 dark:text-white/40">{m.pivot.quantity}x @ Rp {Number(m.price).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</p>
                                                             </div>
                                                         </div>
-                                                        <p className="text-sm font-bold text-emerald-400">
+                                                        <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
                                                             Rp {(m.price * m.pivot.quantity).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}
                                                         </p>
                                                     </div>
@@ -530,24 +531,24 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
 
                                 {/* Payment Details */}
                                 <div className="space-y-3">
-                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-500">{__('Ringkasan Tagihan (DP)')}</h4>
-                                    <div className="bg-white/5 rounded-2xl border border-white/5 p-4 space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-500">{__('Ringkasan Tagihan (DP)')}</h4>
+                                    <div className="bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 p-4 space-y-3">
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-white/60">{__('Estimasi Total DP (50%)')}</span>
+                                            <span className="text-slate-500 dark:text-white/60">{__('Estimasi Total DP (50%)')}</span>
                                             <span className="font-bold">Rp {Number(selectedReservation.booking_fee).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
                                         </div>
                                         <div className="flex justify-between items-center text-sm">
-                                            <span className="text-white/60">{__('Diskon Loyalty Points')}</span>
-                                            <span className="font-bold text-rose-400">- Rp {Number(selectedReservation.discount_amount || 0).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
+                                            <span className="text-slate-500 dark:text-white/60">{__('Diskon Loyalty Points')}</span>
+                                            <span className="font-bold text-rose-500 dark:text-rose-400">- Rp {Number(selectedReservation.discount_amount || 0).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
                                         </div>
-                                        <div className="pt-3 border-t border-white/10 flex justify-between items-center">
-                                            <span className="font-bold text-white/90">{__('Total Harus Dibayar')}</span>
-                                            <span className="text-xl font-black text-blue-400">Rp {Number(selectedReservation.total_after_discount || selectedReservation.booking_fee).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
+                                        <div className="pt-3 border-t border-slate-200 dark:border-white/10 flex justify-between items-center">
+                                            <span className="font-bold text-slate-900 dark:text-white/90">{__('Total Harus Dibayar')}</span>
+                                            <span className="text-xl font-black text-blue-600 dark:text-blue-400">Rp {Number(selectedReservation.total_after_discount || selectedReservation.booking_fee).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
                                         </div>
                                     </div>
                                     <div className="flex justify-between items-center pt-2">
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">{__('Status Reservasi:')}</span>
+                                            <span className="text-[10px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest">{__('Status Reservasi:')}</span>
                                             <StatusBadge status={selectedReservation.status} />
                                         </div>
                                         {selectedReservation.status !== 'rejected' && selectedReservation.status !== 'cancelled' && (

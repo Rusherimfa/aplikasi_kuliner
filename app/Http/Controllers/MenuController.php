@@ -6,6 +6,7 @@ use App\Enums\Role;
 use App\Models\Menu;
 use App\Models\Team;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class MenuController extends Controller
@@ -46,7 +47,7 @@ class MenuController extends Controller
      */
     public function store(Request $request)
     {
-        if (! auth()->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -58,7 +59,12 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
             'is_best_seller' => 'boolean',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('menus', 'public');
+        }
 
         $team->menus()->create($validated);
 
@@ -70,7 +76,7 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
-        if (auth()->user()->role === Role::STAFF) {
+        if ($request->user()->role === Role::STAFF) {
             $validated = $request->validate([
                 'is_available' => 'boolean',
                 'is_best_seller' => 'boolean',
@@ -87,7 +93,15 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
             'is_best_seller' => 'boolean',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($menu->image_path) {
+                Storage::disk('public')->delete($menu->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('menus', 'public');
+        }
 
         $menu->update($validated);
 
@@ -97,9 +111,9 @@ class MenuController extends Controller
     /**
      * Remove the specified menu from storage.
      */
-    public function destroy(Menu $menu)
+    public function destroy(Request $request, Menu $menu)
     {
-        if (! auth()->user()->isAdmin()) {
+        if (! $request->user()->isAdmin()) {
             abort(403, 'Unauthorized action.');
         }
 

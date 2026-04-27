@@ -67,8 +67,26 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
     return (
         <section 
             ref={containerRef} 
-            className="premium-noise bg-background py-16 md:py-24 transition-colors duration-700 relative overflow-hidden"
+            className="premium-noise bg-section-signature py-24 md:py-32 transition-colors duration-1000 relative overflow-hidden"
         >
+            {/* Atmospheric Background Layers */}
+            <div className="god-rays" />
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-transparent opacity-40 dark:opacity-20" />
+            
+            {/* Multi-Wave Transition from Hero */}
+            <div className="wave-container top-0 rotate-180">
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="wave-anim-1">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-background"></path>
+                </svg>
+                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="wave-anim-2 absolute inset-0">
+                    <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-background/40"></path>
+                </svg>
+            </div>
+
+            {/* Floating particles orbs */}
+            <div className="absolute top-1/2 left-1/4 h-96 w-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none dark:opacity-30" />
+            <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] bg-sky-500/5 rounded-full blur-[120px] pointer-events-none dark:opacity-20" />
+            
             {/* Decorative background elements */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
             <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-primary/5 to-transparent hidden md:block" />
@@ -124,7 +142,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                             <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden m-4 rounded-[1.8rem] md:rounded-[2.2rem]">
                                 {item.image_path ? (
                                     <img 
-                                        src={item.image_path} 
+                                        src={`/storage/${item.image_path}`} 
                                         alt={item.name}
                                         className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                     />

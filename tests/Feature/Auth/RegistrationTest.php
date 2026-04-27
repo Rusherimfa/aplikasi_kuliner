@@ -1,23 +1,31 @@
 <?php
 
 use App\Models\User;
+use Tests\TestCase;
+
+use function Pest\Laravel\assertAuthenticated;
+use function Pest\Laravel\get;
+use function Pest\Laravel\post;
+use function Pest\Laravel\withoutExceptionHandling;
+
+uses(TestCase::class);
 
 test('registration screen can be rendered', function () {
-    $response = $this->get(route('register'));
+    $response = get(route('register'));
 
     $response->assertOk();
 });
 
 test('new users can register', function () {
-    $this->withoutExceptionHandling();
-    $response = $this->post(route('register.store'), [
+    withoutExceptionHandling();
+    $response = post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
 
-    $this->assertAuthenticated();
+    assertAuthenticated();
 
     $user = User::where('email', 'test@example.com')->first();
     $response->assertRedirect(route('dashboard'));

@@ -71,14 +71,17 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.05]" />
             </div>
 
-            {/* Atmospheric Orbs */}
+            {/* Atmospheric Orbs - Enhanced for depth */}
             <div 
                 ref={(el) => { if (el) orbsRef.current[0] = el; }}
-                className="pointer-events-none absolute -top-48 -right-48 h-[800px] w-[800px] rounded-full bg-primary/10 blur-[160px]" 
+                className="pointer-events-none absolute -top-48 -right-48 h-[1000px] w-[1000px] rounded-full bg-sky-500/15 blur-[200px] opacity-60 mix-blend-screen" 
             />
             <div 
                 ref={(el) => { if (el) orbsRef.current[1] = el; }}
-                className="pointer-events-none absolute bottom-1/4 -left-48 h-[600px] w-[600px] rounded-full bg-sky-600/5 blur-[120px]" 
+                className="pointer-events-none absolute bottom-1/4 -left-64 h-[800px] w-[800px] rounded-full bg-indigo-600/10 blur-[180px] opacity-40 mix-blend-plus-lighter" 
+            />
+            <div 
+                className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-full bg-[radial-gradient(circle_at_center,transparent_0%,var(--background)_80%)] opacity-80"
             />
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-24 pb-16 lg:px-8">

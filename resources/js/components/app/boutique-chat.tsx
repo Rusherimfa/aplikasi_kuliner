@@ -16,6 +16,7 @@ interface Message {
         role: string;
     };
     is_chatbot: boolean;
+    read_at?: string | null;
     created_at: string;
 }
 
@@ -145,7 +146,7 @@ export default function BoutiqueChat({ reservationId, orderId, currentUser }: { 
                 >
                     <MessageCircle size={28} className="group-hover:rotate-12 transition-transform" />
                     {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 h-6 w-6 bg-rose-500 border-2 border-black rounded-full flex items-center justify-center shadow-lg">
+                        <div className="absolute -top-1 -right-1 h-6 w-6 bg-rose-500 border-2 border-white dark:border-black rounded-full flex items-center justify-center shadow-lg">
                             <span className="text-[10px] font-black text-white">{unreadCount}</span>
                         </div>
                     )}
@@ -174,7 +175,7 @@ export default function BoutiqueChat({ reservationId, orderId, currentUser }: { 
                                     </div>
                                 </div>
                             </div>
-                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full hover:bg-white/10 transition-colors">
+                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
                                 <X size={20} />
                             </Button>
                         </div>
@@ -229,7 +230,7 @@ export default function BoutiqueChat({ reservationId, orderId, currentUser }: { 
                                     placeholder={__('Ask for concierge assistance...')}
                                     value={newMessage}
                                     onChange={e => setNewMessage(e.target.value)}
-                                    className="h-14 pl-6 pr-14 rounded-2xl border-slate-200 dark:border-white/10 dark:bg-black/40 focus:ring-sky-500/20 font-medium"
+                                    className="h-14 pl-6 pr-14 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-black/40 text-slate-900 dark:text-white focus:ring-sky-500/20 font-medium"
                                 />
                                 <button 
                                     type="submit"

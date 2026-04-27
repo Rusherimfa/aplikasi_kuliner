@@ -22,7 +22,7 @@ export function AppSidebar() {
     const { __ } = useTranslations();
     const page = usePage();
     const dashboardUrl = page.props.currentTeam
-        ? dashboard(page.props.currentTeam.slug)
+        ? (dashboard((page.props.currentTeam as any).slug) as any).url()
         : '/';
 
     const userRole = (page.props.auth as any).user.role;

@@ -11,6 +11,7 @@ use App\Models\RestoTable;
 use App\Models\ServiceRequest;
 use App\Models\Team;
 use App\Models\User;
+use App\Notifications\AppNotification;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -109,7 +110,10 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        if ($reservation->user_id !== Auth::id() && ! Auth::user()->isStaff()) {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($reservation->user_id !== $user->id && ! $user->isStaff()) {
             abort(403, 'Unauthorized access to reservation details.');
         }
 
@@ -246,6 +250,17 @@ class ReservationController extends Controller
             $reservation->menus()->sync($syncData);
         }
 
+        // Notify Admin/Staff about new reservation
+        $staff = User::whereIn('role', ['admin', 'staff'])->get();
+        foreach ($staff as $s) {
+            $s->notify(new AppNotification(
+                __('Reservasi Baru'),
+                __('Ada reservasi baru dari :name untuk tanggal :date.', ['name' => $reservation->customer_name, 'date' => $reservation->date]),
+                'info',
+                route('reservations.index', [], false)
+            ));
+        }
+
         return redirect()->route('reservations.history')->with('success', 'Reservasi berhasil diajukan. Kami akan segera mengonfirmasi ketersediaan kursi dan menu Anda.');
     }
 
@@ -297,7 +312,7 @@ class ReservationController extends Controller
         // WA Simulation
         WhatsAppService::send(
             $reservation->customer_phone,
-            "Halo {$reservation->customer_name}, Pembayaran DP sebesar Rp ".number_format($reservation->booking_fee, 0, ',', '.').' telah kami terima. Reservasi Anda sedang diverifikasi. Cek progress live di: '.route('reservations.show', $reservation->id)
+            "Halo {$reservation->customer_name}, Pembayaran DP sebesar Rp ".number_format((float) $reservation->booking_fee, 0, ',', '.').' telah kami terima. Reservasi Anda sedang diverifikasi. Cek progress live di: '.route('reservations.show', $reservation->id)
         );
 
         // Award Loyalty Points (1 point per 10k IDR)
@@ -308,6 +323,25 @@ class ReservationController extends Controller
                 $reservation->customer_phone,
                 "Selamat! Anda mendapatkan {$points} fpt poin dari transaksi ini. Total poin Anda sekarang: ".($user->points)
             );
+        }
+
+        // Notify Customer about payment
+        $reservation->user?->notify(new AppNotification(
+            __('Pembayaran Diterima'),
+            __('Terima kasih! Pembayaran DP Anda untuk reservasi #:id telah kami terima.', ['id' => $reservation->id]),
+            'success',
+            route('reservations.show', [$reservation->id], false)
+        ));
+
+        // Notify Staff about payment
+        $staff = User::whereIn('role', ['admin', 'staff'])->get();
+        foreach ($staff as $s) {
+            $s->notify(new AppNotification(
+                __('DP Reservasi Dibayar'),
+                __('Pelanggan :name telah membayar DP untuk reservasi #:id.', ['name' => $reservation->customer_name, 'id' => $reservation->id]),
+                'success',
+                route('reservations.index', [], false)
+            ));
         }
 
         return redirect()->route('reservations.history')->with('success', 'Pembayaran DP berhasil! Email konfirmasi telah dikirim.');
@@ -350,6 +384,14 @@ class ReservationController extends Controller
         // Broadcast real-time update
         event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable'])));
 
+        // Notify Customer about status change
+        $reservation->user?->notify(new AppNotification(
+            __('Update Status Reservasi'),
+            __('Status reservasi Anda telah diperbarui menjadi: :status', ['status' => ucfirst($validated['status'])]),
+            'info',
+            route('reservations.show', [$reservation->id], false)
+        ));
+
         return back()->with('success', 'Reservation status updated.');
     }
 
@@ -380,8 +422,11 @@ class ReservationController extends Controller
      */
     public function updateDeliveryStatus(Request $request, Reservation $reservation)
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         // Only the assigned courier or staff can update the status
-        if (Auth::user()->isCourier() && $reservation->courier_id !== Auth::id()) {
+        if ($user->isCourier() && $reservation->courier_id !== $user->id) {
             abort(403, 'Unauthorized access to this delivery.');
         }
 
