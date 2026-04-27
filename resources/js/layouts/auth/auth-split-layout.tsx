@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ChefHat } from 'lucide-react';
+import { ArrowLeft, ChefHat } from 'lucide-react';
 import { home } from '@/routes';
 import type { AuthLayoutProps } from '@/types';
 import { useTranslations } from '@/hooks/use-translations';
@@ -40,6 +40,14 @@ export default function AuthSplitLayout({
                         <h2 className="font-['Playfair_Display',serif] text-3xl font-bold tracking-widest text-foreground drop-shadow-lg">
                             {name || "Ocean's Resto"}
                         </h2>
+                    </Link>
+
+                    <Link
+                        href={home()}
+                        className="mt-4 inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-xs font-semibold text-orange-600 transition-colors hover:bg-orange-500/15 hover:text-orange-500 dark:text-orange-400"
+                    >
+                        <ArrowLeft size={14} />
+                        Kembali ke Home
                     </Link>
                 </div>
 

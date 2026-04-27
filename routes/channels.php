@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\Order;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\Broadcast;
@@ -19,7 +20,8 @@ Broadcast::channel('reservations.{id}', function ($user, $id) {
     }
 
     return (int) $user->id === (int) $reservation->user_id ||
-           $user->isStaff() ||
+           $user->isAdmin() ||
+           $user->role === Role::STAFF ||
            (int) $user->id === (int) $reservation->courier_id;
 });
 
@@ -30,10 +32,11 @@ Broadcast::channel('orders.{id}', function ($user, $id) {
     }
 
     return (int) $user->id === (int) $order->user_id ||
-           $user->isStaff() ||
+           $user->isAdmin() ||
+           $user->role === Role::STAFF ||
            (int) $user->id === (int) $order->courier_id;
 });
 
 Broadcast::channel('staff.notifications', function ($user) {
-    return $user->isStaff();
+    return $user->isAdmin() || $user->role === Role::STAFF;
 });

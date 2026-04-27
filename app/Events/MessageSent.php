@@ -6,11 +6,11 @@ use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcast
+class MessageSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -36,12 +36,16 @@ class MessageSent implements ShouldBroadcast
             new PrivateChannel($prefix.'.'.$id),
         ];
 
-        // Notify staff if a customer sends a message
         if ($this->message->sender && ! $this->message->sender->isStaff()) {
             $channels[] = new PrivateChannel('staff.notifications');
+
+            $courierId = $this->message->reservation?->courier_id ?? $this->message->order?->courier_id;
+
+            if ($courierId) {
+                $channels[] = new PrivateChannel('user.'.$courierId);
+            }
         }
 
-        // Notify the customer if a staff member sends a message
         if ($this->message->sender && $this->message->sender->isStaff()) {
             $recipientId = null;
             if ($prefix === 'reservations') {
