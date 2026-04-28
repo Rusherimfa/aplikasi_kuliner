@@ -1,5 +1,6 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { useTranslations } from '@/hooks/use-translations';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame, Image as ImageIcon, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,7 +67,7 @@ export default function MenuManagement({ menus, filters }: any) {
             image: null,
             _method: 'put',
         });
-        setImagePreview(menu.image_path ? `/storage/${menu.image_path}` : null);
+        setImagePreview(menu.image_path ? (menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`) : null);
         setIsModalOpen(true);
     };
 
@@ -158,7 +159,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-muted overflow-hidden border border-slate-200 dark:border-border">
                                                         {menu.image_path ? (
-                                                            <img src={`/storage/${menu.image_path}`} className="h-full w-full object-cover" alt={menu.name} />
+                                                            <img src={menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`} className="h-full w-full object-cover" alt={menu.name} />
                                                         ) : (
                                                             <BookOpen size={18} className="text-slate-400 dark:text-muted-foreground" />
                                                         )}

@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
 use App\Notifications\AppNotification;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -26,17 +27,48 @@ class OrderController extends Controller
             'items.*.id' => 'required|exists:menus,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.price' => 'required|numeric|min:0',
+            'items.*.notes' => 'nullable|string|max:500',
             'cart_total' => 'required|numeric|min:0',
             'customer_lat' => 'nullable|numeric',
             'customer_lng' => 'nullable|numeric',
+            'delivery_address' => 'nullable|string',
             'delivery_method' => 'nullable|string|in:resto,gojek,grab',
             'delivery_service' => 'nullable|string',
             'delivery_fee' => 'nullable|numeric',
         ]);
 
         $order = DB::transaction(function () use ($validated) {
-            $deliveryFee = $validated['delivery_fee'] ?? 0;
-            $totalPrice = $validated['cart_total'] + $deliveryFee;
+            $subtotal = $validated['cart_total'];
+            $taxAmount = $subtotal * 0.10; // PB1 10%
+            $serviceAmount = 0;
+
+            // Calculate Delivery Fee on Backend
+            $deliveryFee = 0;
+            if ($validated['order_type'] === 'delivery') {
+                $restoLat = config('services.resto.lat', -1.2654);
+                $restoLng = config('services.resto.lng', 116.8312);
+                $feePerKm = config('services.delivery.fee_per_km', 5000);
+
+                if (isset($validated['customer_lat']) && isset($validated['customer_lng'])) {
+                    $distance = $this->calculateDistance(
+                        $restoLat, $restoLng,
+                        $validated['customer_lat'], $validated['customer_lng']
+                    );
+
+                    // Cap distance at 50km for safety, otherwise it might be a GPS error or very far
+                    $safeDistance = min(50, $distance);
+                    $deliveryFee = max(5000, round($safeDistance * $feePerKm));
+
+                    // Add surcharge for 3rd party
+                    if (($validated['delivery_method'] ?? 'resto') !== 'resto') {
+                        $deliveryFee += 5000;
+                    }
+                } else {
+                    $deliveryFee = $validated['delivery_fee'] ?? 0;
+                }
+            }
+
+            $totalPrice = $subtotal + $taxAmount + $serviceAmount + $deliveryFee;
 
             $order = Order::create([
                 'user_id' => Auth::id(),
@@ -46,14 +78,27 @@ class OrderController extends Controller
                 'customer_phone' => $validated['customer_phone'] ?? null,
                 'customer_lat' => $validated['customer_lat'] ?? null,
                 'customer_lng' => $validated['customer_lng'] ?? null,
+                'delivery_address' => $validated['delivery_address'] ?? null,
                 'order_type' => $validated['order_type'],
                 'delivery_method' => $validated['delivery_method'] ?? null,
                 'delivery_service' => $validated['delivery_service'] ?? null,
+                'subtotal' => $subtotal,
+                'tax_amount' => $taxAmount,
+                'service_amount' => $serviceAmount,
                 'delivery_fee' => $deliveryFee,
                 'payment_status' => 'unpaid',
                 'order_status' => 'pending',
                 'total_price' => $totalPrice,
             ]);
+
+            // Generate Midtrans Snap Token
+            try {
+                $midtrans = new MidtransService;
+                $snapToken = $midtrans->getSnapToken($order);
+                $order->update(['midtrans_snap_token' => $snapToken]);
+            } catch (\Exception $e) {
+                Log::error('Midtrans Error: '.$e->getMessage());
+            }
 
             foreach ($validated['items'] as $item) {
                 OrderItem::create([
@@ -62,8 +107,11 @@ class OrderController extends Controller
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['price'],
                     'total_price' => $item['quantity'] * $item['price'],
+                    'notes' => $item['notes'] ?? null,
                 ]);
             }
+
+            Log::info('Order Created Successfully', ['id' => $order->id, 'number' => $order->order_number]);
 
             return $order;
         });
@@ -80,7 +128,9 @@ class OrderController extends Controller
             ));
         }
 
-        return redirect()->route('orders.history')->with('success', 'Pesanan Anda telah berhasil dibuat!');
+        Log::info('Redirecting to Track Page', ['url' => "/orders/{$order->id}/track"]);
+
+        return redirect()->to("/orders/{$order->id}/track");
     }
 
     public function history(Request $request)
@@ -105,11 +155,45 @@ class OrderController extends Controller
             return redirect()->route('orders.history')->with('success', 'Pesanan ini sudah dibayar.');
         }
 
+        // Jika token belum ada (misal gagal digenerate saat store), generate sekarang
+        if (! $order->midtrans_snap_token) {
+            try {
+                $midtrans = new MidtransService;
+                $snapToken = $midtrans->getSnapToken($order);
+                $order->update(['midtrans_snap_token' => $snapToken]);
+            } catch (\Exception $e) {
+                Log::error('Midtrans Retry Error: '.$e->getMessage());
+            }
+        }
+
         $order->load(['items.menu']);
 
         return Inertia::render('orders/payment', [
             'order' => $order,
         ]);
+    }
+
+    public function refreshPayment(Order $order)
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($order->payment_status === 'paid') {
+            return back()->with('error', 'Pesanan ini sudah dibayar.');
+        }
+
+        try {
+            $midtrans = new MidtransService;
+            $snapToken = $midtrans->getSnapToken($order);
+            $order->update(['midtrans_snap_token' => $snapToken]);
+
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Refresh Error: '.$e->getMessage());
+
+            return response()->json(['error' => 'Gagal memperbarui token pembayaran.'], 500);
+        }
     }
 
     public function processPayment(Order $order)
@@ -240,5 +324,21 @@ class OrderController extends Controller
         return Inertia::render('orders/track', [
             'order' => $order,
         ]);
+    }
+
+    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    {
+        $earthRadius = 6371; // KM
+
+        $latDelta = deg2rad($lat2 - $lat1);
+        $lonDelta = deg2rad($lon2 - $lon1);
+
+        $a = sin($latDelta / 2) * sin($latDelta / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($lonDelta / 2) * sin($lonDelta / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
     }
 }

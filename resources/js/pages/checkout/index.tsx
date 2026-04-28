@@ -65,6 +65,7 @@ export default function CheckoutIndex() {
         customer_phone: auth?.user?.phone || '',
         customer_lat: null as number | null,
         customer_lng: null as number | null,
+        delivery_address: '',
         delivery_method: 'resto' as 'resto' | 'gojek' | 'grab',
         delivery_service: 'standard' as string,
     });
@@ -80,14 +81,47 @@ export default function CheckoutIndex() {
         }
     }, [formData.delivery_method]);
 
+    const { config } = usePage().props as any;
+
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+        const R = 6371; // Radius bumi dalam KM
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = 
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    };
+
     const deliveryFee = useMemo(() => {
         if (orderType === 'pickup') return 0;
-        const method = formData.delivery_method as keyof typeof DELIVERY_PRICES;
-        const services = DELIVERY_PRICES[method] as any;
-        return services[formData.delivery_service] || 0;
-    }, [orderType, formData.delivery_method, formData.delivery_service]);
+        
+        // Jika belum ada lokasi, tampilkan harga dasar atau 0
+        if (!formData.customer_lat || !formData.customer_lng) {
+            const method = formData.delivery_method as keyof typeof DELIVERY_PRICES;
+            const services = DELIVERY_PRICES[method] as any;
+            return services[formData.delivery_service] || 0;
+        }
 
-    const taxAmount = cartTotal * 0.15;
+        const distance = calculateDistance(
+            config.resto_lat, 
+            config.resto_lng, 
+            formData.customer_lat, 
+            formData.customer_lng
+        );
+
+        // Biaya = Jarak * Tarif per KM (Minimal 5000)
+        const fee = Math.max(5000, Math.round(distance * config.delivery_fee_per_km));
+        
+        // Tambahkan surcharge jika pakai Gojek/Grab
+        const surcharge = formData.delivery_method === 'resto' ? 0 : 5000;
+        
+        return fee + surcharge;
+    }, [orderType, formData.delivery_method, formData.delivery_service, formData.customer_lat, formData.customer_lng]);
+
+    const taxAmount = cartTotal * 0.10;
     const grandTotal = cartTotal + taxAmount + deliveryFee;
 
     const getMyLocation = () => {
@@ -99,12 +133,30 @@ export default function CheckoutIndex() {
         }
 
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setFormData({
-                    ...formData,
-                    customer_lat: position.coords.latitude,
-                    customer_lng: position.coords.longitude
-                });
+            async (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                setFormData(prev => ({
+                    ...prev,
+                    customer_lat: lat,
+                    customer_lng: lng
+                }));
+
+                // Reverse Geocoding using OpenStreetMap (Nominatim)
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`);
+                    const data = await response.json();
+                    if (data.display_name) {
+                        setFormData(prev => ({
+                            ...prev,
+                            delivery_address: data.display_name
+                        }));
+                    }
+                } catch (error) {
+                    console.error("Geocoding error:", error);
+                }
+
                 setLocationStatus('success');
             },
             () => {
@@ -116,6 +168,13 @@ export default function CheckoutIndex() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validation for Delivery
+        if (orderType === 'delivery' && (!formData.delivery_address || formData.delivery_address.trim().length < 10)) {
+            alert('Harap masukkan alamat pengiriman yang lengkap (minimal 10 karakter).');
+            return;
+        }
+
         setIsSubmitting(true);
         
         router.post('/orders/checkout', {
@@ -187,6 +246,19 @@ export default function CheckoutIndex() {
                                                 <Input required value={formData.customer_phone} onChange={(e) => setFormData({...formData, customer_phone: e.target.value})} type="tel" placeholder="+62 8..." className="h-16 rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold px-6 focus:ring-sky-500/20" />
                                             </div>
                                         </div>
+
+                                        {orderType === 'delivery' && (
+                                            <div className="space-y-3">
+                                                <label className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-[0.3em] ml-2">Delivery Address</label>
+                                                <textarea 
+                                                    required 
+                                                    value={formData.delivery_address} 
+                                                    onChange={(e) => setFormData({...formData, delivery_address: e.target.value})} 
+                                                    placeholder="Jl. Contoh No. 123, Kelurahan, Kecamatan..." 
+                                                    className="w-full min-h-[120px] rounded-2xl bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/5 text-lg font-bold p-6 focus:ring-sky-500/20 focus:outline-none transition-all"
+                                                />
+                                            </div>
+                                        )}
 
                                         {orderType === 'delivery' && (
                                             <div className="pt-4">
@@ -332,7 +404,7 @@ export default function CheckoutIndex() {
                                                                     <p className="text-[10px] text-slate-500">Layanan pengantaran khusus dari tim kami.</p>
                                                                 </div>
                                                             </div>
-                                                            <p className="font-black text-sky-500 italic">Rp 10.000</p>
+                                                            <p className="font-black text-sky-500 italic">Rp {deliveryFee.toLocaleString('id-ID')}</p>
                                                         </div>
                                                     ) : (
                                                         <>
@@ -342,7 +414,7 @@ export default function CheckoutIndex() {
                                                                 className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'economy' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
                                                             >
                                                                 <div className="flex items-center gap-4">
-                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'economy' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'economy' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40'}`}>
                                                                         <CircleDollarSign size={20} />
                                                                     </div>
                                                                     <div>
@@ -351,7 +423,7 @@ export default function CheckoutIndex() {
                                                                     </div>
                                                                 </div>
                                                                 <p className={`font-black italic ${formData.delivery_service === 'economy' ? 'text-sky-500' : 'text-slate-400'}`}>
-                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['economy'].toLocaleString('id-ID')}
+                                                                    Rp {deliveryFee.toLocaleString('id-ID')}
                                                                 </p>
                                                             </label>
 
@@ -361,7 +433,7 @@ export default function CheckoutIndex() {
                                                                 className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'instant' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
                                                             >
                                                                 <div className="flex items-center gap-4">
-                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'instant' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'instant' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40'}`}>
                                                                         <Zap size={20} />
                                                                     </div>
                                                                     <div>
@@ -370,7 +442,7 @@ export default function CheckoutIndex() {
                                                                     </div>
                                                                 </div>
                                                                 <p className={`font-black italic ${formData.delivery_service === 'instant' ? 'text-sky-500' : 'text-slate-400'}`}>
-                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['instant'].toLocaleString('id-ID')}
+                                                                    Rp {deliveryFee.toLocaleString('id-ID')}
                                                                 </p>
                                                             </label>
 
@@ -380,7 +452,7 @@ export default function CheckoutIndex() {
                                                                 className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all cursor-pointer ${formData.delivery_service === 'priority' ? 'border-sky-500 bg-sky-500/5' : 'border-slate-100 dark:border-white/5 hover:border-sky-500/20'}`}
                                                             >
                                                                 <div className="flex items-center gap-4">
-                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'priority' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400'}`}>
+                                                                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${formData.delivery_service === 'priority' ? 'bg-sky-500 text-black' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40'}`}>
                                                                         <Trophy size={20} />
                                                                     </div>
                                                                     <div>
@@ -389,7 +461,7 @@ export default function CheckoutIndex() {
                                                                     </div>
                                                                 </div>
                                                                 <p className={`font-black italic ${formData.delivery_service === 'priority' ? 'text-sky-500' : 'text-slate-400'}`}>
-                                                                    Rp {(DELIVERY_PRICES as any)[formData.delivery_method]['priority'].toLocaleString('id-ID')}
+                                                                    Rp {deliveryFee.toLocaleString('id-ID')}
                                                                 </p>
                                                             </label>
                                                         </>
@@ -424,6 +496,9 @@ export default function CheckoutIndex() {
                                             <li key={item.id} className="flex justify-between items-start group">
                                                 <div className="space-y-1">
                                                     <p className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight leading-tight group-hover:text-sky-500 transition-colors">{item.name}</p>
+                                                    {item.notes && (
+                                                        <p className="text-[9px] text-sky-500/60 font-medium italic">"{item.notes}"</p>
+                                                    )}
                                                     <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[.2em] italic">Quantity: {item.quantity}</p>
                                                 </div>
                                                 <span className="font-black text-slate-700 dark:text-white italic text-sm whitespace-nowrap">
@@ -448,7 +523,7 @@ export default function CheckoutIndex() {
                                         <span className="text-slate-800 dark:text-white/60">Rp {cartTotal.toLocaleString('id-ID')}</span>
                                     </div>
                                     <div className="flex justify-between text-[11px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest">
-                                        <span>Tax & Service (15%)</span>
+                                        <span>Tax (PB1 10%)</span>
                                         <span className="text-slate-800 dark:text-white/60">Rp {taxAmount.toLocaleString('id-ID')}</span>
                                     </div>
                                     <div className="flex justify-between text-[11px] font-bold text-emerald-500 uppercase tracking-widest">
@@ -467,10 +542,16 @@ export default function CheckoutIndex() {
                                     </div>
                                 </div>
 
+                                {orderType === 'delivery' && (!formData.delivery_address || formData.delivery_address.trim().length < 10) && (
+                                    <p className="mt-8 text-center text-[10px] font-black text-rose-500 uppercase tracking-widest animate-pulse">
+                                        Silahkan isi alamat pengiriman yang lengkap
+                                    </p>
+                                )}
+
                                 <Button 
                                     onClick={handleSubmit} 
-                                    disabled={isSubmitting || items.length === 0} 
-                                    className="w-full mt-12 h-18 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-20 flex items-center justify-center gap-3 py-8"
+                                    disabled={isSubmitting || items.length === 0 || (orderType === 'delivery' && (!formData.delivery_address || formData.delivery_address.trim().length < 10))} 
+                                    className="w-full mt-6 h-18 rounded-[2rem] bg-sky-500 text-black font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-sky-500/20 hover:bg-white hover:scale-[1.02] transition-all disabled:opacity-20 flex items-center justify-center gap-3 py-8"
                                 >
                                     {isSubmitting ? (
                                         <>

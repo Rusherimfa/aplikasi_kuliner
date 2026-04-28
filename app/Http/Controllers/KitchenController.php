@@ -45,6 +45,7 @@ class KitchenController extends Controller
                             'name' => $item->menu ? $item->menu->name : 'Menu Tidak Tersedia',
                             'quantity' => $item->quantity,
                             'status' => $item->status ?? 'pending',
+                            'notes' => $item->notes,
                             'type' => 'order',
                         ];
                     }),
@@ -121,9 +122,17 @@ class KitchenController extends Controller
         if ($item) {
             event(new DishStatusUpdated($item->reservation_id, $pivotId, $validated['status'], $item->name));
 
+            // Auto-complete reservation if all items are served
+            $reservation = Reservation::with('menus')->find($item->reservation_id);
+            if ($reservation && $validated['status'] === 'served') {
+                $allServed = $reservation->menus->every(fn ($m) => $m->pivot->status === 'served');
+                if ($allServed) {
+                    $reservation->update(['status' => 'completed']);
+                }
+            }
+
             // WA Simulation if Ready
             if ($validated['status'] === 'ready') {
-                $reservation = Reservation::find($item->reservation_id);
                 if ($reservation) {
                     WhatsAppService::send(
                         $reservation->customer_phone,
@@ -158,6 +167,17 @@ class KitchenController extends Controller
         $item->update(['status' => $validated['status']]);
 
         event(new DishStatusUpdated($item->order_id, $itemId, $validated['status'], $item->menu ? $item->menu->name : 'Item'));
+
+        // Auto-complete order if all items are ready
+        $order = Order::with('items')->find($item->order_id);
+        if ($order && ($validated['status'] === 'ready' || $validated['status'] === 'served')) {
+            $allReady = $order->items->every(fn ($i) => $i->status === 'ready' || $i->status === 'served');
+            if ($allReady) {
+                // If it's delivery, we might want to wait for courier pickup,
+                // but for simplicity, we mark it as ready for pickup/delivery
+                $order->update(['order_status' => $order->order_type === 'delivery' ? 'preparing' : 'complete']);
+            }
+        }
 
         if ($validated['status'] === 'ready' && $item->order && $item->order->user) {
             $item->order->user->notify(new AppNotification(

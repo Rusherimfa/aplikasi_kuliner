@@ -12,6 +12,7 @@ use App\Models\ServiceRequest;
 use App\Models\Team;
 use App\Models\User;
 use App\Notifications\AppNotification;
+use App\Services\MidtransService;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -209,6 +210,8 @@ class ReservationController extends Controller
         }
 
         $dpAmount = $foodTotal > 0 ? $foodTotal * 0.5 : 50000;
+        $taxAmount = $dpAmount * 0.10; // PB1 10%
+        $serviceAmount = 0;
 
         // Loyalty Logic
         $pointsUsed = 0;
@@ -222,7 +225,7 @@ class ReservationController extends Controller
             $discountAmount = $pointsUsed * 100;
         }
 
-        $finalAmount = $dpAmount - $discountAmount;
+        $finalAmount = ($dpAmount + $taxAmount + $serviceAmount) - $discountAmount;
 
         $reservation = Reservation::create([
             'team_id' => $defaultTeam->id,
@@ -238,6 +241,9 @@ class ReservationController extends Controller
             'type' => $validated['type'],
             'delivery_address' => $validated['type'] === 'delivery' ? $validated['delivery_address'] : null,
             'status' => 'pending',
+            'subtotal' => $dpAmount,
+            'tax_amount' => $taxAmount,
+            'service_amount' => $serviceAmount,
             'booking_fee' => $dpAmount,
             'points_used' => $pointsUsed,
             'discount_amount' => $discountAmount,
@@ -245,6 +251,15 @@ class ReservationController extends Controller
             'payment_status' => 'unpaid',
             'check_in_token' => Str::uuid()->toString(),
         ]);
+
+        // Generate Midtrans Snap Token
+        try {
+            $midtrans = new MidtransService;
+            $snapToken = $midtrans->getSnapToken($reservation);
+            $reservation->update(['midtrans_snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            \Log::error('Midtrans Error: '.$e->getMessage());
+        }
 
         if (! empty($syncData)) {
             $reservation->menus()->sync($syncData);
@@ -276,6 +291,17 @@ class ReservationController extends Controller
 
         if ($reservation->payment_status === 'paid' && in_array($reservation->status, ['pending', 'confirmed'])) {
             return redirect()->route('reservations.history')->with('success', 'Reservasi ini sudah dibayar.');
+        }
+
+        // Jika token belum ada (misal gagal digenerate saat store), generate sekarang
+        if (! $reservation->midtrans_snap_token) {
+            try {
+                $midtrans = new MidtransService;
+                $snapToken = $midtrans->getSnapToken($reservation);
+                $reservation->update(['midtrans_snap_token' => $snapToken]);
+            } catch (\Exception $e) {
+                \Log::error('Midtrans Retry Error: '.$e->getMessage());
+            }
         }
 
         $reservation->load(['menus', 'restoTable']);

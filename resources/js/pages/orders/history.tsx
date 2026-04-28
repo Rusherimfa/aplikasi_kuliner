@@ -16,6 +16,7 @@ import {
     Truck,
     Store,
     MessageCircle,
+    CircleDollarSign,
 } from 'lucide-react';
 import { useState } from 'react';
 import BoutiqueChat from '@/components/app/boutique-chat';
@@ -32,8 +33,8 @@ import Navbar from '@/pages/welcome/sections/navbar';
 export default function OrderHistory({ auth, orders }: any) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
-    const [activeChatOrderId, setActiveChatOrderId] = useState<number | null>(
-        null,
+    const [activeChatOrderId, setActiveChatOrderId] = useState<number | undefined>(
+        undefined,
     );
     const [chatContext, setChatContext] = useState<'support' | 'courier'>(
         'support',
@@ -316,20 +317,50 @@ export default function OrderHistory({ auth, orders }: any) {
                                                     Order Details
                                                 </Button>
 
-                                                {o.order_status ===
-                                                    'waiting_for_payment' && (
-                                                    <Link
-                                                        href={`/orders/payment/${o.id}`}
-                                                        className="w-full"
+                                                {o.payment_status === 'unpaid' && o.order_status !== 'cancelled' && (
+                                                    <Button 
+                                                        onClick={async () => {
+                                                            const snap = (window as any).snap;
+                                                            if (!snap) {
+                                                                router.visit(`/orders/payment/${o.id}`);
+                                                                return;
+                                                            }
+
+                                                            try {
+                                                                // Always fetch a fresh token to avoid expiration/method-locking issues
+                                                                const response = await fetch(`/orders/payment/${o.id}/refresh`, {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as any)?.content || '',
+                                                                        'Accept': 'application/json',
+                                                                    }
+                                                                });
+                                                                
+                                                                const data = await response.json();
+                                                                
+                                                                if (data.snap_token) {
+                                                                    snap.pay(data.snap_token, {
+                                                                        onSuccess: () => router.reload(),
+                                                                        onPending: () => router.reload(),
+                                                                        onClose: () => router.reload(),
+                                                                    });
+                                                                } else {
+                                                                    // Fallback
+                                                                    router.visit(`/orders/payment/${o.id}`);
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('Payment Refresh Error:', error);
+                                                                router.visit(`/orders/payment/${o.id}`);
+                                                            }
+                                                        }}
+                                                        className="flex h-14 w-full items-center justify-center rounded-2xl bg-emerald-500 text-[10px] font-black tracking-widest text-white uppercase shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.02]"
                                                     >
-                                                        <Button className="flex h-14 w-full items-center justify-center rounded-2xl bg-blue-500 text-[10px] font-black tracking-widest text-white uppercase shadow-xl shadow-blue-500/20 transition-all hover:scale-[1.02]">
-                                                            Panduan Pembayaran{' '}
-                                                            <ArrowRight
-                                                                size={16}
-                                                                className="ml-2"
-                                                            />
-                                                        </Button>
-                                                    </Link>
+                                                        Bayar Sekarang{' '}
+                                                        <ArrowRight
+                                                            size={16}
+                                                            className="ml-2"
+                                                        />
+                                                    </Button>
                                                 )}
 
                                                 {o.order_status ===
@@ -401,7 +432,7 @@ export default function OrderHistory({ auth, orders }: any) {
                                                         setActiveChatOrderId(
                                                             activeChatOrderId ===
                                                                 o.id
-                                                                ? null
+                                                                ? undefined
                                                                 : o.id,
                                                         );
                                                     }}
@@ -430,7 +461,7 @@ export default function OrderHistory({ auth, orders }: any) {
                                                                 setActiveChatOrderId(
                                                                     activeChatOrderId ===
                                                                         o.id
-                                                                        ? null
+                                                                        ? undefined
                                                                         : o.id,
                                                                 );
                                                             }}
@@ -530,6 +561,16 @@ export default function OrderHistory({ auth, orders }: any) {
                                             })}
                                         </p>
                                     </div>
+                                    {selectedOrder.order_type === 'delivery' && (
+                                        <div className="col-span-2">
+                                            <p className="mb-1 text-[10px] font-black tracking-[0.3em] text-slate-400 uppercase dark:text-white/20">
+                                                Delivery Address
+                                            </p>
+                                            <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+                                                {selectedOrder.delivery_address || '-'}
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
@@ -596,6 +637,23 @@ export default function OrderHistory({ auth, orders }: any) {
                                             ).toLocaleString('id-ID')}
                                         </p>
                                     </div>
+                                    {selectedOrder.payment_status === 'unpaid' && selectedOrder.order_status !== 'cancelled' && (
+                                        <Button 
+                                            onClick={() => {
+                                                const snap = (window as any).snap;
+                                                if (snap && selectedOrder.midtrans_snap_token) {
+                                                    snap.pay(selectedOrder.midtrans_snap_token, {
+                                                        onSuccess: () => router.reload(),
+                                                        onPending: () => router.reload(),
+                                                    });
+                                                }
+                                            }}
+                                            className="mt-6 h-16 w-full rounded-2xl bg-emerald-500 text-xs font-black tracking-widest text-white uppercase shadow-xl shadow-emerald-500/20 transition-all hover:scale-[1.02]"
+                                        >
+                                            <CircleDollarSign className="mr-2 h-5 w-5" />
+                                            Bayar Sekarang
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         </div>

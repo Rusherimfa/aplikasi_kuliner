@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import L from 'leaflet';
 import {
     ArrowLeft,
@@ -10,6 +10,7 @@ import {
     Utensils,
     Store,
     CheckCircle2,
+    CircleDollarSign,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import BoutiqueChat from '@/components/app/boutique-chat';
@@ -84,6 +85,45 @@ export default function OrderTrack({ order: initialOrder }: any) {
     };
 
     useEffect(() => {
+        // Auto trigger payment if unpaid
+        const triggerPayment = async () => {
+            if (order?.payment_status === 'unpaid') {
+                const snap = (window as any).snap;
+                if (!snap) return;
+
+                try {
+                    // Fetch a fresh token to ensure it's not expired or locked to a previous method
+                    const response = await fetch(`/orders/payment/${order.id}/refresh`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as any)?.content || '',
+                            'Accept': 'application/json',
+                        }
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.snap_token) {
+                        snap.pay(data.snap_token, {
+                            onSuccess: () => router.reload(),
+                            onPending: () => router.reload(),
+                            onClose: () => console.log('Payment modal closed'),
+                            onError: () => console.error('Payment failed'),
+                        });
+                    }
+                } catch (error) {
+                    console.error('Auto Payment Refresh Error:', error);
+                }
+            }
+        };
+
+        if (order?.payment_status === 'unpaid') {
+            triggerPayment();
+        }
+    }, [order?.id]);
+
+    useEffect(() => {
+
         if (typeof window !== 'undefined' && !mapRef.current) {
             const map = L.map('track-map', {
                 zoomControl: false,
@@ -387,7 +427,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                                     Destinasi
                                                 </p>
                                                 <p className="line-clamp-2 text-sm font-medium text-white/80">
-                                                    {order?.address ||
+                                                    {order?.delivery_address ||
                                                         'Alamat tujuan...'}
                                                 </p>
                                             </div>
@@ -413,34 +453,54 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                 </div>
                                 <div className="mt-8 space-y-3">
                                     <div className="flex gap-3">
-                                        <Button
-                                            variant="outline"
-                                            className="h-14 flex-1 rounded-2xl border-white/10 bg-white/5 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white hover:text-black"
-                                            onClick={() => {
-                                                setChatContext('support');
-                                                setActiveChat(!activeChat);
-                                            }}
-                                        >
-                                            <MessageSquare className="mr-2 h-4 w-4" />{' '}
-                                            Live Chat
-                                        </Button>
-                                        {order?.order_type === 'delivery' &&
-                                            order?.courier?.name && (
+                                        {order?.payment_status === 'unpaid' ? (
+                                            <Button
+                                                className="h-14 flex-1 rounded-2xl bg-emerald-500 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-emerald-600 shadow-lg shadow-emerald-500/20"
+                                                onClick={() => {
+                                                    const snap = (window as any).snap;
+                                                    if (snap && order.midtrans_snap_token) {
+                                                        snap.pay(order.midtrans_snap_token, {
+                                                            onSuccess: () => router.reload(),
+                                                            onPending: () => router.reload(),
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <CircleDollarSign className="mr-2 h-4 w-4" />{' '}
+                                                Bayar Sekarang
+                                            </Button>
+                                        ) : (
+                                            <>
                                                 <Button
-                                                    className="h-14 flex-1 rounded-2xl bg-cyan-500 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-cyan-600"
+                                                    variant="outline"
+                                                    className="h-14 flex-1 rounded-2xl border-white/10 bg-white/5 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-white hover:text-black"
                                                     onClick={() => {
-                                                        setChatContext(
-                                                            'courier',
-                                                        );
-                                                        setActiveChat(
-                                                            !activeChat,
-                                                        );
+                                                        setChatContext('support');
+                                                        setActiveChat(!activeChat);
                                                     }}
                                                 >
-                                                    <Bike className="mr-2 h-4 w-4" />{' '}
-                                                    Chat Kurir
+                                                    <MessageSquare className="mr-2 h-4 w-4" />{' '}
+                                                    Live Chat
                                                 </Button>
-                                            )}
+                                                {order?.order_type === 'delivery' &&
+                                                    order?.courier?.name && (
+                                                        <Button
+                                                            className="h-14 flex-1 rounded-2xl bg-cyan-500 text-[10px] font-black tracking-widest text-white uppercase transition-all hover:bg-cyan-600"
+                                                            onClick={() => {
+                                                                setChatContext(
+                                                                    'courier',
+                                                                );
+                                                                setActiveChat(
+                                                                    !activeChat,
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Bike className="mr-2 h-4 w-4" />{' '}
+                                                            Chat Kurir
+                                                        </Button>
+                                                    )}
+                                            </>
+                                        )}
                                         <Button
                                             variant="outline"
                                             className="h-14 w-14 rounded-2xl border-white/10 bg-white/5 text-white transition-all hover:bg-sky-500"

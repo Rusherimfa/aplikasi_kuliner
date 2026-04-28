@@ -56,6 +56,11 @@ class HandleInertiaRequests extends Middleware
                 'status' => $request->session()->get('status'),
                 'error' => $request->session()->get('error'),
             ],
+            'config' => [
+                'resto_lat' => env('RESTO_LAT', -6.1754),
+                'resto_lng' => env('RESTO_LNG', 106.8272),
+                'delivery_fee_per_km' => env('DELIVERY_FEE_PER_KM', 5000),
+            ],
         ];
     }
 

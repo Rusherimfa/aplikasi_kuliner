@@ -552,7 +552,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                     <div key={m.id} className="p-4 flex items-center justify-between">
                                                         <div className="flex items-center gap-3">
                                                             <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-white/5">
-                                                                <img src={`/storage/${m.image_url}`} alt={m.name} className="h-full w-full object-cover" />
+                                                                <img src={m.image_path.startsWith('http') ? m.image_path : `/storage/${m.image_path}`} alt={m.name} className="h-full w-full object-cover" />
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-slate-900 dark:text-white/90">{m.name}</p>

@@ -7,7 +7,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useTranslations } from '@/hooks/use-translations';
 
 export default function CartDrawer() {
-    const { isCartOpen, setCartOpen, items, removeItem, updateQuantity, cartTotal } = useCart();
+    const { isCartOpen, setCartOpen, items, removeItem, updateQuantity, updateNotes, cartTotal } = useCart();
     const { auth, locale } = usePage().props as any;
     const { __ } = useTranslations();
 
@@ -94,20 +94,29 @@ export default function CartDrawer() {
                                                                              </div>
                                                                          </div>
                                                                          <div className="flex flex-1 items-end justify-between text-sm mt-4">
-                                                                             <div className="flex items-center gap-3 rounded-full border border-border bg-background p-1 shadow-sm">
-                                                                                 <button
-                                                                                     onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
-                                                                                 >
-                                                                                     <Minus size={14} />
-                                                                                 </button>
-                                                                                 <span className="w-4 text-center font-medium text-foreground">{item.quantity}</span>
-                                                                                 <button
-                                                                                     onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                                                     className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20"
-                                                                                 >
-                                                                                     <Plus size={14} />
-                                                                                 </button>
+                                                                             <div className="flex flex-col gap-3 flex-1 mr-4">
+                                                                                <div className="flex items-center gap-3 rounded-full border border-border bg-background p-1 shadow-sm w-fit">
+                                                                                    <button
+                                                                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                                                        className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-muted-foreground hover:text-foreground"
+                                                                                    >
+                                                                                        <Minus size={14} />
+                                                                                    </button>
+                                                                                    <span className="w-4 text-center font-medium text-foreground">{item.quantity}</span>
+                                                                                    <button
+                                                                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                                                        className="flex h-7 w-7 items-center justify-center rounded-full bg-sky-500/10 text-sky-600 hover:bg-sky-500/20"
+                                                                                    >
+                                                                                        <Plus size={14} />
+                                                                                    </button>
+                                                                                </div>
+                                                                                
+                                                                                <textarea 
+                                                                                    placeholder={__('Add notes (e.g., no spicy)...')}
+                                                                                    value={item.notes || ''}
+                                                                                    onChange={(e) => updateNotes(item.id, e.target.value)}
+                                                                                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg p-2 text-[10px] focus:outline-none focus:ring-1 focus:ring-sky-500/30 resize-none h-12 text-foreground"
+                                                                                />
                                                                              </div>
 
                                                                             <button

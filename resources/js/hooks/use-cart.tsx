@@ -5,15 +5,17 @@ export interface CartItem {
     name: string;
     price: number | string;
     quantity: number;
+    notes?: string;
 }
 
 interface CartContextType {
     items: CartItem[];
     isCartOpen: boolean;
     setCartOpen: (open: boolean) => void;
-    addItem: (item: Omit<CartItem, 'quantity'>) => void;
+    addItem: (item: Omit<CartItem, 'quantity' | 'notes'>) => void;
     removeItem: (id: number) => void;
     updateQuantity: (id: number, quantity: number) => void;
+    updateNotes: (id: number, notes: string) => void;
     clearCart: () => void;
     cartCount: number;
     cartTotal: number;
@@ -63,6 +65,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
     };
 
+    const updateNotes = (id: number, notes: string) => {
+        setItems(current => 
+            current.map(i => i.id === id ? { ...i, notes } : i)
+        );
+    };
+
     const clearCart = () => setItems([]);
 
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
@@ -76,6 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             addItem,
             removeItem,
             updateQuantity,
+            updateNotes,
             clearCart,
             cartCount,
             cartTotal

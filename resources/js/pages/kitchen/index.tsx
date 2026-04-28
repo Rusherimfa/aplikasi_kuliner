@@ -1,6 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle, MessageCircle, Trash2 } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, PlayCircle, Loader2, UtensilsCrossed, AlertCircle, MessageCircle, Trash2, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -158,7 +158,7 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                         >
                             <MessageCircle size={16} />
                         </button>
-                        {(statusType === 'completed' || statusType === 'cancelled') && (
+                        {(statusType === 'completed' || statusType === 'cancelled' || statusType === 'history') && (
                             <button 
                                 onClick={() => handleDelete(order.id, order.type)}
                                 className="p-2 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20"
@@ -169,10 +169,24 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                         )}
                     </div>
                     
+                    {order.order_type === 'delivery' && (
+                        <div className="mt-3 p-3 rounded-2xl bg-white dark:bg-black/20 border border-slate-100 dark:border-white/5 flex items-start gap-3">
+                            <MapPin size={14} className="text-sky-500 mt-0.5 shrink-0" />
+                            <p className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 leading-relaxed line-clamp-2">
+                                {order.delivery_address || __('Alamat tidak tersedia')}
+                            </p>
+                        </div>
+                    )}
+
                     <div className="mt-4 flex items-center justify-between">
-                            <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-50' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40')}`}>
-                                {order.order_status === 'pending' ? __('Menunggu') : (order.order_status === 'preparing' ? __('Memasak') : __(order.order_status.replace(/_/g, ' ')))}
-                            </Badge>
+                            <div className="flex gap-2">
+                                <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-50' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40')}`}>
+                                    {order.order_status === 'pending' ? __('Menunggu') : (order.order_status === 'preparing' ? __('Memasak') : __(order.order_status.replace(/_/g, ' ')))}
+                                </Badge>
+                                <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.payment_status === 'paid' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/20'}`}>
+                                    {order.payment_status === 'paid' ? __('LUNAS') : __('BELUM BAYAR')}
+                                </Badge>
+                            </div>
                             <span className="text-[9px] font-black text-slate-400 dark:text-white/20">{readyItemsCount}/{totalItemsCount} {__('SIAP')}</span>
                         <div className="text-[10px] font-black text-slate-500 dark:text-white/60">
                             Rp {Number(order.total_price).toLocaleString(usePage().props.locale === 'id' ? 'id-ID' : 'en-US')}
@@ -201,9 +215,16 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                             <button 
                                                 onClick={() => updateItemStatus(item.id, item.type, 'ready', item.name)}
                                                 className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all shadow-sm ${item.status === 'ready' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-white/40 hover:bg-emerald-500/20 hover:text-emerald-500'}`}
-                                                disabled={loadingId === item.id}
+                                                disabled={loadingId === item.id || item.status === 'served'}
                                             >
                                                 {loadingId === item.id && item.status === 'ready' ? '...' : __('Siap')}
+                                            </button>
+                                            <button 
+                                                onClick={() => updateItemStatus(item.id, item.type, 'served', item.name)}
+                                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all shadow-sm ${item.status === 'served' ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-white/40 hover:bg-indigo-500/20 hover:text-indigo-500'}`}
+                                                disabled={loadingId === item.id}
+                                            >
+                                                {loadingId === item.id && item.status === 'served' ? '...' : __('Sajikan')}
                                             </button>
                                         </div>
                                     )}

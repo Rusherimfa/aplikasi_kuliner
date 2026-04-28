@@ -23,8 +23,13 @@ class Order extends Model
         'payment_status',
         'order_status',
         'total_price',
+        'subtotal',
+        'tax_amount',
+        'service_amount',
+        'midtrans_snap_token',
         'customer_lat',
         'customer_lng',
+        'delivery_address',
     ];
 
     public function items()

@@ -38,6 +38,10 @@ class Reservation extends Model
         'points_used',
         'discount_amount',
         'total_after_discount',
+        'subtotal',
+        'tax_amount',
+        'service_amount',
+        'midtrans_snap_token',
     ];
 
     /**

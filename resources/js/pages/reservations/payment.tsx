@@ -17,13 +17,31 @@ export default function SimulatePayment() {
 
     const { post } = useForm();
 
-    const handleSimulatePayment = () => {
+    const handlePayment = () => {
+        if (!reservation.midtrans_snap_token) {
+            alert(__('Token pembayaran tidak ditemukan. Silakan hubungi admin.'));
+            return;
+        }
+
         setIsSimulating(true);
-        // Simulate waiting for bank confirmation randomly between 2-3 seconds
-        setTimeout(() => {
-            clearCart(); // Clear local storage cart once paid
-            post(`/reservations/payment/${reservation.id}`);
-        }, 2500);
+
+        (window as any).snap.pay(reservation.midtrans_snap_token, {
+            onSuccess: function(result: any) {
+                clearCart();
+                post(`/reservations/payment/${reservation.id}`);
+            },
+            onPending: function(result: any) {
+                alert(__("Menunggu pembayaran Anda!"));
+                setIsSimulating(false);
+            },
+            onError: function(result: any) {
+                alert(__("Pembayaran gagal!"));
+                setIsSimulating(false);
+            },
+            onClose: function() {
+                setIsSimulating(false);
+            }
+        });
     };
 
     return (
@@ -79,11 +97,19 @@ export default function SimulatePayment() {
                                             )}
                                         </div>
 
-                                        <div className="pt-2">
-                                            <div className="flex justify-between items-center bg-white/5 rounded-xl p-4 border border-white/10">
+                                        <div className="pt-2 space-y-3">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-400">{__('Subtotal (Komitmen Meja)')}</span>
+                                                <span className="text-white font-medium">Rp {Number(reservation.subtotal).toLocaleString('id-ID')}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-zinc-400">{__('Pajak (PB1 10%)')}</span>
+                                                <span className="text-white font-medium">Rp {Number(reservation.tax_amount).toLocaleString('id-ID')}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center bg-white/5 rounded-xl p-4 border border-white/10 mt-4">
                                                 <span className="text-lg font-medium text-white">{__('Wajib DP Sekarang')}</span>
                                                 <span className="text-2xl font-bold tracking-tight text-sky-400">
-                                                    Rp {Number(reservation.booking_fee).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}
+                                                    Rp {Number(reservation.total_after_discount).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}
                                                 </span>
                                             </div>
                                             <p className="mt-3 text-center text-xs text-zinc-500">{__('Sisa pembayaran makanan akan ditagih di kasir restoran sesudah Anda selesai makan.')}</p>
@@ -94,11 +120,18 @@ export default function SimulatePayment() {
 
                             {/* Right Side: Virtual Payment Gateway */}
                             <div className="p-8 sm:p-12">
-                                <h3 className="mb-6 text-xl font-bold text-foreground">{__('Pilih Metode Pembayaran')}</h3>
+
                                 
-                                <div className="space-y-4">
-                                     <button 
-                                        onClick={() => setPaymentMethod('ewallet')}
+                                <div className="space-y-4 text-center py-8">
+                                    <div className="mx-auto w-20 h-20 bg-sky-500/10 rounded-full flex items-center justify-center text-sky-500 mb-4">
+                                        <ShieldCheck size={40} />
+                                    </div>
+                                    <h4 className="text-xl font-bold dark:text-white">{__('Pembayaran Aman')}</h4>
+                                    <p className="text-muted-foreground text-sm max-w-xs mx-auto">
+                                        {__('Klik tombol di bawah untuk melanjutkan ke gerbang pembayaran aman Midtrans. Anda dapat memilih QRIS, GoPay, OVO, atau Transfer Bank di sana.')}
+                                    </p>
+                                </div>
+                                <div className="hidden">                                        onClick={() => setPaymentMethod('ewallet')}
                                         className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-slate-200 dark:border-border bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
@@ -151,26 +184,23 @@ export default function SimulatePayment() {
                                         </div>
                                     </button>
                                 </div>
-
-                                <div className="my-8 rounded-2xl bg-slate-50 dark:bg-muted p-6 text-center border border-slate-100 dark:border-border">
-                                    <Lock className="mx-auto mb-2 h-6 w-6 text-slate-400 dark:text-muted-foreground/60" />
-                                    <p className="text-sm font-medium text-slate-900 dark:text-foreground">{__('Ini adalah Simulasi Payment Gateway.')}</p>
-                                    <p className="text-xs text-slate-500 dark:text-muted-foreground mt-1">{__('Uang Anda aman. Tidak ada saldo asli yang dipotong.')}</p>
                                 </div>
 
+
+
                                 <Button
-                                    onClick={handleSimulatePayment}
+                                    onClick={handlePayment}
                                     disabled={isSimulating}
                                     className="group flex h-14 w-full items-center justify-center gap-2 rounded-full bg-slate-900 dark:bg-foreground text-base font-semibold text-white dark:text-background shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 hover:bg-black dark:hover:bg-foreground/90 disabled:opacity-70 disabled:hover:scale-100"
                                 >
                                     {isSimulating ? (
                                         <div className="flex items-center gap-3">
                                             <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white"></div>
-                                            <span>{__('Mengecek Saldo...')}</span>
+                                            <span>{__('Memproses Pembayaran...')}</span>
                                         </div>
                                     ) : (
                                         <>
-                                            {__('Bayar MuraPay')} Rp {Number(reservation.booking_fee).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}
+                                            {__('Bayar Sekarang')} Rp {Number(reservation.total_after_discount).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}
                                             <ChevronRight size={20} className="transition-transform group-hover:translate-x-1" />
                                         </>
                                     )}

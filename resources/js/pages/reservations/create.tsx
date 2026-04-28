@@ -418,7 +418,7 @@ export default function CreateReservation() {
                                                     <div key={menu.id} className="flex flex-col gap-2 p-4 rounded-2xl border border-border bg-white dark:bg-white/[0.02]">
                                                         <div className="flex gap-4 items-center">
                                                             <div className="h-16 w-16 bg-slate-100 dark:bg-white/5 rounded-xl overflow-hidden shrink-0">
-                                                                <img src={`/storage/${menu.image_url}`} alt={menu.name} className="w-full h-full object-cover" />
+                                                                <img src={menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`} alt={menu.name} className="w-full h-full object-cover" />
                                                             </div>
                                                             <div className="flex flex-col flex-1">
                                                                 <span className="text-sm font-black tracking-tight">{menu.name}</span>

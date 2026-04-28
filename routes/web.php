@@ -68,6 +68,7 @@ Route::middleware(['auth', 'verified'])
         Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
         Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         Route::get('/orders/payment/{order}', [OrderController::class, 'payment'])->name('orders.payment');
+        Route::post('/orders/payment/{order}/refresh', [OrderController::class, 'refreshPayment'])->name('orders.payment.refresh');
         Route::post('/orders/payment/{order}', [OrderController::class, 'processPayment'])->name('orders.payment.process');
         Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
         Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
