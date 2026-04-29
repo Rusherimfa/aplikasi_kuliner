@@ -8,7 +8,7 @@ use function Pest\Laravel\assertAuthenticated;
 use function Pest\Laravel\assertAuthenticatedAs;
 use function Pest\Laravel\get;
 
-uses(TestCase::class);
+// uses(TestCase::class); // Already handled in tests/Pest.php
 
 test('users can redirect to google', function () {
     $response = get('/auth/google');
@@ -32,6 +32,7 @@ test('new users can register via google', function () {
     $abstractUser->avatar = 'https://google.com/avatar.jpg';
 
     $provider = Mockery::mock('Laravel\Socialite\Contracts\Provider');
+    $provider->shouldReceive('stateless')->andReturnSelf();
     $provider->shouldReceive('user')->andReturn($abstractUser);
 
     Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
@@ -65,6 +66,7 @@ test('existing admin users can login via google and redirect to dashboard', func
     $abstractUser->avatar = 'https://google.com/avatar_admin.jpg';
 
     $provider = Mockery::mock('Laravel\Socialite\Contracts\Provider');
+    $provider->shouldReceive('stateless')->andReturnSelf();
     $provider->shouldReceive('user')->andReturn($abstractUser);
 
     Socialite::shouldReceive('driver')->with('google')->andReturn($provider);

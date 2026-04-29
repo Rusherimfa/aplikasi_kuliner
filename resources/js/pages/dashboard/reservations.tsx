@@ -95,13 +95,18 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     const { auth } = usePage().props as any;
     const http = useHttp();
 
-    const updateStatus = (id: number, status: string) => {
+    const updateStatus = (id: number, status: string, paymentStatus: string | null = null) => {
+        const data: any = { status };
+        if (paymentStatus) {
+            data.payment_status = paymentStatus;
+        }
+
         router.put(
             `/reservations/${id}`,
-            { status },
+            data,
             { 
                 preserveScroll: true,
-                onSuccess: () => toast.success(`${__('Reservation status updated to')} ${status.toUpperCase()}`)
+                onSuccess: () => toast.success(`${__('Reservation updated successfully')}`)
             },
         );
     };
@@ -371,7 +376,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                                         size="icon"
                                                                         variant="outline"
                                                                         className="h-8 w-8 border-sky-500/20 bg-sky-500/10 text-sky-500 hover:bg-sky-500/20"
-                                                                        onClick={() => updateStatus(reservation.id, 'confirmed')}
+                                                                        onClick={() => updateStatus(reservation.id, 'confirmed', 'paid')}
                                                                         title={__('Tandai Sudah Bayar (Confirmed)')}
                                                                     >
                                                                         <DollarSign className="h-4 w-4" />

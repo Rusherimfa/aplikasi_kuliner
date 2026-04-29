@@ -31,9 +31,18 @@ class PaymentNotificationController extends Controller
             Log::info("Midtrans Notification Received: $orderId - $transaction");
 
             if (str_starts_with($orderId, 'ORD-')) {
-                $this->handleOrder($orderId, $transaction, $fraud);
+                // Order ID format: ORD-YYYYMMDDHHMMSS-RAND-TIMESTAMP
+                // We need to extract the original ORD-YYYYMMDDHHMMSS-RAND
+                $parts = explode('-', $orderId);
+                array_pop($parts); // Remove the timestamp suffix
+                $originalOrderNumber = implode('-', $parts);
+
+                $this->handleOrder($originalOrderNumber, $transaction, $fraud);
             } elseif (str_starts_with($orderId, 'RES-')) {
-                $id = str_replace('RES-', '', $orderId);
+                // Reservation ID format: RES-ID-TIMESTAMP
+                $parts = explode('-', $orderId);
+                $id = $parts[1]; // Get the actual ID
+
                 $this->handleReservation($id, $transaction, $fraud);
             }
 
@@ -45,7 +54,7 @@ class PaymentNotificationController extends Controller
         }
     }
 
-    private function handleOrder($orderNumber, $status, $fraud)
+    private function handleOrder(string $orderNumber, string $status, string $fraud): void
     {
         $order = Order::where('order_number', $orderNumber)->first();
         if (! $order) {
@@ -66,7 +75,7 @@ class PaymentNotificationController extends Controller
         }
     }
 
-    private function handleReservation($id, $status, $fraud)
+    private function handleReservation(string|int $id, string $status, string $fraud): void
     {
         $reservation = Reservation::find($id);
         if (! $reservation) {

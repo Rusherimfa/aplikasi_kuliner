@@ -15,7 +15,7 @@ class NotificationController extends Controller
         return response()->json($notifications);
     }
 
-    public function markAsRead(Request $request, $id)
+    public function markAsRead(Request $request, string $id)
     {
         $notification = $request->user()
             ->notifications()
@@ -33,13 +33,15 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, string $id)
     {
         $notification = $request->user()
             ->notifications()
-            ->findOrFail($id);
+            ->find($id);
 
-        $notification->delete();
+        if ($notification) {
+            $notification->delete();
+        }
 
         return response()->json(['success' => true]);
     }

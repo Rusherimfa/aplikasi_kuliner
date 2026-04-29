@@ -35,7 +35,12 @@ class TestimonialController extends Controller
             'role' => 'nullable|string|max:255',
             'quote' => 'required|string',
             'rating' => 'required|integer|min:1|max:5',
+            'image' => 'nullable|image|max:5120',
         ]);
+
+        if ($request->hasFile('image')) {
+            $validated['image_path'] = $request->file('image')->store('testimonials', 'public');
+        }
 
         $validated['name'] = Auth::user()->name;
         $validated['email'] = Auth::user()->email;

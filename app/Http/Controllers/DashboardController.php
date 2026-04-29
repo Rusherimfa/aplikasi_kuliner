@@ -93,97 +93,10 @@ class DashboardController extends Controller
             ->sum('total_price');
 
         // 1. Optimized Revenue Analytics
-        $groupByRaw = match ($period) {
-            'year' => "DATE_FORMAT(created_at, '%Y-%m')",
-            'day' => "HOUR(created_at)",
-            default => "DATE(created_at)",
-        };
-
-        $dailyRevenue = Order::where('created_at', '>=', $startDate->startOfDay())
-            ->where('order_status', 'complete')
-            ->select(
-                DB::raw("$groupByRaw as day"),
-                DB::raw('SUM(total_price) as total_revenue'),
-                DB::raw('COUNT(*) as total_sales')
-            )
-            ->groupBy('day')
-            ->get()
-            ->keyBy('day');
-
-        $revenueChart = [];
-        if ($period === 'year') {
-            for ($i = 11; $i >= 0; $i--) {
-                $date = Carbon::today()->subMonths($i)->format('Y-m');
-                $dayData = $dailyRevenue->get($date);
-                $revenueChart[] = [
-                    'name' => Carbon::parse($date)->format('M'),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        } elseif ($period === 'day') {
-            for ($i = 0; $i < 24; $i++) {
-                $dayData = $dailyRevenue->get($i);
-                $revenueChart[] = [
-                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        } else {
-            for ($i = 0; $i < $days; $i++) {
-                $date = $startDate->copy()->addDays($i)->toDateString();
-                $dayData = $dailyRevenue->get($date);
-                $revenueChart[] = [
-                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        }
+        $revenueChart = $this->getRevenueChartData($period, $startDate, $days);
 
         // 2. Optimized Reservation Analytics
-        $dailyReservations = Reservation::where('created_at', '>=', $startDate->startOfDay())
-            ->select(
-                DB::raw("$groupByRaw as day"),
-                DB::raw('COUNT(*) as total_reservations'),
-                DB::raw('SUM(CASE WHEN payment_status = "paid" THEN COALESCE(total_after_discount, booking_fee, 0) ELSE 0 END) as total_revenue')
-            )
-            ->groupBy('day')
-            ->get()
-            ->keyBy('day');
-
-        $reservationChart = [];
-        if ($period === 'year') {
-            for ($i = 11; $i >= 0; $i--) {
-                $date = Carbon::today()->subMonths($i)->format('Y-m');
-                $dayData = $dailyReservations->get($date);
-                $reservationChart[] = [
-                    'name' => Carbon::parse($date)->format('M'),
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        } elseif ($period === 'day') {
-            for ($i = 0; $i < 24; $i++) {
-                $dayData = $dailyReservations->get($i);
-                $reservationChart[] = [
-                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        } else {
-            for ($i = 0; $i < $days; $i++) {
-                $date = $startDate->copy()->addDays($i)->toDateString();
-                $dayData = $dailyReservations->get($date);
-                $reservationChart[] = [
-                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        }
+        $reservationChart = $this->getReservationChartData($period, $startDate, $days);
 
         // 3. Best Selling Menus (Top 5)
         $bestSellers = DB::table('order_items')
@@ -191,7 +104,7 @@ class DashboardController extends Controller
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->where('orders.order_status', 'complete')
             ->where('orders.created_at', '>=', $startDate->startOfDay())
-            ->select('menus.name', 'menus.id', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->select(['menus.name', 'menus.id', DB::raw('SUM(order_items.quantity) as total_sold')])
             ->groupBy('menus.id', 'menus.name')
             ->orderByDesc('total_sold')
             ->take(5)
@@ -249,103 +162,22 @@ class DashboardController extends Controller
         // Analytics Data (Optimized)
         $groupByRaw = match ($period) {
             'year' => "DATE_FORMAT(created_at, '%Y-%m')",
-            'day' => "HOUR(created_at)",
-            default => "DATE(created_at)",
+            'day' => 'HOUR(created_at)',
+            default => 'DATE(created_at)',
         };
 
         // 1. Revenue Analytics
-        $dailyRevenue = Order::where('created_at', '>=', $startDate->startOfDay())
-            ->where('order_status', 'complete')
-            ->select(
-                DB::raw("$groupByRaw as day"),
-                DB::raw('SUM(total_price) as total_revenue'),
-                DB::raw('COUNT(*) as total_sales')
-            )
-            ->groupBy('day')
-            ->get()
-            ->keyBy('day');
-
-        $revenueChart = [];
-        if ($period === 'year') {
-            for ($i = 11; $i >= 0; $i--) {
-                $date = Carbon::today()->subMonths($i)->format('Y-m');
-                $dayData = $dailyRevenue->get($date);
-                $revenueChart[] = [
-                    'name' => Carbon::parse($date)->format('M'),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        } elseif ($period === 'day') {
-            for ($i = 0; $i < 24; $i++) {
-                $dayData = $dailyRevenue->get($i);
-                $revenueChart[] = [
-                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        } else {
-            for ($i = 0; $i < $days; $i++) {
-                $date = $startDate->copy()->addDays($i)->toDateString();
-                $dayData = $dailyRevenue->get($date);
-                $revenueChart[] = [
-                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                    'sales' => (int) ($dayData?->total_sales ?? 0),
-                ];
-            }
-        }
+        $revenueChart = $this->getRevenueChartData($period, $startDate, $days);
 
         // 2. Reservation Analytics
-        $dailyReservations = Reservation::where('created_at', '>=', $startDate->startOfDay())
-            ->select(
-                DB::raw("$groupByRaw as day"),
-                DB::raw('COUNT(*) as total_reservations'),
-                DB::raw('SUM(CASE WHEN payment_status = "paid" THEN COALESCE(total_after_discount, booking_fee, 0) ELSE 0 END) as total_revenue')
-            )
-            ->groupBy('day')
-            ->get()
-            ->keyBy('day');
-
-        $reservationChart = [];
-        if ($period === 'year') {
-            for ($i = 11; $i >= 0; $i--) {
-                $date = Carbon::today()->subMonths($i)->format('Y-m');
-                $dayData = $dailyReservations->get($date);
-                $reservationChart[] = [
-                    'name' => Carbon::parse($date)->format('M'),
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        } elseif ($period === 'day') {
-            for ($i = 0; $i < 24; $i++) {
-                $dayData = $dailyReservations->get($i);
-                $reservationChart[] = [
-                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT) . ':00',
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        } else {
-            for ($i = 0; $i < $days; $i++) {
-                $date = $startDate->copy()->addDays($i)->toDateString();
-                $dayData = $dailyReservations->get($date);
-                $reservationChart[] = [
-                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
-                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
-                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
-                ];
-            }
-        }
+        $reservationChart = $this->getReservationChartData($period, $startDate, $days);
 
         $bestSellers = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->join('menus', 'order_items.menu_id', '=', 'menus.id')
             ->where('orders.order_status', 'complete')
             ->where('orders.created_at', '>=', $startDate->startOfDay())
-            ->select('menus.name', 'menus.id', DB::raw('SUM(order_items.quantity) as total_sold'))
+            ->select(['menus.name', 'menus.id', DB::raw('SUM(order_items.quantity) as total_sold')])
             ->groupBy('menus.id', 'menus.name')
             ->orderByDesc('total_sold')
             ->take(5)
@@ -430,5 +262,112 @@ class DashboardController extends Controller
                 'time' => $r->time,
                 'created_at' => $r->created_at->diffForHumans(),
             ]);
+    }
+
+    private function getRevenueChartData(string $period, Carbon $startDate, int $days): array
+    {
+        $groupByRaw = match ($period) {
+            'year' => "DATE_FORMAT(created_at, '%Y-%m')",
+            'day' => 'HOUR(created_at)',
+            default => 'DATE(created_at)',
+        };
+
+        $dailyRevenue = Order::where('created_at', '>=', $startDate->startOfDay())
+            ->where('order_status', 'complete')
+            ->select([
+                DB::raw("$groupByRaw as day"),
+                DB::raw('SUM(total_price) as total_revenue'),
+                DB::raw('COUNT(*) as total_sales'),
+            ])
+            ->groupBy('day')
+            ->get()
+            ->keyBy('day');
+
+        $chart = [];
+        if ($period === 'year') {
+            for ($i = 11; $i >= 0; $i--) {
+                $date = Carbon::today()->subMonths($i)->format('Y-m');
+                $dayData = $dailyRevenue->get($date);
+                $chart[] = [
+                    'name' => Carbon::parse($date)->format('M'),
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                    'sales' => (int) ($dayData?->total_sales ?? 0),
+                ];
+            }
+        } elseif ($period === 'day') {
+            for ($i = 0; $i < 24; $i++) {
+                $dayData = $dailyRevenue->get($i);
+                $chart[] = [
+                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT).':00',
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                    'sales' => (int) ($dayData?->total_sales ?? 0),
+                ];
+            }
+        } else {
+            for ($i = 0; $i < $days; $i++) {
+                $date = $startDate->copy()->addDays($i)->toDateString();
+                $dayData = $dailyRevenue->get($date);
+                $chart[] = [
+                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                    'sales' => (int) ($dayData?->total_sales ?? 0),
+                ];
+            }
+        }
+
+        return $chart;
+    }
+
+    private function getReservationChartData(string $period, Carbon $startDate, int $days): array
+    {
+        $groupByRaw = match ($period) {
+            'year' => "DATE_FORMAT(created_at, '%Y-%m')",
+            'day' => 'HOUR(created_at)',
+            default => 'DATE(created_at)',
+        };
+
+        $dailyReservations = Reservation::where('created_at', '>=', $startDate->startOfDay())
+            ->select([
+                DB::raw("$groupByRaw as day"),
+                DB::raw('COUNT(*) as total_reservations'),
+                DB::raw('SUM(CASE WHEN payment_status = "paid" THEN COALESCE(total_after_discount, booking_fee, 0) ELSE 0 END) as total_revenue'),
+            ])
+            ->groupBy('day')
+            ->get()
+            ->keyBy('day');
+
+        $chart = [];
+        if ($period === 'year') {
+            for ($i = 11; $i >= 0; $i--) {
+                $date = Carbon::today()->subMonths($i)->format('Y-m');
+                $dayData = $dailyReservations->get($date);
+                $chart[] = [
+                    'name' => Carbon::parse($date)->format('M'),
+                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                ];
+            }
+        } elseif ($period === 'day') {
+            for ($i = 0; $i < 24; $i++) {
+                $dayData = $dailyReservations->get($i);
+                $chart[] = [
+                    'name' => str_pad($i, 2, '0', STR_PAD_LEFT).':00',
+                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                ];
+            }
+        } else {
+            for ($i = 0; $i < $days; $i++) {
+                $date = $startDate->copy()->addDays($i)->toDateString();
+                $dayData = $dailyReservations->get($date);
+                $chart[] = [
+                    'name' => Carbon::parse($date)->format($period === 'month' ? 'd M' : 'D'),
+                    'reservations' => (int) ($dayData?->total_reservations ?? 0),
+                    'revenue' => (float) ($dayData?->total_revenue ?? 0),
+                ];
+            }
+        }
+
+        return $chart;
     }
 }

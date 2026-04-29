@@ -204,9 +204,8 @@ export default function OrderTrack({ order: initialOrder }: any) {
         }
 
         if (order?.id) {
-            window.Echo.channel(`orders.${order.id}`).listen(
-                '.CourierLocationUpdated',
-                (e: any) => {
+            window.Echo.channel(`orders.${order.id}`)
+                .listen('.CourierLocationUpdated', (e: any) => {
                     const lat = Number(e.latitude);
                     const lng = Number(e.longitude);
 
@@ -247,8 +246,10 @@ export default function OrderTrack({ order: initialOrder }: any) {
                             duration: 1.5,
                         });
                     }
-                },
-            );
+                })
+                .listen('.OrderStatusUpdated', (e: any) => {
+                    router.reload();
+                });
 
             return () => {
                 window.Echo.leave(`orders.${order.id}`);
@@ -351,7 +352,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                                 'preparing',
                                                 'delivering',
                                                 'delivered',
-                                            ].includes(order?.status || ''),
+                                            ].includes(order?.order_status || ''),
                                         },
                                         {
                                             id: 'picked_up',
@@ -361,7 +362,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                             status: [
                                                 'delivering',
                                                 'delivered',
-                                            ].includes(order?.status || ''),
+                                            ].includes(order?.order_status || ''),
                                         },
                                         {
                                             id: 'delivering',
@@ -369,7 +370,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                             desc: 'Kurir sedang memacu kendaraan menuju lokasi Anda.',
                                             icon: Bike,
                                             status:
-                                                order?.status === 'delivering',
+                                                order?.order_status === 'delivering',
                                         },
                                         {
                                             id: 'delivered',
@@ -377,7 +378,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                             desc: 'Pesanan telah mendarat dengan aman di tujuan.',
                                             icon: CheckCircle2,
                                             status:
-                                                order?.status === 'delivered',
+                                                order?.order_status === 'delivered',
                                         },
                                     ].map((step, idx) => (
                                         <div
@@ -406,7 +407,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                     ))}
                                 </div>
                             </div>
-
+ 
                             <div className="flex flex-1 flex-col justify-between rounded-[3rem] border border-white/5 bg-white/[0.03] p-8 backdrop-blur-3xl">
                                 <div>
                                     <div className="mb-8 flex items-center justify-between">
@@ -414,7 +415,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                             Destination
                                         </h3>
                                         <Badge className="border border-sky-500/20 bg-sky-500/10 px-3 py-1 text-[9px] font-black text-sky-500 uppercase">
-                                            {formatStatus(order?.status)}
+                                            {formatStatus(order?.order_status)}
                                         </Badge>
                                     </div>
                                     <div className="space-y-6">

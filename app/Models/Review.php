@@ -15,6 +15,7 @@ class Review extends Model
         'reservation_id',
         'rating',
         'message',
+        'image_path',
         'is_approved',
     ];
 

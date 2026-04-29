@@ -17,7 +17,7 @@ class MidtransService
         Config::$is3ds = config('services.midtrans.is_3ds');
     }
 
-    public function getSnapToken($order)
+    public function getSnapToken(Order|Reservation $order): string
     {
         $itemDetails = [];
         $subtotal = 0;
@@ -68,7 +68,7 @@ class MidtransService
         $params = [
             'transaction_details' => [
                 'order_id' => ($order->order_number ?? 'RES-'.$order->id).'-'.time(),
-                'gross_amount' => (int) $order->total_price ?? $order->total_after_discount,
+                'gross_amount' => (int) ($order->total_price ?? $order->total_after_discount),
             ],
             'item_details' => $itemDetails,
             'customer_details' => [

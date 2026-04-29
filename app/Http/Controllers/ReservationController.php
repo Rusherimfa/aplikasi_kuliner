@@ -16,6 +16,7 @@ use App\Services\MidtransService;
 use App\Services\WhatsAppService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -258,7 +259,7 @@ class ReservationController extends Controller
             $snapToken = $midtrans->getSnapToken($reservation);
             $reservation->update(['midtrans_snap_token' => $snapToken]);
         } catch (\Exception $e) {
-            \Log::error('Midtrans Error: '.$e->getMessage());
+            Log::error('Midtrans Error: '.$e->getMessage());
         }
 
         if (! empty($syncData)) {
@@ -300,7 +301,7 @@ class ReservationController extends Controller
                 $snapToken = $midtrans->getSnapToken($reservation);
                 $reservation->update(['midtrans_snap_token' => $snapToken]);
             } catch (\Exception $e) {
-                \Log::error('Midtrans Retry Error: '.$e->getMessage());
+                Log::error('Midtrans Retry Error: '.$e->getMessage());
             }
         }
 
@@ -404,18 +405,32 @@ class ReservationController extends Controller
     public function update(Request $request, Reservation $reservation)
     {
         $validated = $request->validate([
-            'status' => 'required|in:pending,awaiting_payment,confirmed,rejected,completed',
+            'status' => 'nullable|in:pending,awaiting_payment,confirmed,rejected,completed',
+            'payment_status' => 'nullable|in:unpaid,paid,failed',
         ]);
 
-        $reservation->update(['status' => $validated['status']]);
+        if (isset($validated['status'])) {
+            $reservation->status = $validated['status'];
 
-        // OTOMATISASI: Update status menu jika status reservasi berubah
-        if ($validated['status'] === 'completed') {
-            $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'ready']);
-        } elseif ($validated['status'] === 'confirmed') {
-            // Jika dikonfirmasi (aktif), bisa dianggap mulai dimasak
-            $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'preparing']);
+            // OTOMATISASI: Update status menu jika status reservasi berubah
+            if ($validated['status'] === 'completed') {
+                $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'ready']);
+            } elseif ($validated['status'] === 'confirmed') {
+                // Jika dikonfirmasi (aktif), bisa dianggap mulai dimasak
+                $reservation->menus()->updateExistingPivot($reservation->menus->pluck('id'), ['status' => 'preparing']);
+            }
         }
+
+        if (isset($validated['payment_status'])) {
+            $reservation->payment_status = $validated['payment_status'];
+
+            // Jika dibayar oleh staff, biasanya status otomatis confirmed
+            if ($validated['payment_status'] === 'paid' && $reservation->status === 'awaiting_payment') {
+                $reservation->status = 'confirmed';
+            }
+        }
+
+        $reservation->save();
 
         // Broadcast real-time update
         event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable'])));
@@ -423,12 +438,15 @@ class ReservationController extends Controller
         // Notify Customer about status change
         $reservation->user?->notify(new AppNotification(
             __('Update Status Reservasi'),
-            __('Status reservasi Anda telah diperbarui menjadi: :status', ['status' => ucfirst($validated['status'])]),
+            __('Status reservasi Anda telah diperbarui menjadi: :status (:payment)', [
+                'status' => ucfirst($reservation->status),
+                'payment' => strtoupper($reservation->payment_status),
+            ]),
             'info',
             route('reservations.show', [$reservation->id], false)
         ));
 
-        return back()->with('success', 'Reservation status updated.');
+        return back()->with('success', 'Reservation updated successfully.');
     }
 
     /**

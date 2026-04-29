@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\Role;
 use App\Events\DishStatusUpdated;
+use App\Events\OrderStatusUpdated;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Reservation;
@@ -26,63 +27,13 @@ class KitchenController extends Controller
         $allOrders = Order::with(['items.menu', 'courier'])
             ->latest()
             ->get()
-            ->map(function ($order) {
-                return [
-                    'id' => $order->id,
-                    'type' => 'order',
-                    'order_number' => $order->order_number,
-                    'customer_name' => $order->customer_name,
-                    'order_type' => $order->order_type,
-                    'payment_status' => $order->payment_status,
-                    'order_status' => $order->order_status,
-                    'total_price' => $order->total_price,
-                    'courier' => $order->courier ? $order->courier->name : null,
-                    'time' => $order->created_at->format('H:i'),
-                    'elapsed_minutes' => now()->diffInMinutes($order->created_at),
-                    'items' => $order->items->map(function ($item) {
-                        return [
-                            'id' => $item->id,
-                            'name' => $item->menu ? $item->menu->name : 'Menu Tidak Tersedia',
-                            'quantity' => $item->quantity,
-                            'status' => $item->status ?? 'pending',
-                            'notes' => $item->notes,
-                            'type' => 'order',
-                        ];
-                    }),
-                ];
-            });
+            ->map(fn (Order $order) => $this->mapOrder($order));
 
         // 2. Fetch Dine-in Reservations
         $reservations = Reservation::with(['menus', 'restoTable'])
             ->latest()
             ->get()
-            ->map(function ($res) {
-                return [
-                    'id' => $res->id,
-                    'type' => 'reservation',
-                    'order_number' => 'RES-'.$res->id,
-                    'customer_name' => $res->customer_name,
-                    'order_type' => 'dine-in',
-                    'table_number' => $res->restoTable ? $res->restoTable->name : null,
-                    'payment_status' => $res->status == 'completed' ? 'paid' : 'pending',
-                    'order_status' => $res->status, // pending, confirmed, active, completed, cancelled
-                    'total_price' => $res->menus->sum(fn ($m) => $m->price * $m->pivot->quantity),
-                    'courier' => null,
-                    'time' => $res->reservation_time ? Carbon::parse($res->reservation_time)->format('H:i') : $res->created_at->format('H:i'),
-                    'elapsed_minutes' => now()->diffInMinutes($res->created_at),
-                    'items' => $res->menus->map(function ($item) {
-                        return [
-                            'id' => $item->pivot->id,
-                            'name' => $item->name,
-                            'quantity' => $item->pivot->quantity,
-                            'status' => $item->pivot->status ?? 'pending',
-                            'notes' => $item->pivot->notes,
-                            'type' => 'reservation',
-                        ];
-                    }),
-                    'special_requests' => $res->special_requests,
-                ];
-            });
+            ->map(fn (Reservation $res) => $this->mapReservation($res));
 
         $allOrders = $allOrders->concat($reservations)->sortByDesc('time')->values();
 
@@ -97,9 +48,71 @@ class KitchenController extends Controller
     }
 
     /**
+     * Map Order model to KDS format.
+     */
+    private function mapOrder(Order $order): array
+    {
+        return [
+            'id' => $order->id,
+            'type' => 'order',
+            'order_number' => $order->order_number,
+            'customer_name' => $order->customer_name,
+            'order_type' => $order->order_type,
+            'payment_status' => $order->payment_status,
+            'order_status' => $order->order_status,
+            'total_price' => $order->total_price,
+            'courier' => $order->courier ? $order->courier->name : null,
+            'time' => $order->created_at->format('H:i'),
+            'elapsed_minutes' => now()->diffInMinutes($order->created_at),
+            'items' => $order->items->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->menu ? $item->menu->name : 'Menu Tidak Tersedia',
+                    'quantity' => $item->quantity,
+                    'status' => $item->status ?? 'pending',
+                    'notes' => $item->notes,
+                    'type' => 'order',
+                ];
+            }),
+        ];
+    }
+
+    /**
+     * Map Reservation model to KDS format.
+     */
+    private function mapReservation(Reservation $res): array
+    {
+        return [
+            'id' => $res->id,
+            'type' => 'reservation',
+            'order_number' => 'RES-'.$res->id,
+            'customer_name' => $res->customer_name,
+            'order_type' => 'dine-in',
+            'table_number' => $res->restoTable ? $res->restoTable->name : null,
+            'payment_status' => $res->status == 'completed' ? 'paid' : 'pending',
+            'order_status' => $res->status, // pending, confirmed, active, completed, cancelled
+            'total_price' => $res->menus->sum(fn ($m) => $m->price * $m->pivot->quantity),
+            'courier' => null,
+            'time' => $res->reservation_time ? Carbon::parse($res->reservation_time)->format('H:i') : $res->created_at->format('H:i'),
+            'elapsed_minutes' => now()->diffInMinutes($res->created_at),
+            'items' => $res->menus->map(function ($item) {
+                return [
+                    'id' => $item->pivot->id,
+                    'name' => $item->name,
+                    'quantity' => $item->pivot->quantity,
+                    'status' => $item->pivot->status ?? 'pending',
+                    'notes' => $item->pivot->notes,
+                    'type' => 'reservation',
+                ];
+            }),
+            'special_requests' => $res->special_requests,
+        ];
+    }
+
+    /**
      * Update the status of a specific menu item within a reservation.
      */
-    public function updateItemStatus(Request $request, $pivotId)
+    public function updateItemStatus(Request $request, int $pivotId)
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,preparing,ready,served',
@@ -116,7 +129,7 @@ class KitchenController extends Controller
         $item = DB::table('menu_reservation')
             ->join('menus', 'menu_reservation.menu_id', '=', 'menus.id')
             ->where('menu_reservation.id', $pivotId)
-            ->select('menus.name', 'menu_reservation.reservation_id')
+            ->select(['menus.name', 'menu_reservation.reservation_id'])
             ->first();
 
         if ($item) {
@@ -153,7 +166,7 @@ class KitchenController extends Controller
         return back()->with('success', 'Item status updated.');
     }
 
-    public function updateOrderItemStatus(Request $request, $itemId)
+    public function updateOrderItemStatus(Request $request, int $itemId)
     {
         $validated = $request->validate([
             'status' => 'required|in:pending,preparing,ready,served',
@@ -197,39 +210,59 @@ class KitchenController extends Controller
     public function updateOrderStatus(Request $request, Order $order)
     {
         $validated = $request->validate([
-            'status' => 'required|string',
+            'status' => 'nullable|string',
             'courier_id' => 'nullable|exists:users,id',
+            'payment_status' => 'nullable|in:unpaid,paid,failed',
         ]);
 
-        $updateData = ['order_status' => $validated['status']];
+        $updateData = [];
+        if (isset($validated['status'])) {
+            $updateData['order_status'] = $validated['status'];
+        }
         if (isset($validated['courier_id'])) {
             $updateData['courier_id'] = $validated['courier_id'];
+        }
+        if (isset($validated['payment_status'])) {
+            $updateData['payment_status'] = $validated['payment_status'];
+
+            // OTOMATISASI: Jika dibayar oleh staff, biasanya status otomatis confirmed
+            if ($validated['payment_status'] === 'paid' && $order->order_status === 'waiting_for_payment') {
+                $updateData['order_status'] = 'confirmed';
+            }
         }
 
         $order->update($updateData);
 
+        // Refresh model to get updated order_status for the event
+        $order->refresh();
+
+        event(new OrderStatusUpdated($order));
+
         // OTOMATISASI: Jika status pesanan berubah, update semua item di dalamnya
-        if ($validated['status'] === 'preparing') {
-            $order->items()->update(['status' => 'preparing']);
-        } elseif (in_array($validated['status'], ['complete', 'delivering', 'delivered'])) {
-            $order->items()->update(['status' => 'ready']);
+        if (isset($validated['status'])) {
+            if ($validated['status'] === 'preparing') {
+                $order->items()->update(['status' => 'preparing']);
+            } elseif (in_array($validated['status'], ['complete', 'delivering', 'delivered'])) {
+                $order->items()->update(['status' => 'ready']);
+            }
         }
 
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pesanan'),
-            __('Pesanan #:order Anda sekarang berstatus: :status', ['order' => $order->order_number, 'status' => ucfirst($validated['status'])]),
+            __('Pesanan #:order Anda telah diperbarui.', ['order' => $order->order_number]),
             'info',
             route('orders.track', [$order->id], false)
         ));
 
-        return back()->with('success', "Pesanan #{$order->order_number} diperbarui ke ".ucfirst($validated['status']));
+        return back()->with('success', "Pesanan #{$order->order_number} berhasil diperbarui.");
     }
 
     public function acceptOrder(Order $order)
     {
         // Langsung masuk ke tahap memasak tanpa menunggu pembayaran
         $order->update(['order_status' => 'preparing']);
+        event(new OrderStatusUpdated($order));
 
         // Otomatis tandai semua item sebagai sedang dimasak
         $order->items()->update(['status' => 'preparing']);
@@ -248,6 +281,7 @@ class KitchenController extends Controller
     public function rejectOrder(Order $order)
     {
         $order->update(['order_status' => 'rejected']);
+        event(new OrderStatusUpdated($order));
 
         // Notify Customer
         $order->user?->notify(new AppNotification(

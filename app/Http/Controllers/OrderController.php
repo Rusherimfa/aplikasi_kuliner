@@ -326,7 +326,7 @@ class OrderController extends Controller
         ]);
     }
 
-    private function calculateDistance($lat1, $lon1, $lat2, $lon2)
+    private function calculateDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         $earthRadius = 6371; // KM
 

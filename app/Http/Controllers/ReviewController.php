@@ -24,12 +24,19 @@ class ReviewController extends Controller
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'message' => 'nullable|string|max:1000',
+            'image' => 'nullable|image|max:2048',
         ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('reviews', 'public');
+        }
 
         $reservation->review()->create([
             'user_id' => $request->user()->id,
             'rating' => $validated['rating'],
             'message' => $validated['message'],
+            'image_path' => $imagePath,
             'is_approved' => true,
         ]);
 

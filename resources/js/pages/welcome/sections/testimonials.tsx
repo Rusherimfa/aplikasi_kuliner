@@ -52,6 +52,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
             role: r.user ? __('Verified Guest') : __('Regular Guest'),
             quote: r.message,
             rating: r.rating,
+            image: r.image_path,
             isReview: true
         })),
         ...testimonials.map(t => ({
@@ -174,6 +175,17 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                                 <p className="mb-6 flex-1 text-base md:text-lg font-medium leading-relaxed text-slate-600 dark:text-neutral-400 italic relative z-10">
                                     "{t.quote}"
                                 </p>
+
+                                {/* Review Photo */}
+                                {t.image && (
+                                    <div className="mb-8 rounded-[1.5rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg group-hover:scale-[1.02] transition-transform duration-700">
+                                        <img 
+                                            src={t.image.startsWith('http') ? t.image : `/storage/${t.image}`} 
+                                            alt="Gourmet Experience" 
+                                            className="w-full h-auto object-cover max-h-56" 
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Author Profile */}
                                 <div className="flex items-center gap-5 pt-8 border-t border-border dark:border-white/5 relative z-10">

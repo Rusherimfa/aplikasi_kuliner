@@ -131,7 +131,9 @@ export default function SimulatePayment() {
                                         {__('Klik tombol di bawah untuk melanjutkan ke gerbang pembayaran aman Midtrans. Anda dapat memilih QRIS, GoPay, OVO, atau Transfer Bank di sana.')}
                                     </p>
                                 </div>
-                                <div className="hidden">                                        onClick={() => setPaymentMethod('ewallet')}
+                                 <div className="mt-8 space-y-4">
+                                     <button 
+                                        onClick={() => setPaymentMethod('ewallet')}
                                         className={`w-full flex items-center justify-between rounded-2xl border p-4 transition-all ${paymentMethod === 'ewallet' ? 'border-sky-500 bg-sky-500/10 shadow-md ring-1 ring-sky-500' : 'border-slate-200 dark:border-border bg-white dark:bg-card hover:bg-slate-50 dark:hover:bg-accent/10'}`}
                                     >
                                         <div className="flex items-center gap-4">
@@ -183,7 +185,6 @@ export default function SimulatePayment() {
                                             {paymentMethod === 'bank' && <div className="h-2 w-2 rounded-full bg-white"></div>}
                                         </div>
                                     </button>
-                                </div>
                                 </div>
 
 

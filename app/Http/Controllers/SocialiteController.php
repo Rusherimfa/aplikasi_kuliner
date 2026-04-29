@@ -30,6 +30,7 @@ class SocialiteController extends Controller
             /** @var AbstractProvider $driver */
             $driver = Socialite::driver('google');
 
+            /** @var \Laravel\Socialite\Two\User $googleUser */
             $googleUser = $driver->stateless()->user();
         } catch (\Exception $e) {
             Log::error('Google Login Error: '.$e->getMessage(), [

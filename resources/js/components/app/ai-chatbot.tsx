@@ -194,7 +194,7 @@ export default function AIChatbot() {
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder={__('Ask something...')}
-                                className="w-full rounded-full border border-white/10 bg-white/5 pl-4 pr-12 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-sky-500/50 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+                                className="w-full rounded-full border border-white/10 bg-white/5 pl-4 pr-12 py-2.5 text-sm text-white placeholder:text-white/30 focus:border-sky-500/50 focus:outline-none focus:ring-1 focus:ring-sky-500/50 caret-sky-500"
                             />
                             <button
                                 type="submit"

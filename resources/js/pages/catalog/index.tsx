@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { dashboard } from '@/routes';
 import { useCart } from '@/hooks/use-cart';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from 'framer-motion';
 import { useTranslations } from '@/hooks/use-translations';
 
 // Layout Shared Components
@@ -46,6 +46,18 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
     const [searchTerm, setSearchTerm] = useState(filters.search || '');
     const [selectedDish, setSelectedDish] = useState<any>(null);
 
+    // Mouse Spotlight Tracking
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const springX = useSpring(mouseX, { damping: 50, stiffness: 400 });
+    const springY = useSpring(mouseY, { damping: 50, stiffness: 400 });
+
+    const handleMouseMove = ({ clientX, clientY, currentTarget }: React.MouseEvent) => {
+        const { left, top } = currentTarget.getBoundingClientRect();
+        mouseX.set(clientX - left);
+        mouseY.set(clientY - top);
+    };
+
     const rawCategories = Array.from(new Set(menus.map((item) => item.category)));
     const categories = [__('All'), __('Best Seller'), ...rawCategories];
 
@@ -71,12 +83,33 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
     };
 
     return (
-        <div className="relative min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0B] font-['Inter',sans-serif] text-foreground transition-colors duration-500 overflow-hidden">
-            <Head title={`${__('Menu Catalog')} — ${__('Premium Gastronomy Selection')}`} />
+        <div 
+            onMouseMove={handleMouseMove}
+            className="group/catalog relative min-h-screen bg-slate-100 dark:bg-[#0A0A0B] font-sans text-slate-900 dark:text-white transition-colors duration-500 overflow-x-hidden"
+        >
+            <Head title={__('Catalog Delicacies — Ocean\'s Resto Experience')} />
             
-            {/* Premium Decorative Ambient */}
-            <div className="pointer-events-none absolute top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-sky-500/5 blur-[140px]" />
-            <div className="pointer-events-none absolute bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-sky-600/5 blur-[120px]" />
+            {/* Background Atmosphere & Mouse Spotlight */}
+            <div className="pointer-events-none fixed inset-0 z-0">
+                <div className="absolute inset-0 bg-[radial-gradient(#0ea5e920_1px,transparent_1px)] [background-size:32px_32px] opacity-40" />
+                
+                {/* Dynamic Mouse Spotlight */}
+                <motion.div
+                    className="absolute inset-0 z-0 transition duration-300 opacity-0 group-hover/catalog:opacity-100"
+                    style={{
+                        background: useMotionTemplate`
+                            radial-gradient(
+                                600px circle at ${springX}px ${springY}px,
+                                rgba(14, 165, 233, 0.12),
+                                transparent 80%
+                            )
+                        `,
+                    }}
+                />
+
+                <div className="absolute top-[-10%] right-[-10%] h-[800px] w-[800px] rounded-full bg-sky-500/10 blur-[140px]" />
+                <div className="absolute bottom-[-10%] left-[-10%] h-[600px] w-[600px] rounded-full bg-sky-600/10 blur-[120px]" />
+            </div>
 
             <Navbar
                 auth={auth}
@@ -119,14 +152,15 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="glass-card flex flex-col md:flex-row items-center gap-6 p-4 rounded-[2.5rem] bg-white/70 dark:bg-white/[0.02] border-border dark:border-white/5"
+                        whileHover={{ backgroundColor: 'rgba(14, 165, 233, 0.05)' }}
+                        className="glass-card flex flex-col md:flex-row items-center gap-6 p-4 rounded-[2.5rem] bg-slate-200/40 dark:bg-white/[0.02] border border-slate-300/50 dark:border-white/5 transition-colors duration-300"
                     >
                         <div className="relative flex-1 w-full">
                             <Search className="absolute top-4 left-5 h-5 w-5 text-slate-400" />
                             <Input
                                 type="search"
                                 placeholder={__('Search for exquisite dishes...')}
-                                className="h-14 rounded-3xl border-none bg-slate-50 dark:bg-white/5 pl-14 text-base font-medium placeholder:text-slate-400 focus:ring-sky-500/30 transition-all font-sans"
+                                className="h-14 rounded-3xl border border-slate-300 dark:border-white/5 bg-slate-200/50 dark:bg-white/5 pl-14 text-base font-medium text-slate-900 dark:text-white placeholder:text-slate-500 focus:ring-sky-500/30 caret-slate-900 dark:caret-sky-500 transition-all font-sans shadow-inner"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />

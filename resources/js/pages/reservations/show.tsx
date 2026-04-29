@@ -29,7 +29,10 @@ import {
     CreditCard,
     Truck,
     Star,
-    Bell
+    Bell,
+    Camera,
+    Image as ImageIcon,
+    X
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
@@ -343,8 +346,16 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             {[
                                                 { label: __('Booked'), icon: Ticket, active: true },
                                                 { label: __('Check-in'), icon: ShieldCheck, active: isCheckedIn },
-                                                { label: __('Cooking'), icon: ChefHat, active: reservation.menus.some((m: any) => m.pivot?.status === 'cooking' || m.pivot?.status === 'preparing') },
-                                                { label: __('Enjoy'), icon: Utensils, active: reservation.status === 'completed' || reservation.menus.every((m: any) => m.pivot?.status === 'ready' || m.pivot?.status === 'served') }
+                                                { 
+                                                    label: __('Cooking'), 
+                                                    icon: ChefHat, 
+                                                    active: reservation.menus.some((m: any) => ['preparing', 'cooking', 'ready'].includes(m.pivot?.status)) || reservation.status === 'preparing'
+                                                },
+                                                { 
+                                                    label: __('Enjoy'), 
+                                                    icon: Utensils, 
+                                                    active: reservation.status === 'completed' || reservation.status === 'served' || reservation.menus.every((m: any) => m.pivot?.status === 'served') 
+                                                }
                                             ].map((step, idx) => (
                                                 <div key={idx} className="relative z-10 flex flex-col items-center">
                                                     <div className={`h-10 w-10 rounded-full flex items-center justify-center border-2 transition-all duration-700 ${step.active ? 'bg-sky-500 border-sky-500 text-white dark:text-[#0A0A0B]' : 'bg-slate-50 dark:bg-[#0A0A0B] border-slate-200 dark:border-white/10 text-slate-300 dark:text-white/20'}`}>
@@ -580,13 +591,29 @@ function ReviewForm({ reservationId }: { reservationId: number }) {
     const { data, setData, post, processing } = useForm({
         rating: 5,
         message: '',
+        image: null as File | null,
     });
+
+    const [preview, setPreview] = useState<string | null>(null);
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post(`/reservations/${reservationId}/reviews`, {
             onSuccess: () => toast.success(__('Terima kasih atas ulasan Anda!')),
+            forceFormData: true,
         });
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('image', file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     return (
@@ -616,6 +643,36 @@ function ReviewForm({ reservationId }: { reservationId: number }) {
                                 <Star size={20} fill={data.rating >= star ? "currentColor" : "none"} />
                             </button>
                         ))}
+                    </div>
+                </div>
+
+                <div className="space-y-4">
+                    <Label className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-500/60">{__('Lampirkan Foto Hidangan')}</Label>
+                    
+                    <div className="flex flex-wrap gap-4">
+                        <label className="cursor-pointer group/upload relative h-32 w-32 rounded-3xl border-2 border-dashed border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/40 flex flex-col items-center justify-center gap-2 hover:border-sky-500/50 hover:bg-sky-500/5 transition-all">
+                            <input 
+                                type="file" 
+                                className="hidden" 
+                                accept="image/*"
+                                onChange={handleFileChange}
+                            />
+                            <Camera size={24} className="text-slate-300 dark:text-white/20 group-hover/upload:text-sky-500 transition-colors" />
+                            <span className="text-[8px] font-black uppercase tracking-widest text-slate-400 dark:text-white/20">{__('Upload')}</span>
+                        </label>
+
+                        {preview && (
+                            <div className="relative h-32 w-32 rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 group/preview">
+                                <img src={preview} alt="Preview" className="h-full w-full object-cover" />
+                                <button 
+                                    type="button"
+                                    onClick={() => { setPreview(null); setData('image', null); }}
+                                    className="absolute top-2 right-2 h-8 w-8 rounded-full bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover/preview:opacity-100 transition-opacity shadow-lg"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 

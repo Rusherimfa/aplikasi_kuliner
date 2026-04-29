@@ -1,4 +1,4 @@
-﻿import { Head, usePage, useForm, Link } from '@inertiajs/react';
+import { Head, usePage, useForm, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import { Quote, Star, MessageSquarePlus, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ interface Testimonial {
     role: string | null;
     quote: string;
     rating: number;
+    image_path: string | null;
 }
 
 const DEFAULT_TESTIMONIALS = [
@@ -60,6 +61,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
         role: '',
         quote: '',
         rating: 5,
+        image: null as File | null,
     });
 
     const [formSubmitted, setFormSubmitted] = useState(false);
@@ -67,6 +69,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post('/testimonials', {
+            forceFormData: true,
             onSuccess: () => {
                 reset();
                 setFormSubmitted(true);
@@ -83,12 +86,14 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
             role: r.user ? 'Verified Guest' : 'Regular Guest',
             quote: r.message,
             rating: r.rating,
+            image: r.image_path,
             isReview: true
         })),
         ...testimonials.map(t => ({
             ...t,
             quote: t.quote || (t as any).message,
             role: t.role || 'Gourmet Enthusiast',
+            image: t.image_path,
             isReview: false
         }))
     ];
@@ -155,6 +160,16 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                             <p className="mb-6 mt-2 flex-1 text-sm leading-relaxed text-slate-600 dark:text-neutral-400 italic">
                                                 "{t.quote}"
                                             </p>
+
+                                            {t.image && (
+                                                <div className="mb-6 rounded-2xl overflow-hidden border border-slate-100 dark:border-neutral-800 shadow-sm transition-transform duration-500 group-hover:scale-[1.02]">
+                                                    <img 
+                                                        src={t.image.startsWith('http') ? t.image : `/storage/${t.image}`} 
+                                                        alt="Gourmet Experience" 
+                                                        className="w-full h-auto object-cover max-h-48" 
+                                                    />
+                                                </div>
+                                            )}
 
                                             <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-neutral-800">
                                                 <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${avatarBg.includes('bg-') ? avatarBg : 'bg-slate-100 dark:bg-neutral-700'} text-sm font-bold ${avatarBg.includes('bg-') ? 'text-white' : 'text-slate-600 dark:text-neutral-300'}`}>
@@ -243,6 +258,55 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                                 required
                                             />
                                             {errors.quote && <p className="text-xs text-rose-500 mt-1 font-medium">{errors.quote}</p>}
+                                        </div>
+
+                                        {/* Image Upload */}
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-semibold text-slate-700 dark:text-neutral-300">
+                                                Foto Momen <span className="text-slate-400 font-normal">(Opsional)</span>
+                                            </label>
+                                            <div className="flex flex-col gap-4">
+                                                <div className="relative group/upload">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        id="testimonial-image-upload"
+                                                        onChange={(e) => setData('image', e.target.files?.[0] || null)}
+                                                    />
+                                                    <label
+                                                        htmlFor="testimonial-image-upload"
+                                                        className="flex cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 bg-white px-6 py-8 transition-all hover:border-sky-400 hover:bg-sky-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-sky-500/50 dark:hover:bg-sky-500/5"
+                                                    >
+                                                        <div className="flex flex-col items-center gap-2 text-center">
+                                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-sky-100 text-sky-600 dark:bg-sky-500/10 dark:text-sky-500">
+                                                                <MessageSquarePlus size={20} />
+                                                            </div>
+                                                            <span className="text-xs font-bold text-slate-600 dark:text-neutral-400">
+                                                                {data.image ? data.image.name : 'Ketuk untuk tambah foto'}
+                                                            </span>
+                                                        </div>
+                                                    </label>
+                                                </div>
+
+                                                {data.image && (
+                                                    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-sky-100 shadow-md animate-in zoom-in duration-300">
+                                                        <img
+                                                            src={URL.createObjectURL(data.image)}
+                                                            alt="Preview"
+                                                            className="h-full w-full object-cover"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setData('image', null)}
+                                                            className="absolute top-2 right-2 rounded-full bg-black/50 p-1.5 text-white backdrop-blur-md transition-all hover:bg-rose-500"
+                                                        >
+                                                            <Quote size={12} className="rotate-180" />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {errors.image && <p className="text-xs font-bold text-rose-500 mt-1">{errors.image}</p>}
                                         </div>
 
                                         <Button

@@ -278,12 +278,20 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
                                                 <p className="text-[9px] font-black text-amber-600 uppercase tracking-widest">{__('Menunggu Pembayaran')}</p>
                                             </div>
-                                            <Button 
-                                                onClick={() => updateOrderStatus(order.id, 'preparing')}
-                                                className="w-full bg-sky-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12"
-                                            >
-                                                {__('Tetap Masak (Bypass)')}
-                                            </Button>
+                                            <div className="flex gap-2">
+                                                <Button 
+                                                    onClick={() => updateOrderStatus(order.id, 'preparing', 'order')}
+                                                    className="flex-1 bg-slate-200 text-slate-700 font-black uppercase tracking-widest text-[10px] rounded-xl h-12"
+                                                >
+                                                    {__('Bypass')}
+                                                </Button>
+                                                <Button 
+                                                    onClick={() => router.patch(kitchen.orders.update_status.url(order.id), { payment_status: 'paid' }, { preserveScroll: true, onSuccess: () => toast.success(__('Pembayaran dikonfirmasi')) })}
+                                                    className="flex-[2] bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-emerald-500/20"
+                                                >
+                                                    {__('Konfirmasi Bayar')}
+                                                </Button>
+                                            </div>
                                         </div>
                                     )}
 

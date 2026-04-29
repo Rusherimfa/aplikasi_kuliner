@@ -68,14 +68,18 @@ export default function BentoFeatures() {
             !mounted ? "bg-white" : (resolvedAppearance === 'dark' ? "bg-background" : "bg-white")
         )}>
             {/* Ambient Background Glow */}
-            <div className={cn(
-                "absolute top-1/4 left-1/4 w-[600px] h-[600px] blur-[150px] rounded-full pointer-events-none transition-all duration-700 opacity-50",
-                resolvedAppearance === 'dark' ? "bg-sky-500/20" : "bg-sky-500/10"
-            )} />
-            <div className={cn(
-                "absolute bottom-1/4 right-1/4 w-[600px] h-[600px] blur-[150px] rounded-full pointer-events-none transition-all duration-700 opacity-50",
-                resolvedAppearance === 'dark' ? "bg-cyan-500/20" : "bg-cyan-500/10"
-            )} />
+            {mounted && (
+                <>
+                    <div className={cn(
+                        "absolute top-1/4 left-1/4 w-[600px] h-[600px] blur-[150px] rounded-full pointer-events-none transition-all duration-700 opacity-50",
+                        resolvedAppearance === 'dark' ? "bg-sky-500/20" : "bg-sky-500/10"
+                    )} />
+                    <div className={cn(
+                        "absolute bottom-1/4 right-1/4 w-[600px] h-[600px] blur-[150px] rounded-full pointer-events-none transition-all duration-700 opacity-50",
+                        resolvedAppearance === 'dark' ? "bg-cyan-500/20" : "bg-cyan-500/10"
+                    )} />
+                </>
+            )}
 
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
@@ -93,7 +97,7 @@ export default function BentoFeatures() {
                             whileInView={{ opacity: 1, y: 0 }}
                             className={cn(
                                 "font-serif text-5xl md:text-7xl font-light leading-[1.1] text-wrap-balance transition-colors duration-500",
-                                resolvedAppearance === 'dark' ? "text-white" : "text-slate-900"
+                                !mounted ? "text-slate-900" : (resolvedAppearance === 'dark' ? "text-white" : "text-slate-900")
                             )}
                         >
                             {__('Details That Define Us')}
@@ -104,7 +108,7 @@ export default function BentoFeatures() {
                         whileInView={{ opacity: 1 }}
                         className={cn(
                             "max-w-sm text-sm leading-relaxed transition-colors duration-500",
-                            resolvedAppearance === 'dark' ? "text-slate-400" : "text-slate-600"
+                            !mounted ? "text-slate-600" : (resolvedAppearance === 'dark' ? "text-slate-400" : "text-slate-600")
                         )}
                     >
                         {__('More than just taste, we bring a symphony between nature, culinary art, and sincere hospitality.')}
@@ -122,9 +126,11 @@ export default function BentoFeatures() {
                             viewport={{ once: true }}
                             className={cn(
                                 "group relative overflow-hidden rounded-[3rem] border p-8 md:p-12 flex flex-col justify-end transition-all duration-700",
-                                resolvedAppearance === 'dark' 
-                                    ? "border-white/10 hover:border-sky-500/30 hover:shadow-[0_20px_50px_rgba(14,165,233,0.1)]" 
-                                    : "border-black/5 hover:border-sky-500/20 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]",
+                                !mounted 
+                                    ? "border-black/5" 
+                                    : (resolvedAppearance === 'dark' 
+                                        ? "border-white/10 hover:border-sky-500/30 hover:shadow-[0_20px_50px_rgba(14,165,233,0.1)]" 
+                                        : "border-black/5 hover:border-sky-500/20 hover:shadow-[0_20px_50px_rgba(14,165,233,0.05)]"),
                                 feature.className
                             )}
                         >
@@ -139,15 +145,19 @@ export default function BentoFeatures() {
                                 {/* Overlays */}
                                 <div className={cn(
                                     "absolute inset-0 transition-colors duration-700",
-                                    resolvedAppearance === 'dark' 
-                                        ? "bg-gradient-to-t from-background via-background/20 to-transparent" 
-                                        : "bg-gradient-to-t from-white via-white/10 to-transparent"
+                                    !mounted 
+                                        ? "bg-gradient-to-t from-white via-white/10 to-transparent"
+                                        : (resolvedAppearance === 'dark' 
+                                            ? "bg-gradient-to-t from-background via-background/20 to-transparent" 
+                                            : "bg-gradient-to-t from-white via-white/10 to-transparent")
                                 )} />
                                 <div className={cn(
                                     "absolute inset-0 transition-colors duration-700",
-                                    resolvedAppearance === 'dark'
-                                        ? "bg-gradient-to-b from-transparent via-transparent to-background"
-                                        : "bg-gradient-to-b from-transparent via-transparent to-white"
+                                    !mounted
+                                        ? "bg-gradient-to-b from-transparent via-transparent to-white"
+                                        : (resolvedAppearance === 'dark'
+                                            ? "bg-gradient-to-b from-transparent via-transparent to-background"
+                                            : "bg-gradient-to-b from-transparent via-transparent to-white")
                                 )} />
                             </div>
 
@@ -161,19 +171,25 @@ export default function BentoFeatures() {
                                 </div>
                                 <span className={cn(
                                     "text-[10px] font-black tracking-[0.4em] uppercase block mb-3 transition-all duration-700",
-                                    resolvedAppearance === 'dark' ? "text-sky-400" : "text-sky-600"
+                                    !mounted 
+                                        ? "text-sky-600"
+                                        : (resolvedAppearance === 'dark' ? "text-sky-400" : "text-sky-600")
                                 )}>
                                     {feature.title}
                                 </span>
                                 <h3 className={cn(
                                     "font-serif text-3xl md:text-4xl font-light mb-6 leading-tight transition-colors duration-500",
-                                    resolvedAppearance === 'dark' ? "text-white" : "text-slate-900"
+                                    !mounted 
+                                        ? "text-slate-900"
+                                        : (resolvedAppearance === 'dark' ? "text-white" : "text-slate-900")
                                 )}>
                                     {feature.subtitle}
                                 </h3>
                                 <p className={cn(
                                     "text-sm leading-relaxed max-w-sm transition-all duration-700",
-                                    resolvedAppearance === 'dark' ? "text-slate-400/60 group-hover:text-slate-200" : "text-slate-500/60 group-hover:text-slate-800"
+                                    !mounted
+                                        ? "text-slate-500/60"
+                                        : (resolvedAppearance === 'dark' ? "text-slate-400/60 group-hover:text-slate-200" : "text-slate-500/60 group-hover:text-slate-800")
                                 )}>
                                     {feature.description}
                                 </p>
