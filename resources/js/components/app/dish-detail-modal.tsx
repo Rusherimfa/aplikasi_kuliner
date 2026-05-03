@@ -81,29 +81,6 @@ export default function DishDetailModal({ dish, isOpen, onClose, onAddToCart }: 
                                 {dish.description || __('A symphony of flavors crafted with high dedication by our chefs to provide a culinary experience like never before.')}
                             </p>
 
-                            {/* Infographic Stats */}
-                            <div className="grid grid-cols-2 gap-4 py-6 border-y border-white/5">
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Preparation Time')}</p>
-                                    <p className="text-white font-bold tracking-tight uppercase">15 - 20 {__('Min.')}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">{__('Complexity Level')}</p>
-                                    <p className="text-white font-bold tracking-tight uppercase">{__('Masterpiece')}</p>
-                                </div>
-                            </div>
-
-                            {/* Dietary Info */}
-                            <div className="flex gap-6">
-                                <div className="flex items-center gap-2 text-white/40">
-                                    <Leaf size={16} className="text-emerald-500" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{__('Vegan Friendly')}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-white/40">
-                                    <Wheat size={16} className="text-sky-300" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{__('Non-Gluten')}</span>
-                                </div>
-                            </div>
                         </div>
 
                         <div className="mt-12 flex gap-4">

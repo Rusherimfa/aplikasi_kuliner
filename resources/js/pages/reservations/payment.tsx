@@ -44,6 +44,14 @@ export default function SimulatePayment() {
         });
     };
 
+    const handleBypassPayment = () => {
+        setIsSimulating(true);
+        setTimeout(() => {
+            clearCart();
+            post(`/reservations/payment/${reservation.id}`);
+        }, 1000);
+    };
+
     return (
         <>
             <Head title={`${__('Pembayaran')} #${reservation.id} - Ocean's Resto`} />
@@ -205,6 +213,15 @@ export default function SimulatePayment() {
                                             <ChevronRight size={20} className="transition-transform group-hover:translate-x-1" />
                                         </>
                                     )}
+                                </Button>
+
+                                <Button
+                                    onClick={handleBypassPayment}
+                                    disabled={isSimulating}
+                                    variant="outline"
+                                    className="mt-4 w-full h-14 rounded-full border-slate-200 dark:border-white/10 bg-transparent text-slate-400 dark:text-white/40 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all disabled:opacity-50"
+                                >
+                                    BYPASS (UJI COBA)
                                 </Button>
                             </div>
                         </div>

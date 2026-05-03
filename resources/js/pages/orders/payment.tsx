@@ -57,6 +57,14 @@ export default function OrderPayment() {
         }
     };
 
+    const handleBypassPayment = () => {
+        setIsSimulating(true);
+        setTimeout(() => {
+            clearCart();
+            post(`/orders/payment/${order.id}`);
+        }, 1000);
+    };
+
     return (
         <>
             <Head title={`Secure Payment — Ocean's Resto`} />
@@ -117,10 +125,10 @@ export default function OrderPayment() {
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-sm font-bold text-white group-hover:text-sky-400 transition-colors">{item.menu?.name}</p>
-                                                                    <p className="text-[10px] text-white/30 font-medium">Rp {Number(item.price).toLocaleString('id-ID')}</p>
+                                                                    <p className="text-[10px] text-white/30 font-medium">Rp {Number(item.unit_price).toLocaleString('id-ID')}</p>
                                                                 </div>
                                                             </div>
-                                                            <p className="text-sm font-black text-white/80">Rp {Number(item.price * item.quantity).toLocaleString('id-ID')}</p>
+                                                            <p className="text-sm font-black text-white/80">Rp {Number(item.unit_price * item.quantity).toLocaleString('id-ID')}</p>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -199,6 +207,15 @@ export default function OrderPayment() {
                                                         <ChevronRight size={24} className="transition-transform group-hover:translate-x-1" />
                                                     </>
                                                 )}
+                                            </Button>
+
+                                            <Button
+                                                onClick={handleBypassPayment}
+                                                disabled={isSimulating}
+                                                variant="outline"
+                                                className="mt-4 w-full h-14 rounded-2xl border-white/10 bg-transparent text-white/40 font-bold tracking-widest hover:bg-white/5 hover:text-white transition-all disabled:opacity-50"
+                                            >
+                                                BYPASS (UJI COBA)
                                             </Button>
 
                                             <div className="mt-12 space-y-6">

@@ -225,9 +225,9 @@ class KitchenController extends Controller
         if (isset($validated['payment_status'])) {
             $updateData['payment_status'] = $validated['payment_status'];
 
-            // OTOMATISASI: Jika dibayar oleh staff, biasanya status otomatis confirmed
+            // OTOMATISASI: Jika dibayar, otomatis status menjadi preparing agar mulai dimasak
             if ($validated['payment_status'] === 'paid' && $order->order_status === 'waiting_for_payment') {
-                $updateData['order_status'] = 'confirmed';
+                $updateData['order_status'] = 'preparing';
             }
         }
 
@@ -239,10 +239,11 @@ class KitchenController extends Controller
         event(new OrderStatusUpdated($order));
 
         // OTOMATISASI: Jika status pesanan berubah, update semua item di dalamnya
-        if (isset($validated['status'])) {
-            if ($validated['status'] === 'preparing') {
+        $newStatus = $validated['status'] ?? ($updateData['order_status'] ?? null);
+        if ($newStatus) {
+            if ($newStatus === 'preparing') {
                 $order->items()->update(['status' => 'preparing']);
-            } elseif (in_array($validated['status'], ['complete', 'delivering', 'delivered'])) {
+            } elseif (in_array($newStatus, ['complete', 'delivering', 'delivered'])) {
                 $order->items()->update(['status' => 'ready']);
             }
         }
@@ -260,22 +261,21 @@ class KitchenController extends Controller
 
     public function acceptOrder(Order $order)
     {
-        // Langsung masuk ke tahap memasak tanpa menunggu pembayaran
-        $order->update(['order_status' => 'preparing']);
+        // Berubah: Tunggu pembayaran dulu sebelum dimasak
+        $order->update(['order_status' => 'waiting_for_payment']);
         event(new OrderStatusUpdated($order));
 
-        // Otomatis tandai semua item sebagai sedang dimasak
-        $order->items()->update(['status' => 'preparing']);
+        // Note: Tidak otomatis tandai item sedang dimasak, biarkan pending
 
         // Notify Customer
         $order->user?->notify(new AppNotification(
-            __('Pesanan Diterima'),
-            __('Kabar baik! Pesanan #:order Anda telah diterima dan koki kami mulai memasak sekarang.', ['order' => $order->order_number]),
+            __('Pesanan Dikonfirmasi'),
+            __('Pesanan #:order Anda telah dikonfirmasi. Silakan lakukan pembayaran agar pesanan dapat segera disiapkan.', ['order' => $order->order_number]),
             'success',
-            route('orders.track', [$order->id], false)
+            route('orders.history', [], false)
         ));
 
-        return back()->with('success', "Pesanan #{$order->order_number} diterima dan mulai dimasak.");
+        return back()->with('success', "Pesanan #{$order->order_number} dikonfirmasi, menunggu pembayaran.");
     }
 
     public function rejectOrder(Order $order)
@@ -292,5 +292,24 @@ class KitchenController extends Controller
         ));
 
         return back()->with('success', "Pesanan #{$order->order_number} ditolak.");
+    }
+
+    public function readyAll(Order $order)
+    {
+        $order->items()->update(['status' => 'ready']);
+
+        // Refresh to get the latest item statuses
+        $order->load('items');
+        event(new OrderStatusUpdated($order));
+
+        // Notify Customer
+        $order->user?->notify(new AppNotification(
+            __('Pesanan Selesai Disiapkan'),
+            __('Kabar baik! Semua hidangan untuk pesanan #:order Anda sudah siap.', ['order' => $order->order_number]),
+            'success',
+            route('orders.track', [$order->id], false)
+        ));
+
+        return back()->with('success', 'Semua item pesanan telah ditandai Selesai Dimasak.');
     }
 }

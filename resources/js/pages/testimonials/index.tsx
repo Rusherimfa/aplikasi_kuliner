@@ -6,6 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import Navbar from '../welcome/sections/navbar';
 import Footer from '../welcome/sections/footer';
+import GlobalCustomerChat from '@/components/app/global-customer-chat';
+import AIChatbot from '@/components/app/ai-chatbot';
 import { dashboard } from '@/routes';
 
 interface Testimonial {
@@ -87,6 +89,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
             quote: r.message,
             rating: r.rating,
             image: r.image_path,
+            userAvatar: r.user?.avatar,
             isReview: true
         })),
         ...testimonials.map(t => ({
@@ -94,6 +97,7 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
             quote: t.quote || (t as any).message,
             role: t.role || 'Gourmet Enthusiast',
             image: t.image_path,
+            userAvatar: (t as any).user?.avatar,
             isReview: false
         }))
     ];
@@ -172,9 +176,15 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                                             )}
 
                                             <div className="flex items-center gap-3 pt-4 border-t border-slate-100 dark:border-neutral-800">
-                                                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${avatarBg.includes('bg-') ? avatarBg : 'bg-slate-100 dark:bg-neutral-700'} text-sm font-bold ${avatarBg.includes('bg-') ? 'text-white' : 'text-slate-600 dark:text-neutral-300'}`}>
-                                                    {avatarLetters}
-                                                </div>
+                                                {t.userAvatar ? (
+                                                    <div className="flex h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-neutral-700">
+                                                        <img src={t.userAvatar.startsWith('http') || t.userAvatar.startsWith('/') ? t.userAvatar : `/storage/${t.userAvatar}`} alt={t.name} className="h-full w-full object-cover" />
+                                                    </div>
+                                                ) : (
+                                                    <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${avatarBg.includes('bg-') ? avatarBg : 'bg-slate-100 dark:bg-neutral-700'} text-sm font-bold ${avatarBg.includes('bg-') ? 'text-white' : 'text-slate-600 dark:text-neutral-300'}`}>
+                                                        {avatarLetters}
+                                                    </div>
+                                                )}
                                                 <div>
                                                     <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{t.name || 'Tamu'}</p>
                                                     {t.role && <p className="text-xs font-semibold text-slate-500 dark:text-neutral-500 tracking-wide uppercase">{t.role}</p>}
@@ -339,6 +349,8 @@ export default function TestimonialIndex({ testimonials = [], reviews = [] }: { 
                 </main>
 
                 <Footer />
+                <GlobalCustomerChat />
+                <AIChatbot />
             </div>
         </>
     );

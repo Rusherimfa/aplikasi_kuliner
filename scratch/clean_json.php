@@ -1,10 +1,15 @@
 <?php
-function cleanJson($filePath) {
-    if (!file_exists($filePath)) return;
+
+function cleanJson($filePath)
+{
+    if (! file_exists($filePath)) {
+        return;
+    }
     $content = file_get_contents($filePath);
     $data = json_decode($content, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        echo "Error parsing $filePath: " . json_last_error_msg() . "\n";
+        echo "Error parsing $filePath: ".json_last_error_msg()."\n";
+
         return;
     }
     // json_decode with true already handles duplicates by taking the LAST one

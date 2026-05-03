@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import Navbar from '../welcome/sections/navbar';
 import AIChatbot from '@/components/app/ai-chatbot';
+import GlobalCustomerChat from '@/components/app/global-customer-chat';
 import { useTranslations } from '@/hooks/use-translations';
 
 export default function CreateReservation() {
@@ -35,7 +36,7 @@ export default function CreateReservation() {
     const [preorder, setPreorder] = useState(false);
 
     const foodTotal = selectedMenus.reduce((total, item) => total + (item.price * item.quantity), 0);
-    const dpAmount = foodTotal > 0 ? foodTotal * 0.5 : 50000;
+    const dpAmount = 50000 + (foodTotal * 0.5);
 
     const today = new Date();
     today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -417,8 +418,12 @@ export default function CreateReservation() {
                                                 return (
                                                     <div key={menu.id} className="flex flex-col gap-2 p-4 rounded-2xl border border-border bg-white dark:bg-white/[0.02]">
                                                         <div className="flex gap-4 items-center">
-                                                            <div className="h-16 w-16 bg-slate-100 dark:bg-white/5 rounded-xl overflow-hidden shrink-0">
-                                                                <img src={menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`} alt={menu.name} className="w-full h-full object-cover" />
+                                                            <div className="h-16 w-16 bg-slate-100 dark:bg-white/5 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
+                                                                {menu.image_path ? (
+                                                                    <img src={menu.image_path.startsWith('http') || menu.image_path.startsWith('/') ? menu.image_path : `/storage/${menu.image_path}`} alt={menu.name} className="w-full h-full object-cover" />
+                                                                ) : (
+                                                                    <span className="text-xs text-slate-400 font-bold">{menu.name.substring(0, 2).toUpperCase()}</span>
+                                                                )}
                                                             </div>
                                                             <div className="flex flex-col flex-1">
                                                                 <span className="text-sm font-black tracking-tight">{menu.name}</span>
@@ -486,11 +491,15 @@ export default function CreateReservation() {
                             </h3>
                             
                             <div className="space-y-3 mb-10">
+                                <div className="flex justify-between text-sm font-bold opacity-80 border-b border-black/10 pb-2 mb-2">
+                                    <span>{__('Table Booking Fee')}</span>
+                                    <span>Rp 50,000</span>
+                                </div>
                                 {selectedMenus.length > 0 ? (
                                     selectedMenus.map(item => (
                                         <div key={item.id} className="flex justify-between text-sm font-bold opacity-80">
-                                            <span>{item.quantity}x {item.name}</span>
-                                            <span>Rp {(item.price * item.quantity).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
+                                            <span>{item.quantity}x {item.name} <span className="text-[10px] opacity-60">(DP 50%)</span></span>
+                                            <span>Rp {((item.price * item.quantity) * 0.5).toLocaleString(locale === 'id' ? 'id-ID' : 'en-US')}</span>
                                         </div>
                                     ))
                                 ) : (
@@ -535,6 +544,7 @@ export default function CreateReservation() {
                     </form>
                 </motion.div>
                 
+                <GlobalCustomerChat />
                 <AIChatbot />
             </div>
         </div>

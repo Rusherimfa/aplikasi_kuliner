@@ -59,6 +59,8 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
             ...t,
             quote: t.quote || t.message,
             role: t.role ? __(t.role) : __('Gourmet Enthusiast'),
+            userAvatar: t.user?.avatar,
+            image: t.image_path,
             isReview: false
         }))
     ];
@@ -176,22 +178,17 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                                     "{t.quote}"
                                 </p>
 
-                                {/* Review Photo */}
-                                {t.image && (
-                                    <div className="mb-8 rounded-[1.5rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg group-hover:scale-[1.02] transition-transform duration-700">
-                                        <img 
-                                            src={t.image.startsWith('http') ? t.image : `/storage/${t.image}`} 
-                                            alt="Gourmet Experience" 
-                                            className="w-full h-auto object-cover max-h-56" 
-                                        />
-                                    </div>
-                                )}
-
                                 {/* Author Profile */}
                                 <div className="flex items-center gap-5 pt-8 border-t border-border dark:border-white/5 relative z-10">
-                                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${avatarBg} text-base font-black text-white dark:text-black shadow-inner`}>
-                                        {avatarLetters}
-                                    </div>
+                                    {t.userAvatar ? (
+                                        <div className="flex h-14 w-14 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-white/10 shadow-inner">
+                                            <img src={t.userAvatar.startsWith('http') || t.userAvatar.startsWith('/') ? t.userAvatar : `/storage/${t.userAvatar}`} alt={t.name} className="h-full w-full object-cover" />
+                                        </div>
+                                    ) : (
+                                        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${avatarBg} text-base font-black text-white dark:text-black shadow-inner`}>
+                                            {avatarLetters}
+                                        </div>
+                                    )}
                                     <div>
                                         <p className="text-base font-black text-slate-900 dark:text-white tracking-tight">{t.name}</p>
                                         <p className="text-xs font-bold text-slate-500 dark:text-neutral-500 uppercase tracking-widest mt-0.5">

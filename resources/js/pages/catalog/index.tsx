@@ -12,6 +12,7 @@ import { useTranslations } from '@/hooks/use-translations';
 import Navbar from '../welcome/sections/navbar';
 import Footer from '../welcome/sections/footer';
 import AIChatbot from '@/components/app/ai-chatbot';
+import GlobalCustomerChat from '@/components/app/global-customer-chat';
 import DishDetailModal from '@/components/app/dish-detail-modal';
 
 interface Menu {
@@ -342,6 +343,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
             />
 
             <Footer />
+            <GlobalCustomerChat />
             <AIChatbot />
         </div>
     );

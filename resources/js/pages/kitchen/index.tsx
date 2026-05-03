@@ -203,31 +203,6 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                         <span className={`${statusType === 'active' && (item.status === 'preparing' || item.status === 'pending') ? 'text-sky-600 dark:text-sky-500' : 'text-slate-400 dark:text-white/20'} font-black mr-2`}>{item.quantity}x</span>
                                         {item.name}
                                     </span>
-                                    {statusType === 'active' && item.status !== 'served' && (
-                                        <div className="flex gap-1">
-                                            <button 
-                                                onClick={() => updateItemStatus(item.id, item.type, 'preparing', item.name)}
-                                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all shadow-sm ${item.status === 'preparing' ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-white/40 hover:bg-slate-200 dark:hover:bg-white/10'}`}
-                                                disabled={loadingId === item.id || item.status === 'ready'}
-                                            >
-                                                {loadingId === item.id && item.status !== 'preparing' ? '...' : __('Masak')}
-                                            </button>
-                                            <button 
-                                                onClick={() => updateItemStatus(item.id, item.type, 'ready', item.name)}
-                                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all shadow-sm ${item.status === 'ready' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-white/40 hover:bg-emerald-500/20 hover:text-emerald-500'}`}
-                                                disabled={loadingId === item.id || item.status === 'served'}
-                                            >
-                                                {loadingId === item.id && item.status === 'ready' ? '...' : __('Siap')}
-                                            </button>
-                                            <button 
-                                                onClick={() => updateItemStatus(item.id, item.type, 'served', item.name)}
-                                                className={`px-2 py-1 text-[9px] font-black uppercase rounded-md transition-all shadow-sm ${item.status === 'served' ? 'bg-indigo-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-white/5 dark:text-white/40 hover:bg-indigo-500/20 hover:text-indigo-500'}`}
-                                                disabled={loadingId === item.id}
-                                            >
-                                                {loadingId === item.id && item.status === 'served' ? '...' : __('Sajikan')}
-                                            </button>
-                                        </div>
-                                    )}
                                 </div>
                                 {item.notes && (
                                     <div className="ml-7 text-[10px] text-amber-600 dark:text-amber-500 italic bg-amber-500/5 px-2 py-1 rounded border border-amber-500/10">
@@ -260,7 +235,7 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                                 className="bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-emerald-500/20 w-full"
                                                 disabled={loadingId === `accept-${order.id}`}
                                             >
-                                                {loadingId === `accept-${order.id}` ? <Loader2 className="animate-spin" size={16}/> : __('Terima & Mulai Masak')}
+                                                {loadingId === `accept-${order.id}` ? <Loader2 className="animate-spin" size={16}/> : __('Konfirmasi Pesanan')}
                                             </Button>
                                             <Button 
                                                 onClick={() => handleRejectOrder(order.id)}
@@ -297,35 +272,53 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
 
                                     {order.order_status === 'preparing' && (
                                         <div className="space-y-4">
-                                            {order.order_type === 'delivery' ? (
-                                                <div className="space-y-3">
-                                                    <div className="flex flex-col gap-2">
-                                                        <label className="text-[8px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest ml-1">{__('Pilih Kurir')}</label>
-                                                        <select 
-                                                            className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white/60 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
-                                                            value={selectedCourier[order.id] || ''}
-                                                            onChange={(e) => setSelectedCourier({...selectedCourier, [order.id]: e.target.value})}
-                                                        >
-                                                            <option value="">{order.courier || __('Pilih Kurir...')}</option>
-                                                            {couriers.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                                        </select>
-                                                    </div>
-                                                    <Button 
-                                                        onClick={() => updateOrderStatus(order.id, 'delivering')}
-                                                        className={`w-full font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg ${progress === 100 ? 'bg-sky-500 text-black' : 'bg-slate-200 text-slate-400'}`}
-                                                        disabled={loadingId === `status-${order.id}`}
-                                                    >
-                                                        {progress === 100 ? __('Kirim Pesanan') : __('Belum Semua Siap')}
-                                                    </Button>
-                                                </div>
-                                            ) : (
+                                            {progress < 100 ? (
                                                 <Button 
-                                                    onClick={() => updateOrderStatus(order.id, 'complete')}
-                                                    className="w-full bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-emerald-500/20"
-                                                    disabled={loadingId === `status-${order.id}`}
+                                                    onClick={() => {
+                                                        setLoadingId(`ready-all-${order.id}`);
+                                                        router.post(kitchen.orders.ready_all.url(order.id), {}, {
+                                                            onFinish: () => setLoadingId(null),
+                                                            preserveScroll: true
+                                                        });
+                                                    }}
+                                                    className="w-full bg-amber-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-amber-500/20 hover:bg-amber-400"
+                                                    disabled={loadingId === `ready-all-${order.id}`}
                                                 >
-                                                    {progress === 100 ? __('Pesanan Selesai') : __('Siapkan & Selesaikan')}
+                                                    {loadingId === `ready-all-${order.id}` ? <Loader2 className="animate-spin" size={16}/> : __('Done Preparing')}
                                                 </Button>
+                                            ) : (
+                                                <>
+                                                    {order.order_type === 'delivery' ? (
+                                                        <div className="space-y-3">
+                                                            <div className="flex flex-col gap-2">
+                                                                <label className="text-[8px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest ml-1">{__('Pilih Kurir')}</label>
+                                                                <select 
+                                                                    className="w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-slate-900 dark:text-white/60 focus:outline-none focus:ring-1 focus:ring-sky-500/50"
+                                                                    value={selectedCourier[order.id] || ''}
+                                                                    onChange={(e) => setSelectedCourier({...selectedCourier, [order.id]: e.target.value})}
+                                                                >
+                                                                    <option value="">{order.courier || __('Pilih Kurir...')}</option>
+                                                                    {couriers.map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                                                </select>
+                                                            </div>
+                                                            <Button 
+                                                                onClick={() => updateOrderStatus(order.id, 'delivering')}
+                                                                className="w-full font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg bg-sky-500 text-black"
+                                                                disabled={loadingId === `status-${order.id}`}
+                                                            >
+                                                                {__('Kirim Pesanan')}
+                                                            </Button>
+                                                        </div>
+                                                    ) : (
+                                                        <Button 
+                                                            onClick={() => updateOrderStatus(order.id, 'complete')}
+                                                            className="w-full bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-emerald-500/20"
+                                                            disabled={loadingId === `status-${order.id}`}
+                                                        >
+                                                            {__('Pesanan Selesai')}
+                                                        </Button>
+                                                    )}
+                                                </>
                                             )}
                                         </div>
                                     )}
