@@ -29,18 +29,13 @@ class KitchenController extends Controller
             ->get()
             ->map(fn (Order $order) => $this->mapOrder($order));
 
-        // 2. Fetch Dine-in Reservations
-        $reservations = Reservation::with(['menus', 'restoTable'])
-            ->latest()
-            ->get()
-            ->map(fn (Reservation $res) => $this->mapReservation($res));
-
-        $allOrders = $allOrders->concat($reservations)->sortByDesc('time')->values();
+        // Removed Dine-in Reservations as per user request (handled outside order dashboard)
+        $allOrders = $allOrders->sortByDesc('time')->values();
 
         $couriers = User::where('role', Role::KURIR->value)->get(['id', 'name']);
 
         return Inertia::render('kitchen/index', [
-            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered', 'active']))->values(),
+            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'ready', 'delivering', 'delivered', 'active']))->values(),
             'online_completed' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['complete', 'completed', 'served']))->values(),
             'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected']))->values(),
             'couriers' => $couriers,
@@ -188,7 +183,7 @@ class KitchenController extends Controller
             if ($allReady) {
                 // If it's delivery, we might want to wait for courier pickup,
                 // but for simplicity, we mark it as ready for pickup/delivery
-                $order->update(['order_status' => $order->order_type === 'delivery' ? 'preparing' : 'complete']);
+                $order->update(['order_status' => $order->order_type === 'delivery' ? 'preparing' : ($order->order_type === 'pickup' ? 'ready' : 'complete')]);
             }
         }
 
@@ -297,6 +292,10 @@ class KitchenController extends Controller
     public function readyAll(Order $order)
     {
         $order->items()->update(['status' => 'ready']);
+
+        if ($order->order_type === 'pickup' && $order->order_status !== 'ready') {
+            $order->update(['order_status' => 'ready']);
+        }
 
         // Refresh to get the latest item statuses
         $order->load('items');

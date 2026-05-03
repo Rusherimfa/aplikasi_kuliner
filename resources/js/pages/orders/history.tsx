@@ -86,6 +86,11 @@ export default function OrderHistory({ auth, orders }: any) {
                 color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
                 icon: ChefHat,
             },
+            ready: {
+                label: 'Makanan Siap Diambil',
+                color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+                icon: CheckCircle2,
+            },
             delivering: {
                 label: 'Dalam Pengiriman',
                 color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
@@ -406,6 +411,17 @@ export default function OrderHistory({ auth, orders }: any) {
                                                             className="mr-2"
                                                         />{' '}
                                                         Chef is Cooking...
+                                                    </div>
+                                                )}
+
+                                                {o.order_status ===
+                                                    'ready' && o.order_type === 'pickup' && (
+                                                    <div className="flex h-14 w-full items-center justify-center rounded-2xl border border-emerald-500/20 bg-emerald-500/10 text-[10px] font-black tracking-widest text-emerald-500 uppercase">
+                                                        <Store
+                                                            size={16}
+                                                            className="mr-2"
+                                                        />{' '}
+                                                        Ambil Makanan Anda
                                                     </div>
                                                 )}
 

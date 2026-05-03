@@ -181,7 +181,7 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                     <div className="mt-4 flex items-center justify-between">
                             <div className="flex gap-2">
                                 <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.order_status === 'pending' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-50' : (statusType === 'active' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-white/40')}`}>
-                                    {order.order_status === 'pending' ? __('Menunggu') : (order.order_status === 'preparing' ? __('Memasak') : __(order.order_status.replace(/_/g, ' ')))}
+                                    {order.order_status === 'pending' ? __('Menunggu') : (order.order_status === 'preparing' ? __('Memasak') : (order.order_status === 'ready' ? __('Ready') : __(order.order_status.replace(/_/g, ' '))))}
                                 </Badge>
                                 <Badge variant="outline" className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 border-slate-200 dark:border-white/5 ${order.payment_status === 'paid' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-rose-500/20 text-rose-600 dark:text-rose-400 border-rose-500/20'}`}>
                                     {order.payment_status === 'paid' ? __('LUNAS') : __('BELUM BAYAR')}
@@ -321,6 +321,16 @@ export default function KitchenIndex({ auth, online_active = [], online_complete
                                                 </>
                                             )}
                                         </div>
+                                    )}
+
+                                    {order.order_status === 'ready' && order.order_type === 'pickup' && (
+                                        <Button 
+                                            onClick={() => updateOrderStatus(order.id, 'complete')}
+                                            className="w-full bg-emerald-500 text-black font-black uppercase tracking-widest text-[10px] rounded-xl h-12 shadow-lg shadow-emerald-500/20"
+                                            disabled={loadingId === `status-${order.id}`}
+                                        >
+                                            {__('Pesanan Selesai')}
+                                        </Button>
                                     )}
 
                                     {order.order_status === 'delivering' && (
