@@ -35,7 +35,7 @@ class ProfileController extends Controller
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('avatars', 'public');
-            $data['avatar'] = asset('storage/'.$path);
+            $data['avatar'] = '/storage/'.$path;
         }
 
         $user->fill($data);

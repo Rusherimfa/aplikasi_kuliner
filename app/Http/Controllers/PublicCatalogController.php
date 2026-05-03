@@ -41,7 +41,8 @@ class PublicCatalogController extends Controller
                 ->toArray();
         });
 
-        $testimonials = Testimonial::where('is_approved', true)
+        $testimonials = Testimonial::with('user:id,name,avatar')
+            ->where('is_approved', true)
             ->orderBy('rating', 'desc')
             ->latest()
             ->take(3)

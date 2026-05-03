@@ -2,8 +2,8 @@ import { Head, usePage } from '@inertiajs/react';
 import { useState, useRef } from 'react';
 import { dashboard } from '@/routes';
 import AIChatbot from '@/components/app/ai-chatbot';
-import GuestSupportChat from '@/components/app/guest-support-chat';
 import HomeLiveChat from '@/components/app/home-live-chat';
+import GlobalCustomerChat from '@/components/app/global-customer-chat';
 
 // Sections
 import BentoFeatures from './sections/bento-features';
@@ -94,11 +94,7 @@ export default function Welcome({
 
                 <Footer />
 
-                {auth.user ? (
-                    <HomeLiveChat currentUser={auth.user} />
-                ) : (
-                    <GuestSupportChat />
-                )}
+                <GlobalCustomerChat />
                 <AIChatbot />
             </div>
         </div>

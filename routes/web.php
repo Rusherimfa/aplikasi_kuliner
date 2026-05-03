@@ -144,6 +144,7 @@ Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
             Route::patch('kitchen/order-item/{itemId}', [KitchenController::class, 'updateOrderItemStatus'])->name('kitchen.order_item.update');
             Route::post('kitchen/orders/{order}/accept', [KitchenController::class, 'acceptOrder'])->name('kitchen.orders.accept');
             Route::post('kitchen/orders/{order}/reject', [KitchenController::class, 'rejectOrder'])->name('kitchen.orders.reject');
+            Route::post('kitchen/orders/{order}/ready-all', [KitchenController::class, 'readyAll'])->name('kitchen.orders.ready_all');
             Route::patch('kitchen/orders/{order}/status', [KitchenController::class, 'updateOrderStatus'])->name('kitchen.orders.update_status');
 
             // Analytics Dashboard

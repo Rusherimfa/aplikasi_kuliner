@@ -23,10 +23,10 @@ trait ProfileValidationRules
             'avatar' => ['nullable', 'image', 'max:2048'],
         ];
 
-        // Only require password if name or email is being changed
+        // Only require password if name or email is being changed and user is authenticated
         $user = auth()->user();
-        if ($request->filled('name') && $request->name !== $user->name ||
-            $request->filled('email') && $request->email !== $user->email) {
+        if ($user && ($request->filled('name') && $request->name !== $user->name ||
+            $request->filled('email') && $request->email !== $user->email)) {
             $rules['current_password'] = ['required', 'string', 'current_password'];
         } else {
             $rules['current_password'] = ['nullable', 'string', 'current_password'];

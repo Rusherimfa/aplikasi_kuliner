@@ -112,8 +112,10 @@ export default function CheckoutIndex() {
             formData.customer_lng
         );
 
+        const safeDistance = Math.min(50, distance);
+
         // Biaya = Jarak * Tarif per KM (Minimal 5000)
-        const fee = Math.max(5000, Math.round(distance * config.delivery_fee_per_km));
+        const fee = Math.max(5000, Math.round(safeDistance * config.delivery_fee_per_km));
         
         // Tambahkan surcharge jika pakai Gojek/Grab
         const surcharge = formData.delivery_method === 'resto' ? 0 : 5000;

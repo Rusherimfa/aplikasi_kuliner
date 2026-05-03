@@ -13,7 +13,8 @@ class TestimonialController extends Controller
 {
     public function index()
     {
-        $testimonials = Testimonial::where('is_approved', true)
+        $testimonials = Testimonial::with('user:id,name,avatar')
+            ->where('is_approved', true)
             ->latest()
             ->get();
 

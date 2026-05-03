@@ -317,7 +317,7 @@ export default function OrderHistory({ auth, orders }: any) {
                                                     Order Details
                                                 </Button>
 
-                                                {o.payment_status === 'unpaid' && o.order_status !== 'cancelled' && (
+                                                {o.payment_status === 'unpaid' && o.order_status === 'waiting_for_payment' && (
                                                     <Button 
                                                         onClick={async () => {
                                                             const snap = (window as any).snap;
@@ -637,7 +637,7 @@ export default function OrderHistory({ auth, orders }: any) {
                                             ).toLocaleString('id-ID')}
                                         </p>
                                     </div>
-                                    {selectedOrder.payment_status === 'unpaid' && selectedOrder.order_status !== 'cancelled' && (
+                                    {selectedOrder.payment_status === 'unpaid' && selectedOrder.order_status === 'waiting_for_payment' && (
                                         <Button 
                                             onClick={() => {
                                                 const snap = (window as any).snap;

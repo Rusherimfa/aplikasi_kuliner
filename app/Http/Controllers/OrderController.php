@@ -128,9 +128,9 @@ class OrderController extends Controller
             ));
         }
 
-        Log::info('Redirecting to Track Page', ['url' => "/orders/{$order->id}/track"]);
+        Log::info('Redirecting to History Page', ['order_id' => $order->id]);
 
-        return redirect()->to("/orders/{$order->id}/track");
+        return redirect()->route('orders.history')->with('success', 'Pesanan berhasil dibuat. Silakan cek riwayat untuk melanjutkan pembayaran atau melacak pesanan.');
     }
 
     public function history(Request $request)

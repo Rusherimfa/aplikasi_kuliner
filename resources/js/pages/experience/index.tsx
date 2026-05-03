@@ -14,6 +14,7 @@ import { useTranslations } from '@/hooks/use-translations';
 import Navbar from '../welcome/sections/navbar';
 import Footer from '../welcome/sections/footer';
 import AIChatbot from '@/components/app/ai-chatbot';
+import GlobalCustomerChat from '@/components/app/global-customer-chat';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -267,6 +268,7 @@ export default function Experience() {
                 </main>
  
                 <Footer />
+                <GlobalCustomerChat />
                 <AIChatbot />
             </div>
         </div>

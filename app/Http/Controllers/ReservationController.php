@@ -210,7 +210,7 @@ class ReservationController extends Controller
             }
         }
 
-        $dpAmount = $foodTotal > 0 ? $foodTotal * 0.5 : 50000;
+        $dpAmount = 50000 + ($foodTotal * 0.5);
         $taxAmount = $dpAmount * 0.10; // PB1 10%
         $serviceAmount = 0;
 
