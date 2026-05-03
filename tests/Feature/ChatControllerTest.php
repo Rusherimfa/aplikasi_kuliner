@@ -107,6 +107,6 @@ test('chat threads expose customer staff and courier conversations for home', fu
         ->assertSuccessful()
         ->assertJsonPath('threads.0.type', 'reservations')
         ->assertJsonPath('threads.0.record_id', $reservation->id)
-        ->assertJsonPath('threads.0.badge', 'Customer, Staff & Kurir')
+        ->assertJsonPath('threads.0.badge', 'Resto Support')
         ->assertJsonPath('threads.0.unread_count', 1);
 });

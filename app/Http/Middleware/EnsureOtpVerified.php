@@ -16,8 +16,8 @@ class EnsureOtpVerified
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && ! Auth::user()->is_verified && ! $request->is('verify-otp*') && ! $request->is('logout')) {
-            return redirect()->route('otp.verify');
+        if (Auth::check() && ! Auth::user()->is_verified && ! $request->is('verify-otp*') && ! $request->is('resend-otp*') && ! $request->is('logout')) {
+            return redirect()->route('otp.verify')->with('warning', 'Akun Anda belum terverifikasi. Silakan masukkan kode OTP untuk melanjutkan.');
         }
 
         return $next($request);

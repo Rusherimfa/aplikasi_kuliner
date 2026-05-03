@@ -1,12 +1,11 @@
 <?php
 
+/** @var TestCase $this */
+
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\SocialiteManager;
 use Tests\TestCase;
-
-use function Pest\Laravel\assertAuthenticated;
-use function Pest\Laravel\assertAuthenticatedAs;
-use function Pest\Laravel\get;
 
 // uses(TestCase::class); // Already handled in tests/Pest.php
 
@@ -35,7 +34,9 @@ test('new users can register via google', function () {
     $provider->shouldReceive('stateless')->andReturnSelf();
     $provider->shouldReceive('user')->andReturn($abstractUser);
 
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+    $manager = Mockery::mock(SocialiteManager::class);
+    $manager->shouldReceive('driver')->with('google')->andReturn($provider);
+    Socialite::swap($manager);
 
     $response = get('/auth/google/callback');
 
@@ -69,7 +70,9 @@ test('existing admin users can login via google and redirect to dashboard', func
     $provider->shouldReceive('stateless')->andReturnSelf();
     $provider->shouldReceive('user')->andReturn($abstractUser);
 
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+    $manager = Mockery::mock(SocialiteManager::class);
+    $manager->shouldReceive('driver')->with('google')->andReturn($provider);
+    Socialite::swap($manager);
 
     $response = get('/auth/google/callback');
 

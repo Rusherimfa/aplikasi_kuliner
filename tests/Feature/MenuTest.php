@@ -11,7 +11,7 @@ use App\Models\User;
 test('staff can view the menus management page', function () {
     $staff = User::factory()->create(['role' => 'staff']);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->get(route('menus.index'))
         ->assertOk();
 });
@@ -19,13 +19,13 @@ test('staff can view the menus management page', function () {
 test('customers cannot access menu management', function () {
     $customer = User::factory()->create(['role' => 'customer']);
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->get(route('menus.index'))
         ->assertForbidden();
 });
 
 test('guests are redirected to login for menu management', function () {
-    $this->get(route('menus.index'))
+    get(route('menus.index'))
         ->assertRedirect(route('login'));
 });
 
@@ -37,7 +37,7 @@ test('admin can create a new menu item', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     Team::factory()->create();
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->post(route('menus.store'), [
             'name' => 'Sate Ayam Premium',
             'description' => 'Sate ayam pilihan dengan bumbu kacang spesial.',
@@ -53,7 +53,7 @@ test('admin can create a new menu item', function () {
 test('creating a menu requires a name, category, and valid price', function () {
     $admin = User::factory()->create(['role' => 'admin']);
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->post(route('menus.store'), [
             'name' => '',
             'category' => '',
@@ -65,7 +65,7 @@ test('creating a menu requires a name, category, and valid price', function () {
 test('customers cannot create a menu item', function () {
     $customer = User::factory()->create(['role' => 'customer']);
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->post(route('menus.store'), [
             'name' => 'Test Menu',
             'category' => 'Beverage',
@@ -82,7 +82,7 @@ test('admin can update an existing menu item', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $menu = Menu::factory()->create();
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->put(route('menus.update', $menu), [
             'name' => 'Nama Baru',
             'description' => 'Deskripsi baru.',
@@ -100,7 +100,7 @@ test('customers cannot update a menu item', function () {
     $customer = User::factory()->create(['role' => 'customer']);
     $menu = Menu::factory()->create();
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->put(route('menus.update', $menu), [
             'name' => 'Coba Ubah',
             'category' => 'Appetizer',
@@ -117,7 +117,7 @@ test('admin can delete a menu item', function () {
     $admin = User::factory()->create(['role' => 'admin']);
     $menu = Menu::factory()->create();
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->delete(route('menus.destroy', $menu))
         ->assertRedirect();
 
@@ -128,7 +128,7 @@ test('customers cannot delete a menu item', function () {
     $customer = User::factory()->create(['role' => 'customer']);
     $menu = Menu::factory()->create();
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->delete(route('menus.destroy', $menu))
         ->assertForbidden();
 });

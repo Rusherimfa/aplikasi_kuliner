@@ -1,15 +1,7 @@
 <?php
 
+use App\Models\User;
 use Laravel\Fortify\Features;
-use Tests\TestCase;
-
-use function Pest\Laravel\actingAs;
-use function Pest\Laravel\assertAuthenticated;
-use function Pest\Laravel\assertGuest;
-use function Pest\Laravel\get;
-use function Pest\Laravel\post;
-
-uses(TestCase::class);
 
 test('login screen can be rendered', function () {
     $response = get(route('login'));
@@ -30,9 +22,7 @@ test('users can authenticate using the login screen', function () {
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
-    if (! Features::canManageTwoFactorAuthentication()) {
-        $this->markTestSkipped('Two-factor authentication is not enabled.');
-    }
+    skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
     Features::twoFactorAuthentication([
         'confirm' => true,
@@ -71,6 +61,7 @@ test('users can not authenticate with invalid password', function () {
 test('users can logout', function () {
     $user = User::factory()->create();
 
+    /** @var User $user */
     $response = actingAs($user)->post(route('logout'));
 
     assertGuest();

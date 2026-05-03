@@ -25,6 +25,7 @@ use Inertia\Inertia;
 
 Route::get('/', [PublicCatalogController::class, 'welcome'])->name('home');
 Route::get('/catalog', [PublicCatalogController::class, 'catalog'])->name('catalog');
+Route::get('/catalog/{menu}', [PublicCatalogController::class, 'show'])->name('catalog.show');
 Route::get('/experience', [PublicCatalogController::class, 'experience'])->name('experience');
 Route::get('/testimonials', [TestimonialController::class, 'index'])->name('testimonials.index');
 Route::get('/privacy', function () {
@@ -49,7 +50,7 @@ Route::post('/guest-chat/messages', [GuestChatController::class, 'store'])->midd
 Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
-Route::middleware(['auth', 'verified'])
+Route::middleware(['auth', 'otp'])
     ->group(function () {
         Route::get('/reservations/auth-intent', function () {
             return redirect()->route('reservations.create');
@@ -105,12 +106,12 @@ Route::middleware(['auth', 'verified'])
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-Route::middleware(['auth', 'verified', 'role:staff'])->group(function () {
+Route::middleware(['auth', 'otp', 'role:staff'])->group(function () {
     Route::get('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffMessages'])->name('guest-chat.staff.messages');
     Route::post('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffStore'])->name('guest-chat.staff.store');
 });
 
-Route::middleware(['auth', 'verified', 'role:admin,staff,kurir'])
+Route::middleware(['auth', 'otp', 'role:admin,staff,kurir'])
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

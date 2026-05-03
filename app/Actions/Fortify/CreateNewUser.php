@@ -29,6 +29,7 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             ...$this->profileRules(),
+            'phone' => ['required', 'numeric'],
             'password' => $this->passwordRules(),
         ])->validate();
 
@@ -36,6 +37,7 @@ class CreateNewUser implements CreatesNewUsers
             $user = User::create([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'phone' => $input['phone'],
                 'password' => $input['password'],
                 'role' => Role::CUSTOMER,
             ]);

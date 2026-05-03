@@ -3,17 +3,12 @@
 use App\Models\User;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
-use Tests\TestCase;
 
 use function Pest\Laravel\get;
 use function Pest\Laravel\post;
 
-uses(TestCase::class);
-
 beforeEach(function () {
-    if (! Features::enabled(Features::twoFactorAuthentication())) {
-        $this->markTestSkipped('Two factor authentication is not enabled.');
-    }
+    skipUnlessFortifyHas(Features::twoFactorAuthentication());
 });
 
 test('two factor challenge redirects to login when not authenticated', function () {

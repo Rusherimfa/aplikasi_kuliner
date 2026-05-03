@@ -27,6 +27,20 @@ class ChatController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
+        $threads = collect()
+            ->concat($this->getReservationThreads($user))
+            ->concat($this->getOrderThreads($user))
+            ->concat($this->getGuestThreads($user))
+            ->sortByDesc(fn (array $thread) => $thread['last_message']['created_at'] ?? $thread['created_at'])
+            ->values();
+
+        return response()->json([
+            'threads' => $threads,
+        ]);
+    }
+
+    private function getReservationThreads(User $user): Collection
+    {
         /** @var \Illuminate\Database\Eloquent\Collection<int, Reservation> $reservations */
         $reservations = Reservation::query()
             ->select(['id', 'user_id', 'customer_name', 'status', 'date', 'time', 'courier_id', 'created_at'])
@@ -37,39 +51,17 @@ class ChatController extends Controller
             ->limit(12)
             ->get();
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Order> $orders */
-        $orders = Order::query()
-            ->select(['id', 'user_id', 'courier_id', 'order_number', 'customer_name', 'order_type', 'order_status', 'created_at'])
-            ->with(['courier:id,name,role'])
-            ->when($user->isCustomer(), fn ($query) => $query->where('user_id', $user->id))
-            ->when($user->isCourier(), fn ($query) => $query->where('courier_id', $user->id))
-            ->latest()
-            ->limit(12)
-            ->get();
-
         $resIds = $reservations->pluck('id')->all();
-        $orderIds = $orders->pluck('id')->all();
-
-        // Support Messages
         $resLastSupport = $this->lastMessagesFor('reservation_id', $resIds, 'support');
-        $orderLastSupport = $this->lastMessagesFor('order_id', $orderIds, 'support');
-        $resUnreadSupport = $this->unreadCountsFor('reservation_id', $resIds, $user, 'support');
-        $orderUnreadSupport = $this->unreadCountsFor('order_id', $orderIds, $user, 'support');
-
-        // Delivery Messages
         $resLastDelivery = $this->lastMessagesFor('reservation_id', $resIds, 'delivery');
-        $orderLastDelivery = $this->lastMessagesFor('order_id', $orderIds, 'delivery');
+        $resUnreadSupport = $this->unreadCountsFor('reservation_id', $resIds, $user, 'support');
         $resUnreadDelivery = $this->unreadCountsFor('reservation_id', $resIds, $user, 'delivery');
-        $orderUnreadDelivery = $this->unreadCountsFor('order_id', $orderIds, $user, 'delivery');
 
-        $allThreads = collect();
-
-        // Format Reservation Threads
+        $threads = collect();
         foreach ($reservations as $res) {
-            /** @var Reservation $res */
             // Add Support Thread (Customer & Staff)
             if (! $user->isCourier()) {
-                $allThreads->push($this->formatReservationThread(
+                $threads->push($this->formatReservationThread(
                     reservation: $res,
                     user: $user,
                     type: 'support',
@@ -84,7 +76,7 @@ class ChatController extends Controller
                     continue;
                 }
 
-                $allThreads->push($this->formatReservationThread(
+                $threads->push($this->formatReservationThread(
                     reservation: $res,
                     user: $user,
                     type: 'delivery',
@@ -94,12 +86,32 @@ class ChatController extends Controller
             }
         }
 
-        // Format Order Threads
+        return $threads;
+    }
+
+    private function getOrderThreads(User $user): Collection
+    {
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Order> $orders */
+        $orders = Order::query()
+            ->select(['id', 'user_id', 'courier_id', 'order_number', 'customer_name', 'order_type', 'order_status', 'created_at'])
+            ->with(['courier:id,name,role'])
+            ->when($user->isCustomer(), fn ($query) => $query->where('user_id', $user->id))
+            ->when($user->isCourier(), fn ($query) => $query->where('courier_id', $user->id))
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        $orderIds = $orders->pluck('id')->all();
+        $orderLastSupport = $this->lastMessagesFor('order_id', $orderIds, 'support');
+        $orderLastDelivery = $this->lastMessagesFor('order_id', $orderIds, 'delivery');
+        $orderUnreadSupport = $this->unreadCountsFor('order_id', $orderIds, $user, 'support');
+        $orderUnreadDelivery = $this->unreadCountsFor('order_id', $orderIds, $user, 'delivery');
+
+        $threads = collect();
         foreach ($orders as $order) {
-            /** @var Order $order */
             // Add Support Thread
             if (! $user->isCourier()) {
-                $allThreads->push($this->formatOrderThread(
+                $threads->push($this->formatOrderThread(
                     order: $order,
                     user: $user,
                     type: 'support',
@@ -114,7 +126,7 @@ class ChatController extends Controller
                     continue;
                 }
 
-                $allThreads->push($this->formatOrderThread(
+                $threads->push($this->formatOrderThread(
                     order: $order,
                     user: $user,
                     type: 'delivery',
@@ -124,34 +136,37 @@ class ChatController extends Controller
             }
         }
 
-        // Guest Threads for Staff
-        if ($user->role === Role::STAFF || $user->role === Role::ADMIN) {
-            $guestConversations = GuestConversation::query()
-                ->select(['id', 'guest_name', 'status', 'created_at'])
-                ->where('status', 'open')
-                ->latest()
-                ->limit(12)
-                ->get();
-            $guestIds = $guestConversations->pluck('id')->all();
-            $guestLastMessages = $this->guestLastMessagesFor($guestIds);
-            $guestUnreadCounts = $this->guestUnreadCountsFor($guestIds);
+        return $threads;
+    }
 
-            foreach ($guestConversations as $conv) {
-                $allThreads->push($this->formatGuestThread(
-                    conversation: $conv,
-                    lastMessage: $guestLastMessages->get($conv->id),
-                    unreadCount: (int) ($guestUnreadCounts->get($conv->id) ?? 0),
-                ));
-            }
+    private function getGuestThreads(User $user): Collection
+    {
+        if (! ($user->role === Role::STAFF || $user->role === Role::ADMIN)) {
+            return collect();
         }
 
-        $threads = $allThreads
-            ->sortByDesc(fn (array $thread) => $thread['last_message']['created_at'] ?? $thread['created_at'])
-            ->values();
+        /** @var \Illuminate\Database\Eloquent\Collection<int, GuestConversation> $guestConversations */
+        $guestConversations = GuestConversation::query()
+            ->select(['id', 'guest_name', 'status', 'created_at'])
+            ->where('status', 'open')
+            ->latest()
+            ->limit(12)
+            ->get();
 
-        return response()->json([
-            'threads' => $threads,
-        ]);
+        $guestIds = $guestConversations->pluck('id')->all();
+        $guestLastMessages = $this->guestLastMessagesFor($guestIds);
+        $guestUnreadCounts = $this->guestUnreadCountsFor($guestIds);
+
+        $threads = collect();
+        foreach ($guestConversations as $conv) {
+            $threads->push($this->formatGuestThread(
+                conversation: $conv,
+                lastMessage: $guestLastMessages->get($conv->id),
+                unreadCount: (int) ($guestUnreadCounts->get($conv->id) ?? 0),
+            ));
+        }
+
+        return $threads;
     }
 
     /**

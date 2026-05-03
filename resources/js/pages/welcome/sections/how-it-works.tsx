@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowRight, Calendar, ClipboardCheck, MailCheck, Rocket } from 'lucide-react';
+import { ArrowRight, Calendar, ClipboardCheck, MailCheck, Rocket, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
@@ -72,58 +72,71 @@ export default function HowItWorks() {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-20 md:py-32 transition-colors duration-500 font-['Inter',sans-serif]">
-            {/* Background Texture */}
-            <div className="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
+        <section ref={containerRef} className="premium-noise relative overflow-hidden bg-background py-24 md:py-32 transition-colors duration-1000">
+            {/* Ambient Background */}
+            <div className="absolute top-0 left-0 w-full h-full bg-grid-white opacity-[0.02] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
 
-            <div className="relative z-10 mx-auto max-w-7xl px-8">
+            <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
                 {/* Header */}
-                <div className="mb-24 flex flex-col items-center text-center space-y-6">
+                <div className="mb-32 flex flex-col items-center text-center max-w-4xl mx-auto">
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
+                        className="mb-10 inline-flex items-center gap-4 rounded-full border border-primary/20 bg-primary/5 px-6 py-2 backdrop-blur-xl"
                     >
-                        {__('Reservation Process')}
+                        <Sparkles size={14} className="text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">{__('The Gastronomic Journey')}</span>
                     </motion.div>
+                    
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="font-['Playfair_Display',serif] text-4xl md:text-6xl font-black text-slate-900 dark:text-white tracking-tighter"
+                        className="font-serif text-6xl md:text-8xl lg:text-9xl font-light text-foreground leading-[0.9] tracking-tighter"
                     >
-                        {__('Secure')} <span className="italic font-serif opacity-30 text-sky-500">{__('Your Table')}</span>
+                        {__('How to')} <br />
+                        <span className="italic font-light opacity-40">{__('Experience.')}</span>
                     </motion.h2>
-                    <p className="mx-auto max-w-2xl text-slate-500 dark:text-neutral-400 text-lg font-medium">
-                        {__('Four easy steps to plan a dining experience with beautiful sea views.')}
-                    </p>
+
+                    <motion.p 
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="mt-12 text-muted-foreground text-lg md:text-2xl font-medium leading-relaxed max-w-2xl opacity-70"
+                    >
+                        {__('A seamless transition from digital curiosity to coastal excellence. Secure your sanctuary in four elegant movements.')}
+                    </motion.p>
                 </div>
 
                 {/* Steps Grid */}
-                <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-4">
+                <div className="grid grid-cols-1 gap-8 sm:gap-12 md:grid-cols-2 lg:grid-cols-4">
                     {HOW_IT_WORKS.map((step, idx) => (
                         <div 
                             key={step.step}
                             ref={(el) => { if (el) stepsRef.current[idx] = el; }}
                             className="group relative"
                         >
-                            <div className="glass-card flex h-full flex-col items-center text-center p-8 md:p-10 rounded-[2.5rem] bg-white dark:bg-white/[0.02] border border-border dark:border-white/5 transition-all duration-700 md:hover:-translate-y-4 hover:border-sky-500/30 hover:shadow-sky-500/10">
-                                {/* Icon & Step Number */}
-                                <div className="relative mb-10">
-                                    <div className="flex h-20 w-20 items-center justify-center rounded-[1.75rem] bg-slate-50 dark:bg-white/5 transition-all duration-700 group-hover:bg-sky-500 group-hover:rotate-[15deg]">
-                                        <step.icon className="h-8 w-8 text-sky-600 dark:text-sky-500 transition-colors duration-700 group-hover:text-white" />
+                            {/* Connector Line (Desktop) */}
+                            {idx < 3 && (
+                                <div className="absolute top-1/2 left-[calc(100%-1.5rem)] w-12 h-px bg-gradient-to-r from-primary/30 to-transparent hidden lg:block z-0" />
+                            )}
+                            
+                            <div className="glass-elite flex h-full flex-col p-10 rounded-[3rem] transition-all duration-700 hover:translate-y-[-12px] hover:shadow-[0_40px_80px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-black/5 dark:border-white/5 relative z-10">
+                                {/* Step Number & Icon */}
+                                <div className="flex items-center justify-between mb-10">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-all duration-700 group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:rotate-6 shadow-xl">
+                                        <step.icon size={28} strokeWidth={1.5} />
                                     </div>
-                                    <span className="absolute -bottom-4 -right-4 font-['Playfair_Display',serif] text-4xl font-black text-slate-200 dark:text-neutral-800 transition-colors duration-700 group-hover:text-sky-500/40">
+                                    <span className="font-serif text-5xl font-black text-black/5 dark:text-white/5 transition-colors duration-700 group-hover:text-primary/20">
                                         {step.step}
                                     </span>
                                 </div>
 
-                                <h3 className="mb-4 text-xl font-black text-slate-900 dark:text-white tracking-tight uppercase">
+                                <h3 className="mb-4 font-serif text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
                                     {step.title}
                                 </h3>
-                                <p className="text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-500">
+                                <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-400 opacity-80">
                                     {step.desc}
                                 </p>
                             </div>
@@ -134,14 +147,17 @@ export default function HowItWorks() {
                 {/* Bottom Action */}
                 <div 
                     ref={magneticButtonRef as any}
-                    className="mt-20 text-center"
+                    className="mt-24 text-center"
                 >
                     <Link href="/reservations/create">
                         <Button
-                            className="group h-16 rounded-[1.25rem] bg-slate-900 dark:bg-white px-12 text-[11px] font-black uppercase tracking-[0.2em] text-white dark:text-black shadow-2xl transition-all hover:scale-105 hover:bg-sky-600 hover:text-white dark:hover:bg-sky-500"
+                            className="group relative h-16 w-full sm:w-auto rounded-2xl bg-primary px-12 text-[11px] font-black uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_-10px_oklch(var(--primary)/0.4)] transition-all hover:scale-105 active:scale-95"
                         >
-                            {__('Reserve Now')}
-                            <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            <span className="relative z-10 flex items-center gap-3">
+                                {__('Secure Your Table')}
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                         </Button>
                     </Link>
                 </div>

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowRight, Star, CalendarDays, Flame, ChevronDown, Trophy, Medal } from 'lucide-react';
+import { ArrowRight, Star, CalendarDays, Flame, ChevronDown, Trophy, Medal, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { useRef, useEffect } from 'react';
@@ -60,181 +60,187 @@ export default function Hero() {
                 <img
                     src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2670&auto=format&fit=crop"
                     alt="Ocean view"
-                    className="h-full w-full object-cover opacity-[0.8] dark:opacity-[0.4] transition-transform duration-1000"
+                    className="h-full w-full object-cover opacity-[0.8] dark:opacity-[0.35] transition-transform duration-1000"
                 />
                 
-                {/* Animated Mesh Gradients - made more transparent so bg is visible */}
-                <div className="absolute inset-0 bg-gradient-to-b from-sky-900/40 via-background/60 to-background/90" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,var(--color-primary)/0.05_0%,transparent_50%)]" />
+                {/* Advanced Light Beams */}
+                <div className="light-beam top-[-20%] left-[-20%] animate-pulse-orange" style={{ animationDuration: '8s' }} />
+                <div className="light-beam bottom-[-20%] right-[-20%] opacity-20" style={{ animationDuration: '12s' }} />
                 
-                {/* Textures */}
-                <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.05]" />
+                {/* Atmospheric Overlays */}
+                <div className="absolute inset-0 bg-gradient-to-b from-sky-950/20 dark:from-sky-950/40 via-background/60 to-background transition-colors duration-1000" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,var(--color-primary)/0.08_0%,transparent_60%)]" />
+                
+                {/* Refined Grid */}
+                <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.07]" />
             </div>
 
-            {/* Atmospheric Orbs - Enhanced for depth */}
+            {/* Floating Atmospheric Orbs */}
             <div 
                 ref={(el) => { if (el) orbsRef.current[0] = el; }}
-                className="pointer-events-none absolute -top-48 -right-48 h-[1000px] w-[1000px] rounded-full bg-sky-500/15 blur-[200px] opacity-60 mix-blend-screen" 
+                className="pointer-events-none absolute -top-48 -right-48 h-[1000px] w-[1000px] rounded-full bg-primary/10 blur-[200px] opacity-40 mix-blend-screen" 
             />
             <div 
                 ref={(el) => { if (el) orbsRef.current[1] = el; }}
-                className="pointer-events-none absolute bottom-1/4 -left-64 h-[800px] w-[800px] rounded-full bg-indigo-600/10 blur-[180px] opacity-40 mix-blend-plus-lighter" 
-            />
-            <div 
-                className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-full w-full bg-[radial-gradient(circle_at_center,transparent_0%,var(--background)_80%)] opacity-80"
+                className="pointer-events-none absolute bottom-1/4 -left-64 h-[800px] w-[800px] rounded-full bg-indigo-500/5 blur-[180px] opacity-30 mix-blend-plus-lighter" 
             />
 
-            <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 pt-24 pb-16 lg:px-8">
-                <div className="grid items-center gap-12 md:gap-20 lg:grid-cols-2">
-                    {/* Left column - Content */}
-                    <div className="max-w-2xl py-12">
-                        {/* Award badge */}
+            <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 sm:px-10 pt-20 pb-16 lg:px-8">
+                <div className="grid items-center gap-16 md:gap-24 lg:grid-cols-2">
+                    {/* Content Column */}
+                    <div className="relative py-8 md:py-12">
+                        {/* Elite Badge */}
                         <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="mb-12 inline-flex items-center gap-3 rounded-full border border-sky-500/30 bg-sky-500/10 px-6 py-2.5 text-[10px] font-black tracking-[0.4em] text-sky-600 dark:text-sky-400 uppercase shadow-[0_0_40px_rgba(14,165,233,0.15)]"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 1, ease: "backOut" }}
+                            className="mb-10 inline-flex items-center gap-3 rounded-full border border-primary/20 bg-primary/5 px-5 py-2 backdrop-blur-xl"
                         >
-                            <span className="text-sky-500">🌊</span>
-                            <span>{__('Fresh Seafood Daily')}</span>
+                            <Sparkles size={14} className="text-primary animate-pulse" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">{__('Experience Extraordinary')}</span>
                         </motion.div>
-
-                        {/* Headline */}
-                        <h1 
-                            className="mb-6 font-serif text-4xl leading-[1.1] font-light tracking-tighter text-foreground sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-wrap-balance"
-                        >
+ 
+                        {/* Cinematic Headline */}
+                        <h1 className="mb-10 font-serif text-7xl sm:text-9xl md:text-[10rem] lg:text-[13rem] leading-[0.8] tracking-tighter transition-all">
                             <motion.span 
-                                initial={{ y: 40, opacity: 0 }}
+                                initial={{ y: 100, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1, ease: "easeOut", delay: 0.5 }}
-                                className="block text-sky-900 dark:text-sky-50"
+                                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                                className="block font-light text-slate-900/30 dark:text-white/20"
                             >
                                 {__("Ocean's")}
                             </motion.span>
                             <motion.span 
-                                initial={{ y: 40, opacity: 0 }}
+                                initial={{ y: 100, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
-                                transition={{ duration: 1, ease: "easeOut", delay: 0.7 }}
-                                className="block italic text-sky-700 dark:text-sky-200"
+                                transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                                className="block italic text-slate-900 dark:text-white drop-shadow-2xl"
                             >
                                 {__('Resto')}
                             </motion.span>
-                            <motion.span 
-                                 initial={{ y: 40, opacity: 0 }}
-                                 animate={{ y: 0, opacity: 1 }}
-                                 transition={{ duration: 1, ease: "easeOut", delay: 0.9 }}
-                                 className="block text-sky-500 font-medium tracking-[-0.05em] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mt-2"
+                            <motion.div 
+                                initial={{ scaleX: 0, opacity: 0 }}
+                                animate={{ scaleX: 1, opacity: 1 }}
+                                transition={{ duration: 1.5, ease: "circOut", delay: 0.4 }}
+                                className="mt-6 md:mt-12 flex items-center gap-4 md:gap-8"
                             >
-                                {__('The Fish Connection.')}
-                            </motion.span>
+                                <div className="h-px flex-1 bg-gradient-to-r from-primary to-transparent" />
+                                <span className="text-[10px] md:text-xs font-black uppercase tracking-[0.4em] md:tracking-[0.8em] text-primary whitespace-nowrap">
+                                    {__('The Fish Connection')}
+                                </span>
+                            </motion.div>
                         </h1>
-
-                        {/* Subtext */}
-                        <motion.p 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 1.4, duration: 1 }}
-                            className="mb-14 max-w-lg text-sm leading-relaxed font-medium text-slate-600 dark:text-sky-100/70 sm:text-lg"
+ 
+                        {/* Descriptive Text with Glass Backing */}
+                        <motion.div
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: 0.8, duration: 1 }}
+                            className="mb-12 border-l-2 border-primary/30 pl-6 md:pl-10"
                         >
-                            {__('Experience the sensation of fresh seafood with a stunning beach panorama. A culinary destination where flavor meets the waves.')}
-                        </motion.p>
-
-                        {/* CTA buttons */}
-                        <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-                            <Link 
-                                href="/reservations/create"
-                                className="w-full sm:w-auto"
-                            >
+                            <p className="max-w-xl text-base font-medium leading-relaxed text-slate-600 dark:text-sky-100/60 sm:text-xl transition-colors">
+                                {__('Where the horizon meets your plate. We bridge the gap between deep sea bounty and culinary art, serving only the freshest catch with a side of sunset.')}
+                            </p>
+                        </motion.div>
+  
+                        {/* Elite CTA Buttons */}
+                        <div className="flex flex-col gap-6 sm:flex-row">
+                            <Link href="/reservations/create" className="w-full sm:w-auto">
                                 <Button
                                     size="lg"
-                                    className="group h-16 w-full rounded-full bg-sky-600 hover:bg-sky-700 text-white px-10 text-[11px] font-black uppercase tracking-widest shadow-2xl shadow-sky-900/20 transition-all hover:scale-[1.02] active:scale-95 sm:h-18 sm:px-12 sm:text-sm border-none"
+                                    className="group relative h-16 w-full overflow-hidden rounded-2xl bg-primary px-12 text-[11px] font-black uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_-10px_oklch(var(--primary)/0.4)] transition-all hover:scale-105 active:scale-95"
                                 >
-                                    {__('Reserve a Table')}
-                                    <ArrowRight className="ml-3 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                    <span className="relative z-10 flex items-center gap-3">
+                                        {__('Begin Journey')}
+                                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
+                                    </span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                                 </Button>
                             </Link>
-                            <Link 
-                                href="/catalog"
-                                className="w-full sm:w-auto"
-                            >
+                            <Link href="/catalog" className="w-full sm:w-auto">
                                 <Button
                                     size="lg"
                                     variant="outline"
-                                    className="h-16 w-full rounded-full border-border bg-transparent px-10 text-[11px] font-bold uppercase tracking-widest text-foreground shadow-sm transition-all hover:bg-white/5 hover:scale-[1.02] active:scale-95 sm:h-18 sm:px-12 sm:text-sm"
+                                    className="h-16 w-full rounded-2xl border-primary/20 bg-white/5 px-10 text-[11px] font-black uppercase tracking-[0.3em] backdrop-blur-md transition-all hover:bg-white/10 hover:border-primary/40 active:scale-95"
                                 >
-                                    {__('Explore Menu')}
+                                    {__('Discover Menu')}
                                 </Button>
                             </Link>
                         </div>
                     </div>
 
-                    {/* Right column â€” Visual Card */}
-                    <div className="relative hidden lg:block">
+                    {/* Visual Column - The Frame */}
+                    <div className="relative">
                         <motion.div 
-                            initial={{ opacity: 0, scale: 0.95, x: 30 }}
-                            animate={{ opacity: 1, scale: 1, x: 0 }}
-                            transition={{ duration: 1.5, ease: "circOut" }}
-                            className="relative"
+                            initial={{ opacity: 0, scale: 0.9, rotateY: 20 }}
+                            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                            transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
+                            className="perspective-1000"
                         >
-                            {/* Main frame with glass-highlight */}
-                            <div className="glass-highlight relative aspect-[4/5] overflow-hidden rounded-[4rem] shadow-[0_50px_100px_-20px_rgba(14,165,233,0.3)] ring-1 ring-white/20">
-                                <img
-                                    src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2574&auto=format&fit=crop"
-                                    alt="Fresh seafood plate"
-                                    className="h-full w-full scale-105 object-cover transition-transform duration-1000 hover:scale-100"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-sky-900/30 to-transparent opacity-90 mix-blend-multiply" />
-                                
-                                {/* Inner Overlay Label */}
-                                <div className="absolute bottom-12 left-12 z-20">
-                                    <span className="text-[10px] font-bold tracking-[0.2em] text-sky-300 uppercase mb-4 block font-sans">{__('Our Specialization')}</span>
-                                    <h3 className="font-serif text-5xl font-light text-white leading-tight italic">
-                                        {__('Ocean')} <br /> {__('Fresh.')}
-                                    </h3>
+                            <div className="glass-elite relative aspect-[4/5] max-w-[520px] mx-auto overflow-hidden rounded-[4rem] p-4">
+                                <div className="h-full w-full overflow-hidden rounded-[3rem]">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?q=80&w=2574&auto=format&fit=crop"
+                                        alt="Signature Seafood"
+                                        className="h-full w-full object-cover transition-transform duration-[2000ms] hover:scale-110"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                                    
+                                    {/* Frame Label */}
+                                    <div className="absolute bottom-16 left-16 right-16">
+                                        <div className="mb-4 h-px w-12 bg-primary" />
+                                        <h3 className="font-serif text-4xl font-light text-white italic leading-tight">
+                                            {__('The Ocean’s')} <br /> {__('Finest selection.')}
+                                        </h3>
+                                    </div>
                                 </div>
                             </div>
-                        </motion.div>
 
-                        {/* THE ELITE STATUS BADGE (Magnetic) */}
-                        <div 
-                            ref={magneticBadgeRef as any}
-                            className="absolute -bottom-10 -left-20 z-40 hidden xl:block"
-                        >
+                            {/* Floating decorative card */}
                             <motion.div 
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 1, duration: 1 }}
-                                className="group flex items-center gap-5 rounded-full border border-white/20 bg-slate-950/80 p-3 pr-8 backdrop-blur-3xl shadow-[0_20px_50px_-10px_rgba(0,0,0,0.5)] ring-1 ring-white/10 transition-all hover:border-primary/40 hover:bg-slate-950 cursor-pointer"
+                                animate={{ y: [0, -20, 0] }}
+                                transition={{ duration: 6, repeat: -1, ease: "easeInOut" }}
+                                className="absolute -bottom-10 -right-10 hidden md:block"
                             >
-                                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-2xl glow-primary">
-                                    <CalendarDays size={24} />
-                                </div>
-                                <div className="flex flex-col">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
-                                        <span className="text-[10px] font-bold tracking-[0.2em] text-white/60 uppercase font-sans">{__('Outdoor Area')}</span>
+                                <div className="glass-elite flex items-center gap-6 rounded-3xl p-6 pr-10">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-xl glow-primary">
+                                        <Medal className="text-white" size={32} />
                                     </div>
-                                    <p className="font-serif text-xl text-white tracking-tight leading-none mt-1 italic">
-                                        {__('Sunset View')}
-                                    </p>
+                                    <div>
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">{__('Authentic')}</span>
+                                        <p className="font-serif text-2xl italic text-white">{__('Awarded Taste')}</p>
+                                    </div>
                                 </div>
                             </motion.div>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
 
-                {/* Refined Scroll guide */}
+                {/* Bottom Stats / Social Guide */}
+                <div className="absolute bottom-12 left-6 sm:left-10 hidden lg:flex flex-col gap-8">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">{__('Established')}</span>
+                        <span className="text-sm font-serif italic text-slate-400 dark:text-white/40 transition-colors">MMXXIV</span>
+                    </div>
+                </div>
+
+                {/* Center Scroll Guide */}
                 <motion.div 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 2.5, duration: 1.5 }}
-                    className="absolute bottom-12 left-1/2 flex -translate-x-1/2 flex-col items-center gap-5"
+                    transition={{ delay: 2.5, duration: 2 }}
+                    className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-6"
                 >
-                    <div className="h-16 w-[1px] bg-gradient-to-b from-primary/50 to-transparent" />
-                    <span className="text-[10px] font-black tracking-[0.6em] text-neutral-500 uppercase">{__('Scroll Down')}</span>
+                    <div className="relative h-16 w-px bg-white/10 overflow-hidden">
+                        <motion.div 
+                            animate={{ y: [0, 64, 0] }}
+                            transition={{ duration: 2, repeat: -1, ease: "easeInOut" }}
+                            className="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-transparent via-primary to-transparent"
+                        />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400 dark:text-white/20 transition-colors">{__('Dive Deeper')}</span>
                 </motion.div>
             </div>
         </main>
     );
 }
-

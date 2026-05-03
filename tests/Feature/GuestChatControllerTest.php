@@ -6,10 +6,14 @@ use App\Models\GuestMessage;
 use App\Models\User;
 use Illuminate\Support\Facades\Event;
 
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\getJson;
+use function Pest\Laravel\postJson;
+
 test('guest can start a staff chat without logging in', function () {
     Event::fake([GuestMessageSent::class]);
 
-    $this->postJson(route('guest-chat.store'), [
+    postJson(route('guest-chat.store'), [
         'guest_name' => 'Tamu Website',
         'content' => 'Halo staff, saya mau bertanya.',
     ])
@@ -33,14 +37,14 @@ test('guest can start a staff chat without logging in', function () {
             && $event->message->content === 'Halo staff, saya mau bertanya.';
     });
 
-    $this->getJson(route('guest-chat.messages'))
+    getJson(route('guest-chat.messages', ['conversation_id' => $conversation->id]))
         ->assertSuccessful()
         ->assertJsonPath('conversation.id', $conversation->id)
         ->assertJsonPath('messages.0.content', 'Halo staff, saya mau bertanya.');
 });
 
 test('guest conversation persists when session changes but conversation id is reused', function () {
-    $response = $this->postJson(route('guest-chat.store'), [
+    $response = postJson(route('guest-chat.store'), [
         'guest_name' => 'Evan',
         'content' => 'Halo staff, ini Evan.',
     ])
@@ -48,9 +52,9 @@ test('guest conversation persists when session changes but conversation id is re
 
     $conversationId = $response->json('conversation_id');
 
-    $this->flushSession();
+    flushSession();
 
-    $this->getJson(route('guest-chat.messages', [
+    getJson(route('guest-chat.messages', [
         'conversation_id' => $conversationId,
     ]))
         ->assertSuccessful()
@@ -58,7 +62,7 @@ test('guest conversation persists when session changes but conversation id is re
         ->assertJsonPath('conversation.guest_name', 'Evan')
         ->assertJsonPath('messages.0.content', 'Halo staff, ini Evan.');
 
-    $this->postJson(route('guest-chat.store'), [
+    postJson(route('guest-chat.store'), [
         'conversation_id' => $conversationId,
         'guest_name' => 'Evan',
         'content' => 'Saya lanjut chat yang sama.',
@@ -86,7 +90,7 @@ test('staff can see and reply to guest chat threads', function () {
         'content' => 'Apakah restoran buka malam ini?',
     ]);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->getJson(route('chat.threads'))
         ->assertSuccessful()
         ->assertJsonPath('threads.0.type', 'guest')
@@ -94,7 +98,7 @@ test('staff can see and reply to guest chat threads', function () {
         ->assertJsonPath('threads.0.badge', 'Guest & Staff')
         ->assertJsonPath('threads.0.unread_count', 1);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->postJson(route('guest-chat.staff.store', $conversation), [
             'content' => 'Buka, staff siap membantu.',
         ])
@@ -117,7 +121,7 @@ test('admin cannot reply to guest staff chat', function () {
         'status' => 'open',
     ]);
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->postJson(route('guest-chat.staff.store', $conversation), [
             'content' => 'Admin tidak mengambil chat tamu.',
         ])

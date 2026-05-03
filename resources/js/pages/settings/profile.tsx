@@ -98,7 +98,7 @@ export default function Profile({
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className="group relative overflow-hidden rounded-[3rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-gradient-to-br dark:from-white/10 dark:to-transparent shadow-xl dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur-3xl transition-all duration-700 hover:border-sky-500/30 ring-1 ring-slate-100 dark:ring-transparent"
                 >
-                    <div className="absolute inset-0 bg-[url('/noise.svg')] opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" />
+                    <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg_viewBox=%220_0_200_200%22_xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter_id=%22noise%22%3E%3CfeTurbulence_type=%22fractalNoise%22_baseFrequency=%220.65%22_numOctaves=%223%22_stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect_width=%22100%25%22_height=%22100%25%22_filter=%22url(%23noise)%22/%3E%3C/svg%3E')] opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" />
                     
                     {/* Dynamic Hero Banner */}
                     <div className="relative h-40 sm:h-56 w-full overflow-hidden">

@@ -1,14 +1,6 @@
 <?php
 
 use App\Models\User;
-use Tests\TestCase;
-
-use function Pest\Laravel\assertAuthenticated;
-use function Pest\Laravel\get;
-use function Pest\Laravel\post;
-use function Pest\Laravel\withoutExceptionHandling;
-
-uses(TestCase::class);
 
 test('registration screen can be rendered', function () {
     $response = get(route('register'));
@@ -21,6 +13,7 @@ test('new users can register', function () {
     $response = post(route('register.store'), [
         'name' => 'Test User',
         'email' => 'test@example.com',
+        'phone' => '081234567890',
         'password' => 'password',
         'password_confirmation' => 'password',
     ]);
@@ -28,5 +21,5 @@ test('new users can register', function () {
     assertAuthenticated();
 
     $user = User::where('email', 'test@example.com')->first();
-    $response->assertRedirect(route('dashboard'));
+    $response->assertRedirect(route('otp.verify'));
 });

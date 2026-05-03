@@ -2,6 +2,7 @@ import { Eye, Camera, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from '@/hooks/use-translations';
 import { useState } from 'react';
+import { cn } from '@/lib/utils';
 import {
     Dialog,
     DialogContent,
@@ -40,127 +41,168 @@ export default function PhotoGallery() {
             alt: 'Tropical drinks',
             label: __('Tropical Drinks'),
         },
-         {
+        {
             src: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?q=80&w=2670&auto=format&fit=crop',
             alt: 'Beachfront dining',
             label: __('Coastal Atmosphere'),
         },
+        {
+            src: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2669&auto=format&fit=crop',
+            alt: 'Luxury interior',
+            label: __('Elite Interiors'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Artisan Cocktails',
+            label: __('Liquid Art'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1551024506-0bccd828d307?q=80&w=2528&auto=format&fit=crop',
+            alt: 'Gourmet Dessert',
+            label: __('Sweet Finale'),
+        },
+        {
+            src: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?q=80&w=2670&auto=format&fit=crop',
+            alt: 'Fresh Salmon',
+            label: __('Ocean Treasure'),
+        },
     ];
 
     return (
-        <section className="bg-section-gallery py-32 transition-colors duration-1000 font-['Inter',sans-serif] relative overflow-hidden">
-            {/* Multi-Wave Transition from Features */}
-            <div className="wave-container top-0 rotate-180">
-                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="wave-anim-1">
-                    <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="fill-[var(--bg-features)]"></path>
-                </svg>
-                <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="wave-anim-2 absolute inset-0">
-                    <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="fill-[var(--bg-features)]/40"></path>
-                </svg>
-            </div>
+        <section className="relative py-32 overflow-hidden bg-mesh">
+            {/* Background Atmosphere */}
+            <div className="light-beam top-1/2 left-0 opacity-10" />
             
-            {/* Atmospheric accents */}
-            <div className="absolute top-1/4 right-0 h-[600px] w-[300px] bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-0 left-0 h-[400px] w-[400px] bg-sky-500/10 blur-[120px] rounded-full pointer-events-none" />
-            
-            <div className="mx-auto max-w-7xl px-8">
-                {/* Header */}
-                <div className="mb-24 flex flex-col items-center text-center space-y-6">
+            <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                {/* Elite Header */}
+                <div className="mb-32 flex flex-col items-center text-center max-w-4xl mx-auto">
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="inline-flex items-center gap-3 rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
+                        className="mb-10 inline-flex items-center gap-4 rounded-full border border-primary/20 bg-primary/5 px-6 py-2 backdrop-blur-xl"
                     >
-                        <Camera size={12} />
-                        <span>{__('Visual Journey')}</span>
+                        <Camera size={14} className="text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary">{__('Visual Odyssey')}</span>
                     </motion.div>
+                    
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="font-serif text-5xl font-black text-slate-900 dark:text-white md:text-6xl tracking-tighter"
+                        className="font-serif text-6xl md:text-8xl lg:text-[10rem] font-light text-foreground leading-[0.85] tracking-tighter mb-12"
                     >
-                        {__('Visual Feast')}
+                        {__('Capturing')} <br />
+                        <span className="italic font-light opacity-40 block">{__('The Ocean Soul.')}</span>
                     </motion.h2>
-                    <p className="mx-auto max-w-xl text-slate-500 dark:text-neutral-400 text-lg font-medium">
-                        {__('Explore the freshness of seafood and the coastal atmosphere we\'ve built for you.')}
-                    </p>
+                    
+                    <motion.p 
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="text-lg md:text-2xl text-muted-foreground font-medium leading-relaxed max-w-2xl opacity-70"
+                    >
+                        {__('A curated glimpse into our coastal sanctuary, where every wave tells a story and every dish is a masterpiece.')}
+                    </motion.p>
                 </div>
 
-                {/* Gallery grid */}
-                <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-3">
-                    {GALLERY_IMAGES.map((img, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.7, delay: i * 0.1 }}
-                            className="group relative overflow-hidden rounded-[2.5rem] aspect-[4/5] md:aspect-square lg:aspect-[4/5] bg-slate-100 dark:bg-white/5 cursor-pointer"
-                            onClick={() => setSelectedImage(img)}
-                        >
-                            <img
-                                src={img.src}
-                                alt={img.alt}
-                                className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale-0 group-hover:grayscale-[0.3]"
-                            />
-                            
-                            {/* Overlay effects */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 transition-opacity duration-700 group-hover:opacity-90" />
-                            
-                            {/* Content reveal */}
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-0 transition-all duration-700 group-hover:opacity-100">
+                {/* Dynamic Masonry-ish Grid - 10 Items, 4x4 Tight Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 auto-rows-[250px] md:auto-rows-[300px]">
+                    {GALLERY_IMAGES.map((img, i) => {
+                        const spans = [
+                            "md:col-span-2 md:row-span-2", // 0: C1-2, R1-2 (Large Square)
+                            "md:col-span-2 md:row-span-1", // 1: C3-4, R1 (Wide)
+                            "md:col-span-1 md:row-span-2", // 2: C3, R2-3 (Tall)
+                            "md:col-span-1 md:row-span-1", // 3: C4, R2 (Small)
+                            "md:col-span-1 md:row-span-1", // 4: C4, R3 (Small)
+                            "md:col-span-1 md:row-span-1", // 5: C1, R3 (Small)
+                            "md:col-span-1 md:row-span-1", // 6: C2, R3 (Small)
+                            "md:col-span-1 md:row-span-1", // 7: C1, R4 (Small)
+                            "md:col-span-1 md:row-span-1", // 8: C2, R4 (Small)
+                            "md:col-span-2 md:row-span-1", // 9: C3-4, R4 (Wide)
+                        ];
+                        
+                        return (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                transition={{ duration: 1.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+                                viewport={{ once: true }}
+                                className={cn(
+                                    "group relative overflow-hidden rounded-2xl glass-elite cursor-pointer border border-black/5 dark:border-white/5",
+                                    spans[i] || "md:col-span-1 md:row-span-1"
+                                )}
+                                onClick={() => setSelectedImage(img)}
+                            >
                                 <motion.div 
+                                    className="h-full w-full relative"
                                     whileHover={{ scale: 1.1 }}
-                                    className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-sky-500 text-white shadow-2xl"
+                                    transition={{ duration: 2 }}
                                 >
-                                    <Eye size={24} />
+                                    <img
+                                        src={img.src}
+                                        alt={img.alt}
+                                        className="h-full w-full object-cover grayscale-[0.6] group-hover:grayscale-0 transition-all duration-[2s]"
+                                    />
+                                    
+                                    {/* Multi-layered Overlays */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-40 group-hover:opacity-100 transition-opacity duration-1000" />
+                                    <div className="absolute inset-0 bg-primary/5 group-hover:bg-transparent transition-colors duration-1000" />
                                 </motion.div>
-                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">
-                                    {__('View Details')}
-                                </span>
-                            </div>
-
-                            {/* Permanent Label */}
-                            <div className="absolute bottom-6 left-6 right-6">
-                                <div className="glass-card flex items-center justify-between rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 px-6 py-4">
-                                    <span className="text-xs font-black uppercase tracking-widest text-white">
-                                        {img.label}
+                                
+                                {/* Hover Indicator */}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 opacity-0 transition-all duration-1000 translate-y-10 group-hover:translate-y-0">
+                                    <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 backdrop-blur-3xl border border-white/20 text-white shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-700">
+                                        <Eye size={32} strokeWidth={1} />
+                                    </div>
+                                    <span className="text-[10px] font-black uppercase tracking-[0.5em] text-white/80">
+                                        {__('Explore Moment')}
                                     </span>
                                 </div>
-                            </div>
-                        </motion.div>
-                    ))}
+ 
+                                {/* Minimalist Label */}
+                                <div className="absolute bottom-10 left-10 transition-all duration-700 group-hover:bottom-12">
+                                    <div className="h-[2px] w-12 bg-primary mb-4 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-700" />
+                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 group-hover:text-primary transition-colors block mb-1">
+                                        {__('Memory')}
+                                    </span>
+                                    <h4 className="text-xl sm:text-2xl font-serif italic text-white/90 group-hover:text-white transition-colors">
+                                        {img.label}
+                                    </h4>
+                                </div>
+                            </motion.div>
+                        );
+                    })}
                 </div>
 
-                {/* Lightbox Dialog */}
+                {/* Lightbox Dialog - Enhanced */}
                 <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-                    <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none outline-none overflow-hidden">
+                    <DialogContent className="max-w-6xl border-none bg-transparent p-0 shadow-none outline-none overflow-hidden">
                         <DialogHeader className="sr-only">
                             <DialogTitle>{selectedImage?.label}</DialogTitle>
                         </DialogHeader>
-                        <div className="relative h-full w-full flex items-center justify-center p-4">
+                        <div className="relative h-full w-full flex items-center justify-center p-6">
                             <AnimatePresence mode="wait">
                                 {selectedImage && (
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                                        className="relative rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]"
+                                        initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
+                                        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9, rotateY: 10 }}
+                                        transition={{ type: "spring", damping: 20, stiffness: 100 }}
+                                        className="relative rounded-[4rem] overflow-hidden glass-elite p-4"
                                     >
-                                        <img
-                                            src={selectedImage.src}
-                                            alt={selectedImage.alt}
-                                            className="max-h-[80vh] w-auto object-contain"
-                                        />
-                                        <div className="absolute bottom-0 inset-x-0 p-8 bg-gradient-to-t from-black/90 to-transparent">
-                                            <h3 className="text-2xl font-serif text-white mb-2">{selectedImage.label}</h3>
-                                            <p className="text-white/60 text-sm">{__('Capture your best moments with Ocean\'s Resto.')}</p>
+                                        <div className="overflow-hidden rounded-[3rem]">
+                                            <img
+                                                src={selectedImage.src}
+                                                alt={selectedImage.alt}
+                                                className="max-h-[75vh] w-auto object-contain"
+                                            />
                                         </div>
-                                        <DialogClose className="absolute top-6 right-6 h-10 w-10 flex items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-md border border-white/10 hover:bg-black/60 transition-colors">
-                                            <X size={20} />
+                                        <div className="p-10 pt-6 text-center">
+                                            <h3 className="text-4xl font-serif italic text-white mb-4">{selectedImage.label}</h3>
+                                            <div className="mx-auto h-px w-12 bg-primary mb-4" />
+                                            <p className="text-white/40 text-sm tracking-widest uppercase font-black">{__('A Moment at Ocean\'s Resto')}</p>
+                                        </div>
+                                        <DialogClose className="absolute top-10 right-10 h-12 w-12 flex items-center justify-center rounded-2xl bg-white/10 text-white backdrop-blur-xl border border-white/10 hover:bg-primary transition-all duration-500">
+                                            <X size={24} />
                                         </DialogClose>
                                     </motion.div>
                                 )}

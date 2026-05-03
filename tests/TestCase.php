@@ -7,10 +7,30 @@ use Laravel\Fortify\Features;
 
 abstract class TestCase extends BaseTestCase
 {
-    protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
+    public function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {
             $this->markTestSkipped($message ?? "Fortify feature [{$feature}] is not enabled.");
         }
+    }
+
+    /**
+     * Disable exception handling for the test.
+     *
+     * @return $this
+     */
+    public function withoutExceptionHandling(array $except = [])
+    {
+        return parent::withoutExceptionHandling($except);
+    }
+
+    /**
+     * Restore exception handling for the test.
+     *
+     * @return $this
+     */
+    public function withExceptionHandling()
+    {
+        return parent::withExceptionHandling();
     }
 }

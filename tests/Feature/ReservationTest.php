@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Mail;
 test('guests can view the reservation creation form', function () {
     RestoTable::factory()->create();
 
-    $this->get(route('reservations.create'))
+    get(route('reservations.create'))
         ->assertOk();
 });
 
@@ -24,7 +24,7 @@ test('a guest can create a reservation and is redirected to payment', function (
     $team = Team::factory()->create();
     $table = RestoTable::factory()->create();
 
-    $response = $this->post(route('reservations.store'), [
+    $response = post(route('reservations.store'), [
         'customer_name' => 'Budi Santoso',
         'customer_email' => 'budi@example.com',
         'customer_phone' => '081234567890',
@@ -33,14 +33,15 @@ test('a guest can create a reservation and is redirected to payment', function (
         'guest_count' => 2,
         'special_requests' => null,
         'resto_table_id' => $table->id,
+        'type' => 'dine_in',
         'menus' => [],
     ]);
 
-    $response->assertRedirect();
+    $response->assertRedirect(route('reservations.history'));
 
     $reservation = Reservation::where('customer_email', 'budi@example.com')->first();
     expect($reservation)->not->toBeNull();
-    expect($reservation->status)->toBe('awaiting_payment');
+    expect($reservation->status)->toBe('pending');
     expect($reservation->payment_status)->toBe('unpaid');
     expect($reservation->check_in_token)->not->toBeNull();
 });
@@ -48,7 +49,7 @@ test('a guest can create a reservation and is redirected to payment', function (
 test('cannot create a reservation for a date in the past', function () {
     $table = RestoTable::factory()->create();
 
-    $this->post(route('reservations.store'), [
+    post(route('reservations.store'), [
         'customer_name' => 'Budi Santoso',
         'customer_email' => 'budi@example.com',
         'customer_phone' => '081234567890',
@@ -56,6 +57,7 @@ test('cannot create a reservation for a date in the past', function () {
         'time' => '19:00',
         'guest_count' => 2,
         'resto_table_id' => $table->id,
+        'type' => 'dine_in',
     ])->assertSessionHasErrors(['date']);
 });
 
@@ -73,7 +75,7 @@ test('cannot double-book a table at the same date and time', function () {
         'status' => 'pending',
     ]);
 
-    $response = $this->post(route('reservations.store'), [
+    $response = post(route('reservations.store'), [
         'customer_name' => 'Andi Saputra',
         'customer_email' => 'andi@example.com',
         'customer_phone' => '089876543210',
@@ -81,6 +83,7 @@ test('cannot double-book a table at the same date and time', function () {
         'time' => '19:00',
         'guest_count' => 2,
         'resto_table_id' => $table->id,
+        'type' => 'dine_in',
     ]);
 
     $response->assertSessionHasErrors(['resto_table_id']);
@@ -97,7 +100,7 @@ test('authenticated user can view the payment page for their own reservation', f
         'user_id' => $user->id,
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('reservations.payment', $reservation))
         ->assertOk();
 });
@@ -111,7 +114,7 @@ test('user cannot view payment page of another user\'s reservation', function ()
         'user_id' => $owner->id,
     ]);
 
-    $this->actingAs($other)
+    actingAs($other)
         ->get(route('reservations.payment', $reservation))
         ->assertForbidden();
 });
@@ -125,13 +128,13 @@ test('processing payment marks reservation as paid and sends confirmation email'
         'user_id' => $user->id,
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->post(route('reservations.payment.process', $reservation))
         ->assertRedirect(route('reservations.history'));
 
     $reservation->refresh();
     expect($reservation->payment_status)->toBe('paid');
-    expect($reservation->status)->toBe('pending');
+    expect($reservation->status)->toBe('confirmed');
 
     Mail::assertQueued(ReservationConfirmedMail::class, fn ($mail) => $mail->hasTo($reservation->customer_email));
 });
@@ -147,13 +150,13 @@ test('authenticated user can view their reservation history', function () {
         'user_id' => $user->id,
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->get(route('reservations.history'))
         ->assertOk();
 });
 
 test('guests are redirected to login when visiting reservation history', function () {
-    $this->get(route('reservations.history'))
+    get(route('reservations.history'))
         ->assertRedirect(route('login'));
 });
 
@@ -169,7 +172,7 @@ test('staff can check in a guest via QR token', function () {
         'checked_in_at' => null,
     ]);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->get(route('reservations.checkin', $reservation->check_in_token))
         ->assertRedirect(route('reservations.index'));
 
@@ -184,7 +187,7 @@ test('checking in an already checked-in guest redirects with info message', func
         'team_id' => $staff->currentTeam->id,
     ]);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->get(route('reservations.checkin', $reservation->check_in_token))
         ->assertRedirect(route('reservations.index'));
 });
@@ -192,7 +195,7 @@ test('checking in an already checked-in guest redirects with info message', func
 test('checkin with an invalid token returns 404', function () {
     $staff = User::factory()->create(['role' => 'admin']);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->get(route('reservations.checkin', 'invalid-token-xyz'))
         ->assertNotFound();
 });
@@ -204,7 +207,7 @@ test('checkin with an invalid token returns 404', function () {
 test('customers cannot access the staff reservations dashboard', function () {
     $customer = User::factory()->create(['role' => 'customer']);
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->get(route('reservations.index'))
         ->assertForbidden();
 });
@@ -212,7 +215,7 @@ test('customers cannot access the staff reservations dashboard', function () {
 test('staff can access the reservations dashboard', function () {
     $staff = User::factory()->create(['role' => 'staff']);
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->get(route('reservations.index'))
         ->assertOk();
 });
@@ -224,7 +227,7 @@ test('admin can update reservation status', function () {
         'status' => 'pending',
     ]);
 
-    $this->actingAs($admin)
+    actingAs($admin)
         ->put(route('reservations.update', $reservation), ['status' => 'confirmed'])
         ->assertRedirect();
 
@@ -243,7 +246,8 @@ test('customer can cancel their own pending reservation', function () {
         'status' => 'pending',
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
+        ->from(route('reservations.history'))
         ->delete(route('reservations.destroy', $reservation))
         ->assertRedirect(route('reservations.history'));
 
@@ -258,7 +262,7 @@ test('customer cannot cancel a confirmed reservation', function () {
         'status' => 'confirmed',
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->delete(route('reservations.destroy', $reservation))
         ->assertRedirect();
 

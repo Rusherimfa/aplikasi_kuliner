@@ -1,6 +1,6 @@
 <?php
 
-function appendKeys($filePath, $newKeys)
+function appendKeys(string $filePath, array $newKeys)
 {
     if (! file_exists($filePath)) {
         return;

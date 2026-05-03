@@ -19,66 +19,67 @@ export default function Footer() {
         links.push({ label: __('Dashboard Panel'), href: dashboardUrl });
     }
     return (
-        <footer className="relative bg-[#FAFAFA] dark:bg-[#0A0A0B] text-slate-500 dark:text-neutral-500 border-t border-border dark:border-white/5 transition-colors duration-500 font-['Inter',sans-serif]">
-            {/* Top decorative gradient line */}
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-sky-500/20 to-transparent" />
-
-            <div className="mx-auto max-w-7xl px-8 py-24">
-                <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
+        <footer className="relative bg-background pt-32 pb-20 overflow-hidden transition-colors duration-1000">
+            {/* Artistic Elements */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+            <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-primary/5 rounded-[100%] blur-[120px] pointer-events-none" />
+            
+            <div className="mx-auto max-w-7xl px-8 relative z-10">
+                <div className="flex flex-col items-center text-center mb-32">
                     {/* Brand Section */}
-                    <div className="lg:col-span-5 space-y-8">
-                        <div className="flex items-center gap-4">
-                            <motion.div 
-                                whileHover={{ scale: 1.05 }}
-                                className="flex h-16 items-center justify-center"
-                            >
-                                <div className="h-16 w-16 overflow-hidden rounded-full bg-white/10 p-0.5 shadow-xl">
-                                    <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-full drop-shadow-md" />
-                                </div>
-                            </motion.div>
+                    <motion.div 
+                        whileHover={{ scale: 1.05 }}
+                        className="mb-16 relative group"
+                    >
+                        <div className="h-32 w-32 overflow-hidden rounded-[3rem] bg-white dark:bg-white/5 p-1.5 shadow-4xl border border-black/5 dark:border-white/10 group-hover:rotate-12 transition-all duration-[1s]">
+                            <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-[2.5rem]" />
                         </div>
-                        
-                        <p className="max-w-md text-base leading-relaxed font-medium">
-                            {__('A destination where tradition meets innovation. We curate every dish with gastronomic precision to create eternal memories.')}
-                        </p>
+                        <div className="absolute -inset-8 bg-primary/10 rounded-full blur-[60px] opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                    </motion.div>
+                    
+                    <h3 className="font-serif text-6xl sm:text-8xl md:text-[10rem] font-light text-foreground mb-12 tracking-tighter leading-none">
+                        {__('The Fish')} <br />
+                        <span className="italic font-light opacity-30">{__('Connection.')}</span>
+                    </h3>
+                    
+                    <p className="max-w-2xl text-lg md:text-2xl leading-relaxed text-muted-foreground font-medium mb-20 opacity-70 italic">
+                        {__('A culinary destination where the horizon meets the plate. We bridge the gap between deep sea bounty and gastronomic art.')}
+                    </p>
 
-                        <div className="flex gap-4">
-                            {[
-                                { Icon: Instagram, href: '#' },
-                                { Icon: Twitter, href: '#' },
-                                { Icon: Facebook, href: '#' },
-                            ].map(({ Icon, href }, i) => (
-                                <motion.a
-                                    key={i}
-                                    href={href}
-                                    whileHover={{ y: -5 }}
-                                    className="flex h-12 w-12 items-center justify-center rounded-2xl border border-border dark:border-white/5 bg-white dark:bg-white/5 text-slate-400 transition-all hover:bg-sky-500 hover:text-white hover:border-sky-500 shadow-sm"
-                                >
-                                    <Icon size={18} />
-                                </motion.a>
-                            ))}
-                        </div>
+                    <div className="flex gap-8 mb-32">
+                        {[
+                            { Icon: Instagram, href: '#' },
+                            { Icon: Twitter, href: '#' },
+                            { Icon: Facebook, href: '#' },
+                        ].map(({ Icon, href }, i) => (
+                            <motion.a
+                                key={i}
+                                href={href}
+                                whileHover={{ y: -12, rotate: 12, scale: 1.1 }}
+                                className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] glass-elite border border-black/5 dark:border-white/5 text-muted-foreground transition-all hover:bg-primary hover:text-white shadow-2xl"
+                            >
+                                <Icon size={24} strokeWidth={1} />
+                            </motion.a>
+                        ))}
                     </div>
 
-                    {/* Navigation Columns */}
-                    <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-20 py-24 border-y border-black/5 dark:border-white/5">
                         {/* Quick Links */}
-                        <div className="space-y-8">
-                            <h4 className="text-[10px] font-black tracking-[0.3em] text-slate-900 dark:text-white uppercase px-1">
-                                {__('Exploration')}
+                        <div className="flex flex-col items-center">
+                            <h4 className="text-[10px] font-black tracking-[0.5em] text-primary uppercase mb-12">
+                                {__('Navigation')}
                             </h4>
-                            <ul className="space-y-4">
+                            <ul className="flex flex-wrap justify-center gap-x-12 gap-y-6">
                                 {links.map((link) => (
                                     <li key={link.label}>
                                         <Link
                                             href={link.href}
-                                            className="group inline-flex items-center gap-2 text-sm font-black uppercase tracking-widest transition-all hover:text-sky-500"
+                                            className="group relative inline-flex items-center text-[11px] font-black uppercase tracking-[0.3em] text-muted-foreground transition-all hover:text-foreground"
                                         >
-                                            <span className="h-1 w-0 bg-sky-500 transition-all group-hover:w-4" />
                                             {link.label}
                                             <ArrowUpRight
                                                 size={14}
-                                                className="opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1"
+                                                className="ml-2 opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 text-primary"
                                             />
                                         </Link>
                                     </li>
@@ -87,50 +88,48 @@ export default function Footer() {
                         </div>
 
                         {/* Contact & Status */}
-                        <div className="space-y-8">
-                            <h4 className="text-[10px] font-black tracking-[0.3em] text-slate-900 dark:text-white uppercase px-1">
-                                {__('Headquarters')}
+                        <div className="flex flex-col items-center">
+                            <h4 className="text-[10px] font-black tracking-[0.5em] text-primary uppercase mb-12">
+                                {__('Sanctuary')}
                             </h4>
-                            <ul className="space-y-6">
-                                <li className="flex items-start gap-4">
-                                    <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
-                                        <MapPin size={18} />
-                                    </div>
-                                    <span className="text-sm font-medium leading-relaxed">
-                                        {__('Kompleks Ruko Bandar Blok N1, Jl. Jenderal Sudirman No.26, Balikpapan')}
-                                    </span>
-                                </li>
-                                <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
-                                        <Mail size={18} />
-                                    </div>
-                                    <span className="text-sm font-medium">info@oceans-balikpapan.id</span>
-                                </li>
-                                <li className="flex items-center gap-4">
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 text-sky-500">
-                                        <Clock size={18} />
-                                    </div>
-                                    <span className="text-sm font-medium uppercase tracking-widest">{__('Open Daily 10:00 AM — 11:00 PM')}</span>
-                                </li>
-                            </ul>
+                            <div className="flex flex-wrap justify-center gap-x-12 gap-y-8">
+                                <div className="flex items-center gap-4">
+                                    <MapPin size={16} className="text-primary" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">Balikpapan, ID</span>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Mail size={16} className="text-primary" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">info@oceans.id</span>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Phone size={16} className="text-primary" />
+                                    <span className="text-[11px] font-black uppercase tracking-widest text-muted-foreground">+62 811 000 000</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Ecosystem Bar */}
-                <div className="mt-20 pt-10 border-t border-border dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
-                        © {new Date().getFullYear()} Ocean's Resto The Fish Connection.
-                    </p>
-                    <div className="flex gap-8">
+                {/* Bottom Legal Section */}
+                <div className="flex flex-col md:flex-row items-center justify-between gap-10">
+                    <div className="flex flex-col items-center md:items-start gap-3">
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground opacity-50">
+                            © {new Date().getFullYear()} Ocean's Resto Luxury Group.
+                        </p>
+                        <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary/30">
+                            Designed for Excellence. Inspired by the Sea.
+                        </p>
+                    </div>
+                    
+                    <div className="flex gap-12">
                         {[
-                            { label: __('Privacy Protocol'), href: '/privacy' },
-                            { label: __('Terms of Engagement'), href: '/terms' }
+                            { label: __('Privacy'), href: '/privacy' },
+                            { label: __('Terms'), href: '/terms' }
                         ].map((link) => (
                             <Link
                                 key={link.label}
                                 href={link.href}
-                                className="text-[10px] font-black uppercase tracking-[0.2em] transition-colors hover:text-sky-500"
+                                className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:text-primary"
                             >
                                 {link.label}
                             </Link>

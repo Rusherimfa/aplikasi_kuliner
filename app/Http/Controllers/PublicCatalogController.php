@@ -93,6 +93,21 @@ class PublicCatalogController extends Controller
     }
 
     /**
+     * Display a specific menu item detail.
+     */
+    public function show(Menu $menu)
+    {
+        return Inertia::render('catalog/show', [
+            'menu' => $menu,
+            'relatedMenus' => Menu::where('category', $menu->category)
+                ->where('id', '!=', $menu->id)
+                ->where('is_available', true)
+                ->take(4)
+                ->get(),
+        ]);
+    }
+
+    /**
      * Display the Checkout static page.
      */
     public function checkout()

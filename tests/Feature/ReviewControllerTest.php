@@ -3,9 +3,6 @@
 use App\Models\Reservation;
 use App\Models\Review;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('review is auto-approved when submitted', function () {
     $user = User::factory()->create(['is_verified' => true]);
@@ -14,7 +11,7 @@ test('review is auto-approved when submitted', function () {
         'status' => 'completed',
     ]);
 
-    $this->actingAs($user)
+    actingAs($user)
         ->post(route('reviews.store', $reservation), [
             'rating' => 5,
             'message' => 'Excellent service!',

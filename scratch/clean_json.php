@@ -1,6 +1,6 @@
 <?php
 
-function cleanJson($filePath)
+function cleanJson(string $filePath)
 {
     if (! file_exists($filePath)) {
         return;

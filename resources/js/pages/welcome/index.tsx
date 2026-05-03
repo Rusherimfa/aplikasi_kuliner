@@ -1,7 +1,10 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { motion } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import { useState, useRef } from 'react';
 import { dashboard } from '@/routes';
 import AIChatbot from '@/components/app/ai-chatbot';
+import { CalendarPlus } from 'lucide-react';
 import HomeLiveChat from '@/components/app/home-live-chat';
 import GlobalCustomerChat from '@/components/app/global-customer-chat';
 
@@ -44,9 +47,10 @@ export default function Welcome({
     return (
         <div 
             ref={mainRef}
-            className="group/main relative"
+            className="group/main relative bg-mesh min-h-screen overflow-x-hidden"
             onMouseMove={handleMouseMove}
         >
+            <div className="grain-overlay" />
             <Head title="Ocean's Resto — Taste the Extraordinary">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link
@@ -60,42 +64,58 @@ export default function Welcome({
                 />
             </Head>
 
-            <div className="min-h-screen bg-transparent font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-500 relative">
+            <div className="min-h-screen bg-transparent font-['Inter',sans-serif] text-slate-800 dark:text-neutral-200 selection:bg-sky-100 selection:text-sky-900 dark:selection:bg-sky-500/30 dark:selection:text-sky-200 transition-colors duration-1000 relative">
                 <Navbar
                     auth={auth}
                     dashboardUrl={dashboardUrl}
                     mobileMenuOpen={mobileMenuOpen}
                     setMobileMenuOpen={setMobileMenuOpen}
                 />
-
-                <main className="relative z-10 space-y-32">
+ 
+                <main className="relative z-10">
                     <Hero />
                     
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="space-y-16 md:space-y-32 pb-32 md:pb-64">
                         <BentoFeatures />
-                    </div>
-
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
-                        <SignatureDishes bestSellers={bestSellers} auth={auth} />
-                    </div>
-
-                    <HowItWorks />
-
-                    <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                        <SignatureDishes bestSellers={bestSellers || []} auth={auth} />
+                        <HowItWorks />
                         <PhotoGallery />
+                        <LocationHours />
+                        <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
+                        <CTASection />
                     </div>
-
-                    <LocationHours />
-                    
-                    <Testimonials testimonials={testimonials} reviews={reviews} auth={auth} />
-
-                    <CTASection />
                 </main>
 
                 <Footer />
 
                 <GlobalCustomerChat />
                 <AIChatbot />
+
+                {/* Mobile Floating Action Button (FAB) */}
+                <div className="fixed bottom-24 right-6 z-50 md:hidden pointer-events-none">
+                    <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ delay: 2, type: "spring", stiffness: 260, damping: 20 }}
+                        className="pointer-events-auto"
+                    >
+                        <Link href="/reservations/create">
+                            <Button 
+                                className="h-16 w-16 rounded-full bg-primary text-primary-foreground shadow-[0_15px_30px_rgba(var(--color-primary),0.4)] flex items-center justify-center p-0 group overflow-hidden relative"
+                            >
+                                <motion.div
+                                    animate={{ 
+                                        scale: [1, 1.2, 1],
+                                        opacity: [0.5, 0.2, 0.5]
+                                    }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    className="absolute inset-0 bg-white rounded-full"
+                                />
+                                <CalendarPlus size={24} className="relative z-10" />
+                            </Button>
+                        </Link>
+                    </motion.div>
+                </div>
             </div>
         </div>
     );

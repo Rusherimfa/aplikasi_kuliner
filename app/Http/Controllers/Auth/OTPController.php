@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Mail\OTPMail;
+use App\Models\User;
+use App\Notifications\OTPNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
 
 class OTPController extends Controller
@@ -16,16 +16,21 @@ class OTPController extends Controller
      */
     public function show()
     {
-        if (Auth::user()->is_verified) {
-            return redirect()->intended('/dashboard');
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->is_verified) {
+            if ($user->isAdmin() || $user->isStaff() || $user->isCourier()) {
+                return redirect()->intended('/dashboard');
+            }
+            return redirect()->intended('/catalog');
         }
 
         // Generate OTP if not exists or expired
-        if (! Auth::user()->otp_code || Auth::user()->otp_expires_at < now()) {
-            $otp = Auth::user()->generateOTP();
+        if (! $user->otp_code || $user->otp_expires_at < now()) {
+            $otp = $user->generateOTP();
 
-            // Send Premium Email
-            Mail::to(Auth::user()->email)->send(new OTPMail($otp));
+            $user->notify(new OTPNotification($otp));
         }
 
         return Inertia::render('auth/verify-otp', [
@@ -43,6 +48,7 @@ class OTPController extends Controller
             'otp' => 'required|string|size:6',
         ]);
 
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user->otp_code === $request->otp && $user->otp_expires_at > now()) {
@@ -59,7 +65,11 @@ class OTPController extends Controller
                 return redirect()->route('security.edit')->with('status', __('Keamanan terverifikasi. Anda dapat mengubah password sekarang.'));
             }
 
-            return redirect()->intended('/dashboard');
+            if ($user->isAdmin() || $user->isStaff() || $user->isCourier()) {
+                return redirect()->intended('/dashboard');
+            }
+            
+            return redirect()->intended('/catalog');
         }
 
         return back()->withErrors(['otp' => __('Kode OTP salah atau telah kadaluarsa.')]);
@@ -70,11 +80,13 @@ class OTPController extends Controller
      */
     public function resend()
     {
-        $otp = Auth::user()->generateOTP();
+        /** @var User $user */
+        $user = Auth::user();
 
-        // Send Premium Email
-        Mail::to(Auth::user()->email)->send(new OTPMail($otp));
+        $otp = $user->generateOTP();
 
-        return back()->with('status', __('Kode OTP baru telah dikirim ke email Anda.'));
+        $user->notify(new OTPNotification($otp));
+
+        return back()->with('status', __('Kode OTP baru telah dikirim ke email dan WhatsApp Anda.'));
     }
 }

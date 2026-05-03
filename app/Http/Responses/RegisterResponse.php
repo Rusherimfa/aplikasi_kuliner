@@ -20,7 +20,7 @@ class RegisterResponse implements RegisterResponseContract
 
         URL::defaults(['current_team' => $team->slug]);
 
-        $redirectUrl = $user->isCustomer() ? '/' : route('dashboard');
+        $redirectUrl = route('otp.verify');
 
         return $request->wantsJson()
             ? new JsonResponse(['two_factor' => false], 201)

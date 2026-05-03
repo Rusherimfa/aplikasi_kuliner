@@ -8,6 +8,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { useMagnetic } from '@/hooks/use-magnetic';
 import { useTranslations } from '@/hooks/use-translations';
+import { cn } from '@/lib/utils';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,6 +42,30 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
             quote: __('The online reservation system is very helpful. No need to queue for a long time when arriving at the location.'),
             rating: 5,
             avatarColor: 'bg-emerald-500'
+        },
+        {
+            id: 't-4',
+            name: 'Elena Rodriguez',
+            role: __('Wine Specialist'),
+            quote: __('An impeccable curation of spirits and seafood. The pairing suggestions from the staff were enlightened and elevated the entire experience.'),
+            rating: 5,
+            avatarColor: 'bg-rose-500'
+        },
+        {
+            id: 't-5',
+            name: 'Thomas Mueller',
+            role: __('Family Traveler'),
+            quote: __('Finding a place that balances high-end atmosphere with genuine warmth is rare. Ocean’s Resto made our family evening truly unforgettable.'),
+            rating: 5,
+            avatarColor: 'bg-amber-500'
+        },
+        {
+            id: 't-6',
+            name: 'Marcus Chen',
+            role: __('Celebrity Chef'),
+            quote: __('The technical precision in their seafood preparation is world-class. A masterclass in respecting ingredients and coastal tradition.'),
+            rating: 5,
+            avatarColor: 'bg-neutral-800'
         }
     ];
 
@@ -102,98 +127,100 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
     }, { scope: containerRef, dependencies: [displayData] });
 
     return (
-        <section ref={containerRef} className="relative overflow-hidden bg-[#FAFAFA] dark:bg-[#0A0A0B] py-16 md:py-24 transition-colors duration-500">
-            {/* Premium Decorative Ambient */}
-            <div className="absolute top-0 right-0 w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent" />
-            <div className="pointer-events-none absolute left-[-10%] top-[-5%] h-[600px] w-[600px] rounded-full bg-sky-500/5 blur-[120px]" />
-            <div className="pointer-events-none absolute right-[-5%] bottom-[-5%] h-[500px] w-[500px] rounded-full bg-cyan-600/5 blur-[100px]" />
+        <section ref={containerRef} className="relative overflow-hidden bg-background py-32 md:py-48 transition-colors duration-1000">
+            {/* Cinematic Background Elements */}
+            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
-            <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-                {/* Header */}
-                <div className="mb-12 text-center max-w-3xl mx-auto">
-                    <motion.span 
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="mb-6 inline-block rounded-2xl border border-sky-500/20 bg-sky-500/5 px-5 py-2 text-[10px] font-black tracking-[0.3em] text-sky-600 dark:text-sky-500 uppercase glow-primary"
+            <div className="relative mx-auto max-w-7xl px-8 md:px-12">
+                {/* Header Section */}
+                <div className="mb-24 flex flex-col items-center text-center max-w-4xl mx-auto">
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        className="mb-8 inline-flex items-center gap-4 rounded-full border border-primary/20 bg-primary/5 px-6 py-2 backdrop-blur-xl"
                     >
-                        {__('Guest Experiences')}
-                    </motion.span>
+                        <Quote size={14} className="text-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary">{__('Guest Legacies')}</span>
+                    </motion.div>
+                    
                     <motion.h2 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
-                        className="mb-6 font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white md:text-5xl lg:text-6xl tracking-tight leading-tight"
+                        className="font-serif text-5xl md:text-7xl lg:text-8xl font-light text-foreground leading-tight tracking-tighter"
                     >
-                        {__('Symphony of')} <span className="italic font-serif opacity-40">{__('Satisfaction')}</span>
+                        {__('Symphony of')} <span className="italic">{__('Satisfaction.')}</span>
                     </motion.h2>
+                    
                     <motion.p 
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 }}
-                        className="mx-auto text-lg font-medium text-slate-500 dark:text-neutral-400"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        className="mt-8 text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl opacity-70"
                     >
-                        {__('Authentic testimonials from our guests who have enjoyed our finest seafood.')}
+                        {__('The true essence of Oceanresto lies within the stories of our guests. A curated collection of moments shared by the shore.')}
                     </motion.p>
                 </div>
 
-                {/* Cards Masonry-like Grid */}
-                <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+                {/* Testimonials Masonry-Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                     {displayData.slice(0, 6).map((t: any, index: number) => {
                         const avatarLetters = t.name ? t.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase() : 'RT';
-                        const avatarBg = t.avatarColor || 'bg-sky-500/10';
+                        const avatarBg = t.avatarColor || 'bg-primary/20';
 
                         return (
                             <div
                                 key={t.id}
                                 ref={(el) => { if (el) cardsArray.current[index] = el; }}
-                                className="group glass-card flex flex-col p-6 md:p-8 relative overflow-hidden transition-all duration-700 hover:-translate-y-3 hover:border-sky-500/30 hover:shadow-sky-500/10"
+                                className="group glass-elite flex flex-col p-10 sm:p-12 rounded-2xl border border-black/5 dark:border-white/5 transition-all duration-700 hover:translate-y-[-16px] hover:shadow-[0_50px_100px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_60px_120px_rgba(0,0,0,0.5)] relative overflow-hidden"
                             >
-                                {/* Subtle Quote Icon Overlay */}
-                                <Quote size={120} className="absolute -top-6 -right-6 text-sky-500/5 group-hover:text-sky-500/10 transition-colors" strokeWidth={1} />
-
-                                {/* Header with Stars */}
-                                <div className="mb-8 flex justify-between items-start relative z-10">
+                                {/* Decorative elements */}
+                                <Quote size={160} className="absolute -top-10 -right-10 text-primary/5 group-hover:text-primary/10 transition-all duration-700 rotate-12" strokeWidth={1} />
+                                
+                                <div className="mb-10 flex justify-between items-center relative z-10">
                                     <div className="flex gap-1.5">
                                         {Array.from({ length: 5 }).map((_, i) => (
                                             <Star 
                                                 key={i} 
                                                 size={14} 
-                                                className={`transition-all duration-500 ${i < (t.rating || 5) ? 'fill-sky-500 text-sky-500 scale-110' : 'text-slate-300 dark:text-white/10'}`} 
+                                                fill={i < (t.rating || 5) ? "currentColor" : "none"}
+                                                className={cn(
+                                                    "transition-all duration-500",
+                                                    i < (t.rating || 5) ? "text-primary scale-110" : "text-muted-foreground/20"
+                                                )}
                                             />
                                         ))}
                                     </div>
                                     {t.isReview && (
-                                        <div className="flex items-center gap-1.5 rounded-full bg-sky-500/10 px-3 py-1 text-[10px] font-black text-sky-600 dark:text-sky-500 uppercase tracking-widest border border-sky-500/20">
-                                            <CheckCircle2 size={10} />
-                                            {__('Authentic')}
+                                        <div className="flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-[9px] font-black text-primary uppercase tracking-widest border border-primary/20">
+                                            <CheckCircle2 size={12} />
+                                            {__('Verified')}
                                         </div>
                                     )}
                                 </div>
 
-                                {/* Quote text */}
-                                <p className="mb-6 flex-1 text-base md:text-lg font-medium leading-relaxed text-slate-600 dark:text-neutral-400 italic relative z-10">
+                                <p className="mb-12 flex-1 font-serif text-lg md:text-xl font-light italic leading-relaxed text-foreground/90 opacity-90 group-hover:opacity-100 transition-opacity">
                                     "{t.quote}"
                                 </p>
 
-                                {/* Author Profile */}
-                                <div className="flex items-center gap-5 pt-8 border-t border-border dark:border-white/5 relative z-10">
+                                <div className="flex items-center gap-6 pt-10 border-t border-black/5 dark:border-white/5 relative z-10">
                                     {t.userAvatar ? (
-                                        <div className="flex h-14 w-14 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-white/10 shadow-inner">
+                                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-black/5 dark:border-white/10 shadow-xl group-hover:rotate-6 transition-all duration-700">
                                             <img src={t.userAvatar.startsWith('http') || t.userAvatar.startsWith('/') ? t.userAvatar : `/storage/${t.userAvatar}`} alt={t.name} className="h-full w-full object-cover" />
                                         </div>
                                     ) : (
-                                        <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full ${avatarBg} text-base font-black text-white dark:text-black shadow-inner`}>
+                                        <div className={cn(
+                                            "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-lg font-black text-white shadow-xl group-hover:rotate-6 transition-all duration-700",
+                                            avatarBg
+                                        )}>
                                             {avatarLetters}
                                         </div>
                                     )}
-                                    <div>
-                                        <p className="text-base font-black text-slate-900 dark:text-white tracking-tight">{t.name}</p>
-                                        <p className="text-xs font-bold text-slate-500 dark:text-neutral-500 uppercase tracking-widest mt-0.5">
+                                    <div className="flex flex-col">
+                                        <h4 className="text-sm md:text-base font-bold text-foreground tracking-tight">{t.name}</h4>
+                                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mt-1 opacity-60">
                                             {t.role}
-                                        </p>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -201,27 +228,27 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                     })}
                 </div>
 
-                {/* Bottom Action */}
+                {/* Bottom Action Footer */}
                 <div 
                     ref={magneticButtonRef as any}
-                    className="mt-12 md:mt-16 flex flex-col items-center gap-6"
+                    className="mt-24 md:mt-32 flex flex-col items-center gap-10"
                 >
                     <Link href={auth?.user ? "/testimonials" : "/login"}>
                         <Button 
-                            className="bg-sky-500 hover:bg-sky-600 text-white h-16 rounded-2xl px-12 text-sm font-black uppercase tracking-widest shadow-2xl shadow-sky-500/20 transition-all hover:scale-105 active:scale-95 group"
+                            className="group relative h-20 px-16 rounded-[2rem] bg-primary text-[12px] font-black uppercase tracking-[0.4em] text-white shadow-[0_30px_60px_-15px_oklch(var(--primary)/0.4)] transition-all hover:scale-105 active:scale-95 overflow-hidden"
                         >
-                            <MessageSquarePlus className="mr-3 transition-transform group-hover:scale-110" size={18} />
-                            {__('Share Your Experience')}
+                            <span className="relative z-10 flex items-center gap-4">
+                                <MessageSquarePlus className="transition-transform group-hover:scale-110" size={18} />
+                                {__('Share Your Moment')}
+                            </span>
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
                         </Button>
                     </Link>
+                    
                     {!auth?.user && (
-                        <motion.p 
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            className="text-[10px] font-black tracking-[0.3em] text-slate-400 dark:text-neutral-500 uppercase"
-                        >
-                            {__('Login required to post a review')}
-                        </motion.p>
+                        <p className="text-[9px] font-black tracking-[0.5em] text-muted-foreground uppercase opacity-40">
+                            {__('Account Verification Required to Post')}
+                        </p>
                     )}
                 </div>
             </div>

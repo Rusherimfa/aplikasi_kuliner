@@ -19,17 +19,17 @@ trait ProfileValidationRules
         $rules = [
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
-            'phone' => ['nullable', 'string', 'max:20'],
+            'phone' => ['nullable', 'numeric'],
             'avatar' => ['nullable', 'image', 'max:2048'],
         ];
 
         // Only require password if name or email is being changed and user is authenticated
-        $user = auth()->user();
+        $user = $request->user();
         if ($user && ($request->filled('name') && $request->name !== $user->name ||
             $request->filled('email') && $request->email !== $user->email)) {
             $rules['current_password'] = ['required', 'string', 'current_password'];
         } else {
-            $rules['current_password'] = ['nullable', 'string', 'current_password'];
+            $rules['current_password'] = ['nullable', 'string'];
         }
 
         return $rules;

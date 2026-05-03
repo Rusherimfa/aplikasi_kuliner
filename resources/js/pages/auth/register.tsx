@@ -66,6 +66,24 @@ export default function Register() {
                             </div>
 
                             <div className="group relative grid gap-2">
+                                <Label htmlFor="phone" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
+                                    <span className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors">📱</span>
+                                    {__('Nomor WhatsApp')}
+                                </Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    required
+                                    tabIndex={3}
+                                    autoComplete="tel"
+                                    name="phone"
+                                    placeholder="08123456789"
+                                    className="h-12 border-border bg-background/50 px-4 text-foreground placeholder:text-muted-foreground/30 focus:border-sky-500/50 focus:ring-sky-500/50 rounded-xl transition-all"
+                                />
+                                <InputError message={errors.phone} />
+                            </div>
+
+                            <div className="group relative grid gap-2">
                                 <Label htmlFor="password" className="flex items-center gap-2 text-muted-foreground group-focus-within:text-sky-500 transition-colors">
                                     <Sparkles size={16} className="text-muted-foreground/60 group-focus-within:text-sky-500 transition-colors" />
                                     {__('Password')}
@@ -73,7 +91,7 @@ export default function Register() {
                                 <PasswordInput
                                     id="password"
                                     required
-                                    tabIndex={3}
+                                    tabIndex={4}
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder={__('Create a strong password')}
@@ -90,7 +108,7 @@ export default function Register() {
                                 <PasswordInput
                                     id="password_confirmation"
                                     required
-                                    tabIndex={4}
+                                    tabIndex={5}
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder={__('Confirm your password')}
@@ -104,7 +122,7 @@ export default function Register() {
                             <Button
                                 type="submit"
                                 className="mt-4 h-12 w-full rounded-full bg-gradient-to-r from-sky-500 to-sky-700 font-semibold text-white shadow-xl shadow-sky-900/20 hover:scale-[1.02] hover:from-sky-400 hover:to-sky-600 transition-all duration-300 group/btn"
-                                tabIndex={5}
+                                tabIndex={6}
                                 data-test="register-user-button"
                             >
                                 {processing ? (
@@ -156,7 +174,7 @@ export default function Register() {
 
                         <div className="mt-4 text-center text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-300 fill-mode-both">
                             {__('Already have an account?')}{' '}
-                            <TextLink href={login()} tabIndex={6} className="font-semibold text-sky-600 hover:text-sky-500">
+                            <TextLink href={login()} tabIndex={7} className="font-semibold text-sky-600 hover:text-sky-500">
                                 {__('Sign In')}
                             </TextLink>
                         </div>
