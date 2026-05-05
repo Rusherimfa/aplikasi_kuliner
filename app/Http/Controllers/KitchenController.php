@@ -251,7 +251,10 @@ class KitchenController extends Controller
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pesanan'),
-            __('Pesanan #:order Anda telah diperbarui.', ['order' => $order->order_number]),
+            __('Pesanan #:order Anda sekarang berstatus: :status', [
+                'order' => $order->order_number,
+                'status' => __($order->order_status)
+            ]),
             'info',
             route('orders.track', [$order->id], false)
         ));
@@ -269,8 +272,8 @@ class KitchenController extends Controller
 
         // Notify Customer
         $order->user?->notify(new AppNotification(
-            __('Pesanan Dikonfirmasi'),
-            __('Pesanan #:order Anda telah dikonfirmasi. Silakan lakukan pembayaran agar pesanan dapat segera disiapkan.', ['order' => $order->order_number]),
+            __('Pesanan Diterima'),
+            __('Pesanan #:order Anda telah diterima oleh restoran. Silakan lakukan pembayaran agar kami dapat mulai memasak.', ['order' => $order->order_number]),
             'success',
             route('orders.history', [], false)
         ));

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
+use Throwable;
 
 class OrderController extends Controller
 {
@@ -31,7 +32,7 @@ class OrderController extends Controller
             'cart_total' => 'required|numeric|min:0',
             'customer_lat' => 'nullable|numeric',
             'customer_lng' => 'nullable|numeric',
-            'delivery_address' => 'nullable|string',
+            'delivery_address' => 'required_if:order_type,delivery|nullable|string|max:500',
             'delivery_method' => 'nullable|string|in:resto,gojek,grab',
             'delivery_service' => 'nullable|string',
             'delivery_fee' => 'nullable|numeric',
@@ -96,7 +97,7 @@ class OrderController extends Controller
                 $midtrans = new MidtransService;
                 $snapToken = $midtrans->getSnapToken($order);
                 $order->update(['midtrans_snap_token' => $snapToken]);
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 Log::error('Midtrans Error: '.$e->getMessage());
             }
 
@@ -161,7 +162,7 @@ class OrderController extends Controller
                 $midtrans = new MidtransService;
                 $snapToken = $midtrans->getSnapToken($order);
                 $order->update(['midtrans_snap_token' => $snapToken]);
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 Log::error('Midtrans Retry Error: '.$e->getMessage());
             }
         }
@@ -284,7 +285,10 @@ class OrderController extends Controller
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pengiriman'),
-            __('Pesanan #:order Anda sekarang berstatus: :status', ['order' => $order->order_number, 'status' => ucfirst($request->delivery_status)]),
+            __('Pesanan #:order Anda sekarang berstatus: :status', [
+                'order' => $order->order_number, 
+                'status' => __($request->delivery_status)
+            ]),
             'info',
             route('orders.track', [$order->id], false)
         ));

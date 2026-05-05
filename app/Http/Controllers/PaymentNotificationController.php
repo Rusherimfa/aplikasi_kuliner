@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Reservation;
 use Illuminate\Http\Request;
+use App\Notifications\AppNotification;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Notification;
 
@@ -56,7 +57,7 @@ class PaymentNotificationController extends Controller
 
     private function handleOrder(string $orderNumber, string $status, string $fraud): void
     {
-        $order = Order::where('order_number', $orderNumber)->first();
+        $order = Order::with('user')->where('order_number', $orderNumber)->first();
         if (! $order) {
             return;
         }
@@ -69,15 +70,29 @@ class PaymentNotificationController extends Controller
                     'payment_status' => 'paid',
                     'order_status' => 'preparing',
                 ]);
+
+                $order->user?->notify(new AppNotification(
+                    __('Pembayaran Berhasil'),
+                    __('Pembayaran untuk pesanan #:order telah diverifikasi. Kami mulai menyiapkan hidangan Anda.', ['order' => $order->order_number]),
+                    'success',
+                    route('orders.track', [$order->id], false)
+                ));
             }
         } elseif ($status == 'deny' || $status == 'expire' || $status == 'cancel') {
             $order->update(['payment_status' => 'failed', 'order_status' => 'cancelled']);
+
+            $order->user?->notify(new AppNotification(
+                __('Pembayaran Gagal'),
+                __('Maaf, pembayaran untuk pesanan #:order gagal atau kedaluwarsa.', ['order' => $order->order_number]),
+                'error',
+                route('orders.history', [], false)
+            ));
         }
     }
 
     private function handleReservation(string|int $id, string $status, string $fraud): void
     {
-        $reservation = Reservation::find($id);
+        $reservation = Reservation::with('user')->find($id);
         if (! $reservation) {
             return;
         }
@@ -90,9 +105,23 @@ class PaymentNotificationController extends Controller
                     'payment_status' => 'paid',
                     'status' => 'confirmed',
                 ]);
+
+                $reservation->user?->notify(new AppNotification(
+                    __('Pembayaran Diterima'),
+                    __('Terima kasih! Pembayaran DP Anda untuk reservasi #:id telah kami terima.', ['id' => $reservation->id]),
+                    'success',
+                    route('reservations.show', [$reservation->id], false)
+                ));
             }
         } elseif ($status == 'deny' || $status == 'expire' || $status == 'cancel') {
             $reservation->update(['payment_status' => 'failed', 'status' => 'rejected']);
+
+            $reservation->user?->notify(new AppNotification(
+                __('Pembayaran Gagal'),
+                __('Maaf, pembayaran DP untuk reservasi #:id gagal atau kedaluwarsa.', ['id' => $reservation->id]),
+                'error',
+                route('reservations.history', [], false)
+            ));
         }
     }
 }

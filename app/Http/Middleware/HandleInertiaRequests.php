@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -37,6 +38,11 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         $locale = app()->getLocale();
+        $unreadNotificationsCount = 0;
+
+        if ($user && $this->notificationsTableExists()) {
+            $unreadNotificationsCount = $user->unreadNotifications()->count();
+        }
 
         return [
             ...parent::share($request),
@@ -44,7 +50,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $user,
                 'notifications' => [
-                    'unreadCount' => $user ? $user->unreadNotifications()->count() : 0,
+                    'unreadCount' => $unreadNotificationsCount,
                 ],
             ],
             'locale' => $locale,
@@ -63,6 +69,17 @@ class HandleInertiaRequests extends Middleware
                 'delivery_fee_per_km' => env('DELIVERY_FEE_PER_KM', 5000),
             ],
         ];
+    }
+
+    protected function notificationsTableExists(): bool
+    {
+        static $notificationsTableExists;
+
+        if ($notificationsTableExists === null) {
+            $notificationsTableExists = Schema::hasTable('notifications');
+        }
+
+        return $notificationsTableExists;
     }
 
     protected function getTranslations(string $locale): array
