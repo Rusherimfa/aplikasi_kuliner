@@ -1,16 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import Lenis from 'lenis';
-import 'lenis/dist/lenis.css';
 
-interface SmoothScrollProps {
-    children: React.ReactNode;
-}
-
-export default function SmoothScroll({ children }: SmoothScrollProps) {
-    const lenisRef = useRef<Lenis | null>(null);
-
+export default function SmoothScroll({ children }: { children: React.ReactNode }) {
     useEffect(() => {
-        // Initialize Lenis
         const lenis = new Lenis({
             duration: 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -22,20 +14,18 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
             infinite: false,
         });
 
-        lenisRef.current = lenis;
+        let rafId: number;
 
-        // Custom requestAnimationFrame loop
         function raf(time: number) {
             lenis.raf(time);
-            requestAnimationFrame(raf);
+            rafId = requestAnimationFrame(raf);
         }
 
-        requestAnimationFrame(raf);
+        rafId = requestAnimationFrame(raf);
 
-        // Cleanup
         return () => {
+            cancelAnimationFrame(rafId);
             lenis.destroy();
-            lenisRef.current = null;
         };
     }, []);
 

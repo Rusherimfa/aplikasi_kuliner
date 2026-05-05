@@ -45,37 +45,14 @@ export default function HowItWorks() {
     ];
 
     useGSAP(() => {
-        if (!stepsRef.current.length) return;
-
-        // Ensure triggers are calculated correctly
-        const timeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 500);
-
-        gsap.from(stepsRef.current, {
-            y: 60,
-            opacity: 0,
-            scale: 0.9,
-            stagger: 0.15,
-            duration: 1,
-            ease: "expo.out",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-                toggleActions: "play none none none",
-                invalidateOnRefresh: true,
-                fastScrollEnd: true
-            }
-        });
-
-        return () => clearTimeout(timeout);
+        // Disabled GSAP scroll animation to improve scroll performance
     }, { scope: containerRef });
 
     return (
         <section ref={containerRef} className="premium-noise relative overflow-hidden bg-background py-24 md:py-32 transition-colors duration-1000">
             {/* Ambient Background */}
             <div className="absolute top-0 left-0 w-full h-full bg-grid-white opacity-[0.02] pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-6 sm:px-10 lg:px-12">
                 {/* Header */}
@@ -133,10 +110,10 @@ export default function HowItWorks() {
                                     </span>
                                 </div>
 
-                                <h3 className="mb-4 font-serif text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                                <h3 className="mb-4 font-serif text-2xl font-bold text-foreground tracking-tight">
                                     {step.title}
                                 </h3>
-                                <p className="text-xs sm:text-sm font-medium leading-relaxed text-slate-500 dark:text-neutral-400 opacity-80">
+                                <p className="text-xs sm:text-sm font-medium leading-relaxed text-muted-foreground opacity-80">
                                     {step.desc}
                                 </p>
                             </div>

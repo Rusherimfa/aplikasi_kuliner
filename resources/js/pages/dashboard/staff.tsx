@@ -101,54 +101,56 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
         <>
             <Head title={__('Staff Hub - Dashboard')} />
 
-            <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-20">
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-20 px-4 sm:px-6 lg:px-8">
+                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <span className="h-1 w-8 rounded-full bg-emerald-500" />
                             <span className="text-[10px] font-black tracking-[0.3em] text-emerald-500/80 uppercase">{__('Staff Station')}</span>
                         </div>
-                        <h1 className="font-['Playfair_Display',serif] text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
+                        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
                             {__('Operational')} <span className="text-slate-300 dark:text-white/40 italic font-serif">{__('Hub')}</span>
                         </h1>
-                        <p className="mt-4 text-slate-500 dark:text-white/40 max-w-lg leading-relaxed font-medium">
+                        <p className="mt-4 text-sm md:text-base text-slate-500 dark:text-white/40 max-w-lg leading-relaxed font-medium">
                             {__('Kelola alur tamu, pantau reservasi hari ini, dan pastikan setiap pengalaman kuliner berjalan sempurna.')}
                         </p>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                        <div className="flex bg-slate-100 dark:bg-white/5 rounded-2xl p-1 border border-slate-200 dark:border-white/5 relative z-20">
-                            {[
-                                { id: 'day', label: __('Daily') },
-                                { id: 'week', label: __('Weekly') },
-                                { id: 'month', label: __('Monthly') },
-                                { id: 'year', label: __('Yearly') }
-                            ].map((p) => (
-                                <button
-                                    key={p.id}
-                                    onClick={() => router.get(dashboard.url({ query: { period: p.id } }), {}, { preserveState: true, preserveScroll: true })}
-                                    className={cn(
-                                        "px-6 py-2.5 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-500",
-                                        (filters?.period ?? 'week') === p.id 
-                                            ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xl ring-1 ring-black/5 dark:ring-white/10" 
-                                            : "text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/60"
-                                    )}
-                                >
-                                    {p.label}
-                                </button>
-                            ))}
+                    <div className="flex flex-col items-stretch sm:items-center gap-3 w-full md:w-auto">
+                        <div className="flex bg-slate-100 dark:bg-white/5 rounded-2xl p-1 border border-slate-200 dark:border-white/5 relative z-20 overflow-x-auto hide-scrollbar">
+                            <div className="flex min-w-max">
+                                {[
+                                    { id: 'day', label: __('Daily') },
+                                    { id: 'week', label: __('Weekly') },
+                                    { id: 'month', label: __('Monthly') },
+                                    { id: 'year', label: __('Yearly') }
+                                ].map((p) => (
+                                    <button
+                                        key={p.id}
+                                        onClick={() => router.get(dashboard.url({ query: { period: p.id } }), {}, { preserveState: true, preserveScroll: true })}
+                                        className={cn(
+                                            "px-4 md:px-6 py-2.5 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-500",
+                                            (filters?.period ?? 'week') === p.id 
+                                                ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-xl ring-1 ring-black/5 dark:ring-white/10" 
+                                                : "text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/60"
+                                        )}
+                                    >
+                                        {p.label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2">
-                             <Button asChild variant="outline" className="rounded-2xl border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 h-11 px-6 text-[10px] font-black uppercase tracking-widest">
+                             <Button asChild variant="outline" className="rounded-2xl border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 h-10 md:h-11 px-4 md:px-6 text-[9px] md:text-[10px] font-black uppercase tracking-widest flex-1 sm:flex-none">
                                 <Link href="/reservations/create">
-                                    <Plus className="mr-2 h-4 w-4" />
+                                    <Plus className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
                                     {__('Reservasi Baru')}
                                 </Link>
                             </Button>
-                            <Button asChild variant="outline" className="rounded-2xl border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-500 hover:bg-sky-500/20 h-11 px-6 text-[10px] font-black uppercase tracking-widest">
+                            <Button asChild variant="outline" className="rounded-2xl border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-500 hover:bg-sky-500/20 h-10 md:h-11 px-4 md:px-6 text-[9px] md:text-[10px] font-black uppercase tracking-widest flex-1 sm:flex-none">
                                 <Link href="/kitchen">
-                                    <ChefHat className="mr-2 h-4 w-4" />
+                                    <ChefHat className="mr-1.5 md:mr-2 h-3.5 w-3.5 md:h-4 md:w-4" />
                                     {__('Kitchen View')}
                                 </Link>
                             </Button>
@@ -157,7 +159,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                 </div>
 
                 {/* Operations Stat Cards */}
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+                <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4 mb-8 md:mb-12">
                     {[
                         { title: __('Reservasi Menunggu'), val: stats.pending_reservations, icon: Clock, color: 'text-sky-500', bg: 'bg-sky-500/10', href: reservationsRoute.url({ query: { status: 'pending' } }) },
                         { title: __('Pesanan Aktif'), val: stats.active_orders, icon: CalendarCheck, color: 'text-emerald-500', bg: 'bg-emerald-500/10', href: reservationsRoute.url({ query: { status: 'confirmed' } }) },
@@ -168,41 +170,41 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                             key={idx} 
                             href={card.href}
                             style={{ animationDelay: `${idx * 100}ms` }}
-                            className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both group relative aspect-[4/3] rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-xl dark:shadow-2xl backdrop-blur-3xl transition-all hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/15 overflow-hidden ring-1 ring-slate-100 dark:ring-white/5 block cursor-pointer"
+                            className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both group relative rounded-3xl md:rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-5 md:p-8 shadow-xl dark:shadow-2xl backdrop-blur-3xl transition-all hover:bg-slate-50 dark:hover:bg-white/[0.04] hover:border-slate-300 dark:hover:border-white/15 overflow-hidden ring-1 ring-slate-100 dark:ring-white/5 block cursor-pointer"
                         >
                             <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-white/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                             
-                            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${card.bg} ${card.color} shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6`}>
-                                <card.icon size={28} strokeWidth={1.5} />
+                            <div className={`flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-2xl ${card.bg} ${card.color} shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6`}>
+                                <card.icon size={20} className="md:w-7 md:h-7" strokeWidth={1.5} />
                             </div>
                             
-                            <div className="mt-8">
-                                <p className="text-[10px] font-black tracking-[0.2em] text-slate-300 dark:text-white/20 uppercase mb-2">{card.title}</p>
-                                <p className="text-3xl font-black text-slate-900 dark:text-white tracking-tighter">{card.val}</p>
+                            <div className="mt-4 md:mt-8">
+                                <p className="text-[9px] md:text-[10px] font-black tracking-[0.2em] text-slate-400 dark:text-white/30 uppercase mb-1 md:mb-2 truncate">{card.title}</p>
+                                <p className="text-xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tighter truncate">{card.val}</p>
                             </div>
                         </Link>
                     ))}
                 </div>
 
-                <div className="grid gap-8 lg:grid-cols-3 mb-12">
+                <div className="grid gap-6 md:gap-8 lg:grid-cols-3 mb-8 md:mb-12">
                     {/* Revenue Chart */}
-                    <div className="lg:col-span-2 rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-3xl backdrop-blur-3xl flex flex-col h-[500px] ring-1 ring-white/5">
-                        <div className="flex items-center justify-between mb-12 text-left">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20 shadow-xl">
+                    <div className="lg:col-span-2 rounded-[2rem] md:rounded-[3rem] border border-white/5 bg-white/[0.02] p-6 md:p-10 shadow-3xl backdrop-blur-3xl flex flex-col h-[350px] md:h-[500px] ring-1 ring-white/5">
+                        <div className="flex items-center justify-between mb-8 md:mb-12 text-left">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <div className="p-2.5 md:p-3 bg-blue-500/10 rounded-2xl text-blue-400 border border-blue-500/20 shadow-xl hidden sm:block">
                                     <TrendingUp size={22} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Financial Analytics')}</h2>
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-0.5">
+                                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Financial Analytics')}</h2>
+                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mt-0.5">
                                     {filters?.period === 'day' ? __('Revenue Trends (Today / Hourly)') : (filters?.period === 'year' ? __('Revenue Trends (12 Months)') : (filters?.period === 'month' ? __('Revenue Trends (30 Days)') : __('Revenue Trends (7 Days)')))}
                                 </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 w-full -ml-8">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={revenue_chart}>
+                        <div className="flex-1 w-full min-w-0 overflow-hidden">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                                <AreaChart data={revenue_chart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#10b981" stopOpacity={0.4}/>
@@ -212,28 +214,28 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                     <XAxis 
                                         dataKey="name" 
                                         stroke="#ffffff11" 
-                                        fontSize={10} 
+                                        fontSize={9} 
                                         tickLine={false} 
                                         axisLine={false} 
                                         tick={{fill: '#ffffff33', fontWeight: 600}}
-                                        dy={15}
+                                        dy={10}
                                     />
                                     <YAxis 
                                         stroke="currentColor" 
                                         strokeOpacity={0.1}
-                                        fontSize={9} 
+                                        fontSize={8} 
                                         tickLine={false} 
                                         axisLine={false} 
                                         tickFormatter={(val) => `Rp${val/1000}k`}
                                         tick={{fill: 'currentColor', opacity: 0.3, fontWeight: 600}}
-                                        dx={-10}
+                                        dx={-5}
                                     />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Area 
                                         type="monotone" 
                                         dataKey="revenue" 
                                         stroke="#10b981" 
-                                        strokeWidth={4} 
+                                        strokeWidth={2} 
                                         fillOpacity={1} 
                                         fill="url(#colorRevenue)" 
                                     />
@@ -243,25 +245,25 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                     </div>
 
                     {/* Best Sellers */}
-                    <div className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-10 shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col h-[500px]">
-                        <div className="flex items-center gap-4 mb-12 text-left">
-                            <div className="p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20 shadow-xl">
+                    <div className="rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-6 md:p-10 shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col h-[350px] md:h-[500px]">
+                        <div className="flex items-center gap-3 md:gap-4 mb-8 md:mb-12 text-left">
+                            <div className="p-2.5 md:p-3 bg-emerald-500/10 rounded-2xl text-emerald-500 border border-emerald-500/20 shadow-xl hidden sm:block">
                                 <ShoppingBag size={22} strokeWidth={2.5} />
                             </div>
                             <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Menu Terlaris')}</h2>
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-0.5">{__('Top Performance Dishes')}</p>
+                                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Menu Terlaris')}</h2>
+                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mt-0.5">{__('Top Performance Dishes')}</p>
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                            <div className="space-y-8">
+                            <div className="space-y-6 md:space-y-8">
                                 {best_sellers.map((menu: any, idx: number) => (
                                     <div key={menu.id} className="group relative text-left">
-                                        <div className="flex justify-between items-center mb-3 px-1">
-                                            <span className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors uppercase tracking-tight">{menu.name}</span>
-                                            <span className="text-sm font-black text-emerald-600 dark:text-emerald-500 italic">{menu.sold} <span className="text-[10px] not-italic opacity-40">{__('SOLD')}</span></span>
+                                        <div className="flex justify-between items-center mb-2 md:mb-3 px-1">
+                                            <span className="text-xs md:text-sm font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors uppercase tracking-tight">{menu.name}</span>
+                                            <span className="text-xs md:text-sm font-black text-emerald-600 dark:text-emerald-500 italic">{menu.sold} <span className="text-[9px] md:text-[10px] not-italic opacity-40">{__('SOLD')}</span></span>
                                         </div>
-                                        <div className="h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden border border-slate-200 dark:border-white/5">
+                                        <div className="h-1.5 md:h-2 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden border border-slate-200 dark:border-white/5">
                                             <div 
                                                 className="h-full rounded-full transition-all duration-1000 ease-out"
                                                 style={{ 
@@ -277,25 +279,25 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                     </div>
                 </div>
 
-                <div className="grid gap-8 lg:grid-cols-2 mb-12">
+                <div className="grid gap-6 md:gap-8 lg:grid-cols-2 mb-8 md:mb-12">
                     {/* Reservation Analytics Chart */}
-                    <div className="lg:col-span-2 rounded-[3rem] border border-white/5 bg-white/[0.02] p-10 shadow-3xl backdrop-blur-3xl flex flex-col h-[500px] ring-1 ring-white/5">
-                        <div className="flex items-center justify-between mb-12 text-left">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400 border border-purple-500/20 shadow-xl">
+                    <div className="lg:col-span-2 rounded-[2rem] md:rounded-[3rem] border border-white/5 bg-white/[0.02] p-6 md:p-10 shadow-3xl backdrop-blur-3xl flex flex-col h-[350px] md:h-[500px] ring-1 ring-white/5">
+                        <div className="flex items-center justify-between mb-8 md:mb-12 text-left">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <div className="p-2.5 md:p-3 bg-purple-500/10 rounded-2xl text-purple-400 border border-purple-500/20 shadow-xl hidden sm:block">
                                     <CalendarCheck size={22} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Reservation Analytics')}</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-0.5">
+                                    <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Reservation Analytics')}</h2>
+                                    <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mt-0.5">
                                         {filters?.period === 'day' ? __('Reservasi & Pendapatan DP (Hari Ini / Per Jam)') : (filters?.period === 'year' ? __('Reservasi & Pendapatan DP (12 Bulan)') : (filters?.period === 'month' ? __('Reservasi & Pendapatan DP (30 Hari)') : __('Reservasi & Pendapatan DP (7 Hari)')))}
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div className="flex-1 w-full -ml-8">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={reservation_chart} margin={{ top: 10, right: 10, left: 0, bottom: 20 }}>
+                        <div className="flex-1 w-full min-w-0 overflow-hidden">
+                            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+                                <BarChart data={reservation_chart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="colorRevDP" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#a855f7" stopOpacity={0.8}/>
@@ -305,33 +307,33 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                     <XAxis 
                                         dataKey="name" 
                                         stroke="#ffffff11" 
-                                        fontSize={10} 
+                                        fontSize={9} 
                                         tickLine={false} 
                                         axisLine={false} 
                                         tick={{fill: '#ffffff33', fontWeight: 600}}
-                                        dy={15}
+                                        dy={10}
                                     />
                                     <YAxis 
                                         yAxisId="left"
                                         stroke="currentColor" 
                                         strokeOpacity={0.1}
-                                        fontSize={9} 
+                                        fontSize={8} 
                                         tickLine={false} 
                                         axisLine={false} 
                                         tickFormatter={(val) => `Rp${val/1000}k`}
                                         tick={{fill: 'currentColor', opacity: 0.3, fontWeight: 600}}
-                                        dx={-10}
+                                        dx={-5}
                                     />
                                     <YAxis 
                                         yAxisId="right"
                                         orientation="right"
                                         stroke="currentColor" 
                                         strokeOpacity={0.1}
-                                        fontSize={9} 
+                                        fontSize={8} 
                                         tickLine={false} 
                                         axisLine={false} 
                                         tick={{fill: 'currentColor', opacity: 0.3, fontWeight: 600}}
-                                        dx={10}
+                                        dx={5}
                                     />
                                     <Tooltip content={<CustomTooltip />} />
                                     <Bar 
@@ -339,7 +341,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                         dataKey="revenue" 
                                         fill="url(#colorRevDP)" 
                                         radius={[4, 4, 0, 0]}
-                                        barSize={40}
+                                        barSize={20}
                                     />
                                 </BarChart>
                             </ResponsiveContainer>
@@ -347,19 +349,19 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                     </div>
                 </div>
 
-                <div className="mb-12">
+                <div className="mb-8 md:mb-12">
                     {/* Today's Schedule - Crucial for Staff */}
-                    <div className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-slate-100 dark:ring-white/5">
-                        <div className="p-10 border-b border-slate-100 dark:border-white/5 flex justify-between items-center text-left">
+                    <div className="rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-slate-100 dark:ring-white/5">
+                        <div className="p-5 md:p-10 border-b border-slate-100 dark:border-white/5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center text-left">
                             <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Jadwal Hari Ini')}</h2>
-                                <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-1">{__('Timeline kedatangan tamu')}</p>
+                                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Jadwal Hari Ini')}</h2>
+                                <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mt-1">{__('Timeline kedatangan tamu')}</p>
                             </div>
-                            <Link href={reservationsRoute.url()} className="h-10 px-5 flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-black uppercase tracking-wider text-emerald-500 transition-all hover:bg-emerald-500 hover:text-black">
+                            <Link href={reservationsRoute.url()} className="h-10 px-5 flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] sm:text-xs font-black uppercase tracking-wider text-emerald-500 transition-all hover:bg-emerald-500 hover:text-black w-full sm:w-auto">
                                 {__('Lihat Semua')}
                             </Link>
                         </div>
-                        <div className="flex-1 p-0 overflow-y-auto max-h-[600px] custom-scrollbar">
+                        <div className="flex-1 p-0 overflow-x-auto overflow-y-auto max-h-[600px] custom-scrollbar">
                             {todays_schedule && todays_schedule.length > 0 ? (
                                 <table className="w-full text-left border-collapse">
                                     <thead>

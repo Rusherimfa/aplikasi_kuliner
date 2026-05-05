@@ -331,16 +331,64 @@ export default function Profile({
                                     className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-10 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-slate-100 dark:ring-transparent"
                                 >
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 dark:text-muted-foreground/30 mb-8">{__('Access Points')}</h4>
-                                    <div className="space-y-6">
-                                        <Link href="/settings/security" className="flex items-center justify-between group p-3 -mx-3 rounded-2xl hover:bg-sky-500/10 transition-all duration-500">
+                                    <div className="space-y-2">
+                                        <Link href="/settings/security" className="flex items-center justify-between group p-3 rounded-2xl hover:bg-sky-500/10 transition-all duration-500">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-foreground">{__('Security Protocol')}</span>
                                                 <span className="text-[10px] text-slate-400 dark:text-muted-foreground/40 font-medium">{__('Update password')}</span>
                                             </div>
-                                            <div className="h-12 w-12 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:text-black transition-all duration-500 border border-slate-100 dark:border-transparent">
+                                            <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:text-black transition-all duration-500">
                                                 <ArrowLeft size={16} className="rotate-180" />
                                             </div>
                                         </Link>
+
+                                        {auth.user.role === 'customer' ? (
+                                            <>
+                                                <Link href="/reservations/history" className="flex items-center justify-between group p-3 rounded-2xl hover:bg-sky-500/10 transition-all duration-500">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-foreground">{__('Reservations')}</span>
+                                                        <span className="text-[10px] text-slate-400 dark:text-muted-foreground/40 font-medium">{__('Booking history')}</span>
+                                                    </div>
+                                                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:text-black transition-all duration-500">
+                                                        <ArrowLeft size={16} className="rotate-180" />
+                                                    </div>
+                                                </Link>
+                                                <Link href="/orders/history" className="flex items-center justify-between group p-3 rounded-2xl hover:bg-sky-500/10 transition-all duration-500">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-foreground">{__('Orders')}</span>
+                                                        <span className="text-[10px] text-slate-400 dark:text-muted-foreground/40 font-medium">{__('Purchase history')}</span>
+                                                    </div>
+                                                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:text-black transition-all duration-500">
+                                                        <ArrowLeft size={16} className="rotate-180" />
+                                                    </div>
+                                                </Link>
+                                            </>
+                                        ) : (
+                                            <Link href="/dashboard" className="flex items-center justify-between group p-3 rounded-2xl hover:bg-sky-500/10 transition-all duration-500">
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-foreground">{__('Dashboard')}</span>
+                                                    <span className="text-[10px] text-slate-400 dark:text-muted-foreground/40 font-medium">{__('Admin Panel')}</span>
+                                                </div>
+                                                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-50 dark:bg-white/5 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:text-black transition-all duration-500">
+                                                    <ArrowLeft size={16} className="rotate-180" />
+                                                </div>
+                                            </Link>
+                                        )}
+
+                                        <div className="pt-4 mt-2 border-t border-slate-100 dark:border-white/5">
+                                            <button 
+                                                onClick={() => router.post('/logout')}
+                                                className="w-full flex items-center justify-between group p-3 rounded-2xl hover:bg-rose-500/10 transition-all duration-500 cursor-pointer"
+                                            >
+                                                <div className="flex flex-col text-left">
+                                                    <span className="text-sm font-black uppercase tracking-widest text-rose-500">{__('End Session')}</span>
+                                                    <span className="text-[10px] text-rose-500/60 font-medium">{__('Sign out securely')}</span>
+                                                </div>
+                                                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-500/5 group-hover:bg-rose-500 group-hover:text-white text-rose-500 transition-all duration-500">
+                                                    <ArrowLeft size={16} className="rotate-180" />
+                                                </div>
+                                            </button>
+                                        </div>
                                     </div>
                                 </motion.div>
 

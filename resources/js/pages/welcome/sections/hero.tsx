@@ -60,7 +60,7 @@ export default function Hero() {
                 <img
                     src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2670&auto=format&fit=crop"
                     alt="Ocean view"
-                    className="h-full w-full object-cover opacity-[0.8] dark:opacity-[0.35] transition-transform duration-1000"
+                    className="h-full w-full object-cover opacity-[0.8] dark:opacity-[0.35] transition-transform duration-1000 will-change-transform"
                 />
                 
                 {/* Advanced Light Beams */}
@@ -75,14 +75,14 @@ export default function Hero() {
                 <div className="absolute inset-0 bg-grid-white opacity-[0.03] dark:opacity-[0.07]" />
             </div>
 
-            {/* Floating Atmospheric Orbs */}
+            {/* Floating Atmospheric Orbs (Optimized for performance) */}
             <div 
                 ref={(el) => { if (el) orbsRef.current[0] = el; }}
-                className="pointer-events-none absolute -top-48 -right-48 h-[1000px] w-[1000px] rounded-full bg-primary/10 blur-[200px] opacity-40 mix-blend-screen" 
+                className="pointer-events-none absolute -top-48 -right-48 h-[1000px] w-[1000px] rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_15%,transparent)_0%,transparent_60%)] opacity-40" 
             />
             <div 
                 ref={(el) => { if (el) orbsRef.current[1] = el; }}
-                className="pointer-events-none absolute bottom-1/4 -left-64 h-[800px] w-[800px] rounded-full bg-indigo-500/5 blur-[180px] opacity-30 mix-blend-plus-lighter" 
+                className="pointer-events-none absolute bottom-1/4 -left-64 h-[800px] w-[800px] rounded-full bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_10%,transparent)_0%,transparent_60%)] opacity-30" 
             />
 
             <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 sm:px-10 pt-20 pb-16 lg:px-8">
@@ -106,15 +106,14 @@ export default function Hero() {
                                 initial={{ y: 100, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                                className="block font-light text-slate-900/30 dark:text-white/20"
-                            >
-                                {__("Ocean's")}
+                                className="block font-light text-foreground/30"
+                            > {__("Ocean's")}
                             </motion.span>
                             <motion.span 
                                 initial={{ y: 100, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-                                className="block italic text-slate-900 dark:text-white drop-shadow-2xl"
+                                className="block italic text-foreground drop-shadow-2xl"
                             >
                                 {__('Resto')}
                             </motion.span>
@@ -138,7 +137,7 @@ export default function Hero() {
                             transition={{ delay: 0.8, duration: 1 }}
                             className="mb-12 border-l-2 border-primary/30 pl-6 md:pl-10"
                         >
-                            <p className="max-w-xl text-base font-medium leading-relaxed text-slate-600 dark:text-sky-100/60 sm:text-xl transition-colors">
+                            <p className="max-w-xl text-base font-medium leading-relaxed text-muted-foreground sm:text-xl transition-colors">
                                 {__('Where the horizon meets your plate. We bridge the gap between deep sea bounty and culinary art, serving only the freshest catch with a side of sunset.')}
                             </p>
                         </motion.div>

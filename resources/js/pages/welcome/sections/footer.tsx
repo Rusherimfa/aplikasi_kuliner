@@ -19,7 +19,14 @@ export default function Footer() {
         links.push({ label: __('Dashboard Panel'), href: dashboardUrl });
     }
     return (
-        <footer className="relative bg-background pt-32 pb-20 overflow-hidden transition-colors duration-1000">
+        <footer className="relative overflow-hidden bg-background pt-32 pb-20 transition-colors duration-1000 border-t border-border/40">
+            {/* Immersive Deep Sea Background */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.15)_0%,transparent_70%)]" />
+                <div className="absolute inset-0 bg-grid-white/[0.02]" />
+                <div className="absolute inset-0 opacity-40 mix-blend-overlay" />
+            </div>
+
             {/* Artistic Elements */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
             <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-full max-w-4xl h-64 bg-primary/5 rounded-[100%] blur-[120px] pointer-events-none" />

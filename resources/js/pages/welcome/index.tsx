@@ -7,6 +7,8 @@ import AIChatbot from '@/components/app/ai-chatbot';
 import { CalendarPlus } from 'lucide-react';
 import HomeLiveChat from '@/components/app/home-live-chat';
 import GlobalCustomerChat from '@/components/app/global-customer-chat';
+import OceanBubbles from '@/components/app/ocean-bubbles';
+import SmoothScroll from '@/components/app/smooth-scroll';
 
 // Sections
 import BentoFeatures from './sections/bento-features';
@@ -35,22 +37,13 @@ export default function Welcome({
     const mainRef = useRef<HTMLDivElement>(null);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const handleMouseMove = (e: React.MouseEvent) => {
-        if (!mainRef.current) return;
-        const { clientX, clientY } = e;
-        const x = (clientX / window.innerWidth) * 100;
-        const y = (clientY / window.innerHeight) * 100;
-        mainRef.current.style.setProperty('--mouse-x', `${x}%`);
-        mainRef.current.style.setProperty('--mouse-y', `${y}%`);
-    };
-
     return (
         <div 
             ref={mainRef}
             className="group/main relative bg-mesh min-h-screen overflow-x-hidden"
-            onMouseMove={handleMouseMove}
         >
             <div className="grain-overlay" />
+            <OceanBubbles />
             <Head title="Ocean's Resto — Taste the Extraordinary">
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link

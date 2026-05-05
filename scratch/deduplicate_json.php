@@ -1,6 +1,6 @@
 <?php
 
-function deduplicateJson($filePath)
+function deduplicateJson(string $filePath)
 {
     if (! file_exists($filePath)) {
         echo "File not found: $filePath\n";

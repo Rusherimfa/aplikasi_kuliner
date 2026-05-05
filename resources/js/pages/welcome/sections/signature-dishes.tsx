@@ -90,32 +90,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
     const displayDishes = (!bestSellers || bestSellers.length === 0) ? DEFAULT_DISHES : bestSellers;
 
     useGSAP(() => {
-        const validCards = cardsRef.current.filter(Boolean);
-        if (!validCards.length) return;
-
-        // Ensure triggers are calculated correctly after a short delay to account for layout shifts
-        const timeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 500);
-
-        gsap.from(validCards, {
-            y: 80,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 1.2,
-            ease: "power4.out",
-            clearProps: "all", // This fixes elements getting stuck if animation is interrupted
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 75%",
-                toggleActions: "play none none none",
-                invalidateOnRefresh: true,
-                fastScrollEnd: true,
-                preventOverlaps: true
-            }
-        });
-
-        return () => clearTimeout(timeout);
+        // Removed conflicting GSAP scroll trigger for cards to improve performance
     }, { scope: containerRef, dependencies: [displayDishes] });
 
     // CRITICAL FIX: Reset refs array on each render to prevent animating detached DOM nodes!
@@ -141,8 +116,8 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
             </div>
 
             {/* Floating particles orbs */}
-            <div className="absolute top-1/2 left-1/4 h-96 w-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none dark:opacity-30" />
-            <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] bg-sky-500/5 rounded-full blur-[120px] pointer-events-none dark:opacity-20" />
+            <div className="absolute top-1/2 left-1/4 h-96 w-96 bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_10%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none dark:opacity-30" />
+            <div className="absolute bottom-1/4 right-1/4 h-[500px] w-[500px] bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.05)_0%,transparent_70%)] rounded-full pointer-events-none dark:opacity-20" />
             
             {/* Decorative background elements */}
             <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
@@ -220,12 +195,15 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                             displayDishes.map((item: any, index: number) => (
                             <motion.div
                                 key={item.id}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ duration: 1, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
                                 ref={(el) => { if (el) cardsRef.current[index] = el; }}
-                                className="group relative flex flex-col overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] transition-all duration-700 min-w-[85vw] sm:min-w-[400px] md:min-w-0 snap-center border border-black/5 dark:border-white/5 hover:translate-y-[-10px] hover:shadow-[0_40px_80px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_50px_100px_rgba(0,0,0,0.8)]"
+                                whileHover={{ 
+                                    y: -15, 
+                                    scale: 1.02,
+                                    rotateX: 2,
+                                    rotateY: -2,
+                                    transition: { duration: 0.4, ease: "easeOut" }
+                                }}
+                                className="group relative flex flex-col overflow-hidden rounded-2xl bg-card text-card-foreground shadow-[0_20px_50px_rgba(0,0,0,0.05)] dark:shadow-[0_30px_60px_rgba(0,0,0,0.5)] transition-all duration-700 min-w-[85vw] sm:min-w-[400px] md:min-w-0 snap-center border border-border/40 hover:shadow-[0_40px_80px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_50px_100px_rgba(0,0,0,0.8)]"
                             >
                                 {/* Top Image Section */}
                                 <div className="relative aspect-[4/5] sm:aspect-[16/11] overflow-hidden">
@@ -257,7 +235,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 <div className="flex flex-col p-8 sm:p-10 flex-1 relative">
                                     <div className="mb-6">
                                         <div className="flex justify-between items-start gap-4 mb-2">
-                                            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
+                                            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-foreground leading-tight">
                                                 {item.name}
                                             </h3>
                                             <div className="flex shrink-0 items-center gap-1 text-amber-500">
@@ -268,7 +246,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                         <div className="text-xl sm:text-2xl font-bold text-sky-500 italic mb-4">
                                             {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(item.price)}
                                         </div>
-                                        <p className="text-xs sm:text-sm text-slate-500 dark:text-neutral-400 font-medium line-clamp-2 leading-relaxed opacity-80">
+                                        <p className="text-xs sm:text-sm text-muted-foreground font-medium line-clamp-2 leading-relaxed opacity-80">
                                             {item.description || __('A culinary masterpiece crafted with precision.')}
                                         </p>
                                     </div>

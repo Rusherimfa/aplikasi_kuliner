@@ -122,10 +122,6 @@ export default function PhotoGallery() {
                         return (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                whileInView={{ opacity: 1, scale: 1 }}
-                                transition={{ duration: 1.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
-                                viewport={{ once: true }}
                                 className={cn(
                                     "group relative overflow-hidden rounded-2xl glass-elite cursor-pointer border border-black/5 dark:border-white/5",
                                     spans[i] || "md:col-span-1 md:row-span-1"

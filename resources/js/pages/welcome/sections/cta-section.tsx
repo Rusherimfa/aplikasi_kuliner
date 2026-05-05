@@ -42,7 +42,7 @@ export default function CTASection() {
                             whileInView={{ opacity: 1, y: 0 }}
                             className="font-serif text-6xl md:text-8xl lg:text-[10rem] font-light text-foreground leading-[0.85] tracking-tighter mb-12"
                         >
-                            <span className="text-muted-foreground/30 block mb-4">{__('Capturing')}</span>
+                            <span className="text-foreground/40 block mb-4">{__('Capturing')}</span>
                             <span className="italic block">{__('The Ocean')}</span>
                             <span className="font-bold text-primary block">{__('Soul.')}</span>
                         </motion.h2>

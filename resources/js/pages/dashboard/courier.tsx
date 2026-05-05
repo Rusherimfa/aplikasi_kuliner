@@ -20,24 +20,24 @@ export default function CourierDashboard({ stats, deliveries }: any) {
         <>
             <Head title={`${__('Courier Station - Dashboard')} - Ocean's Resto`} />
 
-            <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-20">
-                <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
+            <div className="mx-auto max-w-7xl font-sans text-slate-900 dark:text-white pb-20 px-4 sm:px-6 lg:px-8">
+                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
                     <div>
                         <div className="flex items-center gap-2 mb-3">
                             <span className="h-1 w-8 rounded-full bg-blue-500" />
                             <span className="text-[10px] font-black tracking-[0.3em] text-blue-500/80 uppercase">{__('Delivery Fleet')}</span>
                         </div>
-                        <h1 className="font-['Playfair_Display',serif] text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
+                        <h1 className="font-['Playfair_Display',serif] text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-white">
                             {__('Courier')} <span className="text-slate-400 dark:text-white/40 italic font-serif">{__('Dashboard')}</span>
                         </h1>
-                        <p className="mt-4 text-slate-400 dark:text-white/40 max-w-lg leading-relaxed font-medium">
+                        <p className="mt-4 text-sm md:text-base text-slate-400 dark:text-white/40 max-w-lg leading-relaxed font-medium">
                             {__('Pantau pengiriman aktif Anda, koordinasikan dengan dapur, dan pastikan pesanan sampai tepat waktu.')}
                         </p>
                     </div>
                 </div>
 
                 {/* Courier Stat Cards */}
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
+                <div className="grid gap-4 md:gap-6 grid-cols-2 sm:grid-cols-3 mb-8 md:mb-12">
                     {[
                         { title: __('Pengiriman Aktif'), val: stats.pending_deliveries, icon: Bike, color: 'text-blue-500', bg: 'bg-blue-500/10' },
                         { title: __('Selesai Hari Ini'), val: stats.completed_today, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
@@ -46,23 +46,23 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                         <div 
                             key={idx} 
                             style={{ animationDelay: `${idx * 100}ms` }}
-                            className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both group relative rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 shadow-xl dark:shadow-2xl backdrop-blur-3xl ring-1 ring-slate-100 dark:ring-white/5 transition-all hover:bg-slate-50 dark:hover:bg-white/[0.04]"
+                            className="animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both group relative rounded-3xl md:rounded-[2.5rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-5 md:p-8 shadow-xl dark:shadow-2xl backdrop-blur-3xl ring-1 ring-slate-100 dark:ring-white/5 transition-all hover:bg-slate-50 dark:hover:bg-white/[0.04]"
                         >
                             <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-slate-100 dark:bg-white/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                            <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${card.bg} ${card.color} shadow-lg mb-6 group-hover:scale-110 transition-transform`}>
-                                <card.icon size={26} strokeWidth={2} />
+                            <div className={`flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-2xl ${card.bg} ${card.color} shadow-lg mb-4 md:mb-6 group-hover:scale-110 transition-transform`}>
+                                <card.icon size={20} className="md:w-[26px] md:h-[26px]" strokeWidth={2} />
                             </div>
-                            <p className="text-[10px] font-black tracking-[.2em] text-slate-400 dark:text-white/20 uppercase mb-2">{card.title}</p>
-                            <p className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{card.val}</p>
+                            <p className="text-[9px] md:text-[10px] font-black tracking-[.2em] text-slate-400 dark:text-white/30 uppercase mb-1 md:mb-2 truncate">{card.title}</p>
+                            <p className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tighter">{card.val}</p>
                         </div>
                     ))}
                 </div>
 
-                <div className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-slate-100 dark:ring-white/5">
-                    <div className="p-10 border-b border-slate-100 dark:border-white/5 flex justify-between items-center text-left">
+                <div className="rounded-[2rem] md:rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] shadow-xl dark:shadow-3xl backdrop-blur-3xl flex flex-col ring-1 ring-slate-100 dark:ring-white/5">
+                    <div className="p-5 md:p-10 border-b border-slate-100 dark:border-white/5 flex justify-between items-center text-left">
                         <div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Tugas Pengiriman')}</h2>
-                            <p className="text-[10px] font-bold text-slate-400 dark:text-white/20 uppercase tracking-[0.2em] mt-1">{__('Pesanan yang perlu diantar')}</p>
+                            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white font-['Playfair_Display',serif] tracking-tight">{__('Tugas Pengiriman')}</h2>
+                            <p className="text-[9px] md:text-[10px] font-bold text-slate-400 dark:text-white/30 uppercase tracking-[0.2em] mt-1">{__('Pesanan yang perlu diantar')}</p>
                         </div>
                     </div>
                     
@@ -70,13 +70,13 @@ export default function CourierDashboard({ stats, deliveries }: any) {
                         {deliveries && deliveries.length > 0 ? (
                             <div className="divide-y divide-slate-100 dark:divide-white/5">
                                 {deliveries.map((delivery: any) => (
-                                    <div key={delivery.id} className="p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 hover:bg-slate-50 dark:hover:bg-white/[0.01] transition-colors">
-                                        <div className="flex gap-6 items-start">
-                                            <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-500 shrink-0 border border-blue-500/20">
-                                                <Package size={24} />
+                                    <div key={delivery.id} className="p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6 hover:bg-slate-50 dark:hover:bg-white/[0.01] transition-colors">
+                                        <div className="flex gap-4 md:gap-6 items-start">
+                                            <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-500 shrink-0 border border-blue-500/20">
+                                                <Package size={20} className="md:w-6 md:h-6" />
                                             </div>
                                             <div className="text-left">
-                                                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{delivery.customer_name}</h3>
+                                                <h3 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{delivery.customer_name}</h3>
                                                 <div className="flex items-center gap-4 mt-2">
                                                     <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-white/40 font-bold">
                                                         <MapPin size={14} className="text-blue-600 dark:text-blue-500/60" />

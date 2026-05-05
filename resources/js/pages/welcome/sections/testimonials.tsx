@@ -94,44 +94,16 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
     const cardsArray = useRef<HTMLDivElement[]>([]);
 
     useGSAP(() => {
-        if (!cardsArray.current.length) return;
-
-        // Reset state awal untuk menghindari bug 'kadang tidak muncul'
-        gsap.set(cardsArray.current, { opacity: 1, y: 0, scale: 1 });
-
-        const animation = gsap.from(cardsArray.current, {
-            y: 60,
-            opacity: 0,
-            scale: 0.95,
-            stagger: 0.1,
-            duration: 1.2,
-            ease: "expo.out",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-                toggleActions: "play none none none",
-                onEnter: () => {
-                    ScrollTrigger.refresh();
-                }
-            }
-        });
-
-        const timeout = setTimeout(() => {
-            ScrollTrigger.refresh();
-        }, 1000);
-
-        return () => {
-            clearTimeout(timeout);
-            animation.kill();
-        };
+        // Disabled GSAP scroll animation to fix opacity bugs and improve scroll performance
     }, { scope: containerRef, dependencies: [displayData] });
 
     return (
         <section ref={containerRef} className="relative overflow-hidden bg-background py-32 md:py-48 transition-colors duration-1000">
             {/* Cinematic Background Elements */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
+            {/* Animated Ambient Background */}
+            <div className="absolute -top-24 -left-24 w-96 h-96 bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none" />
+            <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none" />
 
             <div className="relative mx-auto max-w-7xl px-8 md:px-12">
                 {/* Header Section */}
@@ -199,7 +171,7 @@ export default function Testimonials({ testimonials = [], reviews = [], auth }: 
                                     )}
                                 </div>
 
-                                <p className="mb-12 flex-1 font-serif text-lg md:text-xl font-light italic leading-relaxed text-foreground/90 opacity-90 group-hover:opacity-100 transition-opacity">
+                                <p className="mb-12 flex-1 font-serif text-lg md:text-xl font-light italic leading-relaxed text-foreground opacity-90 group-hover:opacity-100 transition-opacity">
                                     "{t.quote}"
                                 </p>
 

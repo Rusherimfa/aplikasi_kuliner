@@ -102,7 +102,7 @@ export default function LocationHours() {
         <section 
             id="location-hours"
             ref={containerRef}
-            className="relative py-12 md:py-20 bg-[#FFF9F2] dark:bg-background transition-colors duration-700 overflow-hidden px-4"
+            className="relative py-12 md:py-20 bg-background transition-colors duration-700 overflow-hidden px-4"
         >
             <style dangerouslySetInnerHTML={{ __html: `
                 .leaflet-container {
@@ -117,7 +117,7 @@ export default function LocationHours() {
             `}} />
 
             {/* Artistic background grain/textures */}
-            <div className="absolute inset-0 premium-noise opacity-[0.03] pointer-events-none" />
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none" />
             
             <div className="mx-auto max-w-7xl px-8 relative z-10">
                 {/* Elite Header */}
@@ -142,19 +142,19 @@ export default function LocationHours() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
-                                       {/* JAM OPERASIONAL CARD */}
+                    {/* JAM OPERASIONAL CARD */}
                     <motion.div 
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-                        className="glass-elite rounded-3xl p-10 sm:p-12 md:p-16 flex flex-col justify-between border border-black/5 dark:border-white/5 relative overflow-hidden group hover:translate-y-[-10px] transition-all duration-700 shadow-4xl"
+                        className="bg-card rounded-3xl p-10 sm:p-12 md:p-16 flex flex-col justify-between border border-border relative overflow-hidden group hover:translate-y-[-10px] transition-all duration-700 shadow-2xl"
                     >
                         {/* Decorative background element */}
-                        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                        <div className="absolute top-0 right-0 w-96 h-96 bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
                         
                         <div className="relative z-10">
                              <div className="flex items-center gap-6 mb-16">
-                                <div className="h-16 w-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 shadow-2xl group-hover:rotate-12 transition-transform duration-700 border border-primary/20">
+                                <div className="h-16 w-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0 shadow-xl group-hover:rotate-12 transition-transform duration-700 border border-primary/20">
                                      <Clock size={32} strokeWidth={1} />
                                  </div>
                                  <div className="flex flex-col">
@@ -223,7 +223,7 @@ export default function LocationHours() {
                         <div className="relative flex-1 min-h-[400px] rounded-2xl overflow-hidden group/map border border-black/5 dark:border-white/5 shadow-2xl">
                             <div 
                                 ref={mapContainerRef} 
-                                className="absolute inset-0 z-0 h-full w-full grayscale-[0.5] group-hover/map:grayscale-0 transition-all duration-[2s]"
+                                className="absolute inset-0 z-0 h-full w-full"
                             />
                             
                             <div className="absolute top-10 right-10 z-10">

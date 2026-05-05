@@ -14,7 +14,7 @@ test('customer can send a reservation chat message to staff', function () {
 
     Event::fake();
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->postJson(route('chat.store', $reservation), [
             'content' => 'Butuh bantuan staff untuk reservasi saya.',
         ])
@@ -38,7 +38,7 @@ test('staff can reply to a customer reservation chat', function () {
 
     Event::fake();
 
-    $this->actingAs($staff)
+    actingAs($staff)
         ->postJson(route('chat.store', $reservation), [
             'content' => 'Siap, staff akan bantu sekarang.',
         ])
@@ -58,7 +58,7 @@ test('assigned courier can reply to a customer chat', function () {
 
     Event::fake();
 
-    $this->actingAs($courier)
+    actingAs($courier)
         ->postJson(route('chat.store', $reservation), [
             'content' => 'Kurir sudah menuju lokasi.',
         ])
@@ -79,7 +79,7 @@ test('unassigned courier cannot access another customer chat', function () {
 
     Event::fake();
 
-    $this->actingAs($otherCourier)
+    actingAs($otherCourier)
         ->postJson(route('chat.store', $reservation), [
             'content' => 'Saya tidak boleh masuk chat ini.',
         ])
@@ -102,7 +102,7 @@ test('chat threads expose customer staff and courier conversations for home', fu
         'is_chatbot' => false,
     ]);
 
-    $this->actingAs($customer)
+    actingAs($customer)
         ->getJson(route('chat.threads'))
         ->assertSuccessful()
         ->assertJsonPath('threads.0.type', 'reservations')

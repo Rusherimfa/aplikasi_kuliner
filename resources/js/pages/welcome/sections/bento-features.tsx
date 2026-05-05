@@ -61,8 +61,8 @@ export default function BentoFeatures() {
         <section className="relative py-32 md:py-48 px-4 sm:px-6 lg:px-8 overflow-hidden transition-colors duration-1000 bg-background">
             {/* Cinematic Background Elements */}
             <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <div className="absolute top-1/4 -right-48 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
-            <div className="absolute bottom-1/4 -left-48 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[150px] pointer-events-none" />
+            <div className="absolute top-1/4 -right-48 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none" />
+            <div className="absolute bottom-1/4 -left-48 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,color-mix(in_oklch,var(--primary)_5%,transparent)_0%,transparent_70%)] rounded-full pointer-events-none" />
 
             <div className="max-w-7xl mx-auto">
                 {/* Elite Header */}
@@ -104,16 +104,16 @@ export default function BentoFeatures() {
                         return (
                             <motion.div
                                 key={feature.subtitle}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{ delay: idx * 0.1, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-                                viewport={{ once: true }}
                                 className={cn(
                                     "group relative overflow-hidden rounded-2xl p-4 sm:p-6 md:p-10 flex flex-col justify-end transition-all duration-700 min-h-[200px] sm:min-h-[240px] md:min-h-0 glass-elite",
                                     feature.className,
                                     idx === 4 && "col-span-2 md:col-span-2"
                                 )}
                             >
+                                {/* Dynamic Glass Reflection */}
+                                <div className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                                    <div className="absolute inset-[-50%] bg-[radial-gradient(circle_at_var(--mouse-x)_var(--mouse-y),rgba(255,255,255,0.15)_0%,transparent_50%)]" />
+                                </div>
                                 {/* Immersive Background */}
                                 <div className="absolute inset-0 z-0">
                                     <motion.div 
@@ -141,10 +141,10 @@ export default function BentoFeatures() {
                                     <span className="text-[8px] md:text-[10px] font-black tracking-[0.5em] uppercase block mb-2 md:mb-4 text-primary">
                                         {feature.title}
                                     </span>
-                                    <h3 className="font-serif text-lg sm:text-xl md:text-4xl font-light mb-2 md:mb-6 leading-tight text-slate-900 dark:text-white italic transition-colors">
+                                    <h3 className="font-serif text-lg sm:text-xl md:text-4xl font-light mb-2 md:mb-6 leading-tight text-foreground italic transition-colors">
                                         {feature.subtitle}
                                     </h3>
-                                    <p className="text-xs md:text-base leading-relaxed max-w-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors duration-500 line-clamp-2 md:line-clamp-none">
+                                    <p className="text-xs md:text-base leading-relaxed max-w-sm text-muted-foreground group-hover:text-foreground transition-colors duration-500 line-clamp-2 md:line-clamp-none">
                                         {feature.description}
                                     </p>
                                 </div>

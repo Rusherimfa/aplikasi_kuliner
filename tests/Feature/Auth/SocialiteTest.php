@@ -1,6 +1,6 @@
 <?php
 
-/** @var TestCase $this */
+/** @var \Tests\TestCase $this */
 
 use App\Models\User;
 use Laravel\Socialite\Facades\Socialite;

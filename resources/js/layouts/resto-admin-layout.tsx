@@ -10,8 +10,10 @@ import {
     ChevronRight,
     Users,
     MessageSquare,
+    Menu,
+    X,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useTranslations } from '@/hooks/use-translations';
 import NotificationDropdown from '@/components/app/notification-dropdown';
@@ -23,6 +25,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
     const { auth = { user: null } } = usePage().props as any;
     const { url } = usePage();
     const { __ } = useTranslations();
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     useEffect(() => {
         if (auth.user) {
@@ -121,8 +124,16 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                 />
             </div>
 
+            {/* Mobile Sidebar Overlay */}
+            {sidebarOpen && (
+                <div 
+                    className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                />
+            )}
+
             {/* Floating Glass Sidebar */}
-            <aside className="fixed inset-y-4 left-4 z-50 flex w-72 flex-col rounded-[2.5rem] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-2xl lg:translate-x-0 transition-transform duration-500">
+            <aside className={`fixed inset-y-4 left-4 z-50 flex w-72 flex-col rounded-[2.5rem] border border-white/10 bg-black/40 backdrop-blur-3xl shadow-2xl transition-transform duration-500 ${sidebarOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)] lg:translate-x-0'}`}>
                 {/* Logo Area */}
                 <div className="flex h-24 items-center gap-4 px-8 border-b border-white/5">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 shadow-xl shadow-sky-900/40 transform -rotate-3 transition-transform hover:rotate-0">
@@ -157,6 +168,7 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                                 <Link
                                     key={item.title}
                                     href={item.href}
+                                    onClick={() => setSidebarOpen(false)}
                                     className={`group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold transition-all duration-500 ${
                                         isActive
                                             ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20'
@@ -199,11 +211,19 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex flex-1 flex-col pl-80 relative z-10 w-full min-h-screen">
+            <main className="flex flex-1 flex-col lg:pl-80 relative z-10 w-full min-h-screen">
                 {/* Modern Header */}
-                <header className="sticky top-4 z-40 flex h-20 items-center justify-end px-10">
-                    <div className="flex items-center gap-3 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-2 pr-6 shadow-2xl">
-                        <div className="flex items-center gap-1 px-2">
+                <header className="sticky top-4 z-40 flex h-20 items-center justify-between lg:justify-end px-4 sm:px-6 lg:px-10">
+                    {/* Mobile Menu Button */}
+                    <button 
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        className="lg:hidden flex h-11 w-11 items-center justify-center rounded-2xl bg-black/40 backdrop-blur-3xl border border-white/10 text-white/60 hover:text-white transition-colors shadow-xl"
+                    >
+                        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                    </button>
+
+                    <div className="flex items-center gap-2 md:gap-3 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-1.5 md:p-2 pr-4 md:pr-6 shadow-2xl">
+                        <div className="flex items-center gap-1 px-1 md:px-2">
                             <ThemeSwitcher />
                             <LanguageSwitcher />
                         </div>
@@ -212,22 +232,30 @@ export default function RestoAdminLayout({ children }: { children: React.ReactNo
                         
                         <NotificationDropdown />
                         
-                        <div className="h-6 w-px bg-white/10" />
+                        <div className="h-6 w-px bg-white/10 hidden sm:block" />
 
                         <Link
                             href="/logout"
                             method="post"
                             as="button"
-                            className="flex h-11 items-center gap-2.5 rounded-xl bg-white/5 px-6 text-xs font-black tracking-widest uppercase text-white/60 transition-all hover:bg-rose-500/20 hover:text-rose-500 border border-white/5"
+                            className="hidden sm:flex h-11 items-center gap-2.5 rounded-xl bg-white/5 px-4 md:px-6 text-xs font-black tracking-widest uppercase text-white/60 transition-all hover:bg-rose-500/20 hover:text-rose-500 border border-white/5"
                         >
                             <LogOut size={14} strokeWidth={2.5} />
-                            {__('Sign Out')}
+                            <span className="hidden md:inline">{__('Sign Out')}</span>
+                        </Link>
+                        <Link
+                            href="/logout"
+                            method="post"
+                            as="button"
+                            className="sm:hidden flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-white/60 hover:bg-rose-500/20 hover:text-rose-500 border border-white/5"
+                        >
+                            <LogOut size={14} strokeWidth={2.5} />
                         </Link>
                     </div>
                 </header>
 
                 {/* Page Content */}
-                <div className="relative z-20 w-full px-10 py-10">
+                <div className="relative z-20 w-full px-4 sm:px-6 lg:px-10 py-6 md:py-10">
                     {children}
                 </div>
             </main>

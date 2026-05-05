@@ -1,5 +1,5 @@
 import { Link, usePage, router } from '@inertiajs/react';
-import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote, ShoppingBag, User, LayoutDashboard, History, MessageSquare } from 'lucide-react';
+import { UtensilsCrossed, Menu as MenuIcon, X, Home, BookOpen, CalendarPlus, ChevronRight, Moon, Sun, LogOut, Quote, ShoppingBag, User, LayoutDashboard, History, MessageSquare, Languages } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -112,8 +112,6 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                                 : (scrolled ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.6)'),
                         backdropFilter: !mounted || scrolled ? 'blur(24px)' : 'blur(16px)',
                         borderRadius: scrolled ? '2rem' : '9999px',
-                        paddingLeft: scrolled ? '2rem' : '3.5rem',
-                        paddingRight: scrolled ? '2rem' : '3.5rem',
                         width: scrolled ? '95%' : '100%',
                         maxWidth: scrolled ? '1200px' : '1350px',
                     }}
@@ -141,7 +139,7 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                         </svg>
                     </div>
  
-                    <div className="flex flex-1 items-center justify-between px-6 md:px-10 relative z-10">
+                    <div className="flex flex-1 items-center justify-between px-4 sm:px-6 md:px-10 relative z-10 w-full">
                         {/* Logo Section */}
                         <div ref={magneticLogoRef as any}>
                             <Link 
@@ -256,42 +254,45 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                             </div>
 
                             <div className="flex items-center gap-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10">
-                                            <span className="text-[10px] font-black uppercase">{locale}</span>
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-40 mt-4 glass-card border-white/10 backdrop-blur-3xl p-2">
-                                        <DropdownMenuItem 
-                                            onClick={() => router.post(localeHelper.update.url(), { locale: 'id' })}
-                                            className={cn("rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest", locale === 'id' && "bg-primary text-primary-foreground")}
-                                        >
-                                            Bahasa Indonesia
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem 
-                                            onClick={() => router.post(localeHelper.update.url(), { locale: 'en' })}
-                                            className={cn("rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest", locale === 'en' && "bg-primary text-primary-foreground")}
-                                        >
-                                            English (US)
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                {/* Desktop Language & Theme Switchers */}
+                                <div className="hidden md:flex items-center gap-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10">
+                                                <span className="text-[10px] font-black uppercase">{locale}</span>
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-40 mt-4 glass-card border-white/10 backdrop-blur-3xl p-2">
+                                            <DropdownMenuItem 
+                                                onClick={() => router.post(localeHelper.update.url(), { locale: 'id' })}
+                                                className={cn("rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest", locale === 'id' && "bg-primary text-primary-foreground")}
+                                            >
+                                                Bahasa Indonesia
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem 
+                                                onClick={() => router.post(localeHelper.update.url(), { locale: 'en' })}
+                                                className={cn("rounded-xl px-3 py-2 text-[11px] font-bold uppercase tracking-widest", locale === 'en' && "bg-primary text-primary-foreground")}
+                                            >
+                                                English (US)
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
 
-                                <div ref={magneticThemeRef as any}>
-                                    <button
-                                        onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
-                                        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
-                                    >
-                                        {mounted ? (
-                                            resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />
-                                        ) : (
-                                            <Moon size={18} />
-                                        )}
-                                    </button>
+                                    <div ref={magneticThemeRef as any}>
+                                        <button
+                                            onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
+                                            className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
+                                        >
+                                            {mounted ? (
+                                                resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />
+                                            ) : (
+                                                <Moon size={18} />
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
-                                
-                                <div ref={magneticCartRef as any}>
+
+                                <div ref={magneticCartRef as any} className="hidden md:block">
                                     <button
                                         onClick={() => setCartOpen(true)}
                                         className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-105"
@@ -307,13 +308,25 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
 
                                 {/* Mobile Actions */}
                                 <div className="md:hidden flex items-center gap-2">
-                                    {auth.user && <NotificationDropdown />}
+                                    <div ref={magneticThemeRef as any}>
+                                        <button
+                                            onClick={() => updateAppearance(resolvedAppearance === 'dark' ? 'light' : 'dark')}
+                                            className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
+                                        >
+                                            {mounted ? (
+                                                resolvedAppearance === 'dark' ? <Sun size={18} /> : <Moon size={18} />
+                                            ) : (
+                                                <Moon size={18} />
+                                            )}
+                                        </button>
+                                    </div>
                                     <button
-                                        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 dark:bg-white/5 active:scale-95"
                                         onClick={() => setMobileMenuOpen(true)}
+                                        className="flex h-10 w-10 items-center justify-center rounded-full transition-colors bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10"
                                     >
-                                        <MenuIcon size={20} />
+                                        <MenuIcon size={18} />
                                     </button>
+                                    {auth.user && <NotificationDropdown />}
                                 </div>
                             </div>
                         </div>
@@ -321,148 +334,200 @@ export default function Navbar({ auth, dashboardUrl, mobileMenuOpen, setMobileMe
                 </motion.nav>
             </header>
 
-            {/* Mobile Bottom Nav */}
-            {!mobileMenuOpen && (
-                <div className="fixed bottom-6 left-4 right-4 z-[60] md:hidden">
-                    <nav className="mx-auto flex h-16 max-w-sm items-center justify-around rounded-full border border-black/10 dark:border-white/10 bg-background/80 backdrop-blur-2xl px-6 shadow-2xl transition-all duration-500 transition-colors">
-                        {[
-                            { href: '/', icon: Home },
-                            { href: '/catalog', icon: BookOpen },
-                            { icon: ShoppingBag, onClick: () => setCartOpen(true), count: cartCount },
-                            { href: '/reservations/create', icon: CalendarPlus }
-                        ].map((item, i) => (
-                            item.href ? (
-                                <Link key={i} href={item.href} className={`relative p-3 rounded-full transition-all duration-300 active:scale-90 ${isActive(item.href) ? 'text-primary bg-primary/10 shadow-sm' : 'text-foreground/60 hover:text-foreground'}`}>
-                                    <item.icon size={22} className={isActive(item.href) ? 'stroke-[2.5px]' : 'stroke-[1.5px]'} />
-                                    {isActive(item.href) && (
-                                        <motion.span layoutId="bottomNavDot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
-                                    )}
-                                </Link>
-                            ) : (
-                                <button key={i} onClick={item.onClick} className="relative p-3 text-foreground/60 active:scale-90 transition-transform">
-                                    <item.icon size={22} className="stroke-[1.5px]" />
+            {/* Mobile App-Style Bottom Nav */}
+            <div className="fixed bottom-6 left-4 right-4 z-[60] md:hidden">
+                <nav className="flex h-16 w-full items-center justify-around rounded-full border border-black/5 dark:border-white/10 bg-background/80 backdrop-blur-3xl px-2 shadow-2xl">
+                    {[
+                        { href: '/', icon: Home, label: __('Home') },
+                        { href: '/catalog', icon: BookOpen, label: __('Menu') },
+                        { icon: ShoppingBag, onClick: () => setCartOpen(true), count: cartCount, label: __('Cart') },
+                        { href: '/reservations/create', icon: CalendarPlus, label: __('Reserve') },
+                        { href: auth?.user ? '/settings/profile' : login().url, icon: User, label: auth?.user ? __('Profile') : __('Login') }
+                    ].map((item, i) => {
+                        const active = item.href ? isActive(item.href) : false;
+                        return item.href ? (
+                            <Link key={i} href={item.href} className="relative flex flex-col items-center justify-center w-14 h-full transition-all group">
+                                {active && (
+                                    <motion.div 
+                                        layoutId="bottom-nav-active"
+                                        className="absolute inset-y-1 inset-x-0 rounded-full bg-primary/10 dark:bg-primary/20"
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    />
+                                )}
+                                <item.icon size={20} className={cn("relative z-10 transition-colors", active ? 'stroke-[2.5px] text-primary' : 'stroke-[1.5px] text-muted-foreground group-hover:text-foreground')} />
+                                <span className={cn("relative z-10 text-[8px] mt-1 font-bold tracking-wider uppercase transition-colors", active ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground')}>
+                                    {item.label}
+                                </span>
+                            </Link>
+                        ) : (
+                            <button key={i} onClick={item.onClick} className="relative flex flex-col items-center justify-center w-14 h-full transition-all group">
+                                <div className="relative z-10">
+                                    <item.icon size={20} className="stroke-[1.5px] text-muted-foreground group-hover:text-foreground transition-colors" />
                                     {mounted && item.count ? (
-                                        <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] font-black text-primary-foreground border-2 border-background shadow-sm">
+                                        <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[8px] font-black text-primary-foreground border-2 border-background shadow-sm">
                                             {item.count}
                                         </span>
                                     ) : null}
-                                </button>
-                            )
-                        ))}
-                    </nav>
-                </div>
-            )}
+                                </div>
+                                <span className="relative z-10 text-[8px] mt-1 font-bold tracking-wider uppercase text-muted-foreground group-hover:text-foreground transition-colors">
+                                    {item.label}
+                                </span>
+                            </button>
+                        )
+                    })}
+                </nav>
+            </div>
 
-            {/* Full-screen Mobile Menu */}
+            <CartDrawer />
+
+            {/* Mobile Menu Overlay */}
             <AnimatePresence>
                 {mobileMenuOpen && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: '100%' }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: '100%' }}
-                        transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed inset-0 z-[100] bg-background/98 backdrop-blur-3xl p-6 md:hidden flex flex-col"
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+                        transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+                        className="fixed inset-0 z-[70] bg-background/95 backdrop-blur-3xl md:hidden p-6 flex flex-col pt-16 overflow-y-auto"
                     >
-                        <div className="flex items-center justify-between mb-12">
-                             <div className="flex h-10 w-10 items-center justify-center rounded-full overflow-hidden bg-black/5 dark:bg-white/10 p-0.5">
-                                <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-full" />
-                             </div>
-                             <button onClick={() => setMobileMenuOpen(false)} className="h-12 w-12 flex items-center justify-center rounded-full bg-black/5 dark:bg-white/5 cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
-                                <X size={24} />
-                             </button>
-                        </div>
+                        <button 
+                            onClick={() => setMobileMenuOpen(false)}
+                            className="absolute top-6 right-6 p-3 bg-black/5 dark:bg-white/5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors z-10"
+                        >
+                            <X size={20} />
+                        </button>
                         
-                        <div className="flex flex-col gap-4 overflow-y-auto pb-32">
-                            {mobileMenuLinks.map((link, idx) => (
-                                <motion.div
-                                    key={idx}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 + idx * 0.05 }}
-                                >
-                                    <Link 
-                                        href={link.href} 
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="group flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-6 transition-colors"
-                                    >
-                                        <div className="flex flex-col">
-                                            <span className={`text-4xl font-serif ${isActive(link.href) ? 'text-primary italic' : 'text-foreground'}`}>{link.label}</span>
-                                            <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">{link.subtitle}</span>
-                                        </div>
-                                        <ChevronRight size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
-                                    </Link>
-                                </motion.div>
-                            ))}
+                        <motion.div 
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="flex items-center gap-4 mb-8"
+                        >
+                            <div className="flex h-14 w-14 items-center justify-center rounded-full overflow-hidden p-0.5 shadow-md bg-gradient-to-br from-black/10 to-transparent dark:from-white/20 dark:to-transparent">
+                                <img src="/logo.png" alt="Ocean's Resto" className="h-full w-full object-cover rounded-full" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-black tracking-widest uppercase text-foreground">Ocean's Resto</h2>
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-[0.2em] mt-0.5">Taste the Extraordinary</p>
+                            </div>
+                        </motion.div>
 
-                            {/* Profile & Logout for Mobile */}
-                            {auth.user && (
-                                <div className="mt-4 flex flex-col gap-4">
-                                    {[
-                                        { href: "/settings/profile", label: __("My Profile"), subtitle: __("Account settings & avatar"), icon: User },
-                                        ...(auth.user.role === 'customer' ? [
-                                            { href: "/reservations/history", label: __("Reservation History"), subtitle: __("Book your table"), icon: CalendarPlus },
-                                            { href: "/orders/history", label: __("Order History"), subtitle: __("Explore flavors"), icon: ShoppingBag }
-                                        ] : [
-                                            { href: dashboardUrl, label: __("Dashboard Panel"), subtitle: __("Behind the scenes"), icon: LayoutDashboard }
-                                        ])
-                                    ].map((item, idx) => (
-                                        <motion.div
-                                            key={`auth-${idx}`}
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.4 + idx * 0.05 }}
+                        <div className="flex flex-col gap-4 mt-2">
+                            {mobileMenuLinks.map((link, i) => {
+                                const active = isActive(link.href);
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.08, duration: 0.4 }}
+                                    >
+                                        <Link 
+                                            href={link.href}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className={cn(
+                                                "group flex items-center gap-5 p-4 rounded-3xl border transition-all duration-300",
+                                                active 
+                                                    ? "bg-primary/10 border-primary/30 shadow-[0_10px_40px_-15px_rgba(var(--color-primary),0.3)]" 
+                                                    : "bg-black/5 border-white/10 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 shadow-sm"
+                                            )}
                                         >
-                                            <Link 
-                                                href={item.href} 
-                                                onClick={() => setMobileMenuOpen(false)}
-                                                className="group flex items-center justify-between border-b border-white/5 pb-6"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="text-4xl font-serif text-foreground">{item.label}</span>
-                                                    <span className="text-xs text-muted-foreground uppercase tracking-widest mt-1">{item.subtitle}</span>
-                                                </div>
-                                                <item.icon size={20} className="text-primary/40 group-hover:translate-x-2 transition-transform" />
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-
-                                    <motion.button 
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: 0.6 }}
-                                        onClick={() => {
-                                            setMobileMenuOpen(false);
-                                            router.post('/logout');
-                                        }}
-                                        className="group flex items-center justify-between border-b border-white/5 pb-6 text-rose-500 cursor-pointer"
-                                    >
-                                        <div className="flex flex-col text-left">
-                                            <span className="text-4xl font-serif">{__('End Session')}</span>
-                                            <span className="text-xs opacity-50 uppercase tracking-widest mt-1">{__('Complete your visit')}</span>
-                                        </div>
-                                        <LogOut size={20} className="opacity-40 group-hover:translate-x-2 transition-transform" />
-                                    </motion.button>
-                                </div>
-                            )}
+                                            <div className={cn(
+                                                "flex items-center justify-center h-12 w-12 rounded-2xl transition-all duration-300 shadow-inner",
+                                                active 
+                                                    ? "bg-gradient-to-br from-primary to-primary/80 text-primary-foreground shadow-primary/40" 
+                                                    : "bg-white dark:bg-black/50 text-foreground group-hover:scale-105"
+                                            )}>
+                                                <link.icon size={22} className={active ? "stroke-[2.5px]" : "stroke-[1.5px]"} />
+                                            </div>
+                                            <div className="flex flex-col flex-1">
+                                                <h3 className={cn(
+                                                    "text-lg font-bold tracking-wide transition-colors",
+                                                    active ? "text-primary" : "text-foreground group-hover:text-primary"
+                                                )}>
+                                                    {link.label}
+                                                </h3>
+                                                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-widest mt-0.5">
+                                                    {link.subtitle}
+                                                </p>
+                                            </div>
+                                            {active && (
+                                                <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--color-primary),0.8)] mr-2" />
+                                            )}
+                                        </Link>
+                                    </motion.div>
+                                )
+                            })}
                         </div>
 
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.7 }}
-                            className="absolute bottom-12 left-6 right-6"
+                            transition={{ delay: 0.4, duration: 0.4 }}
+                            className="mt-8 pb-32 flex flex-col gap-4"
                         >
-                            <Link href="/reservations/create" onClick={() => setMobileMenuOpen(false)}>
-                                <Button className="w-full h-18 rounded-[2rem] bg-primary text-primary-foreground font-black uppercase tracking-[0.3em] overflow-hidden group">
-                                   {__('Reserve a Table Now')}
-                                </Button>
-                            </Link>
+                             {/* Language toggle */}
+                             <button 
+                                onClick={() => {
+                                    router.post(localeHelper.update.url(), { locale: locale === 'id' ? 'en' : 'id' });
+                                    setMobileMenuOpen(false);
+                                }}
+                                className="group flex items-center justify-between p-5 rounded-3xl bg-black/5 dark:bg-white/5 border border-white/10 hover:bg-black/10 dark:hover:bg-white/10 shadow-sm transition-all"
+                             >
+                                <div className="flex items-center gap-4">
+                                    <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-white dark:bg-black/50 text-foreground group-hover:scale-105 transition-transform shadow-inner">
+                                        <Languages size={18} className="stroke-[1.5px]" />
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="font-bold text-sm text-foreground">{__('Language')}</h3>
+                                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mt-0.5">
+                                            {locale === 'id' ? 'Bahasa Indonesia' : 'English (US)'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-primary px-3 py-1.5 rounded-full bg-primary/10">
+                                    {__('Change')}
+                                </span>
+                             </button>
+
+                             {auth?.user ? (
+                                <button 
+                                    onClick={() => router.post('/logout')}
+                                    className="group flex items-center justify-between p-5 rounded-3xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:bg-rose-500/20 shadow-sm transition-all"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-rose-500/20 group-hover:scale-105 transition-transform">
+                                            <LogOut size={18} className="stroke-[2px]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="font-bold text-sm">{__('End Session')}</h3>
+                                            <p className="text-[10px] uppercase tracking-wider opacity-70 mt-0.5">
+                                                {auth.user.email}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </button>
+                             ) : (
+                                <Link 
+                                    href={login().url}
+                                    className="group flex items-center justify-between p-5 rounded-3xl bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 shadow-sm transition-all"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-primary/20 group-hover:scale-105 transition-transform">
+                                            <User size={18} className="stroke-[2px]" />
+                                        </div>
+                                        <div className="text-left">
+                                            <h3 className="font-bold text-sm">{__('Login')}</h3>
+                                            <p className="text-[10px] uppercase tracking-wider opacity-70 mt-0.5">
+                                                {__('Access your account')}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </Link>
+                             )}
                         </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            <CartDrawer />
         </>
     );
 }
