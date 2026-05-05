@@ -8,6 +8,7 @@ use App\Enums\Role;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -29,6 +30,13 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasTeams, Notifiable, TwoFactorAuthenticatable;
+
+    protected function avatar(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $this->normalizeAvatarUrl($value),
+        );
+    }
 
     public function generateOTP(): string
     {
@@ -84,5 +92,32 @@ class User extends Authenticatable
     public function isCustomer(): bool
     {
         return $this->role === Role::CUSTOMER;
+    }
+
+    protected function normalizeAvatarUrl(?string $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        $path = parse_url($value, PHP_URL_PATH);
+        $host = parse_url($value, PHP_URL_HOST);
+
+        if (! is_string($path) || ! str_starts_with($path, '/storage/')) {
+            return $value;
+        }
+
+        $appHost = parse_url((string) config('app.url'), PHP_URL_HOST);
+        $localHosts = array_filter([
+            $appHost,
+            'localhost',
+            '127.0.0.1',
+        ]);
+
+        if ($host === null || in_array($host, $localHosts, true)) {
+            return $path;
+        }
+
+        return $value;
     }
 }

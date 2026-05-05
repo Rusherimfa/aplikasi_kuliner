@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
+import { buildAvatarUrl } from '@/lib/utils';
 import type { Team, User } from '@/types';
 
 export function UserInfo({
@@ -12,16 +13,19 @@ export function UserInfo({
     team?: Team | null;
 }) {
     const getInitials = useInitials();
+
     if (!user) {
         return null;
     }
-    const showAvatar = Boolean(user.avatar && user.avatar !== '');
+
+    const avatarUrl = buildAvatarUrl(user.avatar, user.updated_at);
+    const showAvatar = Boolean(avatarUrl);
 
     return (
         <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-lg">
                 {showAvatar ? (
-                    <AvatarImage src={user.avatar} alt={user.name} />
+                    <AvatarImage key={avatarUrl} src={avatarUrl} alt={user.name} />
                 ) : null}
                 <AvatarFallback className="rounded-lg text-black dark:text-white">
                     {getInitials(user.name)}

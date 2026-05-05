@@ -1,12 +1,12 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Menu, Search, Languages } from 'lucide-react';
-import { LanguageSwitcher } from '@/components/language-switcher';
-import { ThemeSwitcher } from '@/components/theme-switcher';
+import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from '@/components/app/app-logo';
 import AppLogoIcon from '@/components/app/app-logo-icon';
 import { Breadcrumbs } from '@/components/app/breadcrumbs';
 import { UserMenuContent } from '@/components/app/user-menu-content';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { TeamSwitcher } from '@/components/teams/team-switcher';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -35,7 +35,7 @@ import {
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { useTranslations } from '@/hooks/use-translations';
-import { cn, toUrl } from '@/lib/utils';
+import { buildAvatarUrl, cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -48,10 +48,11 @@ const activeItemStyles =
 
 export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage();
-    const { auth, currentTeam } = page.props as any;
+    const { auth } = page.props as any;
     const getInitials = useInitials();
     const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
     const { __ } = useTranslations();
+    const avatarUrl = buildAvatarUrl(auth.user.avatar, auth.user.updated_at);
     const dashboardUrl = page.props.currentTeam
         ? (dashboard((page.props.currentTeam as any).slug) as any).url()
         : '/';
@@ -224,7 +225,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                 >
                                     <Avatar className="size-8 overflow-hidden rounded-full">
                                         <AvatarImage
-                                            src={auth.user.avatar}
+                                            key={avatarUrl}
+                                            src={avatarUrl}
                                             alt={auth.user.name}
                                         />
                                         <AvatarFallback className="rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">

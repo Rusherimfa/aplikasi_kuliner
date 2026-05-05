@@ -1,14 +1,16 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
-import TextLink from '@/components/text-link';
+import { useState } from 'react';
+import { LogoutConfirmationDialog } from '@/components/app/logout-confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { logout } from '@/routes';
-import { send } from '@/routes/verification';
 import { useTranslations } from '@/hooks/use-translations';
+import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { __ } = useTranslations();
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
+
     return (
         <>
             <Head title={__('Email verification')} />
@@ -27,15 +29,21 @@ export default function VerifyEmail({ status }: { status?: string }) {
                             {__('Resend verification email')}
                         </Button>
 
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
+                        <button
+                            type="button"
+                            onClick={() => setLogoutDialogOpen(true)}
+                            className="mx-auto block text-sm underline underline-offset-4 transition-colors hover:text-foreground"
                         >
                             {__('Log out')}
-                        </TextLink>
+                        </button>
                     </>
                 )}
             </Form>
+
+            <LogoutConfirmationDialog
+                open={logoutDialogOpen}
+                onOpenChange={setLogoutDialogOpen}
+            />
         </>
     );
 }

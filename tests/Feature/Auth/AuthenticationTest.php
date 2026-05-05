@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 use Laravel\Fortify\Features;
 
 test('login screen can be rendered', function () {
@@ -84,4 +85,11 @@ test('users are rate limited', function () {
     ]);
 
     $response->assertTooManyRequests();
+});
+
+test('login screen can be rendered when notifications table is missing', function () {
+    Schema::dropIfExists('notifications');
+
+    get(route('login'))
+        ->assertOk();
 });
