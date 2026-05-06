@@ -1,13 +1,19 @@
 import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame, Image as ImageIcon, Camera, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
-import { useTranslations } from '@/hooks/use-translations';
-import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Plus, Search, BookOpen, Edit2, Trash2, X, Check, EyeOff, Flame, Image as ImageIcon, Camera } from 'lucide-react';
+import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -16,6 +22,9 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import { useTranslations } from '@/hooks/use-translations';
+import RestoAdminLayout from '@/layouts/resto-admin-layout';
 
 export default function MenuManagement({ menus, filters }: any) {
     const { auth } = usePage().props as any;
@@ -24,8 +33,9 @@ export default function MenuManagement({ menus, filters }: any) {
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMenu, setEditingMenu] = useState<any>(null);
+    const [menuToDelete, setMenuToDelete] = useState<any>(null);
 
-    const { data, setData, post, put, delete: destroy, reset, processing, errors, clearErrors } = useForm({
+    const { data, setData, post, delete: destroy, reset, processing, errors, clearErrors } = useForm({
         name: '',
         description: '',
         category: '',
@@ -73,13 +83,23 @@ export default function MenuManagement({ menus, filters }: any) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
         if (editingMenu) {
             post(`/menus/${editingMenu.id}`, {
-                onSuccess: () => setIsModalOpen(false),
+                onSuccess: () => {
+                    setIsModalOpen(false);
+
+                    toast.success(__('Menu updated successfully'));
+                },
             });
         } else {
             post('/menus', {
-                onSuccess: () => setIsModalOpen(false),
+                onSuccess: () => {
+                    setIsModalOpen(false);
+                    toast.success(__('Menu added successfully'), {
+                        description: __('The new menu is now visible in the menu catalog.'),
+                    });
+                },
             });
         }
     };
@@ -92,9 +112,26 @@ export default function MenuManagement({ menus, filters }: any) {
     };
 
     const handleDelete = (id: number) => {
-        if (confirm(__('Yakin ingin menghapus menu ini?'))) {
-            destroy(`/menus/${id}`);
+        const selectedMenu = menus.find((menu: any) => menu.id === id);
+
+        setMenuToDelete(selectedMenu ?? null);
+    };
+
+    const confirmDeleteMenu = () => {
+        if (!menuToDelete) {
+            return;
         }
+
+        destroy(`/menus/${menuToDelete.id}`, {
+            onSuccess: () => {
+                toast.success(__('Menu deleted successfully'), {
+                    description: menuToDelete?.name
+                        ? `${menuToDelete.name} ${__('has been removed from the menu catalog.')}`
+                        : __('The menu item has been removed from the menu catalog.'),
+                });
+                setMenuToDelete(null);
+            },
+        });
     };
 
     const formatRupiah = (amount: any) => {
@@ -333,6 +370,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                 accept="image/*"
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0];
+
                                                     if (file) {
                                                         setData('image', file);
                                                         const reader = new FileReader();
@@ -374,7 +412,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                 </div>
                             </div>
 
-                              <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
+                            <div className="mt-8 flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-border">
                                 <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-slate-400 dark:text-muted-foreground hover:text-slate-900 dark:hover:text-foreground hover:bg-slate-100 dark:hover:bg-muted">
                                     {__('Batal')}
                                 </Button>
@@ -386,9 +424,69 @@ export default function MenuManagement({ menus, filters }: any) {
                     </div>
                 </div>
             )}
+
+            <Dialog
+                open={Boolean(menuToDelete)}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setMenuToDelete(null);
+                    }
+                }}
+            >
+                <DialogContent className="max-w-md rounded-[2rem] border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-950/95 p-0 shadow-2xl backdrop-blur-2xl overflow-hidden">
+                    <div className="border-b border-slate-100 px-6 py-5 dark:border-white/10">
+                        <DialogHeader className="space-y-4 text-left">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500 ring-1 ring-rose-500/20">
+                                <TriangleAlert size={28} />
+                            </div>
+                            <div className="space-y-2">
+                                <DialogTitle className="font-['Playfair_Display',serif] text-2xl font-bold text-slate-900 dark:text-white">
+                                    {__('Delete this menu?')}
+                                </DialogTitle>
+                                <DialogDescription className="text-sm leading-relaxed text-slate-500 dark:text-white/60">
+                                    {__('Please confirm that you really want to remove this menu item from the catalog.')}
+                                </DialogDescription>
+                            </div>
+                        </DialogHeader>
+                    </div>
+
+                    <div className="px-6 py-5">
+                        <div className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-rose-500">
+                                {__('Selected menu')}
+                            </p>
+                            <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">
+                                {menuToDelete?.name ?? __('Menu Item')}
+                            </p>
+                            <p className="mt-1 text-sm text-slate-500 dark:text-white/50">
+                                {menuToDelete?.category ? __(menuToDelete.category) : __('Category not available')}
+                            </p>
+                        </div>
+                    </div>
+
+                    <DialogFooter className="border-t border-slate-100 px-6 py-5 dark:border-white/10 sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setMenuToDelete(null)}
+                            className="rounded-xl"
+                        >
+                            {__('Cancel')}
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={confirmDeleteMenu}
+                            className="rounded-xl"
+                        >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            {__('Delete Menu')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
 
 MenuManagement.layout = (page: React.ReactNode) => <RestoAdminLayout>{page}</RestoAdminLayout>;
-

@@ -1,5 +1,8 @@
-import { Link, router } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { LogOut, Settings } from 'lucide-react';
+import { Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { LogoutConfirmationDialog } from '@/components/app/logout-confirmation-dialog';
 import { UserInfo } from '@/components/app/user-info';
 import {
     DropdownMenuGroup,
@@ -8,11 +11,9 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
-import { logout } from '@/routes';
+import { useTranslations } from '@/hooks/use-translations';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
-import { Calendar } from 'lucide-react';
-import { useTranslations } from '@/hooks/use-translations';
 
 type Props = {
     user: User;
@@ -21,11 +22,7 @@ type Props = {
 export function UserMenuContent({ user }: Props) {
     const { __ } = useTranslations();
     const cleanup = useMobileNavigation();
-
-    const handleLogout = () => {
-        cleanup();
-        router.post('/logout');
-    };
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
     return (
         <>
@@ -63,18 +60,22 @@ export function UserMenuContent({ user }: Props) {
                 </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link
-                    className="block w-full cursor-pointer"
-                    href={logout()}
-                    as="button"
-                    onClick={handleLogout}
-                    data-test="logout-button"
-                >
-                    <LogOut className="mr-2" />
-                    {__('End Session')}
-                </Link>
+            <DropdownMenuItem
+                onSelect={(event) => {
+                    event.preventDefault();
+                    setLogoutDialogOpen(true);
+                }}
+                data-test="logout-button"
+            >
+                <LogOut className="mr-2" />
+                {__('End Session')}
             </DropdownMenuItem>
+
+            <LogoutConfirmationDialog
+                open={logoutDialogOpen}
+                onOpenChange={setLogoutDialogOpen}
+                onBeforeLogout={cleanup}
+            />
         </>
     );
 }

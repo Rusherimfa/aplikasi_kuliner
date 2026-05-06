@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
 use Inertia\Inertia;
 
 class ReservationController extends Controller
@@ -160,7 +161,7 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'customer_name' => 'required|string|max:255',
             'customer_email' => 'required|email|max:255',
             'customer_phone' => 'required|string|max:20',
@@ -170,12 +171,19 @@ class ReservationController extends Controller
             'special_requests' => 'nullable|string|max:500',
             'resto_table_id' => 'required_if:type,dine_in|nullable|exists:resto_tables,id',
             'type' => 'required|in:dine_in,delivery,takeaway',
-            'delivery_address' => 'required_if:type,delivery|nullable|string|max:500',
             'menus' => 'nullable|array',
             'menus.*.id' => 'required|exists:menus,id',
             'menus.*.quantity' => 'required|integer|min:1',
             'use_points' => 'nullable|boolean',
-        ]);
+        ];
+
+        if ($request->input('type') === 'delivery') {
+            $rules['delivery_address'] = 'required|string|max:500';
+        } else {
+            $rules['delivery_address'] = 'nullable|string|max:500';
+        }
+
+        $validated = $request->validate($rules);
 
         // Validate table availability only for dine_in
         if ($validated['type'] === 'dine_in') {
@@ -258,7 +266,7 @@ class ReservationController extends Controller
             $midtrans = new MidtransService;
             $snapToken = $midtrans->getSnapToken($reservation);
             $reservation->update(['midtrans_snap_token' => $snapToken]);
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
             Log::error('Midtrans Error: '.$e->getMessage());
         }
 
@@ -300,7 +308,7 @@ class ReservationController extends Controller
                 $midtrans = new MidtransService;
                 $snapToken = $midtrans->getSnapToken($reservation);
                 $reservation->update(['midtrans_snap_token' => $snapToken]);
-            } catch (\Exception $e) {
+            } catch (Throwable $e) {
                 Log::error('Midtrans Retry Error: '.$e->getMessage());
             }
         }
@@ -439,8 +447,8 @@ class ReservationController extends Controller
         $reservation->user?->notify(new AppNotification(
             __('Update Status Reservasi'),
             __('Status reservasi Anda telah diperbarui menjadi: :status (:payment)', [
-                'status' => ucfirst($reservation->status),
-                'payment' => strtoupper($reservation->payment_status),
+                'status' => __($reservation->status),
+                'payment' => strtoupper(__($reservation->payment_status)),
             ]),
             'info',
             route('reservations.show', [$reservation->id], false)
@@ -468,6 +476,13 @@ class ReservationController extends Controller
         // Broadcast update so courier and customer see it
         event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable', 'courier'])));
 
+        $reservation->user?->notify(new AppNotification(
+            __('Kurir Ditugaskan'),
+            __('Kurir :name telah ditugaskan untuk mengantar pesanan Anda.', ['name' => $reservation->courier->name]),
+            'info',
+            route('reservations.show', [$reservation->id], false)
+        ));
+
         return back()->with('success', 'Kurir berhasil ditugaskan.');
     }
 
@@ -492,6 +507,16 @@ class ReservationController extends Controller
 
         // Broadcast real-time update
         event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable', 'courier'])));
+
+        $reservation->user?->notify(new AppNotification(
+            __('Update Status Pengiriman'),
+            __('Pengiriman reservasi #:id Anda sekarang berstatus: :status', [
+                'id' => $reservation->id,
+                'status' => __($validated['delivery_status'])
+            ]),
+            'info',
+            route('reservations.show', [$reservation->id], false)
+        ));
 
         return back()->with('success', 'Status pengiriman diperbarui.');
     }

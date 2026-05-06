@@ -11,70 +11,35 @@ class MidtransService
 {
     public function __construct()
     {
+        // Konfigurasi Midtrans dari file config/services.php
         Config::$serverKey = config('services.midtrans.server_key');
-        Config::$isProduction = config('services.midtrans.is_production');
-        Config::$isSanitized = config('services.midtrans.is_sanitized');
-        Config::$is3ds = config('services.midtrans.is_3ds');
+        Config::$isProduction = config('services.midtrans.is_production', false);
+        Config::$isSanitized = config('services.midtrans.is_sanitized', true);
+        Config::$is3ds = config('services.midtrans.is_3ds', true);
     }
 
-    public function getSnapToken(Order|Reservation $order): string
+    /**
+     * Mendapatkan Snap Token dari Midtrans.
+     *
+     * @param Order|Reservation $model
+     * @return string
+     */
+    public function getSnapToken($model)
     {
-        $itemDetails = [];
-        $subtotal = 0;
-
-        // Jika ini adalah Order (Pesanan Online)
-        if ($order instanceof Order) {
-            $order->load('items.menu');
-            foreach ($order->items as $item) {
-                $itemDetails[] = [
-                    'id' => 'MENU-'.$item->menu_id,
-                    'price' => (int) $item->price,
-                    'quantity' => (int) $item->quantity,
-                    'name' => $item->menu->name,
-                ];
-                $subtotal += ($item->price * $item->quantity);
-            }
-
-            if ($order->delivery_fee > 0) {
-                $itemDetails[] = [
-                    'id' => 'DELIVERY',
-                    'price' => (int) $order->delivery_fee,
-                    'quantity' => 1,
-                    'name' => 'Biaya Pengiriman',
-                ];
-            }
-        }
-        // Jika ini adalah Reservation (DP)
-        elseif ($order instanceof Reservation) {
-            $itemDetails[] = [
-                'id' => 'DP-RES-'.$order->id,
-                'price' => (int) $order->booking_fee,
-                'quantity' => 1,
-                'name' => 'DP Reservasi Meja',
-            ];
-            $subtotal = $order->booking_fee;
-        }
-
-        // Tambahkan Pajak sebagai Item
-        if ($order->tax_amount > 0) {
-            $itemDetails[] = [
-                'id' => 'TAX',
-                'price' => (int) $order->tax_amount,
-                'quantity' => 1,
-                'name' => 'Pajak (PB1) 10%',
-            ];
-        }
+        $isOrder = $model instanceof Order;
+        
+        // Format Order ID: [Nomor/ID]-[Timestamp] untuk memastikan keunikan saat retry
+        $orderId = ($isOrder ? $model->order_number : 'RES-' . $model->id) . '-' . time();
 
         $params = [
             'transaction_details' => [
-                'order_id' => ($order->order_number ?? 'RES-'.$order->id).'-'.time(),
-                'gross_amount' => (int) ($order->total_price ?? $order->total_after_discount),
+                'order_id' => $orderId,
+                'gross_amount' => (int) ($isOrder ? $model->total_price : $model->total_after_discount),
             ],
-            'item_details' => $itemDetails,
             'customer_details' => [
-                'first_name' => $order->customer_name,
-                'email' => $order->customer_email,
-                'phone' => $order->customer_phone,
+                'first_name' => $model->customer_name,
+                'email' => $model->customer_email,
+                'phone' => $model->customer_phone,
             ],
         ];
 

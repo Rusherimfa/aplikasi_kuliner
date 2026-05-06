@@ -2,8 +2,14 @@ import { Transition } from '@headlessui/react';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Camera, CheckCircle2, Mail, User, Phone, Sparkles, Trash2, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
+<<<<<<< HEAD
 import { useState, useRef } from 'react';
+=======
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+>>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { LogoutConfirmationDialog } from '@/components/app/logout-confirmation-dialog';
 import DeleteUser from '@/components/auth/delete-user';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
@@ -20,7 +26,10 @@ import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/hooks/use-translations';
 import SettingsLayout from '@/layouts/settings/layout';
 import { send } from '@/routes/verification';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
 
 export default function Profile({
     mustVerifyEmail,
@@ -31,8 +40,11 @@ export default function Profile({
 }) {
     const { auth } = usePage().props as any;
     const { __ } = useTranslations();
-    const [preview, setPreview] = useState<string | null>(null);
+    const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(auth.user.avatar ?? null);
+    const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+    const [showAvatarConfirmDialog, setShowAvatarConfirmDialog] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const form = useForm({
@@ -40,24 +52,65 @@ export default function Profile({
         name: auth.user.name ?? '',
         email: auth.user.email ?? '',
         phone: auth.user.phone ?? '',
-        avatar: null as File | null,
         current_password: '',
     });
 
-    const updateAvatar = (file: File) => {
-        router.post(ProfileController.update.url(), {
-            _method: 'PATCH',
-            avatar: file,
-        }, {
+    const avatarForm = useForm({
+        _method: 'PATCH',
+        avatar: null as File | null,
+    });
+
+    useEffect(() => {
+        if (auth.user.avatar) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            setCurrentAvatarUrl(auth.user.avatar);
+        }
+    }, [auth.user.avatar]);
+
+    const resetAvatarSelection = () => {
+        setAvatarPreview(null);
+        setShowAvatarConfirmDialog(false);
+        avatarForm.reset();
+        avatarForm.clearErrors();
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const confirmAvatarUpload = () => {
+        if (! avatarForm.data.avatar) {
+            return;
+        }
+
+        const hadProfilePhoto = Boolean(currentAvatarUrl || auth.user.avatar);
+
+        avatarForm.post(ProfileController.update.url(), {
             preserveScroll: true,
             forceFormData: true,
             onSuccess: () => {
-                setPreview(null);
+                if (avatarPreview) {
+                    setCurrentAvatarUrl(avatarPreview);
+                }
+
+                toast.success(
+                    hadProfilePhoto
+                        ? __('Profile photo updated successfully')
+                        : __('Profile photo added successfully'),
+                    {
+                        description: hadProfilePhoto
+                            ? __('Your latest profile photo is now visible across your account.')
+                            : __('Your new profile photo is now visible across your account.'),
+                    },
+                );
+
+                router.reload({
+                    preserveState: false,
+                    onFinish: () => {
+                        resetAvatarSelection();
+                    },
+                });
             },
-            onError: (errors) => {
-                console.error('Avatar update failed:', errors);
-                setPreview(null);
-            }
         });
     };
 
@@ -70,7 +123,9 @@ export default function Profile({
         setShowConfirmDialog(false);
         form.post(ProfileController.update.url(), {
             preserveScroll: true,
-            onSuccess: () => setPreview(null),
+            onSuccess: () => {
+                form.reset('current_password');
+            },
         });
     };
 
@@ -82,7 +137,32 @@ export default function Profile({
         .toUpperCase();
 
     const handleAvatarClick = () => {
-        fileInputRef.current?.click();
+        if (avatarForm.processing) {
+            return;
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleAvatarChange = (file: File | null) => {
+        if (! file) {
+            return;
+        }
+
+        avatarForm.clearErrors();
+        avatarForm.setData('avatar', file);
+
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+            setAvatarPreview(reader.result as string);
+            setShowAvatarConfirmDialog(true);
+        };
+
+        reader.readAsDataURL(file);
     };
 
     return (
@@ -116,38 +196,48 @@ export default function Profile({
                     <div className="relative px-8 sm:px-12 pb-12">
                         <div className="flex flex-col sm:flex-row items-center sm:items-end gap-8 -mt-20 sm:-mt-24">
                             {/* Cinematic Avatar Upload */}
-                            <div className="relative group/avatar cursor-pointer" onClick={handleAvatarClick}>
-                                <motion.div 
-                                    whileHover={{ scale: 1.05, rotate: -2 }}
-                                    className="flex h-40 w-40 sm:h-48 sm:w-48 items-center justify-center rounded-[3rem] bg-gradient-to-br from-sky-400 to-indigo-600 p-1 shadow-2xl shadow-sky-500/20 ring-4 ring-black/5 dark:ring-white/10 backdrop-blur-2xl overflow-hidden"
-                                >
-                                    <div className="h-full w-full rounded-[2.8rem] overflow-hidden bg-slate-50 dark:bg-zinc-950 flex items-center justify-center text-5xl font-black text-slate-900 dark:text-white">
-                                        {preview ? (
-                                            <img src={preview} className="h-full w-full object-cover" alt="Preview" />
-                                        ) : auth.user.avatar ? (
-                                            <img src={auth.user.avatar} className="h-full w-full object-cover" alt={auth.user.name ?? ''} />
-                                        ) : (
-                                            initials
-                                        )}
-                                        
-                                        {/* Overlay with glass effect */}
-                                        <div className="absolute inset-0 flex items-center justify-center bg-sky-500/10 dark:bg-sky-500/20 opacity-0 group-hover/avatar:opacity-100 transition-all duration-500 backdrop-blur-md">
-                                            <div className="flex flex-col items-center gap-2">
-                                                <Camera className="text-slate-900 dark:text-white h-10 w-10 drop-shadow-lg" />
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{__('Update Focus')}</span>
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="relative group/avatar cursor-pointer" onClick={handleAvatarClick}>
+                                    <motion.div 
+                                        whileHover={{ scale: 1.05, rotate: -2 }}
+                                        className="flex h-40 w-40 sm:h-48 sm:w-48 items-center justify-center rounded-[3rem] bg-gradient-to-br from-sky-400 to-indigo-600 p-1 shadow-2xl shadow-sky-500/20 ring-4 ring-black/5 dark:ring-white/10 backdrop-blur-2xl overflow-hidden"
+                                    >
+                                        <div className="h-full w-full rounded-[2.8rem] overflow-hidden bg-slate-50 dark:bg-zinc-950 flex items-center justify-center text-5xl font-black text-slate-900 dark:text-white">
+                                            {currentAvatarUrl ? (
+                                                <img src={currentAvatarUrl} className="h-full w-full object-cover" alt={auth.user.name ?? ''} />
+                                            ) : (
+                                                initials
+                                            )}
+                                            
+                                            {/* Overlay with glass effect */}
+                                            <div className="absolute inset-0 flex items-center justify-center bg-sky-500/10 dark:bg-sky-500/20 opacity-0 group-hover/avatar:opacity-100 transition-all duration-500 backdrop-blur-md">
+                                                <div className="flex flex-col items-center gap-2">
+                                                    <Camera className="text-slate-900 dark:text-white h-10 w-10 drop-shadow-lg" />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{__('Update Focus')}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </motion.div>
-                                
-                                <motion.div 
-                                    initial={{ scale: 0 }}
-                                    animate={{ scale: 1 }}
-                                    transition={{ delay: 0.5, type: "spring" }}
-                                    className="absolute -bottom-2 -right-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500 text-white dark:text-black shadow-lg dark:shadow-[0_10px_30px_rgba(14,165,233,0.5)] ring-4 ring-white dark:ring-background transition-transform duration-500 group-hover/avatar:rotate-12 group-hover/avatar:scale-110"
-                                >
-                                    <Zap size={24} strokeWidth={3} />
-                                </motion.div>
+                                    </motion.div>
+                                    
+                                    <motion.div 
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ delay: 0.5, type: "spring" }}
+                                        className="absolute -bottom-2 -right-2 flex h-14 w-14 items-center justify-center rounded-2xl bg-sky-500 text-white dark:text-black shadow-lg dark:shadow-[0_10px_30px_rgba(14,165,233,0.5)] ring-4 ring-white dark:ring-background transition-transform duration-500 group-hover/avatar:rotate-12 group-hover/avatar:scale-110"
+                                    >
+                                        <Zap size={24} strokeWidth={3} />
+                                    </motion.div>
+                                </div>
+
+                                <div className="space-y-1 text-center">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-400">
+                                        {__('Add profile photo')}
+                                    </p>
+                                    <p className="text-xs font-medium text-slate-500 dark:text-muted-foreground/60">
+                                        {__('Your profile photo will appear across your account.')}
+                                    </p>
+                                    <InputError className="text-xs" message={avatarForm.errors.avatar} />
+                                </div>
                             </div>
 
                             <div className="flex-1 text-center sm:text-left mb-4">
@@ -187,6 +277,7 @@ export default function Profile({
                                 ref={fileInputRef}
                                 className="hidden" 
                                 accept="image/*"
+<<<<<<< HEAD
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
 
@@ -197,6 +288,9 @@ export default function Profile({
                                         updateAvatar(file);
                                     }
                                 }}
+=======
+                                onChange={(e) => handleAvatarChange(e.target.files?.[0] ?? null)}
+>>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
                             />
 
                             {/* Main Identity Form */}
@@ -377,7 +471,8 @@ export default function Profile({
 
                                         <div className="pt-4 mt-2 border-t border-slate-100 dark:border-white/5">
                                             <button 
-                                                onClick={() => router.post('/logout')}
+                                                type="button"
+                                                onClick={() => setLogoutDialogOpen(true)}
                                                 className="w-full flex items-center justify-between group p-3 rounded-2xl hover:bg-rose-500/10 transition-all duration-500 cursor-pointer"
                                             >
                                                 <div className="flex flex-col text-left">
@@ -409,6 +504,84 @@ export default function Profile({
                         </>
                 </form>
             </div>
+
+            <Dialog
+                open={showAvatarConfirmDialog}
+                onOpenChange={(open) => {
+                    if (open) {
+                        setShowAvatarConfirmDialog(true);
+
+                        return;
+                    }
+
+                    resetAvatarSelection();
+                }}
+            >
+                <DialogContent className="max-w-lg rounded-[2.5rem] border-slate-200 dark:border-white/10 bg-white dark:bg-zinc-950/80 backdrop-blur-2xl p-8 shadow-3xl">
+                    <DialogHeader className="space-y-4">
+                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-[2rem] bg-sky-500/10 text-sky-500 dark:text-sky-400 ring-1 ring-sky-500/20">
+                            <Camera size={40} strokeWidth={1.5} />
+                        </div>
+                        <DialogTitle className="text-center text-2xl font-black uppercase tracking-tight italic text-slate-900 dark:text-white">
+                            {__('Use this photo?')}
+                        </DialogTitle>
+                        <DialogDescription className="text-center text-slate-500 dark:text-muted-foreground/60 font-medium leading-relaxed">
+                            {__('Please confirm that you want to add this photo to your profile.')}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="mt-6 space-y-4">
+                        <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5">
+                            {avatarPreview ? (
+                                <div className="flex items-center gap-4">
+                                    <img
+                                        src={avatarPreview}
+                                        alt={__('Selected profile photo')}
+                                        className="h-20 w-20 rounded-[1.5rem] object-cover ring-1 ring-slate-200 dark:ring-white/10"
+                                    />
+                                    <div className="min-w-0 space-y-1">
+                                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-sky-600 dark:text-sky-400">
+                                            {__('Selected photo')}
+                                        </p>
+                                        <p className="truncate text-base font-semibold text-slate-900 dark:text-white">
+                                            {avatarForm.data.avatar?.name ?? __('Profile photo')}
+                                        </p>
+                                        <p className="text-sm text-slate-500 dark:text-muted-foreground/60">
+                                            {__('This photo will be shown on your profile and account menu.')}
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
+
+                        <InputError className="text-center" message={avatarForm.errors.avatar} />
+                    </div>
+
+                    <DialogFooter className="mt-8 flex flex-col sm:flex-row gap-4">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={resetAvatarSelection}
+                            className="flex-1 h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-muted dark:hover:bg-white/5"
+                        >
+                            {__('Cancel')}
+                        </Button>
+                        <Button
+                            type="button"
+                            onClick={confirmAvatarUpload}
+                            disabled={avatarForm.processing || !avatarForm.data.avatar}
+                            className="flex-1 h-14 rounded-2xl bg-sky-600 dark:bg-sky-500 text-white dark:text-black text-[10px] font-black uppercase tracking-[0.2em] shadow-lg shadow-sky-500/20 hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                        >
+                            {avatarForm.processing ? __('Processing...') : __('Yes, Add Photo')}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <LogoutConfirmationDialog
+                open={logoutDialogOpen}
+                onOpenChange={setLogoutDialogOpen}
+            />
 
             {/* Confirmation Dialog */}
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
@@ -450,7 +623,7 @@ export default function Profile({
                             variant="ghost"
                             onClick={() => {
                                 setShowConfirmDialog(false);
-                                form.setData('current_password', '');
+                                form.reset('current_password');
                             }}
                             className="flex-1 h-14 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-muted dark:hover:bg-white/5"
                         >
@@ -473,4 +646,3 @@ export default function Profile({
 Profile.layout = (page: any) => (
     <SettingsLayout>{page}</SettingsLayout>
 );
-
