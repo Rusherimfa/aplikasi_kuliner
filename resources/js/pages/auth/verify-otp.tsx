@@ -1,4 +1,4 @@
-import { Head, useForm, Link, usePage } from '@inertiajs/react';
+import { Head, useForm, Link, usePage, setLayoutProps } from '@inertiajs/react';
 import { ShieldCheck, ArrowRight, RefreshCw, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,11 @@ export default function VerifyOtp() {
     const { email, status } = usePage().props as any;
     const { warning } = (usePage().props as any).flash || {};
 
+    setLayoutProps({
+        title: 'Security Verification',
+        description: 'Kami telah mengirimkan kode keamanan 6-digit ke WhatsApp dan Email Anda. Silakan masukkan di bawah ini.',
+    });
+
     const { data, setData, post, processing, errors } = useForm({
         otp: '',
     });
@@ -22,39 +27,22 @@ export default function VerifyOtp() {
     };
 
     return (
-        <AuthLayout 
-            title={__('Security Verification')}
-            description={__('Complete your two-factor authentication.')}
-        >
+        <>
             <Head title={__('OTP Verification — Boutique Security')} />
 
-            <div className="w-full max-w-sm mx-auto space-y-8">
+            <div className="w-full max-w-sm mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="text-center space-y-4">
                     {warning && (
-                        <motion.div 
-                            initial={{ y: -20, opacity: 0 }}
-                            animate={{ y: 0, opacity: 1 }}
-                            className="mb-6 rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 text-center text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 backdrop-blur-md"
-                        >
+                        <div className="mb-6 rounded-xl border border-orange-500/20 bg-orange-500/10 p-4 text-center text-[10px] font-black uppercase tracking-widest text-orange-600 dark:text-orange-400 backdrop-blur-md">
                             {warning}
-                        </motion.div>
+                        </div>
                     )}
-                    <motion.div 
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="mx-auto h-20 w-20 rounded-[2rem] bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-500"
-                    >
-                        <ShieldCheck size={40} strokeWidth={1.5} />
-                    </motion.div>
                     
                     <div className="flex flex-col items-center gap-2">
                         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10">
                             <Mail size={12} className="text-slate-400" />
                             <span className="text-[10px] font-black tracking-widest text-slate-500 uppercase">{email}</span>
                         </div>
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 max-w-[240px] leading-relaxed mt-2 transition-colors">
-                            {__('Kami telah mengirimkan kode keamanan 6-digit ke WhatsApp dan Email Anda. Silakan masukkan di bawah ini.')}
-                        </p>
                     </div>
                 </div>
 
@@ -110,6 +98,6 @@ export default function VerifyOtp() {
                     </p>
                 </div>
             </div>
-        </AuthLayout>
+        </>
     );
 }

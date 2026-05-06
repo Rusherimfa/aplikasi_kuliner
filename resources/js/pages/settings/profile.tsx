@@ -1,16 +1,12 @@
 import { Transition } from '@headlessui/react';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
+import { motion } from 'framer-motion';
 import { Camera, CheckCircle2, Mail, User, Phone, Sparkles, Trash2, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
+import { useState, useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/auth/delete-user';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { edit } from '@/routes/profile';
-import { send } from '@/routes/verification';
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
     Dialog,
     DialogContent,
@@ -19,9 +15,12 @@ import {
     DialogDescription,
     DialogFooter,
 } from '@/components/ui/dialog';
-
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/hooks/use-translations';
 import SettingsLayout from '@/layouts/settings/layout';
+import { send } from '@/routes/verification';
+
 
 export default function Profile({
     mustVerifyEmail,
@@ -190,6 +189,7 @@ export default function Profile({
                                 accept="image/*"
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
+
                                     if (file) {
                                         const reader = new FileReader();
                                         reader.onloadend = () => setPreview(reader.result as string);
