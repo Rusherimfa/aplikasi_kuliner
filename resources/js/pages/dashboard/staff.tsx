@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { cn } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { Clock, CalendarCheck, CheckCircle2, UserCheck, ArrowRight, Table as TableIcon, Users, UserPlus, TrendingUp, HandPlatter, Wallet, ShoppingBag, Info, ChefHat, Plus, X, Trash2 } from 'lucide-react';
+import { Clock, CalendarCheck, CheckCircle2, UserCheck, ArrowRight, Table as TableIcon, Users, UserPlus, TrendingUp, HandPlatter, Wallet, ShoppingBag, Info, ChefHat, Plus, X, Trash2, Truck } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -450,13 +450,15 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                                             <MessageCircle size={14} />
                                                         </button>
 
-                                                        <button 
-                                                            onClick={() => deleteReservation(res.id)}
-                                                            className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20"
-                                                            title={__('Hapus Riwayat')}
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                        {auth.user?.role === 'admin' && (
+                                                            <button 
+                                                                onClick={() => deleteReservation(res.id)}
+                                                                className="p-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all border border-rose-500/20"
+                                                                title={__('Hapus Riwayat')}
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -511,6 +513,16 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
                                             <p className="text-sm font-semibold">{__('Meja')} {selectedReservation.table_id || '?'} ({selectedReservation.guests} {__('Tamu')})</p>
                                         </div>
+                                        {selectedReservation.type === 'delivery' && selectedReservation.delivery_address && (
+                                            <div className="col-span-2 bg-sky-500/10 rounded-xl p-3 border border-sky-500/20">
+                                                <p className="text-[10px] text-sky-600 dark:text-sky-400 uppercase font-black tracking-widest mb-1 flex items-center gap-1.5">
+                                                    <Truck size={10} /> {__('Alamat Pengantaran')}
+                                                </p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+                                                    {selectedReservation.delivery_address}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                     {selectedReservation.special_requests && (
                                         <div className="bg-sky-500/5 rounded-xl p-3 border border-sky-500/10">
@@ -530,7 +542,7 @@ export default function StaffDashboard({ auth, stats, todays_schedule, recent_ac
                                                     <div key={m.id} className="p-4 flex items-center justify-between">
                                                         <div className="flex items-center gap-3">
                                                             <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-white/10 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-white/5">
-                                                                <img src={m.image_path.startsWith('http') ? m.image_path : `/storage/${m.image_path}`} alt={m.name} className="h-full w-full object-cover" />
+                                                                <img src={m.image_path.startsWith('http') || m.image_path.startsWith('/') ? m.image_path : `/storage/${m.image_path}`} alt={m.name} className="h-full w-full object-cover" />
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-slate-900 dark:text-white/90">{m.name}</p>

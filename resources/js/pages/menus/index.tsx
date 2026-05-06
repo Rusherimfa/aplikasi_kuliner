@@ -196,7 +196,7 @@ export default function MenuManagement({ menus, filters }: any) {
                                                 <div className="flex items-center gap-3">
                                                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-muted overflow-hidden border border-slate-200 dark:border-border">
                                                         {menu.image_path ? (
-                                                            <img src={menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`} className="h-full w-full object-cover" alt={menu.name} />
+                                                            <img src={menu.image_path.startsWith('http') || menu.image_path.startsWith('/') ? menu.image_path : `/storage/${menu.image_path}`} className="h-full w-full object-cover" alt={menu.name} />
                                                         ) : (
                                                             <BookOpen size={18} className="text-slate-400 dark:text-muted-foreground" />
                                                         )}

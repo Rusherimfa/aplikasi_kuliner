@@ -14,10 +14,12 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -92,11 +94,13 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     const [activeChatId, setActiveChatId] = useState<number | null>(null);
     const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
     const [activeRequests, setActiveRequests] = useState<ServiceRequest[]>(serviceRequests);
+    const [rejectionId, setRejectionId] = useState<number | null>(null);
+    const [rejectionReason, setRejectionReason] = useState('');
     const { auth } = usePage().props as any;
     const http = useHttp();
 
-    const updateStatus = (id: number, status: string, paymentStatus: string | null = null) => {
-        const data: any = { status };
+    const updateStatus = (id: number, status: string, paymentStatus: string | null = null, extraData: any = {}) => {
+        const data: any = { status, ...extraData };
         if (paymentStatus) {
             data.payment_status = paymentStatus;
         }
@@ -106,7 +110,11 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
             data,
             { 
                 preserveScroll: true,
-                onSuccess: () => toast.success(`${__('Reservation updated successfully')}`)
+                onSuccess: () => {
+                    setRejectionId(null);
+                    setRejectionReason('');
+                    toast.success(`${__('Reservation updated successfully')}`);
+                }
             },
         );
     };
@@ -183,7 +191,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     };
 
     useEffect(() => {
-        const channel = (window as any).Echo.channel('staff-notifications')
+        const staffChannel = (window as any).Echo.channel('staff-notifications')
             .listen('.service.request.created', (e: any) => {
                 const request = e.serviceRequest;
                 
@@ -203,8 +211,27 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                 }
             });
 
-        return () => channel.stopListening('.service.request.created');
+        // Listen for global reservation updates
+        const resChannel = (window as any).Echo.channel('reservations')
+            .listen('.ReservationStatusUpdated', (e: any) => {
+                router.reload({ only: ['reservations'] });
+            });
+
+        return () => {
+            staffChannel.stopListening('.service.request.created');
+            resChannel.stopListening('.ReservationStatusUpdated');
+        };
     }, []);
+
+    // Sync selectedReservation with updated props
+    useEffect(() => {
+        if (selectedReservation) {
+            const updated = reservations.find(r => r.id === selectedReservation.id);
+            if (updated) {
+                setSelectedReservation(updated);
+            }
+        }
+    }, [reservations]);
 
     const updateRequestStatus = (id: number, status: string) => {
         http.setData({ status });
@@ -347,62 +374,64 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                         >
                                                             <MessageCircle className="h-4 w-4" />
                                                         </Button>
-                                                        {auth.user?.role !== 'admin' && (
+                                                        {reservation.status === 'pending' && (
                                                             <>
-                                                                {reservation.status === 'pending' && (
-                                                                    <>
-                                                                        <Button
-                                                                            size="icon"
-                                                                            variant="outline"
-                                                                            className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                                                                            onClick={() => updateStatus(reservation.id, 'awaiting_payment')}
-                                                                            title={__('Terima & Menunggu Pembayaran')}
-                                                                        >
-                                                                            <CheckCircle2 className="h-4 w-4" />
-                                                                        </Button>
-                                                                        <Button
-                                                                            size="icon"
-                                                                            variant="outline"
-                                                                            className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                                                                            onClick={() => updateStatus(reservation.id, 'rejected')}
-                                                                            title={__('Tolak Reservasi')}
-                                                                        >
-                                                                            <X className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </>
-                                                                )}
-                                                                {reservation.status === 'awaiting_payment' && (
-                                                                    <Button
-                                                                        size="icon"
-                                                                        variant="outline"
-                                                                        className="h-8 w-8 border-sky-500/20 bg-sky-500/10 text-sky-500 hover:bg-sky-500/20"
-                                                                        onClick={() => updateStatus(reservation.id, 'confirmed', 'paid')}
-                                                                        title={__('Tandai Sudah Bayar (Confirmed)')}
-                                                                    >
-                                                                        <DollarSign className="h-4 w-4" />
-                                                                    </Button>
-                                                                )}
-                                                                 {reservation.status === 'confirmed' && (
-                                                                    <Button
-                                                                        size="icon"
-                                                                        variant="outline"
-                                                                        className="h-8 w-8 border-blue-500/20 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
-                                                                        onClick={() => updateStatus(reservation.id, 'completed')}
-                                                                        title={__('Tandai Selesai')}
-                                                                    >
-                                                                        <CheckCircle2 className="h-4 w-4" />
-                                                                    </Button>
-                                                                )}
+                                                                <Button
+                                                                    size="icon"
+                                                                    variant="outline"
+                                                                    className="h-8 w-8 border-emerald-500/20 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                                                    onClick={() => updateStatus(reservation.id, 'awaiting_payment')}
+                                                                    title={__('Terima & Menunggu Pembayaran')}
+                                                                >
+                                                                    <CheckCircle2 className="h-4 w-4" />
+                                                                </Button>
                                                                 <Button
                                                                     size="icon"
                                                                     variant="outline"
                                                                     className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20"
-                                                                    onClick={() => deleteReservation(reservation.id)}
-                                                                    title={__('Hapus Riwayat')}
+                                                                    onClick={() => setRejectionId(reservation.id)}
+                                                                    title={__('Tolak Reservasi')}
                                                                 >
-                                                                    <Trash2 className="h-4 w-4" />
+                                                                    <X className="h-4 w-4" />
                                                                 </Button>
                                                             </>
+                                                        )}
+                                                        {reservation.status === 'awaiting_payment' && (
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-8 w-8 border-sky-500/20 bg-sky-500/10 text-sky-500 hover:bg-sky-500/20"
+                                                                onClick={() => updateStatus(reservation.id, 'confirmed', 'paid')}
+                                                                title={__('Tandai Sudah Bayar (Confirmed)')}
+                                                            >
+                                                                <DollarSign className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
+                                                        {reservation.status === 'confirmed' && (
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-8 w-8 border-purple-500/20 bg-purple-500/10 text-purple-500 hover:bg-purple-500 hover:text-white transition-all"
+                                                                onClick={() => {
+                                                                    if (confirm(__('Apakah meja ini sudah kosong dan tamu telah selesai?'))) {
+                                                                        updateStatus(reservation.id, 'completed');
+                                                                    }
+                                                                }}
+                                                                title={__('Selesaikan Reservasi (Kosongkan Meja)')}
+                                                            >
+                                                                <CheckCircle2 className="h-4 w-4" />
+                                                            </Button>
+                                                        )}
+                                                        {auth.user?.role === 'admin' && (
+                                                            <Button
+                                                                size="icon"
+                                                                variant="outline"
+                                                                className="h-8 w-8 border-rose-500/20 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                                                                onClick={() => deleteReservation(reservation.id)}
+                                                                title={__('Hapus Riwayat')}
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </Button>
                                                         )}
                                                     </div>
                                                 </TableCell>
@@ -538,6 +567,16 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                             <p className="text-[10px] text-slate-400 dark:text-white/40 uppercase font-bold tracking-wider mb-1">{__('Alokasi Meja')}</p>
                                             <p className="text-sm font-semibold">{__('Meja')} {selectedReservation.table_id || '?'} ({selectedReservation.guest_count} {__('Tamu')})</p>
                                         </div>
+                                        {selectedReservation.type === 'delivery' && selectedReservation.delivery_address && (
+                                            <div className="col-span-2 bg-sky-500/10 rounded-xl p-3 border border-sky-500/20">
+                                                <p className="text-[10px] text-sky-600 dark:text-sky-400 uppercase font-black tracking-widest mb-1 flex items-center gap-1.5">
+                                                    <Truck size={10} /> {__('Alamat Pengantaran')}
+                                                </p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white leading-relaxed">
+                                                    {selectedReservation.delivery_address}
+                                                </p>
+                                            </div>
+                                        )}
                                     </div>
                                     {selectedReservation.special_requests && (
                                         <div className="bg-sky-500/5 rounded-xl p-3 border border-sky-500/10">
@@ -557,7 +596,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                                     <div key={m.id} className="p-4 flex items-center justify-between">
                                                         <div className="flex items-center gap-3">
                                                             <div className="h-10 w-10 rounded-lg bg-slate-200 dark:bg-white/10 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-white/5">
-                                                                <img src={m.image_path.startsWith('http') ? m.image_path : `/storage/${m.image_path}`} alt={m.name} className="h-full w-full object-cover" />
+                                                                <img src={m.image_path.startsWith('http') || m.image_path.startsWith('/') ? m.image_path : `/storage/${m.image_path}`} alt={m.name} className="h-full w-full object-cover" />
                                                             </div>
                                                             <div>
                                                                 <p className="text-sm font-bold text-slate-900 dark:text-white/90">{m.name}</p>
@@ -609,6 +648,41 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                 </div>
                             </div>
                         )}
+                    </DialogContent>
+                </Dialog>
+                {/* Rejection Reason Dialog */}
+                <Dialog open={!!rejectionId} onOpenChange={(open) => !open && setRejectionId(null)}>
+                    <DialogContent className="sm:max-w-md bg-white dark:bg-[#0A0A0B] border-slate-200 dark:border-white/5 text-slate-900 dark:text-white p-6">
+                        <DialogHeader>
+                            <DialogTitle className="font-['Playfair_Display',serif] text-xl font-bold">
+                                {__('Alasan Penolakan')}
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-400 dark:text-white/40">
+                                {__('Berikan alasan mengapa reservasi ini ditolak.')}
+                            </DialogDescription>
+                        </DialogHeader>
+                        
+                        <div className="mt-4">
+                            <Textarea 
+                                value={rejectionReason}
+                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setRejectionReason(e.target.value)}
+                                placeholder={__('Cth: Meja sudah penuh atau ada acara privat...')}
+                                className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-900 dark:text-white min-h-[100px]"
+                            />
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <Button variant="ghost" onClick={() => setRejectionId(null)}>
+                                {__('Batal')}
+                            </Button>
+                            <Button 
+                                onClick={() => rejectionId && updateStatus(rejectionId, 'rejected', null, { rejection_reason: rejectionReason })}
+                                disabled={!rejectionReason}
+                                className="bg-rose-500 hover:bg-rose-600 text-white font-bold"
+                            >
+                                {__('Tolak Reservasi')}
+                            </Button>
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>

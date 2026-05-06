@@ -68,7 +68,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.put(`/reservations/${reservation.id}/customer`, data, {
+        put(`/reservations/${reservation.id}/customer`, {
             onSuccess: () => setIsEditing(false),
         });
     };
@@ -105,9 +105,13 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
     const addMenu = (menu: any) => {
         const existing = data.menus.find((m: any) => m.id === menu.id);
         if (existing) {
-            setData('menus', data.menus.map((m: any) => 
-                m.id === menu.id ? { ...m, quantity: m.quantity + 1 } : m
-            ));
+            setData('menus', data.menus.map((m: any) => {
+                if (m.id === menu.id) {
+                    const currentQuantity = m.quantity ?? m.pivot?.quantity ?? 0;
+                    return { ...m, quantity: currentQuantity + 1 };
+                }
+                return m;
+            }));
         } else {
             setData('menus', [...data.menus, { ...menu, quantity: 1, notes: '' }]);
         }
@@ -116,11 +120,18 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
     const updateMenuQuantity = (id: number, delta: number) => {
         setData('menus', data.menus.map((m: any) => {
             if (m.id === id) {
-                const newQuantity = m.quantity + delta;
+                const currentQuantity = m.quantity ?? m.pivot?.quantity ?? 1;
+                const newQuantity = currentQuantity + delta;
                 return newQuantity > 0 ? { ...m, quantity: newQuantity } : m;
             }
             return m;
-        }).filter((m: any) => m.id !== id || m.quantity + delta > 0));
+        }).filter((m: any) => {
+            if (m.id === id) {
+                const currentQuantity = m.quantity ?? m.pivot?.quantity ?? 1;
+                return currentQuantity + delta > 0;
+            }
+            return true;
+        }));
     };
     
     const removeMenu = (id: number) => {
@@ -158,16 +169,12 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                         </Link>
 
                         <div className="flex gap-4">
-                            {isConfirmed && reservation.status !== 'completed' && !isEditing && (
-                                <Button onClick={() => router.put(`/reservations/${reservation.id}`, { status: 'completed' })} className="h-11 px-6 rounded-2xl bg-emerald-500 text-white dark:text-black font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20">
-                                    <CheckCircle2 size={14} className="mr-2" /> {__('Selesaikan Kedatangan')}
-                                </Button>
-                            )}
                             {isPending && !isEditing && (
                                 <div className="flex gap-3">
-                                    <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:text-sky-500 transition-all shadow-sm">
+                                    {/* Tombol Ubah Reservasi dinonaktifkan sementara sesuai permintaan */}
+                                    {/* <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:text-sky-500 transition-all shadow-sm">
                                         <PencilLine size={14} className="mr-2" /> {__('Ubah Reservasi')}
-                                    </Button>
+                                    </Button> */}
                                     <Button onClick={handleDelete} variant="destructive" className="h-11 px-6 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                                         <Trash2 size={14} className="mr-2" /> {__('Batalkan')}
                                     </Button>
@@ -289,6 +296,7 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                     <AnimatePresence mode="wait">
                                         {isEditing ? (
                                             <motion.form 
+                                                id="edit-form"
                                                 key="edit-form"
                                                 initial={{ opacity: 0, y: 20 }}
                                                 animate={{ opacity: 1, y: 0 }}
@@ -382,8 +390,15 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                             <MapPin size={28} />
                                         </div>
                                         <div className="text-left">
-                                            <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">{__('Reserved Table')}</p>
-                                            <p className="text-xl font-black text-slate-900 dark:text-white">{reservation.resto_table ? `${__('Table Section')} ${reservation.resto_table.name}` : __('Priority Waiting List')}</p>
+                                            <p className="text-[10px] font-black text-slate-400 dark:text-white/20 uppercase tracking-widest">
+                                                {reservation.type === 'delivery' ? __('Delivery Address') : __('Reserved Table')}
+                                            </p>
+                                            <p className="text-xl font-black text-slate-900 dark:text-white leading-tight max-w-xs">
+                                                {reservation.type === 'delivery' 
+                                                    ? (reservation.delivery_address || __('Alamat tidak tersedia'))
+                                                    : (reservation.resto_table ? `${__('Table Section')} ${reservation.resto_table.name}` : __('Priority Waiting List'))
+                                                }
+                                            </p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">

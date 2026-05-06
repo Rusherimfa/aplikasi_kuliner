@@ -209,7 +209,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                                 <div className="relative aspect-[4/5] sm:aspect-[16/11] overflow-hidden">
                                     {item.image_path ? (
                                         <img 
-                                            src={item.image_path.startsWith('http') ? item.image_path : `/storage/${item.image_path}`} 
+                                            src={item.image_path.startsWith('http') || item.image_path.startsWith('/') ? item.image_path : `/storage/${item.image_path}`} 
                                             alt={item.name}
                                             className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-110"
                                         />
@@ -315,7 +315,7 @@ export default function SignatureDishes({ bestSellers, auth }: SignatureDishesPr
                         <div className="relative aspect-square md:aspect-auto md:h-full min-h-[300px] overflow-hidden bg-slate-100 dark:bg-white/5">
                             {selectedItem?.image_path ? (
                                 <img 
-                                    src={selectedItem.image_path.startsWith('http') ? selectedItem.image_path : `/storage/${selectedItem.image_path}`} 
+                                    src={selectedItem.image_path.startsWith('http') || selectedItem.image_path.startsWith('/') ? selectedItem.image_path : `/storage/${selectedItem.image_path}`} 
                                     alt={selectedItem.name}
                                     className="w-full h-full object-cover"
                                 />

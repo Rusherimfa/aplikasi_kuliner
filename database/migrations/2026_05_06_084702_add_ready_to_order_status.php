@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE orders MODIFY COLUMN order_status ENUM('pending', 'confirmed', 'cancelled', 'rejected', 'waiting_for_payment', 'preparing', 'ready', 'complete', 'delivering', 'delivered') NOT NULL DEFAULT 'pending'");
+        }
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE orders MODIFY COLUMN order_status ENUM('pending', 'confirmed', 'cancelled', 'rejected', 'waiting_for_payment', 'preparing', 'complete', 'delivering', 'delivered') NOT NULL DEFAULT 'pending'");
+        }
+    }
+};

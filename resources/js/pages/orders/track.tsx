@@ -299,8 +299,7 @@ export default function OrderTrack({ order: initialOrder }: any) {
                                     Courier Name
                                 </p>
                                 <p className="text-sm font-bold text-white uppercase">
-                                    {order?.courier?.name ||
-                                        'Agus (Kurir Express)'}
+                                    {order?.courier?.name || 'Staff Resto'}
                                 </p>
                             </div>
                         </div>

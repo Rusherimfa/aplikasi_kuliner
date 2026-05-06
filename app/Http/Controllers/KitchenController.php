@@ -29,18 +29,10 @@ class KitchenController extends Controller
             ->get()
             ->map(fn (Order $order) => $this->mapOrder($order));
 
-        // 2. Fetch Dine-in Reservations
-        $reservations = Reservation::with(['menus', 'restoTable'])
-            ->latest()
-            ->get()
-            ->map(fn (Reservation $res) => $this->mapReservation($res));
-
-        $allOrders = $allOrders->concat($reservations)->sortByDesc('time')->values();
-
         $couriers = User::where('role', Role::KURIR->value)->get(['id', 'name']);
 
         return Inertia::render('kitchen/index', [
-            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'delivering', 'delivered', 'active']))->values(),
+            'online_active' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['pending', 'confirmed', 'waiting_for_payment', 'preparing', 'ready', 'delivering', 'delivered', 'active']))->values(),
             'online_completed' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['complete', 'completed', 'served']))->values(),
             'online_cancelled' => $allOrders->filter(fn ($o) => in_array($o['order_status'], ['cancelled', 'rejected']))->values(),
             'couriers' => $couriers,
@@ -61,6 +53,7 @@ class KitchenController extends Controller
             'payment_status' => $order->payment_status,
             'order_status' => $order->order_status,
             'total_price' => $order->total_price,
+            'delivery_address' => $order->delivery_address,
             'courier' => $order->courier ? $order->courier->name : null,
             'time' => $order->created_at->format('H:i'),
             'elapsed_minutes' => now()->diffInMinutes($order->created_at),
@@ -87,11 +80,12 @@ class KitchenController extends Controller
             'type' => 'reservation',
             'order_number' => 'RES-'.$res->id,
             'customer_name' => $res->customer_name,
-            'order_type' => 'dine-in',
+            'order_type' => $res->type === 'dine_in' ? 'dine-in' : ($res->type === 'delivery' ? 'delivery' : 'pickup'),
             'table_number' => $res->restoTable ? $res->restoTable->name : null,
             'payment_status' => $res->status == 'completed' ? 'paid' : 'pending',
             'order_status' => $res->status, // pending, confirmed, active, completed, cancelled
             'total_price' => $res->menus->sum(fn ($m) => $m->price * $m->pivot->quantity),
+            'delivery_address' => $res->delivery_address,
             'courier' => null,
             'time' => $res->reservation_time ? Carbon::parse($res->reservation_time)->format('H:i') : $res->created_at->format('H:i'),
             'elapsed_minutes' => now()->diffInMinutes($res->created_at),
@@ -158,7 +152,7 @@ class KitchenController extends Controller
                     __('Hidangan Siap'),
                     __('Hidangan ":name" Anda sudah siap dan akan segera disajikan.', ['name' => $item->name]),
                     'success',
-                    route('reservations.show', [$item->reservation_id], false)
+                    route('reservations.history', [], false)
                 ));
             }
         }
@@ -188,7 +182,7 @@ class KitchenController extends Controller
             if ($allReady) {
                 // If it's delivery, we might want to wait for courier pickup,
                 // but for simplicity, we mark it as ready for pickup/delivery
-                $order->update(['order_status' => $order->order_type === 'delivery' ? 'preparing' : 'complete']);
+                $order->update(['order_status' => $order->order_type === 'delivery' ? 'ready' : 'complete']);
             }
         }
 
@@ -197,7 +191,7 @@ class KitchenController extends Controller
                 __('Hidangan Siap'),
                 __('Hidangan ":name" Anda sudah siap dan akan segera dikemas/disajikan.', ['name' => $item->menu ? $item->menu->name : 'Menu']),
                 'success',
-                route('orders.track', [$item->order_id], false)
+                route('orders.history', [], false)
             ));
         }
 
@@ -221,6 +215,18 @@ class KitchenController extends Controller
         }
         if (isset($validated['courier_id'])) {
             $updateData['courier_id'] = $validated['courier_id'];
+
+            // Notify Courier
+            $courier = User::find($validated['courier_id']);
+            if ($courier) {
+                /** @var User $courier */
+                $courier->notify(new AppNotification(
+                    __('Tugas Pengiriman Baru'),
+                    __('Anda telah ditugaskan untuk mengantar pesanan #:order.', ['order' => $order->order_number]),
+                    'info',
+                    route('dashboard', [], false)
+                ));
+            }
         }
         if (isset($validated['payment_status'])) {
             $updateData['payment_status'] = $validated['payment_status'];
@@ -251,12 +257,9 @@ class KitchenController extends Controller
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pesanan'),
-            __('Pesanan #:order Anda sekarang berstatus: :status', [
-                'order' => $order->order_number,
-                'status' => __($order->order_status)
-            ]),
+            __('Pesanan #:order Anda telah diperbarui.', ['order' => $order->order_number]),
             'info',
-            route('orders.track', [$order->id], false)
+            $order->order_status === 'delivering' ? route('orders.track', [$order->id], false) : route('orders.history', [], false)
         ));
 
         return back()->with('success', "Pesanan #{$order->order_number} berhasil diperbarui.");
@@ -300,6 +303,7 @@ class KitchenController extends Controller
     public function readyAll(Order $order)
     {
         $order->items()->update(['status' => 'ready']);
+        $order->update(['order_status' => 'ready']);
 
         // Refresh to get the latest item statuses
         $order->load('items');
@@ -310,8 +314,18 @@ class KitchenController extends Controller
             __('Pesanan Selesai Disiapkan'),
             __('Kabar baik! Semua hidangan untuk pesanan #:order Anda sudah siap.', ['order' => $order->order_number]),
             'success',
-            route('orders.track', [$order->id], false)
+            route('orders.history', [], false)
         ));
+
+        // Notify Courier
+        if ($order->courier) {
+            $order->courier->notify(new AppNotification(
+                __('Pesanan Siap Diambil'),
+                __('Pesanan #:order sudah siap. Silakan ambil di restoran untuk segera dikirim.', ['order' => $order->order_number]),
+                'success',
+                route('dashboard', [], false)
+            ));
+        }
 
         return back()->with('success', 'Semua item pesanan telah ditandai Selesai Dimasak.');
     }

@@ -20,7 +20,7 @@ trait ProfileValidationRules
             'name' => $this->nameRules(),
             'email' => $this->emailRules($userId),
             'phone' => ['nullable', 'numeric'],
-            'avatar' => ['nullable', 'image', 'max:2048'],
+            'avatar' => ['nullable', 'image'],
         ];
 
         // Only require password if name or email is being changed and user is authenticated
@@ -33,6 +33,17 @@ trait ProfileValidationRules
         }
 
         return $rules;
+    }
+
+    /**
+     * Get the validation messages for profile rules.
+     */
+    protected function profileMessages(): array
+    {
+        return [
+            'avatar.image' => 'File harus berupa gambar.',
+            'current_password.current_password' => 'Kata sandi saat ini tidak valid.',
+        ];
     }
 
     /**

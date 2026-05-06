@@ -80,6 +80,14 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
     return (
         <>
+            {auth.user && !auth.user.is_verified && (
+                <div className="bg-amber-500 text-black px-4 py-2 text-center text-xs font-black tracking-widest uppercase">
+                    {__('Akun Anda belum terverifikasi.')}{' '}
+                    <Link href="/verify-otp" className="underline hover:text-white transition-colors">
+                        {__('Verifikasi Sekarang untuk Memesan')}
+                    </Link>
+                </div>
+            )}
             <div className="border-b border-sidebar-border/80">
                 <div className="mx-auto flex h-16 items-center px-4 md:max-w-7xl">
                     {/* Mobile Menu */}

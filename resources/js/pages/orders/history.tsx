@@ -96,10 +96,20 @@ export default function OrderHistory({ auth, orders }: any) {
                 color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
                 icon: CheckCircle2,
             },
+            ready: {
+                label: 'Pesanan Sudah Siap',
+                color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]',
+                icon: CheckCircle2,
+            },
             complete: {
                 label: 'Selesai',
                 color: 'bg-white/5 text-white/40 border-white/10',
                 icon: CheckCircle2,
+            },
+            rejected: {
+                label: 'Ditolak',
+                color: 'bg-rose-500/10 text-rose-500 border-rose-500/20',
+                icon: XCircle,
             },
         };
         const config = variants[status] || variants.pending;
@@ -398,14 +408,13 @@ export default function OrderHistory({ auth, orders }: any) {
                                                         </button>
                                                     )}
 
-                                                {o.order_status ===
-                                                    'preparing' && (
+                                                {['preparing', 'ready'].includes(o.order_status) && (
                                                     <div className="flex h-14 w-full items-center justify-center rounded-2xl border border-sky-500/20 bg-sky-500/10 text-[10px] font-black tracking-widest text-sky-500 uppercase">
                                                         <ChefHat
                                                             size={16}
                                                             className="mr-2"
                                                         />{' '}
-                                                        Chef is Cooking...
+                                                        {o.order_status === 'ready' ? 'Pesanan Sudah Siap' : 'Chef is Cooking...'}
                                                     </div>
                                                 )}
 
@@ -424,35 +433,46 @@ export default function OrderHistory({ auth, orders }: any) {
                                                         />
                                                     </Button>
                                                 )}
-                                                <Button
-                                                    onClick={() => {
-                                                        setChatContext(
-                                                            'support',
-                                                        );
-                                                        setActiveChatOrderId(
+                                                {!['complete', 'delivered'].includes(o.order_status) && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            setChatContext(
+                                                                'support',
+                                                            );
+                                                            setActiveChatOrderId(
+                                                                activeChatOrderId ===
+                                                                    o.id
+                                                                    ? undefined
+                                                                    : o.id,
+                                                            );
+                                                        }}
+                                                        variant="outline"
+                                                        className={`mt-2 flex h-14 w-full items-center justify-center rounded-2xl text-[10px] font-black tracking-widest uppercase shadow-sm transition-all ${
                                                             activeChatOrderId ===
-                                                                o.id
-                                                                ? undefined
-                                                                : o.id,
-                                                        );
-                                                    }}
-                                                    variant="outline"
-                                                    className={`mt-2 flex h-14 w-full items-center justify-center rounded-2xl text-[10px] font-black tracking-widest uppercase shadow-sm transition-all ${
-                                                        activeChatOrderId ===
-                                                        o.id
-                                                            ? 'border-sky-500 bg-sky-500 text-white'
-                                                            : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-sky-50 hover:text-sky-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
-                                                    }`}
-                                                >
-                                                    <MessageCircle
-                                                        size={16}
-                                                        className="mr-2"
-                                                    />
-                                                    Chat Pesanan
-                                                </Button>
+                                                            o.id
+                                                                ? 'border-sky-500 bg-sky-500 text-white'
+                                                                : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-sky-50 hover:text-sky-600 dark:border-white/10 dark:bg-white/5 dark:text-white/70 dark:hover:bg-white/10 dark:hover:text-white'
+                                                        }`}
+                                                    >
+                                                        <MessageCircle
+                                                            size={16}
+                                                            className="mr-2"
+                                                        />
+                                                        Chat Pesanan
+                                                    </Button>
+                                                )}
+
+                                                {['complete', 'delivered'].includes(o.order_status) && (
+                                                    <Link href="/testimonials" className="mt-2 w-full">
+                                                        <Button className="flex h-14 w-full items-center justify-center rounded-2xl bg-sky-500 text-[10px] font-black tracking-widest text-black uppercase shadow-xl shadow-sky-500/20 transition-all hover:scale-[1.02]">
+                                                            <CheckCircle2 size={16} className="mr-2" />
+                                                            Beri Rating
+                                                        </Button>
+                                                    </Link>
+                                                )}
 
                                                 {o.order_type === 'delivery' &&
-                                                    o.courier_id && (
+                                                    o.courier_id && !['complete', 'delivered'].includes(o.order_status) && (
                                                         <Button
                                                             onClick={() => {
                                                                 setChatContext(

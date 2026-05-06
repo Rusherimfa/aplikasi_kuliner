@@ -52,6 +52,10 @@ class MenuController extends Controller
         }
 
         $team = Team::first();
+        $messages = [
+            'image.image' => 'File harus berupa gambar.',
+        ];
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -59,11 +63,12 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
             'is_best_seller' => 'boolean',
-            'image' => 'nullable|image|max:2048',
-        ]);
+            'image' => 'nullable|image',
+        ], $messages);
 
         if ($request->hasFile('image')) {
-            $validated['image_path'] = $request->file('image')->store('menus', 'public');
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image_path'] = '/storage/'.$path;
         }
 
         $team->menus()->create($validated);
@@ -76,11 +81,15 @@ class MenuController extends Controller
      */
     public function update(Request $request, Menu $menu)
     {
+        $messages = [
+            'image.image' => 'File harus berupa gambar.',
+        ];
+
         if ($request->user()->role === Role::STAFF) {
             $validated = $request->validate([
                 'is_available' => 'boolean',
                 'is_best_seller' => 'boolean',
-            ]);
+            ], $messages);
             $menu->update($validated);
 
             return back()->with('success', 'Status menu diperbarui.');
@@ -93,14 +102,16 @@ class MenuController extends Controller
             'price' => 'required|numeric|min:0',
             'is_available' => 'boolean',
             'is_best_seller' => 'boolean',
-            'image' => 'nullable|image|max:2048',
-        ]);
+            'image' => 'nullable|image',
+        ], $messages);
 
         if ($request->hasFile('image')) {
             if ($menu->image_path) {
-                Storage::disk('public')->delete($menu->image_path);
+                $oldPath = str_replace('/storage/', '', $menu->image_path);
+                Storage::disk('public')->delete($oldPath);
             }
-            $validated['image_path'] = $request->file('image')->store('menus', 'public');
+            $path = $request->file('image')->store('menus', 'public');
+            $validated['image_path'] = '/storage/'.$path;
         }
 
         $menu->update($validated);

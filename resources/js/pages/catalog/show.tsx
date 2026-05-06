@@ -76,7 +76,7 @@ export default function Show({ menu, relatedMenus }: MenuShowProps) {
                             >
                                 {menu.image_path ? (
                                     <img 
-                                        src={menu.image_path.startsWith('http') ? menu.image_path : `/storage/${menu.image_path}`} 
+                                        src={menu.image_path.startsWith('http') || menu.image_path.startsWith('/') ? menu.image_path : `/storage/${menu.image_path}`} 
                                         alt={menu.name}
                                         className="w-full h-full object-cover"
                                     />
@@ -218,7 +218,7 @@ export default function Show({ menu, relatedMenus }: MenuShowProps) {
                                             <div className="aspect-square rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 border border-black/5 dark:border-white/5 mb-4 relative shadow-lg">
                                                 {item.image_path ? (
                                                     <img 
-                                                        src={item.image_path.startsWith('http') ? item.image_path : `/storage/${item.image_path}`} 
+                                                        src={item.image_path.startsWith('http') || item.image_path.startsWith('/') ? item.image_path : `/storage/${item.image_path}`} 
                                                         alt={item.name}
                                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                                     />

@@ -35,9 +35,6 @@ Route::get('/terms', function () {
     return Inertia::render('legal/terms');
 })->name('terms');
 
-// Public reservations (no login required)
-Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
-Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
 // Checkout (Public) - Removed, moved to Auth group
 
@@ -50,11 +47,17 @@ Route::post('/guest-chat/messages', [GuestChatController::class, 'store'])->midd
 Route::get('/auth/google', [SocialiteController::class, 'redirect'])->name('social.google');
 Route::get('/auth/google/callback', [SocialiteController::class, 'callback']);
 
-Route::middleware(['auth', 'otp'])
+Route::middleware(['auth'])
     ->group(function () {
-        Route::get('/reservations/auth-intent', function () {
-            return redirect()->route('reservations.create');
+        Route::get('/reservations/auth-intent', function (Request $request) {
+            $user = $request->user();
+            $redirectUrl = ($user && $user->isCustomer()) ? route('reservations.create') : route('dashboard');
+
+            return redirect($redirectUrl);
         })->name('reservations.auth-intent');
+
+        Route::get('/reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+        Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 
         Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
         Route::get('/reservations/payment/{reservation}', [ReservationController::class, 'payment'])->name('reservations.payment');
@@ -63,9 +66,10 @@ Route::middleware(['auth', 'otp'])
         Route::put('/reservations/{reservation}/customer', [ReservationController::class, 'updateCustomer'])->name('reservations.update_customer');
         Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->name('reservations.destroy');
 
-        // Checkout (Authenticated)
+        // Checkout (Authenticated & OTP Mandatory)
         Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
         Route::post('/orders/checkout', [OrderController::class, 'store'])->name('orders.checkout');
+        
         Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
         Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         Route::get('/orders/payment/{order}', [OrderController::class, 'payment'])->name('orders.payment');
@@ -92,6 +96,7 @@ Route::middleware(['auth', 'otp'])
         Route::post('/reservations/{reservation}/simulate-tracking', [ReservationController::class, 'simulateTracking'])->name('reservations.simulate_tracking');
         Route::post('/orders/{order}/simulate-tracking', [OrderController::class, 'simulateTracking'])->name('orders.simulate-tracking');
 
+
         Route::get('/verify-otp', [OTPController::class, 'show'])->name('otp.verify');
         Route::post('/verify-otp', [OTPController::class, 'verify']);
         Route::post('/resend-otp', [OTPController::class, 'resend'])->name('otp.resend');
@@ -106,12 +111,12 @@ Route::middleware(['auth', 'otp'])
         Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
     });
 
-Route::middleware(['auth', 'otp', 'role:staff'])->group(function () {
+Route::middleware(['auth', 'role:staff'])->group(function () {
     Route::get('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffMessages'])->name('guest-chat.staff.messages');
     Route::post('/guest-chat/{guestConversation}/messages', [GuestChatController::class, 'staffStore'])->name('guest-chat.staff.store');
 });
 
-Route::middleware(['auth', 'otp', 'role:admin,staff,kurir'])
+Route::middleware(['auth', 'role:admin,staff,kurir'])
     ->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -154,6 +159,11 @@ Route::middleware(['auth', 'otp', 'role:admin,staff,kurir'])
             // Service Hub Routes (Staff)
             Route::get('service-requests', [ServiceRequestController::class, 'index'])->name('service-requests.index');
             Route::patch('service-requests/{serviceRequest}', [ServiceRequestController::class, 'update'])->name('service-requests.update');
+
+            // Cerita Tamu / Reviews Management (Admin & Staff)
+            Route::get('reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
+            Route::patch('reviews/{id}/toggle', [ReviewController::class, 'toggleVisibility'])->name('admin.reviews.toggle');
+            Route::delete('reviews/{id}', [ReviewController::class, 'destroyAdmin'])->name('admin.reviews.destroy');
         });
 
         // QR Code Check-in (Staff only — scan from mobile QR reader)

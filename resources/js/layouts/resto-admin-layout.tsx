@@ -113,6 +113,12 @@ export default function RestoAdminLayout({
             icon: Users,
             roles: ['admin'],
         },
+        {
+            title: __('Cerita Tamu'),
+            href: '/reviews',
+            icon: MessageSquare,
+            roles: ['admin', 'staff'],
+        },
     ].filter((item) => !item.roles || item.roles.includes(auth.user.role));
 
     return (

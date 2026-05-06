@@ -12,6 +12,7 @@ import {
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { store } from '@/routes/two-factor/login';
 import { useTranslations } from '@/hooks/use-translations';
+import AuthLayout from '@/layouts/auth-layout';
 
 export default function TwoFactorChallenge() {
     const { __ } = useTranslations();
@@ -132,3 +133,5 @@ export default function TwoFactorChallenge() {
         </>
     );
 }
+
+TwoFactorChallenge.layout = (page: React.ReactNode) => <AuthLayout>{page}</AuthLayout>;

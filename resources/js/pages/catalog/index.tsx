@@ -234,7 +234,7 @@ export default function CatalogIndex({ menus, filters }: PageProps) {
                                             <div className="relative aspect-[4/3] md:aspect-square overflow-hidden m-2 md:m-3 rounded-[1.5rem] md:rounded-[1.75rem] bg-slate-50 dark:bg-white/5">
                                                 {item.image_path ? (
                                                     <img 
-                                                        src={item.image_path.startsWith('http') ? item.image_path : `/storage/${item.image_path}`} 
+                                                        src={item.image_path.startsWith('http') || item.image_path.startsWith('/') ? item.image_path : `/storage/${item.image_path}`} 
                                                         className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110" 
                                                         alt={item.name} 
                                                     />

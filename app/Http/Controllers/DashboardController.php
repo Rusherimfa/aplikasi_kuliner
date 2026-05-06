@@ -229,6 +229,7 @@ class DashboardController extends Controller
                 'table_id' => $r->resto_table_id,
                 'menus' => $r->menus,
                 'special_requests' => $r->special_requests,
+                'delivery_address' => $r->delivery_address,
             ]);
 
         $recentReservations = $this->getRecentReservations();

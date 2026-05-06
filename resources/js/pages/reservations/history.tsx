@@ -17,7 +17,8 @@ import {
     ChefHat,
     History as HistoryIcon,
     Sparkles,
-    Trash2
+    Trash2,
+    Truck
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -35,8 +36,18 @@ export default function ReservationHistory({ auth, reservations }: any) {
 
     const sortedReservations = useMemo(() => {
         const now = new Date();
-        const upcoming = reservations.filter((r: any) => new Date(r.date) >= now && r.status !== 'rejected');
-        const past = reservations.filter((r: any) => new Date(r.date) < now || r.status === 'rejected');
+        const upcoming = reservations.filter((r: any) => {
+            const [year, month, day] = r.date.split('-').map(Number);
+            const [hour, minute] = r.time.split(':').map(Number);
+            const reservationDate = new Date(year, month - 1, day, hour, minute);
+            return reservationDate >= now && r.status !== 'rejected';
+        });
+        const past = reservations.filter((r: any) => {
+            const [year, month, day] = r.date.split('-').map(Number);
+            const [hour, minute] = r.time.split(':').map(Number);
+            const reservationDate = new Date(year, month - 1, day, hour, minute);
+            return reservationDate < now || r.status === 'rejected';
+        });
         return { upcoming, past };
     }, [reservations]);
 
@@ -176,8 +187,14 @@ export default function ReservationHistory({ auth, reservations }: any) {
 
                                                 <div className="space-y-3">
                                                     <h3 className="font-['Playfair_Display',serif] text-4xl font-black text-slate-900 dark:text-white tracking-tight group-hover:text-sky-500 transition-colors">
-                                                        {__('Meja untuk')} {r.guest_count} {__('Orang')}
+                                                        {r.type === 'delivery' ? __('Delivery Order') : `${__('Meja untuk')} ${r.guest_count} ${__('Orang')}`}
                                                     </h3>
+                                                    {r.type === 'delivery' && r.delivery_address && (
+                                                        <div className="flex items-start gap-2.5 text-sm font-medium text-sky-600 dark:text-sky-500/80 bg-sky-500/5 p-3 rounded-2xl border border-sky-500/10 max-w-lg">
+                                                            <Truck size={16} className="mt-0.5 shrink-0" />
+                                                            <span>{r.delivery_address}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex flex-wrap gap-6 text-sm font-bold text-slate-500 dark:text-neutral-400">
                                                         <span className="flex items-center gap-2.5"><CalendarRange size={16} className="text-sky-500" /> {new Date(r.date).toLocaleDateString(locale === 'id' ? 'id-ID' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                                                         <span className="flex items-center gap-2.5"><Clock size={16} className="text-sky-500" /> {r.time} WITA</span>
@@ -196,6 +213,13 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                                                 </div>
                                                             ))}
                                                         </div>
+                                                    </div>
+                                                )}
+
+                                                {r.status === 'rejected' && r.rejection_reason && (
+                                                    <div className="rounded-2xl bg-rose-500/5 border border-rose-500/10 p-4">
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">{__('Alasan Penolakan')}</p>
+                                                        <p className="text-sm font-medium text-slate-600 dark:text-rose-400/80 italic">"{r.rejection_reason}"</p>
                                                     </div>
                                                 )}
                                             </div>

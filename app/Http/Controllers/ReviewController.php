@@ -24,7 +24,7 @@ class ReviewController extends Controller
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'message' => 'nullable|string|max:1000',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image',
         ]);
 
         $imagePath = null;
@@ -44,5 +44,82 @@ class ReviewController extends Controller
         Cache::forget('welcome_reviews');
 
         return back()->with('success', 'Terima kasih atas ulasan Anda!');
+    }
+
+    // --- Admin Methods ---
+    
+    public function index()
+    {
+        $reviews = Review::with(['user:id,name', 'reservation:id,date,type'])
+            ->latest()
+            ->get()
+            ->map(function ($r) {
+                return [
+                    'id' => $r->id,
+                    'type' => 'review',
+                    'name' => $r->user->name ?? 'Guest',
+                    'rating' => $r->rating,
+                    'message' => $r->message,
+                    'image_path' => $r->image_path,
+                    'is_approved' => $r->is_approved,
+                    'created_at' => $r->created_at,
+                    'source' => 'Reservation #'.$r->reservation_id,
+                ];
+            });
+
+        $testimonials = \App\Models\Testimonial::latest()
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'type' => 'testimonial',
+                    'name' => $t->name,
+                    'rating' => $t->rating,
+                    'message' => $t->quote,
+                    'image_path' => $t->image_path,
+                    'is_approved' => $t->is_approved,
+                    'created_at' => $t->created_at,
+                    'source' => $t->role ?? 'Guest Story',
+                ];
+            });
+
+        $allFeedbacks = $reviews->concat($testimonials)->sortByDesc('created_at')->values();
+
+        return \Inertia\Inertia::render('dashboard/reviews', [
+            'feedbacks' => $allFeedbacks,
+        ]);
+    }
+
+    public function toggleVisibility(Request $request, $id)
+    {
+        $type = $request->input('type');
+        
+        if ($type === 'review') {
+            $model = Review::findOrFail($id);
+        } else {
+            $model = \App\Models\Testimonial::findOrFail($id);
+        }
+
+        $model->is_approved = !$model->is_approved;
+        $model->save();
+
+        Cache::forget('welcome_reviews');
+
+        return back()->with('success', 'Status visibilitas cerita tamu berhasil diperbarui.');
+    }
+
+    public function destroyAdmin(Request $request, $id)
+    {
+        $type = $request->input('type');
+        
+        if ($type === 'review') {
+            Review::findOrFail($id)->delete();
+        } else {
+            \App\Models\Testimonial::findOrFail($id)->delete();
+        }
+
+        Cache::forget('welcome_reviews');
+
+        return back()->with('success', 'Cerita tamu berhasil dihapus secara permanen.');
     }
 }

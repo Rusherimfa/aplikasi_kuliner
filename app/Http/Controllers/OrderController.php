@@ -213,7 +213,7 @@ class OrderController extends Controller
             __('Pembayaran Pesanan Berhasil'),
             __('Terima kasih! Pembayaran untuk pesanan #:order telah kami terima.', ['order' => $order->order_number]),
             'success',
-            route('orders.track', [$order->id], false)
+            route('orders.history', [], false)
         ));
 
         // Notify Staff
@@ -285,12 +285,9 @@ class OrderController extends Controller
         // Notify Customer
         $order->user?->notify(new AppNotification(
             __('Update Status Pengiriman'),
-            __('Pesanan #:order Anda sekarang berstatus: :status', [
-                'order' => $order->order_number, 
-                'status' => __($request->delivery_status)
-            ]),
+            __('Pesanan #:order Anda sekarang berstatus: :status', ['order' => $order->order_number, 'status' => ucfirst($request->delivery_status)]),
             'info',
-            route('orders.track', [$order->id], false)
+            $request->delivery_status === 'delivering' ? route('orders.track', [$order->id], false) : route('orders.history', [], false)
         ));
 
         return back()->with('success', 'Status pengiriman berhasil diupdate.');

@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             SetTeamUrlDefaults::class,
+            EnsureOtpVerified::class,
         ]);
 
         $middleware->alias([

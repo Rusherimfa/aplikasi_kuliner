@@ -101,3 +101,5 @@ export default function VerifyOtp() {
         </>
     );
 }
+
+VerifyOtp.layout = (page: React.ReactNode) => <AuthLayout>{page}</AuthLayout>;

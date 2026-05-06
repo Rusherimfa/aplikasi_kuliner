@@ -2,12 +2,8 @@ import { Transition } from '@headlessui/react';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 import { Camera, CheckCircle2, Mail, User, Phone, Sparkles, Trash2, ArrowLeft, ShieldCheck, Zap } from 'lucide-react';
-<<<<<<< HEAD
-import { useState, useRef } from 'react';
-=======
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
->>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import { LogoutConfirmationDialog } from '@/components/app/logout-confirmation-dialog';
 import DeleteUser from '@/components/auth/delete-user';
@@ -26,10 +22,8 @@ import { Label } from '@/components/ui/label';
 import { useTranslations } from '@/hooks/use-translations';
 import SettingsLayout from '@/layouts/settings/layout';
 import { send } from '@/routes/verification';
-<<<<<<< HEAD
 
-=======
->>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
+
 
 export default function Profile({
     mustVerifyEmail,
@@ -105,7 +99,6 @@ export default function Profile({
                 );
 
                 router.reload({
-                    preserveState: false,
                     onFinish: () => {
                         resetAvatarSelection();
                     },
@@ -175,7 +168,7 @@ export default function Profile({
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="group relative overflow-hidden rounded-[3rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-gradient-to-br dark:from-white/10 dark:to-transparent shadow-xl dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur-3xl transition-all duration-700 hover:border-sky-500/30 ring-1 ring-slate-100 dark:ring-transparent"
+                    className="group relative overflow-hidden rounded-[3rem] border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-900/90 shadow-xl dark:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.5)] backdrop-blur-3xl transition-all duration-700 hover:border-sky-500/30 ring-1 ring-slate-100 dark:ring-transparent"
                 >
                     <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg_viewBox=%220_0_200_200%22_xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter_id=%22noise%22%3E%3CfeTurbulence_type=%22fractalNoise%22_baseFrequency=%220.65%22_numOctaves=%223%22_stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect_width=%22100%25%22_height=%22100%25%22_filter=%22url(%23noise)%22/%3E%3C/svg%3E')] opacity-[0.03] dark:opacity-[0.05] mix-blend-overlay" />
                     
@@ -190,7 +183,7 @@ export default function Profile({
                             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
                             className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(14,165,233,0.1),transparent_50%)] dark:bg-[radial-gradient(circle_at_30%_50%,rgba(14,165,233,0.2),transparent_50%)]" 
                         />
-                        <div className="absolute -bottom-1 left-0 w-full h-24 bg-gradient-to-t from-white dark:from-background via-white/40 dark:via-background/40 to-transparent" />
+                        <div className="absolute -bottom-1 left-0 w-full h-24 bg-gradient-to-t from-white dark:from-slate-900 via-white/40 dark:via-slate-900/40 to-transparent" />
                     </div>
 
                     <div className="relative px-8 sm:px-12 pb-12">
@@ -277,20 +270,7 @@ export default function Profile({
                                 ref={fileInputRef}
                                 className="hidden" 
                                 accept="image/*"
-<<<<<<< HEAD
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onloadend = () => setPreview(reader.result as string);
-                                        reader.readAsDataURL(file);
-                                        updateAvatar(file);
-                                    }
-                                }}
-=======
                                 onChange={(e) => handleAvatarChange(e.target.files?.[0] ?? null)}
->>>>>>> 6c9a9f1d6e42f638ef4b9b173ab3b374f39e7ecf
                             />
 
                             {/* Main Identity Form */}
@@ -299,7 +279,7 @@ export default function Profile({
                                     initial={{ opacity: 0, y: 30 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-8 sm:p-12 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-slate-100 dark:ring-transparent"
+                                    className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50 p-8 sm:p-12 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-slate-100 dark:ring-transparent"
                                 >
                                     <div className="mb-12 flex items-center gap-6">
                                         <div className="flex h-16 w-16 items-center justify-center rounded-[1.5rem] bg-sky-500/10 text-sky-500 dark:text-sky-400 ring-1 ring-sky-500/20 shadow-[0_0_30px_rgba(14,165,233,0.1)]">
@@ -422,7 +402,7 @@ export default function Profile({
                                     initial={{ opacity: 0, x: 30 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ duration: 0.8, delay: 0.6 }}
-                                    className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] p-10 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-slate-100 dark:ring-transparent"
+                                    className="rounded-[3rem] border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50 p-10 shadow-xl dark:shadow-2xl backdrop-blur-xl ring-1 ring-slate-100 dark:ring-transparent"
                                 >
                                     <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 dark:text-muted-foreground/30 mb-8">{__('Access Points')}</h4>
                                     <div className="space-y-2">

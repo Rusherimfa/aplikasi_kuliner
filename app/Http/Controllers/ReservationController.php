@@ -483,6 +483,14 @@ class ReservationController extends Controller
             route('reservations.show', [$reservation->id], false)
         ));
 
+        // Notify Courier
+        $reservation->courier?->notify(new AppNotification(
+            __('Tugas Pengiriman Baru'),
+            __('Anda telah ditugaskan untuk mengantar pesanan reservasi #:id.', ['id' => $reservation->id]),
+            'info',
+            route('dashboard', [], false)
+        ));
+
         return back()->with('success', 'Kurir berhasil ditugaskan.');
     }
 
@@ -536,7 +544,7 @@ class ReservationController extends Controller
 
         $validated = $request->validate([
             'date' => 'required|date|after_or_equal:today',
-            'time' => 'required|date_format:H:i',
+            'time' => 'required|date_format:H:i,H:i:s',
             'guest_count' => 'required|integer|min:1|max:20',
             'special_requests' => 'nullable|string|max:500',
             'menus' => 'nullable|array',
@@ -545,22 +553,57 @@ class ReservationController extends Controller
             'menus.*.notes' => 'nullable|string|max:255',
         ]);
 
+        $foodTotal = 0;
+        $syncData = [];
+        if (! empty($validated['menus'])) {
+            $menuIds = collect($validated['menus'])->pluck('id');
+            $dbMenus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+
+            foreach ($validated['menus'] as $menuItem) {
+                if ($dbMenu = $dbMenus->get($menuItem['id'])) {
+                    $foodTotal += ($dbMenu->price * $menuItem['quantity']);
+                    $syncData[$menuItem['id']] = [
+                        'quantity' => $menuItem['quantity'], 
+                        'notes' => $menuItem['notes'] ?? null
+                    ];
+                }
+            }
+        }
+
+        $dpAmount = 50000 + ($foodTotal * 0.5);
+        $taxAmount = $dpAmount * 0.10; // PB1 10%
+        $serviceAmount = 0;
+
+        $maxPossibleDiscount = $dpAmount * 0.5;
+        $pointsNeeded = floor($maxPossibleDiscount / 100);
+        $pointsUsed = min($reservation->user->points, $pointsNeeded);
+        
+        // If they didn't use points before, they don't use it now, else re-evaluate
+        if ($reservation->points_used == 0) {
+            $pointsUsed = 0;
+        }
+
+        $discountAmount = $pointsUsed * 100;
+        $finalAmount = ($dpAmount + $taxAmount + $serviceAmount) - $discountAmount;
+
         $reservation->update([
             'date' => $validated['date'],
-            'time' => $validated['time'],
+            'time' => substr($validated['time'], 0, 5),
             'guest_count' => $validated['guest_count'],
             'special_requests' => $validated['special_requests'],
+            'subtotal' => $dpAmount,
+            'tax_amount' => $taxAmount,
+            'service_amount' => $serviceAmount,
+            'booking_fee' => $dpAmount,
+            'points_used' => $pointsUsed,
+            'discount_amount' => $discountAmount,
+            'total_after_discount' => $finalAmount,
         ]);
 
-        if (isset($validated['menus'])) {
-            $syncData = [];
-            foreach ($validated['menus'] as $menu) {
-                $syncData[$menu['id']] = ['quantity' => $menu['quantity'], 'notes' => $menu['notes'] ?? null];
-            }
-            $reservation->menus()->sync($syncData);
-        } else {
-            $reservation->menus()->detach();
-        }
+        $reservation->menus()->sync($syncData);
+
+        // Broadcast real-time update so dashboard updates automatically
+        event(new ReservationStatusUpdated($reservation->load(['menus', 'restoTable', 'courier'])));
 
         return back()->with('success', 'Reservasi berhasil diperbarui.');
     }
@@ -584,7 +627,11 @@ class ReservationController extends Controller
 
         $reservation->delete();
 
-        return back()->with('success', 'Reservasi berhasil dihapus.');
+        if ($user->isStaff()) {
+            return back()->with('success', 'Reservasi berhasil dihapus.');
+        }
+
+        return redirect()->route('reservations.history')->with('success', 'Reservasi berhasil dibatalkan.');
     }
 
     /**

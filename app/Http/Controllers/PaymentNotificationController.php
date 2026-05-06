@@ -75,7 +75,7 @@ class PaymentNotificationController extends Controller
                     __('Pembayaran Berhasil'),
                     __('Pembayaran untuk pesanan #:order telah diverifikasi. Kami mulai menyiapkan hidangan Anda.', ['order' => $order->order_number]),
                     'success',
-                    route('orders.track', [$order->id], false)
+                    route('orders.history', [], false)
                 ));
             }
         } elseif ($status == 'deny' || $status == 'expire' || $status == 'cancel') {
