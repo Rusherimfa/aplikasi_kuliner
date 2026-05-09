@@ -53,6 +53,7 @@ export default function BoutiqueChat({
     const [messages, setMessages] = useState<Message[]>([]);
     const [newMessage, setNewMessage] = useState('');
     const [unreadCount, setUnreadCount] = useState(0);
+    const [isTyping, setIsTyping] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const type = reservationId ? 'reservations' : 'orders';
@@ -129,7 +130,15 @@ export default function BoutiqueChat({
             '.message.sent',
             (data: { message: Message }) => {
                 if (data.message.chat_type === chatType) {
-                    setMessages((prev) => [...prev, data.message]);
+                    if (data.message.is_chatbot) {
+                        setIsTyping(true);
+                        setTimeout(() => {
+                            setMessages((prev) => [...prev, data.message]);
+                            setIsTyping(false);
+                        }, 1000);
+                    } else {
+                        setMessages((prev) => [...prev, data.message]);
+                    }
 
                     if (!isOpen && data.message.sender.id !== currentUserId) {
                         setUnreadCount((prev) => prev + 1);
@@ -335,6 +344,21 @@ export default function BoutiqueChat({
                                     </div>
                                 );
                             })}
+
+                            {isTyping && (
+                                <div className="flex items-start gap-2">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500 animate-pulse">
+                                        <Sparkles size={14} />
+                                    </div>
+                                    <div className="rounded-2xl rounded-tl-none bg-slate-100 px-4 py-3 dark:bg-white/[0.05]">
+                                        <div className="flex gap-1">
+                                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-500" />
+                                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-500 [animation-delay:0.2s]" />
+                                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-sky-500 [animation-delay:0.4s]" />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Input Area */}

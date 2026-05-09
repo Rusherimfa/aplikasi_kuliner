@@ -19,8 +19,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
-use Throwable;
 use Inertia\Inertia;
+use Throwable;
 
 class ReservationController extends Controller
 {
@@ -321,6 +321,32 @@ class ReservationController extends Controller
     }
 
     /**
+     * Generate a fresh Midtrans Snap token for the reservation.
+     */
+    public function refreshPayment(Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if ($reservation->payment_status === 'paid') {
+            return response()->json(['error' => 'Reservasi ini sudah dibayar.'], 400);
+        }
+
+        try {
+            $midtrans = new MidtransService;
+            $snapToken = $midtrans->getSnapToken($reservation);
+            $reservation->update(['midtrans_snap_token' => $snapToken]);
+
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans Refresh Error: '.$e->getMessage());
+
+            return response()->json(['error' => 'Gagal memperbarui token pembayaran.'], 500);
+        }
+    }
+
+    /**
      * Process the simulated payment.
      */
     public function processPayment(Reservation $reservation)
@@ -415,7 +441,12 @@ class ReservationController extends Controller
         $validated = $request->validate([
             'status' => 'nullable|in:pending,awaiting_payment,confirmed,rejected,completed',
             'payment_status' => 'nullable|in:unpaid,paid,failed',
+            'rejection_reason' => 'nullable|string|max:255',
         ]);
+
+        if (isset($validated['rejection_reason'])) {
+            $reservation->rejection_reason = $validated['rejection_reason'];
+        }
 
         if (isset($validated['status'])) {
             $reservation->status = $validated['status'];
@@ -520,7 +551,7 @@ class ReservationController extends Controller
             __('Update Status Pengiriman'),
             __('Pengiriman reservasi #:id Anda sekarang berstatus: :status', [
                 'id' => $reservation->id,
-                'status' => __($validated['delivery_status'])
+                'status' => __($validated['delivery_status']),
             ]),
             'info',
             route('reservations.show', [$reservation->id], false)
@@ -563,8 +594,8 @@ class ReservationController extends Controller
                 if ($dbMenu = $dbMenus->get($menuItem['id'])) {
                     $foodTotal += ($dbMenu->price * $menuItem['quantity']);
                     $syncData[$menuItem['id']] = [
-                        'quantity' => $menuItem['quantity'], 
-                        'notes' => $menuItem['notes'] ?? null
+                        'quantity' => $menuItem['quantity'],
+                        'notes' => $menuItem['notes'] ?? null,
                     ];
                 }
             }
@@ -577,7 +608,7 @@ class ReservationController extends Controller
         $maxPossibleDiscount = $dpAmount * 0.5;
         $pointsNeeded = floor($maxPossibleDiscount / 100);
         $pointsUsed = min($reservation->user->points, $pointsNeeded);
-        
+
         // If they didn't use points before, they don't use it now, else re-evaluate
         if ($reservation->points_used == 0) {
             $pointsUsed = 0;

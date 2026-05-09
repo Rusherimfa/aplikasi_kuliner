@@ -17,44 +17,70 @@ import {
     ChefHat,
     History as HistoryIcon,
     Sparkles,
+    Truck,
+    PencilLine,
+    Filter,
+    Search,
+    CreditCard,
     Trash2,
-    Truck
+    MessageCircle
 } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '@/hooks/use-cart';
 import { useTranslations } from '@/hooks/use-translations';
 import BoutiqueChat from '@/components/app/boutique-chat';
-import { MessageCircle } from 'lucide-react';
 
 export default function ReservationHistory({ auth, reservations }: any) {
     const { __, locale } = useTranslations();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
     const [activeChatId, setActiveChatId] = useState<number | null>(null);
+    const [statusFilter, setStatusFilter] = useState<string>('all');
+    const [paymentFilter, setPaymentFilter] = useState<string>('all');
     const { addItem, setCartOpen } = useCart();
+
+    // Auto-switch tabs based on status filter
+    useEffect(() => {
+        if (['completed', 'rejected'].includes(statusFilter)) {
+            setActiveTab('past');
+        } else if (['pending', 'confirmed', 'awaiting_payment'].includes(statusFilter)) {
+            setActiveTab('upcoming');
+        }
+    }, [statusFilter]);
 
     const sortedReservations = useMemo(() => {
         const now = new Date();
-        const upcoming = reservations.filter((r: any) => {
-            const [year, month, day] = r.date.split('-').map(Number);
-            const [hour, minute] = r.time.split(':').map(Number);
-            const reservationDate = new Date(year, month - 1, day, hour, minute);
-            return reservationDate >= now && r.status !== 'rejected';
+        
+        const filtered = reservations.filter((r: any) => {
+            const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
+            const matchesPayment = paymentFilter === 'all' || r.payment_status === paymentFilter;
+            return matchesStatus && matchesPayment;
         });
-        const past = reservations.filter((r: any) => {
+
+        const upcoming = filtered.filter((r: any) => {
             const [year, month, day] = r.date.split('-').map(Number);
             const [hour, minute] = r.time.split(':').map(Number);
             const reservationDate = new Date(year, month - 1, day, hour, minute);
-            return reservationDate < now || r.status === 'rejected';
+            
+            // Upcoming is any active reservation (not completed/rejected) that is scheduled for now or future
+            return reservationDate >= now && !['rejected', 'completed', 'cancelled'].includes(r.status);
+        });
+        const past = filtered.filter((r: any) => {
+            const [year, month, day] = r.date.split('-').map(Number);
+            const [hour, minute] = r.time.split(':').map(Number);
+            const reservationDate = new Date(year, month - 1, day, hour, minute);
+            
+            // Past is any reservation that is already completed/rejected, OR its time has passed
+            return reservationDate < now || ['rejected', 'completed', 'cancelled'].includes(r.status);
         });
         return { upcoming, past };
-    }, [reservations]);
+    }, [reservations, statusFilter, paymentFilter]);
 
     const getStatusBadge = (status: string) => {
         const variants: Record<string, { label: string, color: string, icon: any }> = {
             'confirmed': { label: __('Dikonfirmasi'), color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: CheckCircle2 },
-            'completed': { label: __('Selesai'), color: 'bg-white/5 text-white/40 border-white/10', icon: CheckCircle2 },
+            'completed': { label: __('Selesai'), color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20', icon: CheckCircle2 },
             'awaiting_payment': { label: __('Menunggu Bayar'), color: 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]', icon: Clock3 },
             'rejected': { label: __('Dibatalkan'), color: 'bg-rose-500/10 text-rose-500 border-rose-500/20', icon: XCircle },
             'pending': { label: __('Verifikasi'), color: 'bg-sky-500/10 text-sky-400 border-sky-500/20', icon: Clock3 }
@@ -121,21 +147,56 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                 {__('Pantau reservasi mendatang dan kenang momen kuliner berharga Anda bersama kami.')}
                             </p>
                         </div>
+                    </div>
 
-                        {/* Tab Switcher */}
-                        <div className="flex bg-white/50 dark:bg-white/[0.03] p-1.5 rounded-2xl border border-slate-200 dark:border-white/5 backdrop-blur-xl">
+                    {/* Tab Switcher & Filters */}
+                    <div className="mb-12 flex flex-col lg:flex-row items-center justify-between gap-6">
+                        <div className="flex bg-white/50 dark:bg-white/[0.03] p-1.5 rounded-2xl border border-slate-200 dark:border-white/5 backdrop-blur-xl w-full lg:w-auto">
                             <button 
                                 onClick={() => setActiveTab('upcoming')}
-                                className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === 'upcoming' ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === 'upcoming' ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                             >
                                 <Sparkles size={14} /> {__('Upcoming')}
                             </button>
                             <button 
                                 onClick={() => setActiveTab('past')}
-                                className={`flex items-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === 'past' ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:text-white'}`}
+                                className={`flex-1 lg:flex-none flex items-center justify-center gap-2.5 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === 'past' ? 'bg-sky-500 text-black shadow-lg shadow-sky-500/20' : 'text-slate-400 hover:text-slate-600 dark:hover:text-white'}`}
                             >
                                 <HistoryIcon size={14} /> {__('Past')}
                             </button>
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+                            {/* Status Filter */}
+                            <div className="relative group/filter flex-1 lg:flex-none min-w-[160px]">
+                                <Filter size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-500" />
+                                <select 
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white appearance-none focus:ring-2 focus:ring-sky-500/20 focus:outline-none cursor-pointer transition-all"
+                                >
+                                    <option value="all" className="bg-white dark:bg-slate-900">{__('All Status')}</option>
+                                    <option value="pending" className="bg-white dark:bg-slate-900">{__('Pending Verification')}</option>
+                                    <option value="confirmed" className="bg-white dark:bg-slate-900">{__('Confirmed')}</option>
+                                    <option value="awaiting_payment" className="bg-white dark:bg-slate-900">{__('Awaiting Payment')}</option>
+                                    <option value="completed" className="bg-white dark:bg-slate-900">{__('Completed')}</option>
+                                    <option value="rejected" className="bg-white dark:bg-slate-900">{__('Cancelled')}</option>
+                                </select>
+                            </div>
+
+                            {/* Payment Filter */}
+                            <div className="relative group/filter flex-1 lg:flex-none min-w-[160px]">
+                                <CreditCard size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-sky-500" />
+                                <select 
+                                    value={paymentFilter}
+                                    onChange={(e) => setPaymentFilter(e.target.value)}
+                                    className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white appearance-none focus:ring-2 focus:ring-sky-500/20 focus:outline-none cursor-pointer transition-all"
+                                >
+                                    <option value="all" className="bg-white dark:bg-slate-900">{__('All Payments')}</option>
+                                    <option value="paid" className="bg-white dark:bg-slate-900">{__('Paid')}</option>
+                                    <option value="unpaid" className="bg-white dark:bg-slate-900">{__('Unpaid')}</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -265,19 +326,24 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                                             onClick={() => setActiveChatId(activeChatId === r.id ? null : r.id)}
                                                             variant="outline"
                                                             className={`w-full h-14 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all mt-2 ${
-                                                                activeChatId === r.id ? 'bg-sky-500 text-black border-sky-500' : 'border-white/10 hover:bg-white/5 text-white/60'
+                                                                activeChatId === r.id ? 'bg-sky-500 text-black border-sky-500 shadow-lg shadow-sky-500/20' : 'border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5 text-slate-600 dark:text-white/60'
                                                             }`}
                                                         >
                                                             <MessageCircle size={16} className="mr-2" /> {__('Chat with Staff')}
                                                         </Button>
                                                         {r.status === 'pending' && (
-                                                            <Button 
-                                                                onClick={() => deleteReservation(r.id)}
-                                                                variant="outline"
-                                                                className="w-full h-14 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all mt-2 border-rose-500/20 hover:bg-rose-500/10 text-rose-500"
-                                                            >
-                                                                <Trash2 size={16} className="mr-2" /> {__('Batalkan Reservasi')}
-                                                            </Button>
+                                                            <div className="flex gap-2">
+                                                                <Link href={`/reservations/${r.id}?edit=true`} className="flex-1 h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest hover:bg-sky-500 hover:text-black transition-all group/btn">
+                                                                    <PencilLine size={16} className="mr-2 text-sky-500 group-hover/btn:text-black" /> {__('Ubah')}
+                                                                </Link>
+                                                                <Button 
+                                                                    onClick={() => deleteReservation(r.id)}
+                                                                    variant="outline"
+                                                                    className="flex-1 h-14 rounded-2xl flex items-center justify-center text-[10px] font-black uppercase tracking-widest transition-all border-rose-500/20 hover:bg-rose-500/10 text-rose-500"
+                                                                >
+                                                                    <Trash2 size={16} className="mr-2" /> {__('Batal')}
+                                                                </Button>
+                                                            </div>
                                                         )}
                                                     </>
                                                 )}

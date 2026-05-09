@@ -150,7 +150,7 @@ export default function Hero() {
                                     className="group relative h-16 w-full overflow-hidden rounded-2xl bg-primary px-12 text-[11px] font-black uppercase tracking-[0.3em] text-white shadow-[0_20px_40px_-10px_oklch(var(--primary)/0.4)] transition-all hover:scale-105 active:scale-95"
                                 >
                                     <span className="relative z-10 flex items-center gap-3">
-                                        {__('Begin Journey')}
+                                        {__('Start Reservation')}
                                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-2" />
                                     </span>
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />

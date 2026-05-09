@@ -35,7 +35,6 @@ Route::get('/terms', function () {
     return Inertia::render('legal/terms');
 })->name('terms');
 
-
 // Checkout (Public) - Removed, moved to Auth group
 
 // Chatbot API (Public)
@@ -61,6 +60,7 @@ Route::middleware(['auth'])
 
         Route::get('/reservations/history', [ReservationController::class, 'history'])->name('reservations.history');
         Route::get('/reservations/payment/{reservation}', [ReservationController::class, 'payment'])->name('reservations.payment');
+        Route::post('/reservations/payment/{reservation}/refresh', [ReservationController::class, 'refreshPayment'])->name('reservations.payment.refresh');
         Route::post('/reservations/payment/{reservation}', [ReservationController::class, 'processPayment'])->name('reservations.payment.process');
         Route::get('/reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
         Route::put('/reservations/{reservation}/customer', [ReservationController::class, 'updateCustomer'])->name('reservations.update_customer');
@@ -69,7 +69,7 @@ Route::middleware(['auth'])
         // Checkout (Authenticated & OTP Mandatory)
         Route::get('/checkout', [PublicCatalogController::class, 'checkout'])->name('checkout');
         Route::post('/orders/checkout', [OrderController::class, 'store'])->name('orders.checkout');
-        
+
         Route::get('/orders/history', [OrderController::class, 'history'])->name('orders.history');
         Route::get('/orders/{order}/track', [OrderController::class, 'track'])->name('orders.track');
         Route::get('/orders/payment/{order}', [OrderController::class, 'payment'])->name('orders.payment');
@@ -95,7 +95,6 @@ Route::middleware(['auth'])
         // Simulation Route for Mapping Tracking
         Route::post('/reservations/{reservation}/simulate-tracking', [ReservationController::class, 'simulateTracking'])->name('reservations.simulate_tracking');
         Route::post('/orders/{order}/simulate-tracking', [OrderController::class, 'simulateTracking'])->name('orders.simulate-tracking');
-
 
         Route::get('/verify-otp', [OTPController::class, 'show'])->name('otp.verify');
         Route::post('/verify-otp', [OTPController::class, 'verify']);

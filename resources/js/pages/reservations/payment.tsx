@@ -17,40 +17,50 @@ export default function SimulatePayment() {
 
     const { post } = useForm();
 
-    const handlePayment = () => {
-        if (!reservation.midtrans_snap_token) {
-            alert(__('Token pembayaran tidak ditemukan. Silakan hubungi admin.'));
-            return;
-        }
-
+    const handlePayment = async () => {
         setIsSimulating(true);
 
-        (window as any).snap.pay(reservation.midtrans_snap_token, {
-            onSuccess: function(result: any) {
-                clearCart();
-                post(`/reservations/payment/${reservation.id}`);
-            },
-            onPending: function(result: any) {
-                alert(__("Menunggu pembayaran Anda!"));
+        try {
+            const response = await fetch(`/reservations/payment/${reservation.id}/refresh`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as any)?.content || '',
+                    'Accept': 'application/json',
+                },
+            });
+
+            const data = await response.json();
+
+            if (!data.snap_token) {
+                alert(__('Gagal memperbarui token pembayaran. Silakan coba lagi.'));
                 setIsSimulating(false);
-            },
-            onError: function(result: any) {
-                alert(__("Pembayaran gagal!"));
-                setIsSimulating(false);
-            },
-            onClose: function() {
-                setIsSimulating(false);
+                return;
             }
-        });
+
+            (window as any).snap.pay(data.snap_token, {
+                onSuccess: function(result: any) {
+                    clearCart();
+                    post(`/reservations/payment/${reservation.id}`);
+                },
+                onPending: function(result: any) {
+                    alert(__("Menunggu pembayaran Anda!"));
+                    setIsSimulating(false);
+                },
+                onError: function(result: any) {
+                    alert(__("Pembayaran gagal!"));
+                    setIsSimulating(false);
+                },
+                onClose: function() {
+                    setIsSimulating(false);
+                }
+            });
+        } catch (error) {
+            console.error('Payment Refresh Error:', error);
+            setIsSimulating(false);
+            alert(__('Terjadi kesalahan saat memproses pembayaran.'));
+        }
     };
 
-    const handleBypassPayment = () => {
-        setIsSimulating(true);
-        setTimeout(() => {
-            clearCart();
-            post(`/reservations/payment/${reservation.id}`);
-        }, 1000);
-    };
 
     return (
         <>
@@ -215,14 +225,6 @@ export default function SimulatePayment() {
                                     )}
                                 </Button>
 
-                                <Button
-                                    onClick={handleBypassPayment}
-                                    disabled={isSimulating}
-                                    variant="outline"
-                                    className="mt-4 w-full h-14 rounded-full border-slate-200 dark:border-white/10 bg-transparent text-slate-400 dark:text-white/40 font-bold hover:bg-slate-50 dark:hover:bg-white/5 transition-all disabled:opacity-50"
-                                >
-                                    BYPASS (UJI COBA)
-                                </Button>
                             </div>
                         </div>
 

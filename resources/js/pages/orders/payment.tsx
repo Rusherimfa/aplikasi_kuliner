@@ -57,13 +57,6 @@ export default function OrderPayment() {
         }
     };
 
-    const handleBypassPayment = () => {
-        setIsSimulating(true);
-        setTimeout(() => {
-            clearCart();
-            post(`/orders/payment/${order.id}`);
-        }, 1000);
-    };
 
     return (
         <>
@@ -209,14 +202,6 @@ export default function OrderPayment() {
                                                 )}
                                             </Button>
 
-                                            <Button
-                                                onClick={handleBypassPayment}
-                                                disabled={isSimulating}
-                                                variant="outline"
-                                                className="mt-4 w-full h-14 rounded-2xl border-white/10 bg-transparent text-white/40 font-bold tracking-widest hover:bg-white/5 hover:text-white transition-all disabled:opacity-50"
-                                            >
-                                                BYPASS (UJI COBA)
-                                            </Button>
 
                                             <div className="mt-12 space-y-6">
                                                 <div className="flex items-center justify-center gap-4">

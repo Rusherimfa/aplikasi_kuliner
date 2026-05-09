@@ -47,12 +47,21 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const http = useHttp();
-    
+
     // Status helpers
     const isPending = reservation.status === 'pending';
     const isAwaitingPayment = reservation.status === 'awaiting_payment';
-    const isConfirmed = reservation.status === 'confirmed' || reservation.status === 'completed';
+    const isConfirmed =
+        reservation.status === 'confirmed' ||
+        reservation.status === 'completed';
     const isCheckedIn = !!reservation.checked_in_at;
+
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('edit') === 'true' && isPending) {
+            setIsEditing(true);
+        }
+    }, [isPending]);
 
     // QR code URL
     const checkInUrl = `${window.location.origin}/checkin/${reservation.check_in_token}`;
@@ -63,7 +72,13 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
         time: reservation.time,
         guest_count: reservation.guest_count,
         special_requests: reservation.special_requests || '',
-        menus: reservation.menus || [],
+        menus: (reservation.menus || []).map((m: any) => ({
+            id: m.id,
+            name: m.name,
+            price: m.price,
+            quantity: m.quantity ?? m.pivot?.quantity ?? 1,
+            notes: m.notes ?? m.pivot?.notes ?? '',
+        })),
     }) : { data: {}, setData: () => {}, put: () => {}, processing: false, errors: {} } as any;
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -171,10 +186,9 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                         <div className="flex gap-4">
                             {isPending && !isEditing && (
                                 <div className="flex gap-3">
-                                    {/* Tombol Ubah Reservasi dinonaktifkan sementara sesuai permintaan */}
-                                    {/* <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:text-sky-500 transition-all shadow-sm">
+                                    <Button onClick={() => setIsEditing(true)} variant="outline" className="h-11 px-6 rounded-2xl border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-white hover:text-sky-500 transition-all shadow-sm">
                                         <PencilLine size={14} className="mr-2" /> {__('Ubah Reservasi')}
-                                    </Button> */}
+                                    </Button>
                                     <Button onClick={handleDelete} variant="destructive" className="h-11 px-6 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-500 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                                         <Trash2 size={14} className="mr-2" /> {__('Batalkan')}
                                     </Button>
@@ -270,12 +284,23 @@ export default function ReservationShow({ auth, reservation, availableMenus }: a
                                                 ${isAwaitingPayment ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.1)]' : ''}
                                             `}>
                                                 <div className={`h-1.5 w-1.5 rounded-full animate-pulse ${isConfirmed ? 'bg-emerald-500 dark:bg-emerald-400' : (reservation.status === 'rejected' ? 'bg-rose-600 dark:bg-rose-500' : 'bg-sky-500 dark:bg-sky-400')}`} />
-                                                {isConfirmed && __('Experience Confirmed')}
-                                                {reservation.status === 'completed' && __('Completed')}
+                                                {reservation.status === 'confirmed' && __('Experience Confirmed')}
+                                                {reservation.status === 'completed' && __('Experience Completed')}
                                                 {reservation.status === 'rejected' && __('Cancelled')}
                                                 {reservation.status === 'pending' && __('Awaiting Verification')}
                                                 {isAwaitingPayment && __('Awaiting Payment')}
                                             </span>
+
+                                            {reservation.status === 'rejected' && reservation.rejection_reason && (
+                                                <div className="mt-4 rounded-2xl bg-rose-500/5 border border-rose-500/10 p-5 animate-in fade-in slide-in-from-top-2 duration-700">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-2 flex items-center gap-2">
+                                                        <Info size={12} /> {__('Alasan Penolakan')}
+                                                    </p>
+                                                    <p className="text-sm font-medium text-slate-600 dark:text-rose-400/80 italic leading-relaxed">
+                                                        "{reservation.rejection_reason}"
+                                                    </p>
+                                                </div>
+                                            )}
                                             
                                             <div className="flex gap-3">
                                                 <a 

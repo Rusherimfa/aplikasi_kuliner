@@ -245,9 +245,9 @@ class ChatController extends Controller
                 Log::error('Broadcast failed: '.$e->getMessage());
             }
 
-            if ($user->id === $reservation->user_id && $type === 'support') {
+            if ($type === 'support') {
                 try {
-                    $this->handleChatbot($reservation, null, $validated['content']);
+                    $this->handleChatbot($reservation, null, $validated['content'], $type);
                 } catch (Throwable $e) {
                     Log::error('Chatbot failed: '.$e->getMessage());
                 }
@@ -295,9 +295,9 @@ class ChatController extends Controller
                 Log::error('Broadcast failed: '.$e->getMessage());
             }
 
-            if ($user->id === $order->user_id && $type === 'support') {
+            if ($type === 'support') {
                 try {
-                    $this->handleChatbot(null, $order, $validated['content']);
+                    $this->handleChatbot(null, $order, $validated['content'], $type);
                 } catch (Throwable $e) {
                     Log::error('Chatbot failed: '.$e->getMessage());
                 }
@@ -311,28 +311,105 @@ class ChatController extends Controller
         }
     }
 
-    /**
-     * Handle automated chatbot responses.
-     */
-    protected function handleChatbot(?Reservation $reservation, ?Order $order, string $content): void
+    protected function handleChatbot(?Reservation $reservation, ?Order $order, string $content, string $chatType): void
     {
+        // Simulate a small "thinking" delay
+        usleep(800000);
+
         $input = strtolower($content);
         $reply = null;
 
-        if (str_contains($input, 'halo')) {
-            $reply = 'Halo! Saya adalah Ocean\'s Concierge. Ada yang bisa saya bantu terkait reservasi atau pesanan Anda?';
-        } elseif (str_contains($input, 'status')) {
-            if ($reservation) {
-                $reply = 'Status reservasi Anda saat ini adalah: '.strtoupper($reservation->status).'.';
-            } elseif ($order) {
-                $reply = 'Status pesanan Anda saat ini adalah: '.strtoupper($order->order_status).'.';
+        // 1. GREETING LOGIC (MOVED TO TOP)
+        $greetings = [
+            'halo', 'hall', 'hai', 'hey', 'hi', 'pagi', 'siang', 'sore', 'malam', 
+            'assalamu', 'permisi', 'uy', 'oi', 'tes', 'p ', 'p.', 'p\n',
+            'min', 'admin', 'pagi min', 'siang min', 'sore min', 'malam min'
+        ];
+        
+        $isGreeting = false;
+        $trimmed = trim($input);
+        if ($trimmed === 'p' || $trimmed === 'uy' || $trimmed === 'oi' || $trimmed === 'tes' || $trimmed === 'hi' || $trimmed === 'hay') {
+            $isGreeting = true;
+        }
+
+        if (!$isGreeting) {
+            foreach ($greetings as $greet) {
+                if (str_contains($input, $greet)) {
+                    $isGreeting = true;
+                    break;
+                }
             }
-        } elseif (str_contains($input, 'kurir') || str_contains($input, 'posisi')) {
-            $courier = ($reservation ? $reservation->courier : ($order ? $order->courier : null));
-            if ($courier) {
-                $reply = 'Kurir Anda ('.$courier->name.') sedang dalam perjalanan. Anda bisa memantau posisinya di peta tracking.';
-            } else {
-                $reply = 'Kurir belum ditugaskan untuk pesanan Anda. Kami akan segera mengabari jika sudah ada update.';
+        }
+
+        if ($isGreeting) {
+            $replies = [
+                "Halo! Selamat datang di Ocean's Resto. 🌊 Saya Concierge Anda. Ada yang bisa saya bantu hari ini?",
+                "Hi! Senang sekali bisa menyapa Anda. 😊 Ada yang ingin ditanyakan seputar menu atau reservasi?",
+                "Halo! Ocean's Concierge di sini. 👋 Bagaimana kabar Anda? Ada yang bisa saya bantu?",
+            ];
+            $reply = $replies[array_rand($replies)];
+        }
+
+        if (!$reply) {
+            // Opening Hours
+            if (str_contains($input, 'jam') || str_contains($input, 'buka') || str_contains($input, 'tutup') || str_contains($input, 'kapan')) {
+                $reply = 'Kami siap melayani Anda setiap hari! 🕒 Senin-Jumat: 10:00 - 22:00, dan Sabtu-Minggu: 09:00 - 23:00. Jangan lupa reservasi ya agar tidak kehabisan meja!';
+            }
+            // Location
+            elseif (str_contains($input, 'lokasi') || str_contains($input, 'alamat') || str_contains($input, 'dimana') || str_contains($input, 'mana')) {
+                $reply = 'Ocean\'s Resto berada di lokasi yang sangat strategis dengan pemandangan laut, tepatnya di Jl. Samudra Biru No. 42. Kami tunggu kedatangannya ya! 📍';
+            }
+            // Recommendations
+            elseif (str_contains($input, 'rekomendasi') || str_contains($input, 'menu') || str_contains($input, 'enak') || str_contains($input, 'makan')) {
+                $reply = 'Wah, banyak sekali pilihan lezat! 🍽️ Rekomendasi chef hari ini adalah Grilled Lobster with Lemon Butter atau Wagyu Steak Special kami yang super empuk. Ingin melihat menu lengkap? Cek saja di aplikasi!';
+            }
+            // Ordering
+            elseif (str_contains($input, 'pesan') || str_contains($input, 'order') || str_contains($input, 'beli')) {
+                $reply = "Ingin memesan hidangan laut lezat kami? 🍽️\n\n✅ Silakan kunjungi <a href='/catalog' class='text-sky-400 underline font-semibold'>Katalog Menu</a> untuk memesan secara online (Take-away/Delivery).\n✅ Atau kunjungi <a href='/reservations/create' class='text-sky-400 underline font-semibold'>Reservasi Meja</a> jika Anda ingin makan di tempat dengan fasilitas pre-order makanan! ✨";
+            }
+            // Payment
+            elseif (str_contains($input, 'bayar') || str_contains($input, 'pembayaran') || str_contains($input, 'metode') || str_contains($input, 'qris')) {
+                $reply = 'Pembayaran sangat mudah di sini! 💳 Kami menerima Tunai, Kartu Kredit/Debit, dan E-Wallet seperti QRIS, Dana, atau OVO. Semuanya aman dan cepat.';
+            }
+            // Facilities
+            elseif (str_contains($input, 'wifi') || str_contains($input, 'internet') || str_contains($input, 'fasilitas') || str_contains($input, 'parkir')) {
+                $reply = 'Tentu saja! Kami punya WiFi gratis yang kencang (Password: OceansVibe), area parkir luas, ruang VIP, dan musholla yang nyaman. 🌊✨';
+            }
+            // Status
+            elseif (str_contains($input, 'status') || str_contains($input, 'cek')) {
+                if ($reservation) {
+                    $status = strtoupper($reservation->status);
+                    $reply = "Tentu, saya cek sebentar... 🔍 Status reservasi Anda saat ini adalah: $status. Kami sedang menyiapkan segala sesuatunya untuk Anda!";
+                } elseif ($order) {
+                    $status = strtoupper($order->order_status);
+                    $reply = "Pesanan Anda sedang dalam pantauan kami! 🔍 Status saat ini: $status. Mohon ditunggu sebentar ya.";
+                }
+            }
+            // Delivery
+            elseif (str_contains($input, 'kurir') || str_contains($input, 'posisi') || str_contains($input, 'antar') || str_contains($input, 'kirim')) {
+                $courier = ($reservation ? $reservation->courier : ($order ? $order->courier : null));
+                if ($courier) {
+                    $reply = "Kurir kami, {$courier->name}, sedang meluncur ke tempat Anda! 🛵 Anda bisa memantau posisinya secara real-time di peta tracking.";
+                } else {
+                    $reply = 'Mohon maaf, kurir belum ditugaskan. Tim kami sedang memproses pesanan Anda di dapur. Tenang saja, kualitas tetap jadi prioritas kami! ✨';
+                }
+            }
+            // Closers / Gratitude
+            elseif (str_contains($input, 'makasih') || str_contains($input, 'terima kasih') || str_contains($input, 'thanks') || str_contains($input, 'ok') || str_contains($input, 'oke')) {
+                $replies = [
+                    'Sama-sama! Senang bisa membantu. Sampai jumpa di Ocean\'s Resto! 😊',
+                    'Kembali kasih! Jangan sungkan untuk bertanya lagi ya. Have a great day!',
+                    'Siap! Jika ada hal lain yang dibutuhkan, Ocean\'s Concierge selalu siap membantu. ✨',
+                ];
+                $reply = $replies[array_rand($replies)];
+            }
+            // Goodbye
+            elseif (str_contains($input, 'bye') || str_contains($input, 'dah') || str_contains($input, 'sampai jumpa')) {
+                $reply = 'Sampai jumpa! Kami tidak sabar melayani Anda di Ocean\'s Resto. Selamat beraktivitas! 👋🌊';
+            }
+            // Fallback
+            else {
+                $reply = 'Hmm, saya masih belajar nih... 😅 Tapi saya bisa bantu Anda soal: Jam buka, Lokasi, Rekomendasi Menu, atau cek Status Pesanan Anda. Ada yang ingin ditanyakan dari itu?';
             }
         }
 
@@ -346,6 +423,7 @@ class ChatController extends Controller
                     'sender_id' => $botSender->id,
                     'content' => $reply,
                     'is_chatbot' => true,
+                    'chat_type' => $chatType,
                 ]);
 
                 broadcast(new MessageSent($botMessage->load(['sender:id,name,role', 'reservation', 'order'])));

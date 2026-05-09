@@ -1,5 +1,5 @@
 import { Head, router, usePage, useHttp, Link } from '@inertiajs/react';
-import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck, CheckCircle2, DollarSign, Trash2 } from 'lucide-react';
+import { Calendar, Clock, Users, Check, X, Filter, MessageCircle, Map as MapIcon, List, Save, Info, Truck, CheckCircle2, DollarSign, Trash2, Search, QrCode } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +21,11 @@ import {
 } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import RestoAdminLayout from '@/layouts/resto-admin-layout';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import BoutiqueChat from '@/components/app/boutique-chat';
-import { useEffect } from 'react';
+import QRScanner from '@/components/app/qr-scanner';
 import { Bell, Sparkles, Receipt, Droplets } from 'lucide-react';
 import { useTranslations } from '@/hooks/use-translations';
 import tablesHelper from '@/routes/tables';
@@ -96,8 +96,44 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
     const [activeRequests, setActiveRequests] = useState<ServiceRequest[]>(serviceRequests);
     const [rejectionId, setRejectionId] = useState<number | null>(null);
     const [rejectionReason, setRejectionReason] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [dateFilter, setDateFilter] = useState('all'); // all, today, tomorrow, upcoming
+    const [isScannerOpen, setIsScannerOpen] = useState(false);
     const { auth } = usePage().props as any;
     const http = useHttp();
+
+    const filteredReservations = useMemo(() => {
+        return reservations.filter(r => {
+            const matchesSearch = r.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                 r.customer_phone?.includes(searchTerm) ||
+                                 r.id.toString().includes(searchTerm);
+            
+            const matchesStatus = statusFilter === 'all' || 
+                                 (statusFilter === 'ready' ? r.menus?.some((m: any) => m.pivot?.status === 'ready') : r.status === statusFilter);
+            
+            let matchesDate = true;
+            const today = new Date().toISOString().split('T')[0];
+            const tomorrowDate = new Date();
+            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+            const tomorrow = tomorrowDate.toISOString().split('T')[0];
+
+            if (dateFilter === 'today') {
+                matchesDate = r.date === today;
+            } else if (dateFilter === 'upcoming') {
+                matchesDate = r.date > today;
+            } else if (dateFilter === 'past') {
+                matchesDate = r.date < today;
+            }
+
+            return matchesSearch && matchesStatus && matchesDate;
+        }).sort((a, b) => {
+            // Sort by date and time
+            const dateA = new Date(`${a.date} ${a.time}`);
+            const dateB = new Date(`${b.date} ${b.time}`);
+            return dateA.getTime() - dateB.getTime();
+        });
+    }, [reservations, searchTerm, statusFilter, dateFilter]);
 
     const updateStatus = (id: number, status: string, paymentStatus: string | null = null, extraData: any = {}) => {
         const data: any = { status, ...extraData };
@@ -260,12 +296,80 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                             {__('Kelola pemesanan masuk dan atur tata letak meja restoran secara visual.')}
                         </p>
                     </div>
+
+                    <Button 
+                        onClick={() => setIsScannerOpen(true)}
+                        className="h-14 px-8 rounded-2xl bg-sky-500 hover:bg-white text-black font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-sky-500/20 transition-all hover:scale-105 active:scale-95 group w-full sm:w-auto"
+                    >
+                        <QrCode className="mr-3 group-hover:rotate-12 transition-transform" size={18} /> {__('Scan Check-in')}
+                    </Button>
+                </div>
+
+                {/* Filters Section */}
+                <div className="mb-8 grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div className="md:col-span-4 relative group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-sky-500 transition-colors" size={18} />
+                        <input 
+                            type="text"
+                            placeholder={__('Cari nama, telepon, atau ID...')}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full h-14 pl-12 pr-6 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/5 text-sm font-medium focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all outline-none"
+                        />
+                    </div>
+
+                    <div className="md:col-span-8 flex flex-wrap gap-2 items-center">
+                        <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5 overflow-x-auto hide-scrollbar">
+                            {[
+                                { id: 'all', label: __('Semua') },
+                                { id: 'pending', label: __('Verifikasi') },
+                                { id: 'confirmed', label: __('Dikonfirmasi') },
+                                { id: 'ready', label: __('Siap Saji') },
+                                { id: 'awaiting_payment', label: __('Menunggu Bayar') },
+                                { id: 'completed', label: __('Selesai') },
+                                { id: 'rejected', label: __('Ditolak') }
+                            ].map((f) => (
+                                <button
+                                    key={f.id}
+                                    onClick={() => setStatusFilter(f.id)}
+                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all whitespace-nowrap ${
+                                        statusFilter === f.id 
+                                            ? 'bg-white dark:bg-sky-500 text-sky-600 dark:text-black shadow-sm' 
+                                            : 'text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/50'
+                                    }`}
+                                >
+                                    {f.label}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
+                            {[
+                                { id: 'all', label: __('Semua') },
+                                { id: 'today', label: __('Hari Ini') },
+                                { id: 'upcoming', label: __('Mendatang') },
+                                { id: 'past', label: __('Sudah Lewat') }
+                            ].map((d) => (
+                                <button
+                                    key={d.id}
+                                    onClick={() => setDateFilter(d.id)}
+                                    className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${
+                                        dateFilter === d.id 
+                                            ? 'bg-white dark:bg-blue-500 text-blue-600 dark:text-white shadow-sm' 
+                                            : 'text-slate-400 dark:text-white/30 hover:text-slate-600 dark:hover:text-white/50'
+                                    }`}
+                                >
+                                    {d.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="w-full">
                     {/* List Section */}
                     <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-white/[0.02] backdrop-blur-md shadow-xl dark:shadow-2xl transition-all">
-                        {reservations.length > 0 ? (
+                        {filteredReservations.length > 0 ? (
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader className="border-b border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-white/5">
@@ -281,7 +385,7 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {reservations.map((reservation) => (
+                                        {filteredReservations.map((reservation) => (
                                             <TableRow key={reservation.id} className="hover:bg-slate-50 dark:hover:bg-white/5 border-slate-100 dark:border-white/5 transition-colors group">
                                                 <TableCell>
                                                     <div className="flex items-center gap-4">
@@ -685,6 +789,8 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                         </div>
                     </DialogContent>
                 </Dialog>
+
+                <QRScanner open={isScannerOpen} onOpenChange={setIsScannerOpen} />
             </div>
         </>
     );
