@@ -82,7 +82,7 @@ export default function ReservationHistory({ auth, reservations }: any) {
             'confirmed': { label: __('Dikonfirmasi'), color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', icon: CheckCircle2 },
             'completed': { label: __('Selesai'), color: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20', icon: CheckCircle2 },
             'awaiting_payment': { label: __('Menunggu Bayar'), color: 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.1)]', icon: Clock3 },
-            'rejected': { label: __('Dibatalkan'), color: 'bg-rose-500/10 text-rose-500 border-rose-500/20', icon: XCircle },
+            'rejected': { label: __('Ditolak'), color: 'bg-rose-500/10 text-rose-500 border-rose-500/20', icon: XCircle },
             'pending': { label: __('Verifikasi'), color: 'bg-sky-500/10 text-sky-400 border-sky-500/20', icon: Clock3 }
         };
         const config = variants[status] || variants.pending;
@@ -180,7 +180,7 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                     <option value="confirmed" className="bg-white dark:bg-slate-900">{__('Confirmed')}</option>
                                     <option value="awaiting_payment" className="bg-white dark:bg-slate-900">{__('Awaiting Payment')}</option>
                                     <option value="completed" className="bg-white dark:bg-slate-900">{__('Completed')}</option>
-                                    <option value="rejected" className="bg-white dark:bg-slate-900">{__('Cancelled')}</option>
+                                    <option value="rejected" className="bg-white dark:bg-slate-900">{__('Rejected')}</option>
                                 </select>
                             </div>
 
@@ -277,10 +277,10 @@ export default function ReservationHistory({ auth, reservations }: any) {
                                                     </div>
                                                 )}
 
-                                                {r.status === 'rejected' && r.rejection_reason && (
+                                                {r.status === 'rejected' && (
                                                     <div className="rounded-2xl bg-rose-500/5 border border-rose-500/10 p-4">
                                                         <p className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">{__('Alasan Penolakan')}</p>
-                                                        <p className="text-sm font-medium text-slate-600 dark:text-rose-400/80 italic">"{r.rejection_reason}"</p>
+                                                        <p className="text-sm font-medium text-slate-600 dark:text-rose-400/80 italic">"{r.rejection_reason || __('Tidak ada alasan spesifik yang diberikan.')}"</p>
                                                     </div>
                                                 )}
                                             </div>

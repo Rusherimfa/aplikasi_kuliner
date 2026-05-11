@@ -43,6 +43,7 @@ class ReservationController extends Controller
                     'time' => $reservation->time,
                     'guest_count' => $reservation->guest_count,
                     'status' => $reservation->status,
+                    'rejection_reason' => $reservation->rejection_reason,
                     'payment_status' => $reservation->payment_status,
                     'booking_fee' => $reservation->booking_fee,
                     'total_after_discount' => $reservation->total_after_discount,

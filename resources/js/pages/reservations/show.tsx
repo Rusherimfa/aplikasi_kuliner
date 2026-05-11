@@ -32,7 +32,8 @@ import {
     Bell,
     Camera,
     Image as ImageIcon,
-    X
+    X,
+    Info
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';

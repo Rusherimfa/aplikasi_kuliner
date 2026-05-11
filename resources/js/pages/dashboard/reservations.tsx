@@ -39,6 +39,7 @@ interface Reservation {
     time: string;
     guest_count: number;
     status: 'pending' | 'confirmed' | 'rejected' | 'completed' | 'awaiting_payment' | 'cancelled';
+    rejection_reason?: string | null;
     payment_status?: string;
     booking_fee?: string | number;
     total_after_discount?: string | number;
@@ -749,6 +750,12 @@ export default function ReservationsDashboard({ reservations, tables, couriers, 
                                             </Badge>
                                         )}
                                     </div>
+                                    {selectedReservation.status === 'rejected' && selectedReservation.rejection_reason && (
+                                        <div className="bg-rose-500/10 rounded-2xl border border-rose-500/20 p-4 mt-4">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-rose-500 mb-1">{__('Alasan Penolakan')}</p>
+                                            <p className="text-sm font-medium text-slate-700 dark:text-rose-400/90 italic">"{selectedReservation.rejection_reason}"</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}
